@@ -1,0 +1,14 @@
+{
+  "name": "zeelin-academy-dashboard",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Zeelin Academy exam-readiness dashboard (static demo)",
+  "scripts": {
+    "start": "node server.js",
+    "smoke": "node test/smoke.js",
+    "test": "node test/smoke.js && node test/claim.js"
+  },
+  "devDependencies": {
+    "jsdom": "^24.1.3"
+  }
+}

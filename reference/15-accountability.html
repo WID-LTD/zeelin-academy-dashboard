@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Mockup 15 — Accountability</title>
+<style>
+body{margin:0;background:#121212;color:#f5f5f5;font-family:'Inter','Segoe UI',system-ui,sans-serif;font-size:14.5px}
+.wrap{max-width:1150px;margin:0 auto;padding:24px 22px 60px}
+.topbar{display:flex;align-items:center;gap:14px;margin-bottom:16px}
+.bar{flex:1;height:8px;border-radius:999px;background:linear-gradient(90deg,#d97706,#16a34a);overflow:hidden}
+.bar i{display:block;height:100%;background:rgba(0,0,0,.3)}
+.n{color:#a3a3a3;font-size:12.5px;font-weight:600}
+.layout{display:grid;grid-template-columns:1fr 340px;gap:18px;align-items:start}
+.card{background:#181818;border:1px solid #2a2a2a;border-radius:12px;padding:18px}
+.phead{display:flex;align-items:center;justify-content:space-between;font-weight:700;font-size:15px;margin-bottom:14px}
+.pie{display:flex;gap:20px;align-items:center}
+.ring{width:180px;height:180px;border-radius:50%;background:conic-gradient(#d97706 0 200deg,#16a34a 200deg 290deg,#2563eb 290deg 340deg,#475569 340deg 360deg);position:relative;flex-shrink:0}
+.ring .in{position:absolute;inset:30px;background:#181818;border-radius:50%;display:flex;flex-direction:column;align-items:center;justify-content:center}
+.ring .in b{font-size:24px}
+.ring .in span{font-size:11px;color:#737373}
+.leg{display:flex;flex-direction:column;gap:8px}
+.lr{display:flex;align-items:center;gap:8px;font-size:12.5px;color:#a3a3a3}
+.sw{width:12px;height:12px;border-radius:3px}
+.chart{display:flex;align-items:flex-end;gap:10px;height:180px;padding:0 4px;margin-top:10px}
+.col{flex:1;display:flex;flex-direction:column;align-items:center;gap:6px;height:100%;justify-content:flex-end}
+.cb{width:100%;max-width:40px;border-radius:5px 5px 2px 2px;min-height:4px}
+.clb{font-size:10.5px;color:#737373}
+.cv{font-size:10px;color:#737373}
+.mets{display:flex;flex-direction:column;gap:12px}
+.met{border-radius:12px;padding:14px 16px;background:#0d0d0d;border:1px solid #2a2a2a}
+.ml{font-size:11px;color:#737373;text-transform:uppercase;letter-spacing:.5px}
+.mv{font-size:24px;font-weight:800;margin-top:4px}
+.mb{height:6px;border-radius:999px;background:#262626;overflow:hidden;margin-top:8px}
+.mb i{display:block;height:100%}
+.sbtn{display:inline-flex;align-items:center;gap:8px;background:linear-gradient(90deg,#16a34a,#15803d);color:#fff;border:none;border-radius:10px;padding:12px 20px;font-weight:800;font-size:13.5px;cursor:pointer;margin-top:16px;width:100%;justify-content:center}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="topbar">
+    <span class="n">Exam Ready Soon</span>
+    <div class="bar"><i style="width:78%"></i></div>
+    <span class="n">78%</span>
+  </div>
+  <div class="layout">
+    <div class="card">
+      <div class="phead"><span>Weekly Completion Breakdown</span></div>
+      <div class="pie">
+        <div class="ring"><div class="in"><b>78%</b><span>Completed</span></div></div>
+        <div class="leg">
+          <div class="lr"><span class="sw" style="background:#d97706"></span>Reading — 55%</div>
+          <div class="lr"><span class="sw" style="background:#16a34a"></span>Videos — 25%</div>
+          <div class="lr"><span class="sw" style="background:#2563eb"></span>Quizzes — 14%</div>
+          <div class="lr"><span class="sw" style="background:#475569"></span>Locked — 6%</div>
+        </div>
+      </div>
+      <div class="phead" style="margin-top:16px"><span>Study Hours — This Week</span></div>
+      <div class="chart">
+        <div class="col"><div class="cb" style="height:60%;background:#d97706"></div><div class="cv">3.5h</div><div class="clb">Mon</div></div>
+        <div class="col"><div class="cb" style="height:85%;background:#d97706"></div><div class="cv">5.0h</div><div class="clb">Tue</div></div>
+        <div class="col"><div class="cb" style="height:70%;background:#d97706"></div><div class="cv">4.0h</div><div class="clb">Wed</div></div>
+        <div class="col"><div class="cb" style="height:100%;background:#16a34a"></div><div class="cv">6.0h</div><div class="clb">Thu</div></div>
+        <div class="col"><div class="cb" style="height:75%;background:#d97706"></div><div class="cv">4.5h</div><div class="clb">Fri</div></div>
+        <div class="col"><div class="cb" style="height:35%;background:#475569"></div><div class="cv">2.0h</div><div class="clb">Sat</div></div>
+        <div class="col"><div class="cb" style="height:50%;background:#d97706"></div><div class="cv">3.0h</div><div class="clb">Sun</div></div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="phead"><span>Readiness Metrics</span></div>
+      <div class="mets">
+        <div class="met"><div class="ml">78% Complete</div><div class="mv" style="color:#4ade80">78%</div><div class="mb"><i style="width:78%;background:#16a34a"></i></div></div>
+        <div class="met"><div class="ml">Days Remaining</div><div class="mv" style="color:#f59e0b">4 Days</div><div class="mb"><i style="width:40%;background:#d97706"></i></div></div>
+        <div class="met"><div class="ml">Days to Certification</div><div class="mv" style="color:#34d399">12 Days</div><div class="mb"><i style="width:60%;background:#34d399"></i></div></div>
+        <div class="met"><div class="ml">Advanced Strength</div><div class="mv" style="color:#7dd3fc">88/100</div><div class="mb"><i style="width:88%;background:#2563eb"></i></div></div>
+      </div>
+      <button class="sbtn">Submit Accountability Report</button>
+    </div>
+  </div>
+</div>
+</body>
+</html>

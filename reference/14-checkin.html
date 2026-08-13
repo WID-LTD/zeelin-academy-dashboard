@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Mockup 14 — Personal Check-In</title>
+<style>
+body{margin:0;background:#121212;color:#f5f5f5;font-family:'Inter','Segoe UI',system-ui,sans-serif;font-size:14.5px}
+.wrap{max-width:1150px;margin:0 auto;padding:24px 22px 60px}
+.topbar{display:flex;align-items:center;gap:14px;margin-bottom:16px}
+.bar{flex:1;height:8px;border-radius:999px;background:linear-gradient(90deg,#f59e0b,#16a34a);overflow:hidden}
+.bar i{display:block;height:100%;background:rgba(0,0,0,.25)}
+.n{color:#a3a3a3;font-size:12.5px;font-weight:600}
+.claim{display:flex;align-items:center;gap:18px;border:2px solid #d97706;border-radius:16px;padding:18px 20px;background:#181818;box-shadow:0 8px 26px rgba(217,119,6,.2);margin-bottom:18px;flex-wrap:wrap}
+.xp{font-size:30px;font-weight:800;color:#f59e0b}
+.xp small{font-size:14px;color:#a3a3a3;font-weight:600}
+.btn{display:inline-flex;align-items:center;gap:8px;background:linear-gradient(90deg,#d97706,#f59e0b);color:#fff;border:none;border-radius:10px;padding:11px 20px;font-weight:800;font-size:13.5px;cursor:pointer}
+.layout{display:grid;grid-template-columns:1fr 320px;gap:18px;align-items:start}
+.form{background:#181818;border:1px solid #2a2a2a;border-radius:12px;padding:36px;max-width:780px}
+.lbl{font-weight:700;font-size:14px;margin:18px 0 10px}
+.crow{display:flex;gap:10px;flex-wrap:wrap}
+.c{display:inline-flex;align-items:center;gap:8px;background:#161616;border:1px solid #2a2a2a;border-radius:999px;padding:9px 14px;font-size:13px;color:#a3a3a3}
+.c.sel{background:#26170b;border-color:#d97706;color:#f59e0b}
+textarea{width:100%;box-sizing:border-box;background:#0d0d0d;border:1px solid #2a2a2a;border-radius:9px;color:#f5f5f5;padding:12px;font-family:inherit;font-size:13.5px;resize:vertical;height:90px}
+.sbtn{display:inline-flex;align-items:center;gap:8px;background:linear-gradient(90deg,#16a34a,#15803d);color:#fff;border:none;border-radius:10px;padding:12px 20px;font-weight:800;font-size:13.5px;cursor:pointer;margin-top:18px;width:100%;justify-content:center}
+.panel{background:#181818;border:1px solid #2a2a2a;border-radius:12px;padding:18px}
+.streak{display:flex;gap:6px;margin-top:12px}
+.st{width:26px;height:38px;border-radius:7px;background:#1d1d1d;border:1px solid #2a2a2a;display:flex;align-items:center;justify-content:center;font-size:12px;color:#737373}
+.st.on{background:#14532d;border-color:#16a34a;color:#4ade80}
+.st.tdy{background:#382818;border-color:#d97706;color:#f59e0b}
+.chk{display:flex;flex-direction:column;gap:8px;margin-top:12px}
+.ck{display:flex;align-items:flex-start;gap:10px;font-size:13px;color:#a3a3a3}
+.ck input{margin-top:3px;accent-color:#16a34a}
+.next{margin-top:14px;color:#a3a3a3;font-size:12.5px;text-align:center;cursor:pointer}
+.next b{color:#f59e0b}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="topbar">
+    <span class="n">Ready to Claim</span>
+    <div class="bar"><i style="width:100%"></i></div>
+    <span class="n">100%</span>
+  </div>
+  <div class="claim">
+    <span class="xp">+500 <small>XP</small></span>
+    <div style="flex:1">Claim today&apos;s daily bonus to keep the streak alive.</div>
+    <button class="btn"><svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor" style="vertical-align:-2px"><path d="M11 21h-1l1-7H7.5c-.58 0-.57-.32-.38-.66.19-.34.05-.08.07-.12C8.48 10.94 10.42 7.54 13 3h1l-1 7h3.5c.49 0 .56.33.47.51l-.07.15C12.96 17.55 11.75 20.12 11 21z"/></svg> Claim +500 XP</button>
+  </div>
+  <div class="layout">
+    <div class="form">
+      <div class="lbl">How is your energy today?</div>
+      <div class="crow"><span class="c"><svg viewBox="0 0 24 24" width="14" height="14" fill="currentColor" style="vertical-align:-2px"><path d="M13.5.67s.74 2.65.74 4.8c0 2.06-1.35 3.73-3.41 3.73-2.07 0-3.63-1.67-3.63-3.73l.03-.36C5.21 7.51 4 10.62 4 14c0 4.42 3.58 8 8 8s8-3.58 8-8C20 8.61 17.41 3.8 13.5.67z"/></svg> Energised</span><span class="c sel"><svg viewBox="0 0 24 24" width="14" height="14" fill="currentColor" style="vertical-align:-2px"><path d="M11 21h-1l1-7H7.5c-.58 0-.57-.32-.38-.66.19-.34.05-.08.07-.12C8.48 10.94 10.42 7.54 13 3h1l-1 7h3.5c.49 0 .56.33.47.51l-.07.15C12.96 17.55 11.75 20.12 11 21z"/></svg> Focused</span><span class="c"><svg viewBox="0 0 24 24" width="14" height="14" fill="currentColor" style="vertical-align:-2px"><path d="M20 3H4v10c0 2.21 1.79 4 4 4h6c2.21 0 4-1.79 4-4v-3h2c1.11 0 2-.89 2-2V5c0-1.11-.89-2-2-2zm0 5h-2V5h2v3zM4 19h16v2H4z"/></svg> Tired</span></div>
+      <div class="lbl">How productive was today&apos;s session?</div>
+      <div class="crow"><span class="c sel"><svg viewBox="0 0 24 24" width="14" height="14" fill="currentColor" style="vertical-align:-2px"><path d="M1 21h4V9H1v12zM23 10c0-1.1-.9-2-2-2h-6.31l.95-4.57.03-.32c0-.41-.17-.79-.44-1.06L14.17 1 7.59 7.59C7.22 7.95 7 8.45 7 9v10c0 1.1.9 2 2 2h9c.83 0 1.54-.5 1.84-1.22l3.02-7.05c.09-.23.14-.47.14-.73v-2z"/></svg> Productive</span><span class="c"><svg viewBox="0 0 24 24" width="14" height="14" fill="currentColor" style="vertical-align:-2px"><path d="M15 1H9v2h6V1zm-4 13h2V8h-2v6zm8.03-6.61l1.42-1.42c-.43-.51-.9-.99-1.41-1.41l-1.42 1.42C16.07 4.74 14.12 4 12 4c-4.97 0-9 4.03-9 9s4.02 9 9 9 9-4.03 9-9c0-2.12-.74-4.07-1.97-5.61zM12 20c-3.87 0-7-3.13-7-7s3.13-7 7-7 7 3.13 7 7-3.13 7-7 7z"/></svg> Rushed</span></div>
+      <div class="lbl">Today&apos;s intention</div>
+      <textarea placeholder="I will finish chapter 3 and its mock quiz today…"></textarea>
+      <button class="sbtn">Save &amp; Complete Check-In</button>
+    </div>
+    <div class="panel">
+      <div class="lbl" style="margin-top:0"><svg viewBox="0 0 24 24" width="14" height="14" fill="currentColor" style="vertical-align:-2px"><path d="M13.5.67s.74 2.65.74 4.8c0 2.06-1.35 3.73-3.41 3.73-2.07 0-3.63-1.67-3.63-3.73l.03-.36C5.21 7.51 4 10.62 4 14c0 4.42 3.58 8 8 8s8-3.58 8-8C20 8.61 17.41 3.8 13.5.67z"/></svg> 7-Day Study Streak</div>
+      <div class="streak">
+        <span class="st on">M</span><span class="st on">T</span><span class="st on">W</span><span class="st on">T</span><span class="st on">F</span><span class="st">S</span><span class="st tdy">S</span>
+      </div>
+      <div class="chk">
+        <div class="ck"><input type="checkbox" checked/><span>Day streak XP claimed</span></div>
+        <div class="ck"><input type="checkbox"/><span>Weekend double-XP ready</span></div>
+      </div>
+      <div class="next">Proceed to <b>Accountability →</b></div>
+    </div>
+  </div>
+</div>
+</body>
+</html>
