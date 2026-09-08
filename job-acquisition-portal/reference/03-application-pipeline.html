@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Job Acquisition Portal — Application Tracker &amp; Interview Pipeline</title>
+<style>
+body{margin:0;background:#121212;color:#e0e0e0;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;font-size:14px;height:100vh;overflow:hidden}
+.sb{width:280px;background:#181818;border-right:1px solid #2a2a2a;height:100vh;display:flex;flex-direction:column;overflow-y:auto;position:fixed;left:0;top:0}
+.sb-head{padding:20px 16px;border-bottom:1px solid #2a2a2a;display:flex;align-items:center;gap:10px}
+.sb-brand{width:28px;height:28px;background:#d97706;border-radius:6px;display:flex;align-items:center;justify-content:center;font-weight:bold;color:#fff;font-size:14px}
+.sb-title{font-size:14px;font-weight:600;color:#fff;line-height:1.2}
+.sb-nav{padding:12px 8px;display:flex;flex-direction:column;gap:4px;font-size:13px}
+.sb-nav a{display:flex;align-items:center;gap:10px;padding:10px 12px;color:#a3a3a3;border-radius:6px;text-decoration:none}
+.sb-nav a.active{background:#262626;color:#fff;font-weight:500}
+.sb-nav a.active svg{fill:#d97706}
+.sb-nav a svg{width:16px;height:16px;fill:currentColor}
+.slabel{padding:16px 12px 6px;font-size:11px;font-weight:600;color:#737373;letter-spacing:.5px;text-transform:uppercase}
+.tree-lbl{display:flex;align-items:center;gap:10px;padding:10px 12px;color:#fff;border-radius:6px;cursor:pointer;font-weight:500}
+.tree-lbl svg{width:16px;height:16px;fill:#d97706}
+.sub{padding-left:16px;display:flex;flex-direction:column;gap:2px}
+.sub a{display:flex;align-items:center;gap:8px;padding:6px 10px;color:#a3a3a3;border-radius:4px;text-decoration:none;font-size:12px}
+.sub a svg{width:12px;height:12px;fill:currentColor}
+.sub a.active{color:#fff;background:#262626;font-weight:500}
+.sub a.active svg{fill:#d97706}
+.main{margin-left:280px;display:flex;flex-direction:column;height:100vh;background:#121212;overflow:hidden}
+.topbar{background:#181818;border-bottom:1px solid #2a2a2a;padding:12px 24px;display:flex;align-items:center;justify-content:space-between;gap:20px;flex-shrink:0}
+.topbar-left{display:flex;align-items:center;gap:12px;flex:1}
+.topbar-title{font-size:13px;font-weight:600;color:#fff;white-space:nowrap}
+.topbar-bar{flex:1;max-width:500px;height:8px;background:#262626;border-radius:4px;overflow:hidden}
+.topbar-bar i{display:block;height:100%;background:linear-gradient(90deg,#d97706,#16a34a);border-radius:4px;width:65%}
+.topbar-right{display:flex;align-items:center;gap:12px;font-size:12px;color:#a3a3a3}
+.topbar-right b{color:#d97706;font-weight:700}
+.workspace{flex:1;display:flex;overflow:hidden}
+.canvas{flex:1;padding:32px 40px;overflow-y:auto;background:#121212}
+.canvas-inner{max-width:960px;margin:0 auto;display:flex;flex-direction:column;gap:24px}
+.panel{width:320px;background:#181818;border-left:1px solid #2a2a2a;display:flex;flex-direction:column;flex-shrink:0;overflow:hidden}
+.panel-body{padding:20px;overflow-y:auto;flex:1}
+.panel h3{font-size:15px;font-weight:700;color:#fff;margin:0 0 4px}
+.panel .sub{font-size:12px;color:#a3a3a3;margin:0 0 20px}
+.panel-foot{padding:20px;background:#161616;border-top:1px solid #2a2a2a}
+.pheader{background:#181818;border:1px solid #2a2a2a;border-radius:12px;padding:28px}
+.pheader .kicker{font-size:12px;font-weight:600;color:#d97706;text-transform:uppercase;letter-spacing:.5px}
+.pheader h1{font-size:24px;font-weight:700;color:#fff;margin:6px 0 8px}
+.pheader p{font-size:13px;color:#d4d4d4;margin:0}
+.kanban{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;align-items:start}
+.kanban-col{background:#181818;border:1px solid #2a2a2a;border-radius:12px;padding:16px}
+.kanban-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;border-bottom:1px solid #2a2a2a;padding-bottom:8px}
+.kanban-head span{font-size:13px;font-weight:700;color:#fff}
+.kanban-badge{font-size:11px;padding:2px 6px;border-radius:4px}
+.kanban-badge.new{background:#262626;color:#a3a3a3}
+.kanban-badge.active{background:#382818;color:#d97706}
+.kanban-badge.success{background:#14532d;color:#4ade80}
+.kanban-cards{display:flex;flex-direction:column;gap:12px}
+.kcard{background:#161616;border:1px solid #2a2a2a;border-radius:8px;padding:14px}
+.kcard.highlight{border-color:#d97706;background:#26170b}
+.kcard.offer{border-color:#14532d}
+.kcard .co{font-size:10px;font-weight:600;text-transform:uppercase;margin-bottom:4px}
+.kcard h4{font-size:14px;font-weight:700;color:#fff;margin:0 0 6px}
+.kcard .date{font-size:11px;color:#737373}
+.kcard .date.green{color:#34d399;font-weight:600}
+.stat-card{background:#161616;border:1px solid #2a2a2a;border-radius:8px;padding:14px}
+.stat-card .lbl{font-size:11px;color:#a3a3a3;display:block;margin-bottom:2px}
+.stat-card .val{font-size:18px;font-weight:700;color:#fff}
+.stat-card .val.amber{color:#d97706}
+.panel-note{border-top:1px solid #2a2a2a;padding-top:20px}
+.panel-note h4{font-size:13px;font-weight:700;color:#fff;margin:0 0 8px}
+.panel-note p{font-size:12px;color:#a3a3a3;line-height:1.5;margin:0}
+.btn-amber-lg{background:linear-gradient(135deg,#f59e0b,#d97706);color:#fff;border:none;padding:14px;border-radius:8px;font-size:14px;font-weight:700;cursor:pointer;width:100%;box-shadow:0 4px 12px rgba(217,119,6,.3)}
+</style>
+</head>
+<body>
+<div class="sb">
+  <div class="sb-head"><div class="sb-brand">J</div><span class="sb-title">Job Acquisition Portal</span></div>
+  <div class="sb-nav">
+    <a href="#"><svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-6h2v6zm0-8h-2V7h2v2z"/></svg><span>Portal Overview</span></a>
+    <div class="slabel">STAGE 3: CAREER GATE</div>
+    <div class="tree-lbl"><svg viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg><span>Career Placement</span></div>
+    <div class="sub">
+      <a href="#"><svg viewBox="0 0 24 24"><path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-2 10h-4v4h-2v-4H7v-2h4V7h2v4h4v2z"/></svg><span>Job Feed &amp; AI Matcher</span></a>
+      <a href="#"><svg viewBox="0 0 24 24"><path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-2 10h-4v4h-2v-4H7v-2h4V7h2v4h4v2z"/></svg><span>Company Intelligence</span></a>
+      <a class="active" href="#"><svg viewBox="0 0 24 24"><path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-2 10h-4v4h-2v-4H7v-2h4V7h2v4h4v2z"/></svg><span>Application Pipeline</span></a>
+    </div>
+  </div>
+</div>
+
+<div class="main">
+  <div class="topbar">
+    <div class="topbar-left">
+      <svg viewBox="0 0 24 24" fill="#d97706" width="18" height="18"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+      <span class="topbar-title">Application Tracker &amp; Interview Pipeline</span>
+      <div class="topbar-bar"><i></i></div>
+    </div>
+    <div class="topbar-right">
+      <span>Active Applications: 4</span>
+      <b>1 Interview Scheduled</b>
+    </div>
+  </div>
+
+  <div class="workspace">
+    <div class="canvas">
+      <div class="canvas-inner">
+        <div class="pheader">
+          <span class="kicker">Career Gate &bull; Stage 3 Pipeline</span>
+          <h1>Interview Pipeline Kanban Board</h1>
+          <p>Track your candidate status from initial application submission to final employment offer.</p>
+        </div>
+
+        <div class="kanban">
+          <div class="kanban-col">
+            <div class="kanban-head"><span>Applied (2)</span><span class="kanban-badge new">New</span></div>
+            <div class="kanban-cards">
+              <div class="kcard"><span class="co" style="color:#d97706">Apex Retail</span><h4>Senior Supply Chain BA</h4><span class="date">Applied 2 days ago</span></div>
+              <div class="kcard"><span class="co" style="color:#38bdf8">OmniGlobal</span><h4>Junior Enterprise Analyst</h4><span class="date">Applied 4 days ago</span></div>
+            </div>
+          </div>
+          <div class="kanban-col">
+            <div class="kanban-head"><span>Interviewing (1)</span><span class="kanban-badge active">Active</span></div>
+            <div class="kanban-cards">
+              <div class="kcard highlight"><span class="co" style="color:#f59e0b">Vanguard Tech</span><h4>Business Systems Analyst</h4><span class="date green">Interview: Aug 20, 2:00 PM</span></div>
+            </div>
+          </div>
+          <div class="kanban-col">
+            <div class="kanban-head"><span>Offer Received (1)</span><span class="kanban-badge success">Success</span></div>
+            <div class="kanban-cards">
+              <div class="kcard offer"><span class="co" style="color:#4ade80">Meridian Corp</span><h4>Operations Data Analyst</h4><span class="date green">Offer: £50,000 / yr</span></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="panel">
+      <div class="panel-body">
+        <div style="margin-bottom:20px"><h3>Pipeline Statistics</h3><div class="sub">Conversion &amp; Velocity</div></div>
+        <div style="display:flex;flex-direction:column;gap:12px;margin-bottom:28px">
+          <div class="stat-card"><span class="lbl">Interview Conversion Rate</span><span class="val">25%</span></div>
+          <div class="stat-card"><span class="lbl">Average Response Time</span><span class="val amber">3.2 Days</span></div>
+        </div>
+        <div class="panel-note">
+          <h4>Interview Preparation</h4>
+          <p>Review role-specific scenario questions based on your verified Stage 2 supply chain projects before your upcoming interview.</p>
+        </div>
+      </div>
+      <div class="panel-foot">
+        <button class="btn-amber-lg">View Interview Prep Center</button>
+      </div>
+    </div>
+  </div>
+</div>
+</body>
+</html>

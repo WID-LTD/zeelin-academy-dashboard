@@ -1,4 +1,15 @@
 node_modules/
 *.log
 .DS_Store
-job-scraper/
+# Enterprise auth - local only scraper/console - never push
+job-acquisition-portal/course-builder/
+job-acquisition-portal/course-builder/storage/
+job-acquisition-portal/course-builder/node_modules/
+# local caches & secrets
+storage/
+.aidesigner/*
+!.aidesigner/.gitkeep
+*.pid
+aidesigner-agent-skills-*.tgz
+# OS
+Thumbs.db

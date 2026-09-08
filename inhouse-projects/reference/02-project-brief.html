@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>In-House Project Portal — Project Brief</title>
+<style>
+body{margin:0;background:#121212;color:#e0e0e0;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;font-size:14px;overflow:hidden}
+.layout{display:flex;height:100vh}
+.sb{width:280px;background:#181818;border-right:1px solid #2a2a2a;display:flex;flex-direction:column;overflow-y:auto;flex-shrink:0}
+.sb-head{padding:20px 16px;border-bottom:1px solid #2a2a2a;display:flex;align-items:center;gap:10px}
+.sb-brand{width:28px;height:28px;background:#d97706;border-radius:6px;display:flex;align-items:center;justify-content:center;font-weight:bold;color:#fff;font-size:14px}
+.sb-title{font-size:14px;font-weight:600;color:#fff;line-height:1.2}
+.sb-nav{padding:12px 8px;display:flex;flex-direction:column;gap:4px;font-size:13px}
+.sb-nav a{display:flex;align-items:center;gap:10px;padding:10px 12px;color:#a3a3a3;border-radius:6px;text-decoration:none}
+.sb-nav a.active{background:#262626;color:#fff;font-weight:500}
+.sb-nav a.active svg{fill:#d97706}
+.sb-nav a svg{width:16px;height:16px;fill:currentColor}
+.slabel{padding:16px 12px 6px;font-size:11px;font-weight:600;color:#737373;letter-spacing:.5px}
+.tree-lbl{display:flex;align-items:center;gap:10px;padding:10px 12px;color:#fff;border-radius:6px;font-weight:500}
+.tree-lbl svg{width:16px;height:16px;fill:#d97706}
+.sub{padding-left:16px;display:flex;flex-direction:column;gap:2px}
+.sub a{display:flex;align-items:center;gap:8px;padding:6px 10px;color:#a3a3a3;border-radius:4px;text-decoration:none;font-size:12px}
+.sub a svg{width:12px;height:12px;fill:currentColor}
+.sub a.active{color:#fff;background:#262626;font-weight:500}
+.sub a.active svg{fill:#d97706}
+.main{flex:1;display:flex;flex-direction:column;overflow:hidden}
+.topbar{background:#181818;border-bottom:1px solid #2a2a2a;padding:12px 24px;display:flex;align-items:center;gap:12px;flex-shrink:0}
+.topbar-title{font-size:13px;font-weight:600;color:#fff;white-space:nowrap}
+.topbar-bar{flex:1;max-width:500px;height:8px;background:#262626;border-radius:4px;overflow:hidden}
+.topbar-bar i{display:block;height:100%;background:linear-gradient(90deg,#d97706,#16a34a);border-radius:4px}
+.topbar-right{display:flex;align-items:center;gap:12px;font-size:12px;color:#a3a3a3}
+.topbar-right b{color:#d97706}
+.workspace{flex:1;display:flex;overflow:hidden}
+.canvas{flex:1;padding:32px 40px;overflow-y:auto;background:#121212}
+.brief{max-width:780px;margin:0 auto;background:#181818;border:1px solid #2a2a2a;border-radius:12px;padding:40px}
+.brief-meta{display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid #2a2a2a;padding-bottom:16px;margin-bottom:20px}
+.brief-kicker{font-size:12px;font-weight:600;color:#d97706;text-transform:uppercase;letter-spacing:.5px}
+.brief-deadline{font-size:12px;color:#737373}
+.brief h1{font-size:26px;font-weight:700;color:#fff;margin:0 0 20px;line-height:1.3}
+.brief p{font-size:14px;color:#d4d4d4;line-height:1.8;margin:0 0 20px}
+.brief h2{font-size:18px;font-weight:600;color:#fff;margin:28px 0 12px}
+.brief ul{font-size:14px;color:#d4d4d4;line-height:1.8;padding-left:20px;margin:0 0 24px}
+.brief li{margin-bottom:8px}
+.brief li strong{color:#fff}
+.callout{background:#26170b;border-left:4px solid #d97706;padding:16px 20px;border-radius:0 8px 8px 0;margin:28px 0}
+.callout h4{font-size:14px;font-weight:600;color:#d97706;margin:0 0 6px}
+.callout p{font-size:13px;color:#d4d4d4;margin:0;line-height:1.6}
+.panel{width:320px;background:#181818;border-left:1px solid #2a2a2a;display:flex;flex-direction:column;justify-content:space-between;overflow-y:auto;flex-shrink:0}
+.panel-body{padding:20px}
+.panel h3{font-size:15px;font-weight:700;color:#fff;margin:0 0 4px}
+.panel .sub{font-size:12px;color:#a3a3a3;margin:0 0 20px}
+.checklist{display:flex;flex-direction:column;gap:10px;font-size:12px;color:#d4d4d4;margin-bottom:28px}
+.checklist label{display:flex;align-items:center;gap:8px;cursor:pointer}
+.checklist input{accent-color:#16a34a}
+.resources{border-top:1px solid #2a2a2a;padding-top:20px}
+.resources h4{font-size:13px;font-weight:700;color:#fff;margin:0 0 12px}
+.resources a{color:#d97706;text-decoration:none;display:flex;align-items:center;gap:6px;font-size:12px;margin-bottom:8px}
+.panel-foot{padding:20px;background:#161616;border-top:1px solid #2a2a2a}
+.btn-amber{width:100%;background:linear-gradient(135deg,#f59e0b,#d97706);color:#fff;border:none;padding:14px;border-radius:8px;font-size:14px;font-weight:700;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px}
+</style>
+</head>
+<body>
+<div class="layout">
+  <div class="sb">
+    <div class="sb-head"><div class="sb-brand">W</div><span class="sb-title">In-House Project Training Portal</span></div>
+    <div class="sb-nav">
+      <a href="#"><svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-6h2v6zm0-8h-2V7h2v2z"/></svg><span>Portal Overview</span></a>
+      <div class="slabel">STAGE 2: IN-HOUSE PROJECTS</div>
+      <div class="tree-lbl"><svg viewBox="0 0 24 24" width="16" height="16"><path d="M10 4H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V8c0-1.1-.9-2-2-2h-8l-2-2z"/></svg>Business Analysis Track</div>
+      <div class="sub">
+        <div style="padding:8px 10px;color:#e5e5e5;font-size:12px;display:flex;align-items:center;gap:8px"><svg viewBox="0 0 24 24" fill="#a3a3a3" width="12" height="12"><path d="M10 4H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V8c0-1.1-.9-2-2-2h-8l-2-2z"/></svg>Cohort 001 Projects</div>
+        <a href="#"><svg viewBox="0 0 24 24"><path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-2 10h-4v4h-2v-4H7v-2h4V7h2v4h4v2z"/></svg>Project Brief & Objectives</a>
+        <a href="#"><svg viewBox="0 0 24 24"><path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-2 10h-4v4h-2v-4H7v-2h4V7h2v4h4v2z"/></svg>Spreadsheet & Data Model</a>
+        <a href="#"><svg viewBox="0 0 24 24"><path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-2 10h-4v4h-2v-4H7v-2h4V7h2v4h4v2z"/></svg>Deliverables Submission</a>
+      </div>
+      <div class="slabel">STAGE 3: CAREER GATE</div>
+      <a href="#"><svg viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg><span>Job Acquisition Portal</span></a>
+    </div>
+  </div>
+  <div class="main">
+    <div class="topbar">
+      <svg viewBox="0 0 24 24" fill="#d97706" width="18" height="18"><path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-2 10h-4v4h-2v-4H7v-2h4V7h2v4h4v2z"/></svg>
+      <span class="topbar-title">Project Milestone: Brief & Objectives</span>
+      <div class="topbar-bar"><i style="width:25%"></i></div>
+      <div class="topbar-right"><span>Phase 1 of 4</span><b>25% Complete</b></div>
+    </div>
+    <div class="workspace">
+      <div class="canvas">
+        <div class="brief">
+          <div class="brief-meta"><span class="brief-kicker">In-House Training Project #01 &bull; Business Analysis Track</span><span class="brief-deadline">Deadline: August 25, 2026</span></div>
+          <h1>Retail Enterprise Inventory & Supply Chain Optimization</h1>
+          <p>Welcome to your Stage 2 In-House Project. This practical assignment simulates real-world business analysis consulting. You are tasked with analyzing a failing retail supply chain network, eliciting operational requirements from stakeholders, and modeling a comprehensive inventory management solution.</p>
+          <h2>Core Project Objectives</h2>
+          <ul>
+            <li><strong>Stakeholder Mapping:</strong> Identify key supply chain actors, warehouse managers, and retail vendors.</li>
+            <li><strong>Requirements Traceability:</strong> Document functional and non-functional requirements in the provided template.</li>
+            <li><strong>Data Modeling:</strong> Build inventory turnover and cost-benefit projections using spreadsheet tools.</li>
+          </ul>
+          <div class="callout"><h4>Professional Standard Note</h4><p>All deliverables will be evaluated by your assigned mentor. Completing this project successfully unlocks direct entry into the Job Acquisition Portal (Stage 3).</p></div>
+          <p>Review the checklist on the right, download your assigned workspace resources, and proceed to the interactive spreadsheet module once you have fully understood the project brief.</p>
+        </div>
+      </div>
+      <div class="panel">
+        <div class="panel-body">
+          <h3>Brief Milestones</h3>
+          <div class="sub">Phase 1 Action Items</div>
+          <div class="checklist">
+            <label><input type="checkbox" checked/> Read Project Overview & Scope</label>
+            <label><input type="checkbox" checked/> Review Business Objectives</label>
+            <label><input type="checkbox"/> Download Dataset & Templates</label>
+            <label><input type="checkbox"/> Initialize Spreadsheet Workspace</label>
+          </div>
+          <div class="resources">
+            <h4>Assigned Resources</h4>
+            <a href="#">Supply_Chain_Dataset.xlsx</a>
+            <a href="#">BA_Requirements_Template.docx</a>
+          </div>
+        </div>
+        <div class="panel-foot"><button class="btn-amber">Open Spreadsheet Workspace</button></div>
+      </div>
+    </div>
+  </div>
+</div>
+</body>
+</html>

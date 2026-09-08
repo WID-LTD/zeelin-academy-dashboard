@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Zeelin Academy - mandate Project</title>
+<link rel="stylesheet" href="./styles.css"/>
+</head>
+<body>
+<div class="app">
+  <nav class="sidebar" id="sidebar"></nav>
+  <main class="main" id="main-content"></main>
+</div>
+<script>
+try {
+  const k='zdash_project_v1';
+  let s=JSON.parse(localStorage.getItem(k)||'null');
+  if(!s) s={};
+  s.currentProject='mandate';
+  localStorage.setItem(k, JSON.stringify(s));
+} catch(e){}
+if(!location.hash || location.hash==='#' || location.hash==='#dashboard'){
+  location.hash='#p/mandate/home';
+}
+</script>
+<script src="./data.js"></script>
+<script src="./app.js"></script>
+</body>
+</html>

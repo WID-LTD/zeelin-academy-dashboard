@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>In-House Project Portal — Accountability</title>
+<style>
+body{margin:0;background:#121212;color:#e0e0e0;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;font-size:14px}
+.layout{display:flex;height:100vh}
+.sb{width:280px;background:#181818;border-right:1px solid #2a2a2a;display:flex;flex-direction:column;overflow-y:auto;flex-shrink:0}
+.sb-head{padding:20px 16px;border-bottom:1px solid #2a2a2a;display:flex;align-items:center;gap:10px}
+.sb-brand{width:28px;height:28px;background:#d97706;border-radius:6px;display:flex;align-items:center;justify-content:center;font-weight:bold;color:#fff;font-size:14px}
+.sb-title{font-size:14px;font-weight:600;color:#fff;line-height:1.2}
+.sb-nav{padding:12px 8px;display:flex;flex-direction:column;gap:4px;font-size:13px}
+.sb-nav a{display:flex;align-items:center;gap:10px;padding:10px 12px;color:#a3a3a3;border-radius:6px;text-decoration:none}
+.sb-nav a.active{background:#262626;color:#fff;font-weight:500}
+.sb-nav a.active svg{fill:#d97706}
+.sb-nav a svg{width:16px;height:16px;fill:currentColor}
+.slabel{padding:16px 12px 6px;font-size:11px;font-weight:600;color:#737373;letter-spacing:.5px}
+.main{flex:1;display:flex;flex-direction:column;overflow:hidden}
+.topbar{background:#181818;border-bottom:1px solid #2a2a2a;padding:12px 24px;display:flex;align-items:center;gap:12px;flex-shrink:0}
+.topbar-title{font-size:13px;font-weight:600;color:#fff}
+.content{flex:1;padding:32px 40px;overflow-y:auto;background:#121212}
+.acc-wrap{max-width:900px;margin:0 auto}
+.acc-hero{text-align:center;padding:40px 24px 24px}
+.acc-hero h1{font-size:26px;font-weight:700;color:#fff;margin:0 0 6px}
+.acc-hero p{font-size:13px;color:#a3a3a3;margin:0}
+.metrics{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-bottom:24px}
+.metric{background:#181818;border:1px solid #2a2a2a;border-radius:12px;padding:20px;text-align:center}
+.metric-val{font-size:28px;font-weight:700;color:#d97706;margin-bottom:4px}
+.metric-lbl{font-size:12px;color:#a3a3a3}
+.chart-row{display:grid;grid-template-columns:1fr 1fr;gap:20px;margin-bottom:24px}
+.chart-card{background:#181818;border:1px solid #2a2a2a;border-radius:12px;padding:24px}
+.chart-card h3{font-size:16px;font-weight:700;color:#fff;margin:0 0 16px}
+.pie-placeholder{width:160px;height:160px;border-radius:50%;margin:0 auto;background:conic-gradient(#d97706 0% 40%,#16a34a 40% 70%,#3b82f6 70% 85%,#262626 85% 100%);position:relative}
+.pie-center{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:80px;height:80px;background:#181818;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:18px;font-weight:700;color:#fff}
+.bar-chart{display:flex;flex-direction:column;gap:10px}
+.bar-row{display:flex;align-items:center;gap:12px;font-size:13px}
+.bar-label{width:100px;color:#a3a3a3;text-align:right}
+.bar-track{flex:1;height:20px;background:#262626;border-radius:4px;overflow:hidden}
+.bar-fill{height:100%;border-radius:4px}
+.bar-val{width:40px;color:#fff;font-weight:600;font-size:12px}
+</style>
+</head>
+<body>
+<div class="layout">
+  <div class="sb">
+    <div class="sb-head"><div class="sb-brand">W</div><span class="sb-title">In-House Project Training Portal</span></div>
+    <div class="sb-nav">
+      <a href="#"><svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-6h2v6zm0-8h-2V7h2v2z"/></svg><span>Portal Overview</span></a>
+      <div class="slabel">DAILY ROUTINE</div>
+      <a href="#"><svg viewBox="0 0 24 24"><path d="M11.99 2C6.47 2 2 6.48 2 12s4.47 10 9.99 10C17.52 22 22 17.52 22 12S17.52 2 11.99 2zM12 20c-4.42 0-8-3.58-8-8s3.58-8 8-8 8 3.58 8 8-3.58 8-8 8zm.5-13H11v6l5.25 3.15.75-1.23-4.5-2.67z"/></svg><span>Daily Check-In</span></a>
+      <a class="active" href="#"><svg viewBox="0 0 24 24"><path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zM9 17H7v-7h2v7zm4 0h-2V7h2v10zm4 0h-2v-4h2v4z"/></svg><span>Accountability</span></a>
+    </div>
+  </div>
+  <div class="main">
+    <div class="topbar"><svg viewBox="0 0 24 24" fill="#d97706" width="18" height="18"><path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zM9 17H7v-7h2v7zm4 0h-2V7h2v10zm4 0h-2v-4h2v4z"/></svg><span class="topbar-title">Accountability Dashboard</span></div>
+    <div class="content">
+      <div class="acc-wrap">
+        <div class="acc-hero"><h1>Accountability Dashboard</h1><p>Track your project consistency, peer engagement, and milestone progress.</p></div>
+        <div class="metrics">
+          <div class="metric"><div class="metric-val">12</div><div class="metric-lbl">Check-Ins This Week</div></div>
+          <div class="metric"><div class="metric-val">85%</div><div class="metric-lbl">Consistency Rate</div></div>
+          <div class="metric"><div class="metric-val">4</div><div class="metric-lbl">Peer Reviews Given</div></div>
+          <div class="metric"><div class="metric-val">92</div><div class="metric-lbl">Project Score</div></div>
+        </div>
+        <div class="chart-row">
+          <div class="chart-card"><h3>Time Distribution</h3><div class="pie-placeholder"><div class="pie-center">40%</div></div><div style="margin-top:16px;display:flex;gap:16px;justify-content:center;font-size:12px;color:#a3a3a3"><span style="color:#d97706">Spreadsheet 40%</span><span style="color:#16a34a">BRS Doc 30%</span><span style="color:#3b82f6">Collab 15%</span><span style="color:#737373">Other 15%</span></div></div>
+          <div class="chart-card"><h3>Milestone Progress</h3><div class="bar-chart"><div class="bar-row"><span class="bar-label">Brief</span><div class="bar-track"><div class="bar-fill" style="width:100%;background:#16a34a"></div></div><span class="bar-val">100%</span></div><div class="bar-row"><span class="bar-label">Deliverables</span><div class="bar-track"><div class="bar-fill" style="width:50%;background:#d97706"></div></div><span class="bar-val">50%</span></div><div class="bar-row"><span class="bar-label">Workspace</span><div class="bar-track"><div class="bar-fill" style="width:75%;background:#d97706"></div></div><span class="bar-val">75%</span></div><div class="bar-row"><span class="bar-label">Collaboration</span><div class="bar-track"><div class="bar-fill" style="width:80%;background:#16a34a"></div></div><span class="bar-val">80%</span></div></div></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+</body>
+</html>

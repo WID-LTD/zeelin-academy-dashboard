@@ -1,0 +1,5 @@
+{
+  "version": 1,
+  "include": ["/*"],
+  "exclude": ["/assets/*", "/inhouse-projects/assets/*", "/job-acquisition-portal/assets/*", "*.js", "*.css", "*.png", "*.jpg", "*.mp4", "*.svg", "*.webp"]
+}

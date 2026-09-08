@@ -1,0 +1,13 @@
+name = "zeelin-academy-dashboard"
+type = "javascript"
+compatibility_date = "2024-08-01"
+
+[site]
+bucket = "./"
+include = ["auth.html","portal.html","404.html","index.html","styles.css","auth-guard.js","data.js","app.js","lib/token.js","assets","inhouse-projects/assets","inhouse-projects/*.html","inhouse-projects/*.js","inhouse-projects/*.css","job-acquisition-portal/assets","job-acquisition-portal/*.html","job-acquisition-portal/*.js","job-acquisition-portal/*.css"]
+exclude = ["job-acquisition-portal/course-builder","node_modules",".git","reference","storage",".aidesigner","test"]
+
+[build]
+command = ""
+
+# Pages config fallback

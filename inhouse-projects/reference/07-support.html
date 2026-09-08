@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>In-House Project Portal — Support</title>
+<style>
+body{margin:0;background:#121212;color:#e0e0e0;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;font-size:14px}
+.layout{display:flex;height:100vh}
+.sb{width:280px;background:#181818;border-right:1px solid #2a2a2a;display:flex;flex-direction:column;overflow-y:auto;flex-shrink:0}
+.sb-head{padding:20px 16px;border-bottom:1px solid #2a2a2a;display:flex;align-items:center;gap:10px}
+.sb-brand{width:28px;height:28px;background:#d97706;border-radius:6px;display:flex;align-items:center;justify-content:center;font-weight:bold;color:#fff;font-size:14px}
+.sb-title{font-size:14px;font-weight:600;color:#fff;line-height:1.2}
+.sb-nav{padding:12px 8px;display:flex;flex-direction:column;gap:4px;font-size:13px}
+.sb-nav a{display:flex;align-items:center;gap:10px;padding:10px 12px;color:#a3a3a3;border-radius:6px;text-decoration:none}
+.sb-nav a.active{background:#262626;color:#fff;font-weight:500}
+.sb-nav a.active svg{fill:#d97706}
+.sb-nav a svg{width:16px;height:16px;fill:currentColor}
+.slabel{padding:16px 12px 6px;font-size:11px;font-weight:600;color:#737373;letter-spacing:.5px}
+.main{flex:1;display:flex;flex-direction:column;overflow:hidden}
+.topbar{background:#181818;border-bottom:1px solid #2a2a2a;padding:12px 24px;display:flex;align-items:center;gap:12px;flex-shrink:0}
+.topbar-title{font-size:13px;font-weight:600;color:#fff}
+.content{flex:1;padding:32px 40px;overflow-y:auto;background:#121212}
+.support-wrap{max-width:860px;margin:0 auto}
+.support-hero{text-align:center;padding:48px 24px 32px}
+.support-hero h1{font-size:28px;font-weight:700;color:#fff;margin:0 0 8px}
+.support-hero p{font-size:14px;color:#a3a3a3;margin:0}
+.cards3{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-bottom:32px}
+.scard{background:#181818;border:1px solid #2a2a2a;border-radius:12px;padding:24px;text-align:center}
+.scard svg{width:36px;height:36px;fill:#d97706;margin-bottom:12px}
+.scard h3{font-size:16px;font-weight:600;color:#fff;margin:0 0 6px}
+.scard p{font-size:12px;color:#a3a3a3;line-height:1.5;margin:0}
+.faq-wrap{background:#181818;border:1px solid #2a2a2a;border-radius:12px;padding:28px 24px}
+.faq-wrap h2{font-size:20px;font-weight:700;color:#fff;margin:0 0 20px;text-align:center}
+.faq-item{border-bottom:1px solid #2a2a2a;padding:16px 0}
+.faq-q{display:flex;justify-content:space-between;align-items:center;font-size:14px;font-weight:600;color:#fff;cursor:pointer}
+.faq-a{font-size:13px;color:#a3a3a3;line-height:1.6;margin:8px 0 0;display:none}
+.faq-item.open .faq-a{display:block}
+.panel{width:320px;background:#181818;border-left:1px solid #2a2a2a;display:flex;flex-direction:column;justify-content:space-between;overflow-y:auto;flex-shrink:0}
+.panel-body{padding:20px}
+.panel h3{font-size:15px;font-weight:700;color:#fff;margin:0 0 4px}
+.panel .sub{font-size:12px;color:#a3a3a3;margin:0 0 20px}
+.checklist{display:flex;flex-direction:column;gap:10px;font-size:12px;color:#d4d4d4}
+.checklist label{display:flex;align-items:center;gap:8px;cursor:pointer}
+.checklist input{accent-color:#16a34a}
+</style>
+</head>
+<body>
+<div class="layout">
+  <div class="sb">
+    <div class="sb-head"><div class="sb-brand">W</div><span class="sb-title">In-House Project Training Portal</span></div>
+    <div class="sb-nav">
+      <a href="#"><svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-6h2v6zm0-8h-2V7h2v2z"/></svg><span>Portal Overview</span></a>
+      <div class="slabel">SUPPORT</div>
+      <a class="active" href="#"><svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/></svg><span>Project Support Center</span></a>
+    </div>
+  </div>
+  <div class="main">
+    <div class="topbar"><svg viewBox="0 0 24 24" fill="#d97706" width="18" height="18"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-6h2v6zm0-8h-2V7h2v2z"/></svg><span class="topbar-title">In-House Project Support Center</span></div>
+    <div class="content">
+      <div class="support-wrap">
+        <div class="support-hero"><h1>Project Support Center</h1><p>Get assistance with your Stage 2 In-House Project. Our mentors and support team are here to help you succeed.</p></div>
+        <div class="cards3">
+          <div class="scard"><svg viewBox="0 0 24 24"><path d="M20 2H4c-1.1 0-1.99.9-1.99 2L2 22l4-4h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zm-2 12H6v-2h12v2zm0-3H6V9h12v2zm0-3H6V6h12v2z"/></svg><h3>Community Chat</h3><p>Ask questions and collaborate with your cohort peers and mentors.</p></div>
+          <div class="scard"><svg viewBox="0 0 24 24"><path d="M12 3v10.55c-.59-.34-1.27-.55-2-.55-2.21 0-4 1.79-4 4s1.79 4 4 4 4-1.79 4-4V7h4V3h-6z"/></svg><h3>Mentor Office Hours</h3><p>Schedule 1-on-1 sessions with your assigned project mentor.</p></div>
+          <div class="scard"><svg viewBox="0 0 24 24"><path d="M19.35 10.04C18.67 6.59 15.64 4 12 4 9.11 4 6.6 5.64 5.35 8.04 2.34 8.36 0 10.91 0 14c0 3.31 2.69 6 6 6h13c2.76 0 5-2.24 5-5 0-2.64-2.05-4.78-4.65-4.96z"/></svg><h3>Resource Hub</h3><p>Download templates, dataset files, and project submission guidelines.</p></div>
+        </div>
+        <div class="faq-wrap">
+          <h2>Frequently Asked Questions</h2>
+          <div class="faq-item open"><div class="faq-q">How do I submit my project deliverables? <span>+</span></div><div class="faq-a">Navigate to the Required Deliverables section in your project sidebar. You can drag and drop files or click the upload zone to submit artifacts.</div></div>
+          <div class="faq-item"><div class="faq-q">What happens if I fail the milestone quiz? <span>+</span></div><div class="faq-a">You get one additional attempt. Review your mentor feedback and project brief before retrying.</div></div>
+          <div class="faq-item"><div class="faq-q">Can I change my assigned mentor? <span>+</span></div><div class="faq-a">Contact the Support Team via Community Chat to request a mentor reassignment.</div></div>
+          <div class="faq-item"><div class="faq-q">How does the accountability tracking work? <span>+</span></div><div class="faq-a">Your progress, peer reviews, and mentor evaluations are tracked in real-time on your Accountability dashboard.</div></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+</body>
+</html>

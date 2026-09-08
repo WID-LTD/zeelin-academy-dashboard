@@ -1,0 +1,8 @@
+User-agent: *
+Disallow: /api/
+Disallow: /job-acquisition-portal/course-builder/
+Disallow: /storage/
+Disallow: /.aidesigner/
+Disallow: /auth.html
+Allow: /
+
