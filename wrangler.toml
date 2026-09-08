@@ -6,7 +6,7 @@ compatibility_flags = ["nodejs_compat"]
 [assets]
 directory = "./"
 not_found_handling = "404-page"
-exclude = ["job-acquisition-portal/course-builder/**", "node_modules/**", ".git/**", "storage/**", ".aidesigner/**", "*.log", "*.pid", "reference/**", "test/**"]
 
 # For Cloudflare Pages, leave Deploy command empty — Pages auto-deploys static via git.
 # For Workers, `npx wrangler deploy` or `npx wrangler versions upload` uses this Worker + assets.
+# Excludes are handled via .assetsignore (wrangler v4 does not support assets.exclude here)
