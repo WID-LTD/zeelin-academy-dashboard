@@ -6,7 +6,11 @@ compatibility_flags = ["nodejs_compat"]
 [assets]
 directory = "./"
 not_found_handling = "404-page"
+# Exclude scraper/console and build cruft from Workers assets (also .gitignore)
+# Use gitignore-style; course-builder must never be uploaded even though on disk
 
-# Run `npx wrangler deploy` — serves ./ as static assets + auth Worker
-# For Cloudflare Pages, do NOT set a deploy command; Pages auto-deploys static.
-# If using Pages, set Build command: npm install && npm run build (or empty) and leave Deploy empty.
+[assets.exclude]
+patterns = ["job-acquisition-portal/course-builder/**", "node_modules/**", ".git/**", "storage/**", ".aidesigner/**", "*.log", "*.pid", "reference/**", "test/**", "wrangler.toml"]
+
+# For Cloudflare Pages, leave Deploy command empty — Pages auto-deploys.
+# For Workers, `npx wrangler deploy` or `npx wrangler versions upload` will use this Worker.
