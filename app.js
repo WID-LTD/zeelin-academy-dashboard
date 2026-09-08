@@ -341,6 +341,7 @@ function renderTopbar() {
     <div class="tb-brand"><img class="tb-logo" src="${A}logo.png" alt="Zeelin logo"/><div><div class="tb-name">Zeelin Academy</div><div class="tb-sub">Exam Readiness Dashboard</div></div></div>
     <div class="crumb"><b>${crumb}</b></div>
     <div class="top-actions">
+      <a href="/portal.html" class="top-chip" style="text-decoration:none;border-color:#3a3a3a;background:#1e1e1e;color:#f59e0b" title="Switch Portal">${ic('layers', 14, 14)} Portals</a>
       <span class="top-chip top-xp">${ic('zap', 15, 15)} ${STATE.xp.toLocaleString()} XP</span>
       <span class="top-chip top-streak">${ic('fire', 15, 15)} ${STATE.streak}</span>
       <button class="top-icon" data-go="checkin" title="Check-In">${ic('user-check', 17, 17)}</button>

@@ -196,7 +196,7 @@ function topbarHtml(title, rightHtml, progressPct){
     + '<span style="font-size:14px;font-weight:800;color:#ffffff;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">'+esc(title)+'</span>'
     + '<div style="flex:1;max-width:450px;height:12px;background-color:#161616;border:2px solid #3a3a3a;border-radius:6px;overflow:hidden;display:flex;"><div style="width:'+pct+'%;height:100%;background:linear-gradient(90deg, #d97706 0%, #16a34a 100%);"></div></div>'
     + '</div>'
-    + '<div style="display:flex;align-items:center;gap:16px;font-size:13px;font-weight:700;color:#d4d4d4;flex-shrink:0;">'+(rightHtml||'')+'</div>'
+    + '<div style="display:flex;align-items:center;gap:16px;font-size:13px;font-weight:700;color:#d4d4d4;flex-shrink:0;"><a href="/portal.html" style="display:inline-flex;align-items:center;gap:6px;padding:6px 10px;border-radius:999px;background:#1e1e1e;border:1px solid #3a3a3a;color:#f59e0b;font-size:11px;font-weight:800;text-decoration:none">⟡ Portals</a>'+(rightHtml||'')+'</div>'
     + '</div>';
 }
 

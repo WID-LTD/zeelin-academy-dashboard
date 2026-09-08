@@ -359,7 +359,7 @@ function renderTopbar(title, pct, phaseInfo){
       <svg viewBox="0 0 24 24" fill="#d97706" width="18" height="18"><path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-2 10h-4v4h-2v-4H7v-2h4V7h2v4h4v2z"/></svg>
       <span class="topbar-title">${title}</span>
       <div class="topbar-bar"><i style="width:${pct}%"></i></div>
-      <div class="topbar-right">${phaseInfo||''}</div>
+      <div class="topbar-right"><a href="/portal.html" style="display:inline-flex;align-items:center;gap:6px;padding:6px 10px;border-radius:999px;background:#1e1e1e;border:1px solid #3a3a3a;color:#f59e0b;font-size:11px;font-weight:800;text-decoration:none;margin-right:8px">⟡ Portals</a>${phaseInfo||''}</div>
     </div>`;
 }
 
