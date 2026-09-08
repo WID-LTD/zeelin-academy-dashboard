@@ -17,3 +17,4 @@ test/
 test/**
 wrangler.toml
 .assetsignore
+worker.js
