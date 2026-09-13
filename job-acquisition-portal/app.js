@@ -331,7 +331,7 @@ function viewRegionalBoards(countryParam){
       function boardCard(b){
         const host = (()=>{try{return new URL(b.url).hostname.replace('www.','')}catch{return b.url}})();
         return '<div class="jb-bug-card" data-board="'+b.id+'" style="background:#181818;border:2px solid #2a2a2a;border-radius:14px;overflow:hidden;display:flex;flex-direction:column;">'
-        + '<div class="jb-og-img" data-url="'+esc(b.url)+'" style="height:160px;background:#0d0d0d url(\''+ (b.ogImage||country.hero) +'\') center/cover no-repeat;position:relative;border-bottom:1px solid #2a2a2a;"><div style="position:absolute;inset:0;background:linear-gradient(to top, rgba(0,0,0,.55), transparent);"></div><div style="position:absolute;bottom:10px;left:12px;background:rgba(0,0,0,.75);border:1px solid #3a3a3a;padding:4px 8px;border-radius:999px;font-size:10px;font-weight:800;color:#f59e0b;">'+esc(host)+'</div></div>'
+        + '<div class="jb-og-img" data-url="'+esc(b.url)+'" data-fallback="'+esc(b.boardImg||'')+'" style="height:160px;background:#0d0d0d url(\''+ (b.boardImg||b.ogImage||country.hero) +'\') center/cover no-repeat;position:relative;border-bottom:1px solid #2a2a2a;"><div style="position:absolute;inset:0;background:linear-gradient(to top, rgba(0,0,0,.55), transparent);"></div><div style="position:absolute;bottom:10px;left:12px;background:rgba(0,0,0,.75);border:1px solid #3a3a3a;padding:4px 8px;border-radius:999px;font-size:10px;font-weight:800;color:#f59e0b;">'+esc(host)+'</div></div>'
         + '<div style="padding:16px;flex:1;display:flex;flex-direction:column;">'
         + '<h3 style="font-size:14px;font-weight:800;color:#fff;margin-bottom:6px;">'+esc(b.name)+'</h3>'
         + '<p style="font-size:12px;color:#a3a3a3;line-height:1.5;flex:1;">'+esc(b.desc||'')+'</p>'
@@ -373,7 +373,7 @@ function viewRegionalBoards(countryParam){
   function countryCard(c){
     const bc = (typeof JOB_BOARDS!=='undefined'? JOB_BOARDS.filter(b=>b.countryId===c.id).length : 2);
     return '<a href="#regional-boards/'+c.id+'" style="text-decoration:none;background:#181818;border:2px solid #2a2a2a;border-radius:14px;overflow:hidden;display:flex;flex-direction:column;transition:border-color .15s;">'
-      + '<div style="height:140px;background:url(\''+c.hero+'\') center/cover no-repeat;position:relative;border-bottom:1px solid #2a2a2a;"><div style="position:absolute;top:10px;left:10px;background:rgba(0,0,0,.75);border:1px solid #3a3a3a;padding:4px 8px;border-radius:999px;font-size:11px;font-weight:800;color:#f59e0b;">'+esc(c.region)+'</div><div style="position:absolute;bottom:10px;left:10px;background:rgba(0,0,0,.7);padding:6px 10px;border-radius:10px;font-size:13px;font-weight:800;color:#fff;">'+esc(c.flag)+' '+esc(c.name)+'</div></div>'
+      + '<div style="height:140px;background:url(\''+c.hero+'\') center/cover no-repeat;position:relative;border-bottom:1px solid #2a2a2a;"><div style="position:absolute;top:10px;left:10px;background:rgba(0,0,0,.75);border:1px solid #3a3a3a;padding:4px 8px;border-radius:999px;font-size:11px;font-weight:800;color:#f59e0b;">'+esc(c.region)+'</div><div style="position:absolute;bottom:10px;left:10px;display:flex;align-items:center;gap:8px;background:rgba(0,0,0,.7);padding:6px 10px;border-radius:10px;"><img src="'+(c.flagImg||'')+'" alt="" style="width:22px;height:16px;object-fit:cover;border-radius:3px;border:1px solid rgba(255,255,255,.2);" onerror="this.style.display=\'none\'"/><span style="font-size:13px;font-weight:800;color:#fff;">'+esc(c.name)+'</span></div></div>'
       + '<div style="padding:16px;flex:1;display:flex;flex-direction:column;">'
       + '<div style="font-size:12px;color:#a3a3a3;flex:1;">'+bc+' verified job boards • Direct links</div>'
       + '<div style="margin-top:12px;display:flex;justify-content:space-between;align-items:center;"><span style="font-size:11px;font-weight:800;color:#f59e0b;">Open Boards →</span><span style="font-size:11px;color:#737373;">'+esc(c.region)+'</span></div>'
@@ -421,7 +421,7 @@ function bindRegionalBoards(){
   document.querySelectorAll('.jb-og-img[data-url]').forEach(el=>{
     const url=el.getAttribute('data-url'); if(!url) return;
     fetch('/api/og?url='+encodeURIComponent(url)).then(r=>r.json()).then(j=>{
-      if(j.image){ el.style.backgroundImage = 'url(\''+j.image.replace(/'/g,'%27')+'\')'; }
+      if(j.image){ el.style.backgroundImage = 'url(\''+j.image.replace(/'/g,'%27')+'\')'; } else { const fb=el.getAttribute('data-fallback'); if(fb) el.style.backgroundImage='url(\''+fb+'\')'; }
       if(j.title){ const t=el.parentElement && el.parentElement.querySelector('h3'); if(t && j.title!==new URL(url).hostname) { /* keep orig title */ } }
     }).catch(()=>{});
   });

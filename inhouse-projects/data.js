@@ -1,4 +1,4 @@
-/* Zeelin Academy Dashboard — mock data (demo only) */
+/* Zeelin Academy Dashboard - mock data (demo only) */
 
 const A = 'assets/';
 const S = A + 'stock/';
@@ -328,7 +328,7 @@ const CHAPTER_QUIZZES = {
 
 /* ---------- Videos ---------- */
 const VIDEOS = [
-  { id: 'v1', title: 'Welcome to Zeelin Academy — Exam Readiness', thumb: S + 'IMG-20260605-WA0031.jpg', dur: '02:45', watched: true, day: 1, takeaway: 'The exam tests your routine, not your sprint. Schedule a daily 20-minute slot.', chapter: 'Welcome' },
+  { id: 'v1', title: 'Welcome to Zeelin Academy - Exam Readiness', thumb: S + 'IMG-20260605-WA0031.jpg', dur: '02:45', watched: true, day: 1, takeaway: 'The exam tests your routine, not your sprint. Schedule a daily 20-minute slot.', chapter: 'Welcome' },
   { id: 'v2', title: 'The Role of the Business Analyst', thumb: S + 'IMG-20260605-WA0032.jpg', dur: '06:20', watched: true, day: 1, takeaway: 'Name the technique, then the outcome. Examiners reward a named, applied method.', chapter: 'The Role of the BA' },
   { id: 'v3', title: 'The BA Process Framework', thumb: S + 'IMG-20260605-WA0035.jpg', dur: '07:05', watched: false, day: 2, takeaway: 'Investigate → define requirements → evaluate options → recommend. Keep the steps traceable.', chapter: 'BA Process Framework' },
   { id: 'v4', title: 'Requirements Documentation & MoSCoW', thumb: S + 'IMG-20260605-WA0036.jpg', dur: '18:00', watched: false, day: 2, takeaway: 'MoSCoW = Must / Should / Could / Wont. It forces honest prioritisation under constraints.', chapter: 'Requirements & MoSCoW' },
@@ -341,7 +341,7 @@ const VIDEOS = [
   { id: 'v11', title: 'Anatomy of a Great Prompt', thumb: S + 'IMG-20260605-WA0031.jpg', dur: '08:30', watched: false, day: 5, takeaway: 'Role + task + format + constraints beats a vague question.', chapter: 'Prompt Anatomy' },
   { id: 'v12', title: 'Reasoning & Chain-of-Thought', thumb: S + 'IMG-20260605-WA0032.jpg', dur: '09:00', watched: false, day: 6, takeaway: 'Step-by-step reasoning lifts accuracy on logic and maths.', chapter: 'Chain-of-Thought' },
   { id: 'v13', title: 'Safety, Hallucination & Grounding', thumb: S + 'IMG-20260605-WA0035.jpg', dur: '08:00', watched: false, day: 6, takeaway: 'Ground in source text and ask for citations.', chapter: 'Safety & Limits' },
-  { id: 'v14', title: 'From Course to Career: Your Job Sprint', thumb: S + 'stack.jpg', dur: '12:00', watched: false, day: 7, takeaway: 'Craft your story, portfolio and pitch — then apply, apply, apply.', chapter: 'Career Launch' },
+  { id: 'v14', title: 'From Course to Career: Your Job Sprint', thumb: S + 'stack.jpg', dur: '12:00', watched: false, day: 7, takeaway: 'Craft your story, portfolio and pitch - then apply, apply, apply.', chapter: 'Career Launch' },
 ];
 const PLAYLIST = VIDEOS.map((v) => v.id);
 
@@ -450,7 +450,7 @@ const VIDEO_QUIZZES = {
 const DECKS = {
   foundation: {
     id: 'foundation',
-    title: 'Foundation — The BA Toolkit Deck',
+    title: 'Foundation - The BA Toolkit Deck',
     course: 'Business Analysis Foundation',
     slides: [
       { img: S + 'IMG-20260605-WA0031.jpg', title: 'The BA in one slide', sub: 'Your role, bridged', bullets: ['Bridge business needs & IT solutions', 'Name techniques, then outcomes', 'Every step stays traceable'] },
@@ -463,7 +463,7 @@ const DECKS = {
   },
   software: {
     id: 'software',
-    title: 'Software Engineering — Ship It Deck',
+    title: 'Software Engineering - Ship It Deck',
     course: 'Software Engineering',
     slides: [
       { img: S + 'IMG-20260605-WA0035.jpg', title: 'Engineering over guesswork', sub: 'Discipline wins', bullets: ['Process gives predictability', 'Quality is built in', 'Version control is law'] },
@@ -476,7 +476,7 @@ const DECKS = {
   },
   prompt: {
     id: 'prompt',
-    title: 'Prompt Engineering — Think Better Deck',
+    title: 'Prompt Engineering - Think Better Deck',
     course: 'Prompt Engineering',
     slides: [
       { img: S + 'IMG-20260605-WA0031.jpg', title: 'Models predict tokens', sub: 'Know the engine', bullets: ['LLMs predict the next token', 'They do not truly "know"', 'Context length is a constraint'] },
@@ -489,7 +489,7 @@ const DECKS = {
   },
   jobreadiness: {
     id: 'jobreadiness',
-    title: 'Career Sprint — Land the Job Deck',
+    title: 'Career Sprint - Land the Job Deck',
     course: 'Job Readiness Sprint',
     slides: [
       { img: S + 'IMG-20260605-WA0036.jpg', title: 'Your story', sub: 'One-liner that lands', bullets: ['Situation → action → result', 'Name your real skills', 'Own your trajectory'] },
@@ -582,10 +582,10 @@ const PREV_QA = {
 
 /* ---------- Star-rating branched feedback ---------- */
 const STAR_FB = {
-  1: { q: 'Tough day — what went wrong?', prompt: 'Tell us what blocked you so we can help.', opts: ['Too much content', 'Concepts unclear', 'Bad time', 'Technical issue'] },
-  2: { q: 'A bumpy session — where did it hurt?', prompt: 'Pick the biggest blocker and tell us more.', opts: ['Reading was heavy', 'Video too fast', 'Deck unclear', 'Quiz unfair'] },
-  3: { q: 'Decent session — what could improve it?', prompt: 'One small change would have made this great.', opts: ['Slow the pacing down', 'More examples', 'Clearer deck', 'More practice'] },
-  4: { q: 'Strong session — what almost made it perfect?', prompt: 'Share the small gap between good and great.', opts: ['A little more depth', 'A recap at the end', 'Longer quiz', 'More videos'] },
+  1: { q: 'Tough day - what went wrong?', prompt: 'Tell us what blocked you so we can help.', opts: ['Too much content', 'Concepts unclear', 'Bad time', 'Technical issue'] },
+  2: { q: 'A bumpy session - where did it hurt?', prompt: 'Pick the biggest blocker and tell us more.', opts: ['Reading was heavy', 'Video too fast', 'Deck unclear', 'Quiz unfair'] },
+  3: { q: 'Decent session - what could improve it?', prompt: 'One small change would have made this great.', opts: ['Slow the pacing down', 'More examples', 'Clearer deck', 'More practice'] },
+  4: { q: 'Strong session - what almost made it perfect?', prompt: 'Share the small gap between good and great.', opts: ['A little more depth', 'A recap at the end', 'Longer quiz', 'More videos'] },
   5: { q: 'Excellent! What made it click?', prompt: 'Tell us what worked so we keep doing it.', opts: ['Clear examples', 'Great deck', 'The quiz helped', 'Perfect pacing'] },
 };
 
@@ -599,11 +599,11 @@ const DAY_CARDS = {
       q: 'Understand the BA role and the process framework.',
     },
     cards: [
-      { k: 'checkin', icon: 'user-check', tile: 'green', title: 'Attendance & Personal Check-In', sub: 'Daily attendance — complete it to claim XP', pct: 100, cls: 'green', href: '/checkin', btn: 'Check In' },
+      { k: 'checkin', icon: 'user-check', tile: 'green', title: 'Attendance & Personal Check-In', sub: 'Daily attendance - complete it to claim XP', pct: 100, cls: 'green', href: '/checkin', btn: 'Check In' },
       { k: 'roadmap', icon: 'compass', tile: 'amber', title: 'Daily Structured Reading Roadmap', sub: '2 of 5 milestones cleared', pct: 40, cls: 'amber', href: '/roadmap', btn: 'Continue Roadmap' },
       { k: 'reading', icon: 'book', tile: 'green', title: 'Daily Reading Material', sub: 'Chapter 1 of 8 consumed', pct: 60, cls: 'green', href: '/book/foundation/0', btn: 'Open Book' },
       { k: 'video', img: S + 'IMG-20260605-WA0031.jpg', title: 'Video Tutorial', sub: 'Video 1 of 2 watched', pct: 50, cls: 'amber', href: '/videos', btn: 'Continue Video' },
-      { k: 'visual', icon: 'layers', tile: 'blue', title: 'Visual Summary — Pitch Deck', sub: 'The BA Toolkit deck, ready to flip through', pct: 40, cls: 'blue', href: '/visual/foundation', btn: 'View Deck' },
+      { k: 'visual', icon: 'layers', tile: 'blue', title: 'Visual Summary - Pitch Deck', sub: 'The BA Toolkit deck, ready to flip through', pct: 40, cls: 'blue', href: '/visual/foundation', btn: 'View Deck' },
     ],
     feedback: { title: 'Daily Feedback & Q&A', sub: 'Rate the day, answer the refresher and share anything we can improve.' },
   },
@@ -612,11 +612,11 @@ const DAY_CARDS = {
     intro: 'Turn investigation into testable requirements and honest prioritisation.',
     overall: 20,
     cards: [
-      { k: 'checkin', icon: 'user-check', tile: 'green', title: 'Attendance & Personal Check-In', sub: 'Daily attendance — complete it to claim XP', pct: 60, cls: 'green', href: '/checkin', btn: 'Check In' },
+      { k: 'checkin', icon: 'user-check', tile: 'green', title: 'Attendance & Personal Check-In', sub: 'Daily attendance - complete it to claim XP', pct: 60, cls: 'green', href: '/checkin', btn: 'Check In' },
       { k: 'roadmap', icon: 'compass', tile: 'amber', title: 'Daily Structured Reading Roadmap', sub: '3 of 5 milestones cleared', pct: 60, cls: 'amber', href: '/roadmap', btn: 'Continue Roadmap' },
       { k: 'reading', icon: 'book', tile: 'green', title: 'Daily Reading Material', sub: 'Chapter 5 of 8 consumed', pct: 40, cls: 'green', href: '/book/foundation/4', btn: 'Open Book' },
       { k: 'video', img: S + 'IMG-20260605-WA0036.jpg', title: 'Video Tutorial', sub: '3 of 3 videos watched', pct: 80, cls: 'green', href: '/videos', btn: 'Replay Video' },
-      { k: 'visual', icon: 'layers', tile: 'blue', title: 'Visual Summary — Pitch Deck', sub: 'Requirements & stakeholders deck', pct: 20, cls: 'blue', href: '/visual/foundation', btn: 'View Deck' },
+      { k: 'visual', icon: 'layers', tile: 'blue', title: 'Visual Summary - Pitch Deck', sub: 'Requirements & stakeholders deck', pct: 20, cls: 'blue', href: '/visual/foundation', btn: 'View Deck' },
     ],
     feedback: { title: 'Daily Feedback & Q&A', sub: 'Rate the day and refresh the core loop.' },
   },
@@ -625,24 +625,24 @@ const DAY_CARDS = {
     intro: 'Discipline, process and quality gates for building software that actually ships.',
     overall: 10,
     cards: [
-      { k: 'checkin', icon: 'user-check', tile: 'green', title: 'Attendance & Personal Check-In', sub: 'Daily attendance — complete it to claim XP', pct: 0, cls: 'amber', href: '/checkin', btn: 'Check In' },
+      { k: 'checkin', icon: 'user-check', tile: 'green', title: 'Attendance & Personal Check-In', sub: 'Daily attendance - complete it to claim XP', pct: 0, cls: 'amber', href: '/checkin', btn: 'Check In' },
       { k: 'roadmap', icon: 'compass', tile: 'amber', title: 'Daily Structured Reading Roadmap', sub: '0 of 5 milestones cleared', pct: 0, cls: 'amber', href: '/roadmap', btn: 'Start Roadmap' },
       { k: 'reading', icon: 'book', tile: 'green', title: 'Daily Reading Material', sub: 'Chapter 1 of 6 consumed', pct: 16, cls: 'green', href: '/book/software/0', btn: 'Open Book' },
       { k: 'video', img: S + 'IMG-20260605-WA0032.jpg', title: 'Video Tutorial', sub: 'Video 1 of 2 watched', pct: 20, cls: 'amber', href: '/videos', btn: 'Continue Video' },
-      { k: 'visual', icon: 'layers', tile: 'blue', title: 'Visual Summary — Pitch Deck', sub: 'The ship-it deck for software', pct: 0, cls: 'blue', href: '/visual/software', btn: 'View Deck' },
+      { k: 'visual', icon: 'layers', tile: 'blue', title: 'Visual Summary - Pitch Deck', sub: 'The ship-it deck for software', pct: 0, cls: 'blue', href: '/visual/software', btn: 'View Deck' },
     ],
     feedback: { title: 'Daily Feedback & Q&A', sub: 'Rate the day and refresh the analysis loop.' },
   },
   4: {
     title: 'Testing, DevOps & Delivery',
-    intro: 'Quality is built in, not inspected in — from unit tests to confident deployments.',
+    intro: 'Quality is built in, not inspected in - from unit tests to confident deployments.',
     overall: 5,
     cards: [
-      { k: 'checkin', icon: 'user-check', tile: 'green', title: 'Attendance & Personal Check-In', sub: 'Daily attendance — complete it to claim XP', pct: 0, cls: 'amber', href: '/checkin', btn: 'Check In' },
+      { k: 'checkin', icon: 'user-check', tile: 'green', title: 'Attendance & Personal Check-In', sub: 'Daily attendance - complete it to claim XP', pct: 0, cls: 'amber', href: '/checkin', btn: 'Check In' },
       { k: 'roadmap', icon: 'compass', tile: 'amber', title: 'Daily Structured Reading Roadmap', sub: '0 of 5 milestones cleared', pct: 0, cls: 'amber', href: '/roadmap', btn: 'Start Roadmap' },
       { k: 'reading', icon: 'book', tile: 'green', title: 'Daily Reading Material', sub: 'Chapter 4 of 6 consumed', pct: 8, cls: 'green', href: '/book/software/3', btn: 'Open Book' },
       { k: 'video', img: S + 'IMG-20260605-WA0035.jpg', title: 'Video Tutorial', sub: '2 of 2 videos watched', pct: 60, cls: 'amber', href: '/videos', btn: 'Continue Video' },
-      { k: 'visual', icon: 'layers', tile: 'blue', title: 'Visual Summary — Pitch Deck', sub: 'The ship-it deck for software', pct: 0, cls: 'blue', href: '/visual/software', btn: 'View Deck' },
+      { k: 'visual', icon: 'layers', tile: 'blue', title: 'Visual Summary - Pitch Deck', sub: 'The ship-it deck for software', pct: 0, cls: 'blue', href: '/visual/software', btn: 'View Deck' },
     ],
     feedback: { title: 'Daily Feedback & Q&A', sub: 'Rate the day and refresh the pipeline.' },
   },
@@ -651,11 +651,11 @@ const DAY_CARDS = {
     intro: 'Understand the model, then write prompts that behave predictably.',
     overall: 0,
     cards: [
-      { k: 'checkin', icon: 'user-check', tile: 'green', title: 'Attendance & Personal Check-In', sub: 'Daily attendance — complete it to claim XP', pct: 0, cls: 'amber', href: '/checkin', btn: 'Check In' },
+      { k: 'checkin', icon: 'user-check', tile: 'green', title: 'Attendance & Personal Check-In', sub: 'Daily attendance - complete it to claim XP', pct: 0, cls: 'amber', href: '/checkin', btn: 'Check In' },
       { k: 'roadmap', icon: 'compass', tile: 'amber', title: 'Daily Structured Reading Roadmap', sub: '0 of 4 milestones cleared', pct: 0, cls: 'amber', href: '/roadmap', btn: 'Start Roadmap' },
       { k: 'reading', icon: 'book', tile: 'green', title: 'Daily Reading Material', sub: 'Chapter 1 of 6 consumed', pct: 16, cls: 'green', href: '/book/prompt/0', btn: 'Open Book' },
       { k: 'video', img: S + 'IMG-20260605-WA0031.jpg', title: 'Video Tutorial', sub: 'Video 1 of 2 watched', pct: 0, cls: 'amber', href: '/videos', btn: 'Watch Video' },
-      { k: 'visual', icon: 'layers', tile: 'blue', title: 'Visual Summary — Pitch Deck', sub: 'Think-better deck for prompts', pct: 0, cls: 'blue', href: '/visual/prompt', btn: 'View Deck' },
+      { k: 'visual', icon: 'layers', tile: 'blue', title: 'Visual Summary - Pitch Deck', sub: 'Think-better deck for prompts', pct: 0, cls: 'blue', href: '/visual/prompt', btn: 'View Deck' },
     ],
     feedback: { title: 'Daily Feedback & Q&A', sub: 'Rate the day and refresh your precision.' },
   },
@@ -664,24 +664,24 @@ const DAY_CARDS = {
     intro: 'Chain-of-thought, grounding and building workflows you can actually reuse.',
     overall: 0,
     cards: [
-      { k: 'checkin', icon: 'user-check', tile: 'green', title: 'Attendance & Personal Check-In', sub: 'Daily attendance — complete it to claim XP', pct: 0, cls: 'amber', href: '/checkin', btn: 'Check In' },
+      { k: 'checkin', icon: 'user-check', tile: 'green', title: 'Attendance & Personal Check-In', sub: 'Daily attendance - complete it to claim XP', pct: 0, cls: 'amber', href: '/checkin', btn: 'Check In' },
       { k: 'roadmap', icon: 'compass', tile: 'amber', title: 'Daily Structured Reading Roadmap', sub: '0 of 4 milestones cleared', pct: 0, cls: 'amber', href: '/roadmap', btn: 'Start Roadmap' },
       { k: 'reading', icon: 'book', tile: 'green', title: 'Daily Reading Material', sub: 'Chapter 4 of 6 consumed', pct: 0, cls: 'amber', href: '/book/prompt/3', btn: 'Open Book' },
       { k: 'video', img: S + 'IMG-20260605-WA0036.jpg', title: 'Video Tutorial', sub: '2 of 2 videos watched', pct: 40, cls: 'amber', href: '/videos', btn: 'Continue Video' },
-      { k: 'visual', icon: 'layers', tile: 'blue', title: 'Visual Summary — Pitch Deck', sub: 'Think-better deck for prompts', pct: 0, cls: 'blue', href: '/visual/prompt', btn: 'View Deck' },
+      { k: 'visual', icon: 'layers', tile: 'blue', title: 'Visual Summary - Pitch Deck', sub: 'Think-better deck for prompts', pct: 0, cls: 'blue', href: '/visual/prompt', btn: 'View Deck' },
     ],
     feedback: { title: 'Daily Feedback & Q&A', sub: 'Rate the day and refresh your workflow.' },
   },
   7: {
     title: 'Job Readiness Sprint',
-    intro: 'Your story, your portfolio, your search — then you land the job.',
+    intro: 'Your story, your portfolio, your search - then you land the job.',
     overall: 0,
     cards: [
-      { k: 'checkin', icon: 'user-check', tile: 'green', title: 'Attendance & Personal Check-In', sub: 'Final attendance — complete it to finish', pct: 0, cls: 'amber', href: '/checkin', btn: 'Check In' },
+      { k: 'checkin', icon: 'user-check', tile: 'green', title: 'Attendance & Personal Check-In', sub: 'Final attendance - complete it to finish', pct: 0, cls: 'amber', href: '/checkin', btn: 'Check In' },
       { k: 'roadmap', icon: 'compass', tile: 'amber', title: 'Career Roadmap', sub: '0 of 5 milestones cleared', pct: 0, cls: 'amber', href: '/roadmap', btn: 'Start Roadmap' },
       { k: 'reading', icon: 'book', tile: 'green', title: 'Career Workbook', sub: 'Story + portfolio workbook', pct: 0, cls: 'amber', href: '/book/prompt/5', btn: 'Open Workbook' },
       { k: 'video', img: S + 'stack.jpg', title: 'Video Tutorial', sub: 'From course to career', pct: 0, cls: 'amber', href: '/videos', btn: 'Watch Video' },
-      { k: 'visual', icon: 'layers', tile: 'blue', title: 'Visual Summary — Pitch Deck', sub: 'Land-the-job deck', pct: 0, cls: 'blue', href: '/visual/jobreadiness', btn: 'View Deck' },
+      { k: 'visual', icon: 'layers', tile: 'blue', title: 'Visual Summary - Pitch Deck', sub: 'Land-the-job deck', pct: 0, cls: 'blue', href: '/visual/jobreadiness', btn: 'View Deck' },
     ],
     feedback: { title: 'Daily Feedback & Q&A', sub: 'Rate your readiness and finish the sprint.' },
   },
@@ -689,9 +689,9 @@ const DAY_CARDS = {
 
 /* ---------- Reading sections ---------- */
 const READING_SECTIONS = [
-  { id: 'section-1', label: 'Core Textbook — Foundation in BA Practice', compulsory: true },
-  { id: 'section-2', label: 'Executive Briefing — Software Engineering', compulsory: true },
-  { id: 'section-3', label: 'Executive Briefing — Prompt Engineering', compulsory: true },
+  { id: 'section-1', label: 'Core Textbook - Foundation in BA Practice', compulsory: true },
+  { id: 'section-2', label: 'Executive Briefing - Software Engineering', compulsory: true },
+  { id: 'section-3', label: 'Executive Briefing - Prompt Engineering', compulsory: true },
 ];
 
 /* ---------- Check-in (4-option scale shared) ---------- */
@@ -727,13 +727,13 @@ const ACCOUNTABILITY = {
     ],
     inner: { value: '78%', label: 'Completed' },
     legend: [
-      ['var(--amber)', 'Reading — 55%'],
-      ['var(--green)', 'Videos — 25%'],
-      ['var(--blue)', 'Quizzes — 14%'],
-      ['#475569', 'Locked — 6%'],
+      ['var(--amber)', 'Reading - 55%'],
+      ['var(--green)', 'Videos - 25%'],
+      ['var(--blue)', 'Quizzes - 14%'],
+      ['#475569', 'Locked - 6%'],
     ],
   },
-  chartTitle: 'Study Hours — This Week',
+  chartTitle: 'Study Hours - This Week',
 };
 
 /* ---------- Visual (default deck meta fallback) ---------- */
@@ -744,15 +744,15 @@ const VISUAL = {
     segments: [['var(--amber)', '0 216deg'], ['var(--green)', '216deg 306deg'], ['var(--blue)', '306deg 360deg']],
     inner: { value: '100%', label: 'Mastery' },
     legend: [
-      ['var(--amber)', 'Elicitation — 60%'],
-      ['var(--green)', 'Prioritization — 25%'],
-      ['var(--blue)', 'Strategy — 15%'],
+      ['var(--amber)', 'Elicitation - 60%'],
+      ['var(--green)', 'Prioritization - 25%'],
+      ['var(--blue)', 'Strategy - 15%'],
     ],
   },
   root: 'BA Practice',
   children: ['Elicitation', 'Analysis', 'Prioritisation'],
   panelTitle: 'Right Recap',
-  checks: ['Foundation workbook — complete', 'Chapter 3 recap — complete'],
+  checks: ['Foundation workbook - complete', 'Chapter 3 recap - complete'],
 };
 
 /* ---------- Community / feed / calendar / recordings / support / aluminal ---------- */
@@ -765,7 +765,7 @@ const FEED = [
 
 const MONDAY = [
   { q: 'Three books are not a mountain.', body: 'Take one chapter a day and the summit takes care of itself.', author: 'Zeelin' },
-  { q: 'Your 5–9 is your superpower.', body: 'Busy parents finish because they refuse to start as a hobbyist.', author: 'Cohort Coach' },
+  { q: 'Your 5-9 is your superpower.', body: 'Busy parents finish because they refuse to start as a hobbyist.', author: 'Cohort Coach' },
   { q: 'Consistency beats intensity.', body: 'One quiz today beats three yesterday.', author: 'Study Guide' },
 ];
 
@@ -789,7 +789,7 @@ const COMMUNITY = {
       avatar: S + 'IMG-20260605-WA0032.jpg',
       color: 'var(--teal)',
       ring: 'teal',
-      body: 'Looking for partners to review Business Analysis Foundation Day 1 — I\u2019ll host a quick 20-minute zoom on the BA role & process framework.',
+      body: 'Looking for partners to review Business Analysis Foundation Day 1 - I\u2019ll host a quick 20-minute zoom on the BA role & process framework.',
       tag: 'Study Group',
       tagCls: 'pill-teal',
       reacts: '14 likes · 6 replies',
@@ -802,7 +802,7 @@ const COMMUNITY = {
       avatar: S + 'IMG-20260605-WA0035.jpg',
       color: 'var(--purple)',
       ring: 'purple',
-      body: 'Exam readiness checklist tip: read the first paragraph of every chapter out loud — retention jumps when you hear your own voice.',
+      body: 'Exam readiness checklist tip: read the first paragraph of every chapter out loud - retention jumps when you hear your own voice.',
       tag: 'General',
       tagCls: 'pill-purple',
       reacts: '28 likes · 11 replies',
@@ -816,13 +816,13 @@ const CALENDAR_EVENTS = [
     id: 'c1', date: 4, month: 8, year: 2026, dow: 'Tue', offset: 0, color: 'amber', dcol: '',
     title: 'Live Workshop: Effective Communication in Parenting & Study Balance',
     pills: [{ text: 'Live Session', cls: 'pill-amber' }],
-    meta: '4:00 PM — 5:00 PM · Live on Zoom',
+    meta: '4:00 PM - 5:00 PM · Live on Zoom',
   },
   {
     id: 'c2', date: 8, month: 8, year: 2026, dow: 'Sat', offset: 3, color: 'blue', dcol: 'blue',
     title: 'Cohort 001 Weekly Q&A and Check-in',
     pills: [{ text: 'Q&A Session', cls: 'pill-blue' }],
-    meta: '2:00 PM — 3:00 PM · Live on Zoom',
+    meta: '2:00 PM - 3:00 PM · Live on Zoom',
   },
 ];
 
@@ -840,7 +840,7 @@ const SUPPORT = {
   ],
   faqs: [
     { q: 'How do I submit my daily accountability report?', a: 'Open the Accountability Check-In from your Day page, fill the readiness form and hit \u201cSubmit\u201d. Your report feeds the weekly analytics chart.' },
-    { q: 'My video will not play — what should I do?', a: 'Ensure you are online, then refresh. If it persists, use the Replay/Watch button from Video Tutorials.' },
+    { q: 'My video will not play - what should I do?', a: 'Ensure you are online, then refresh. If it persists, use the Replay/Watch button from Video Tutorials.' },
     { q: 'Can I retake a mock quiz?', a: 'Yes. Each chapter has the same simple 5-question quiz and you can retake it as often as you like to build readiness.' },
     { q: 'How does my XP and streak work?', a: 'Claim the +500 XP in your Personal Check-In once a day. Submitting every day grows your streak widget.' },
   ],
@@ -848,7 +848,7 @@ const SUPPORT = {
 };
 
 const ALUMINAL = {
-  hero: { badge: 'Limited Time 80% Off Special Offer', title: 'Aluminal — the lifelong coalition of Zeelin Academy graduates.', body: 'Every resource, guide and community perk stays yours for life. One fee, no renewals.' },
+  hero: { badge: 'Limited Time 80% Off Special Offer', title: 'Aluminal - the lifelong coalition of Zeelin Academy graduates.', body: 'Every resource, guide and community perk stays yours for life. One fee, no renewals.' },
   features: [
     { img: S + 'IMG-20260605-WA0031.jpg', tag: 'FEATURE 01', title: 'Lifetime library access', body: 'Keep every book, briefing and workbook after your course ends.' },
     { img: S + 'IMG-20260605-WA0032.jpg', tag: 'FEATURE 02', title: 'Aluminal coaching circle', body: 'Monthly live calls with past graduates and mentors.' },
@@ -857,7 +857,7 @@ const ALUMINAL = {
     { img: S + 'classroom.jpg', tag: 'FEATURE 05', title: 'Alumni directory', body: 'Join a private network of certified practitioners.' },
     { img: S + 'stack.jpg', tag: 'FEATURE 06', title: 'Certificate showcase', body: 'A verified digital badge you can share.' },
   ],
-  cta: { old: '£100', price: '£20', label: 'Save 80% Today — one-time payment, lifetime access.' },
+  cta: { old: '£100', price: '£20', label: 'Save 80% Today - one-time payment, lifetime access.' },
 };
 
 /* ---------- Analytics ---------- */
@@ -975,50 +975,50 @@ const TRACKS = [
    }}
 ];
 
-/* Marketplace catalog — 42 projects (21 Business Analysis / 21 Software Engineering) classified by job role */
+/* Marketplace catalog - 42 projects (21 Business Analysis / 21 Software Engineering) classified by job role */
 const MARKETPLACE_PROJECTS = [
-  {id:'ba-01',title:'Stakeholder Map — Retail Banking',category:'business-analysis',jobRole:'Business Analyst',difficulty:'Foundation',duration:'2 weeks',price:0,desc:'Map stakeholders for core banking upgrade. Deliver RACI and engagement plan.'},
-  {id:'ba-02',title:'BPMN As-Is / To-Be — Insurance Claims',category:'business-analysis',jobRole:'Business Analyst',difficulty:'Intermediate',duration:'3 weeks',price:29,desc:'Model claims handling with BPMN 2.0 gateways and swimlanes.'},
-  {id:'ba-03',title:'Requirements Traceability — NHS Referral',category:'business-analysis',jobRole:'Business Analyst',difficulty:'Intermediate',duration:'2 weeks',price:29,desc:'Traceability matrix from business need to UAT for referral system.'},
-  {id:'ba-04',title:'MoSCoW Workshop — ERP Rollout',category:'business-analysis',jobRole:'Business Analyst',difficulty:'Foundation',duration:'1 week',price:0,desc:'Facilitate prioritisation workshop and produce signed-off backlog.'},
-  {id:'ba-05',title:'Business Case & Cost-Benefit — ERP',category:'business-analysis',jobRole:'Business Analyst',difficulty:'Advanced',duration:'3 weeks',price:49,desc:'Create business case with NPV, benefits register and risk log.'},
-  {id:'ba-06',title:'User Stories — Mobile Banking App',category:'business-analysis',jobRole:'Business Analyst',difficulty:'Intermediate',duration:'2 weeks',price:29,desc:'INVEST stories with Gherkin acceptance criteria for payments.'},
-  {id:'ba-07',title:'Data Lineage & GDPR Mapping',category:'business-analysis',jobRole:'Data Analyst',difficulty:'Advanced',duration:'3 weeks',price:49,desc:'Document data flows and retention for GDPR compliance.'},
-  {id:'ba-08',title:'Benefits Realisation Dashboard',category:'business-analysis',jobRole:'Change Manager',difficulty:'Intermediate',duration:'2 weeks',price:29,desc:'Design KPIs dashboard tracking adoption and cost-to-serve.'},
-  {id:'ba-09',title:'Process Mining — Order to Cash',category:'business-analysis',jobRole:'Business Analyst',difficulty:'Advanced',duration:'3 weeks',price:49,desc:'Analyse event logs and propose automation candidates.'},
-  {id:'ba-10',title:'Service Design Blueprint — GDS',category:'business-analysis',jobRole:'Business Analyst',difficulty:'Intermediate',duration:'2 weeks',price:29,desc:'Service blueprint with front/back stage for citizen portal.'},
-  {id:'ba-11',title:'Gap Analysis — Legacy to Cloud',category:'business-analysis',jobRole:'Business Analyst',difficulty:'Foundation',duration:'2 weeks',price:0,desc:'Gap register comparing legacy vs target operating model.'},
-  {id:'ba-12',title:'Risk & Impact — PSD2 Compliance',category:'business-analysis',jobRole:'Business Analyst',difficulty:'Intermediate',duration:'2 weeks',price:29,desc:'Impact assessment heatmap for regulatory change.'},
-  {id:'ba-13',title:'Customer Journey — Telecoms Onboarding',category:'business-analysis',jobRole:'Business Analyst',difficulty:'Foundation',duration:'2 weeks',price:0,desc:'Map journeys, moments of truth and NPS backlog.'},
-  {id:'ba-14',title:'KPI Tree — Retail Analytics',category:'business-analysis',jobRole:'Data Analyst',difficulty:'Intermediate',duration:'2 weeks',price:29,desc:'Decompose goals into operational KPIs and packs.'},
-  {id:'ba-15',title:'Workshop Design — Finance Reconciliation',category:'business-analysis',jobRole:'Business Analyst',difficulty:'Foundation',duration:'1 week',price:0,desc:'Cross-functional workshop to resolve reconciliation exceptions.'},
-  {id:'ba-16',title:'Backlog Grooming — E-commerce',category:'business-analysis',jobRole:'Product Owner',difficulty:'Intermediate',duration:'2 weeks',price:29,desc:'Refine 50+ items, split epics, prepare sprint backlog.'},
-  {id:'ba-17',title:'Change Impact & Comms — Merger',category:'business-analysis',jobRole:'Change Manager',difficulty:'Advanced',duration:'3 weeks',price:49,desc:'Impact assessment, comms matrix and training needs.'},
-  {id:'ba-18',title:'Feasibility Paper — CRM Selection',category:'business-analysis',jobRole:'Business Analyst',difficulty:'Advanced',duration:'3 weeks',price:49,desc:'Build vs buy scoring and recommendation.'},
-  {id:'ba-19',title:'Interview Synthesis — User Research',category:'business-analysis',jobRole:'Business Analyst',difficulty:'Foundation',duration:'2 weeks',price:0,desc:'8 interviews, synthesis and affinity maps.'},
-  {id:'ba-20',title:'Requirements Validation — Loyalty Scheme',category:'business-analysis',jobRole:'Business Analyst',difficulty:'Intermediate',duration:'2 weeks',price:29,desc:'Validation via walkthroughs with sign-off.'},
-  {id:'ba-21',title:'Value Stream Mapping — Public Sector',category:'business-analysis',jobRole:'Business Analyst',difficulty:'Intermediate',duration:'2 weeks',price:29,desc:'Map value stream and quantify improvements.'},
-  {id:'se-01',title:'UML Modelling — Microservices Order',category:'software-engineering',jobRole:'Systems Analyst',difficulty:'Intermediate',duration:'3 weeks',price:49,desc:'Class, sequence and component diagrams for order microservices.'},
-  {id:'se-02',title:'Data Modelling (ERD) — CRM Platform',category:'software-engineering',jobRole:'Systems Analyst',difficulty:'Advanced',duration:'3 weeks',price:49,desc:'Conceptual, logical, physical ERDs to 3NF.'},
-  {id:'se-03',title:'SDLC & CI/CD Pipeline — DevOps',category:'software-engineering',jobRole:'Software Engineer',difficulty:'Intermediate',duration:'2 weeks',price:29,desc:'SDLC workflow, branching and CI/CD quality gates.'},
-  {id:'se-04',title:'API Design & Contract Testing — Payments',category:'software-engineering',jobRole:'Software Engineer',difficulty:'Advanced',duration:'3 weeks',price:49,desc:'OpenAPI spec and Pact contract tests.'},
-  {id:'se-05',title:'RPA Process Automation — Finance Ops',category:'software-engineering',jobRole:'Software Engineer',difficulty:'Intermediate',duration:'2 weeks',price:29,desc:'Automate invoice matching with RPA and audit trail.'},
-  {id:'se-06',title:'Event-Driven Architecture — Inventory',category:'software-engineering',jobRole:'Systems Analyst',difficulty:'Advanced',duration:'3 weeks',price:49,desc:'Event sourcing with Kafka and DLQ handling.'},
-  {id:'se-07',title:'Secure Coding (OWASP Top 10) — Hardening',category:'software-engineering',jobRole:'Software Engineer',difficulty:'Advanced',duration:'2 weeks',price:49,desc:'Fix vulns, input validation and secure headers.'},
-  {id:'se-08',title:'Testing Strategy Pyramid — E-commerce',category:'software-engineering',jobRole:'Software Engineer',difficulty:'Intermediate',duration:'2 weeks',price:29,desc:'Unit/integration/E2E strategy and coverage.'},
-  {id:'se-09',title:'Data Pipeline (ETL) — Retail Analytics',category:'software-engineering',jobRole:'Data Engineer',difficulty:'Advanced',duration:'3 weeks',price:49,desc:'Batch/streaming pipelines and quality checks.'},
-  {id:'se-10',title:'IaC — AWS Landing Zone',category:'software-engineering',jobRole:'Software Engineer',difficulty:'Advanced',duration:'3 weeks',price:49,desc:'VPC, ECS, RDS with Terraform.'},
-  {id:'se-11',title:'Frontend Design System — Component Lib',category:'software-engineering',jobRole:'Software Engineer',difficulty:'Intermediate',duration:'2 weeks',price:29,desc:'Storybook, tokens and a11y components.'},
-  {id:'se-12',title:'Observability — SRE Dashboards',category:'software-engineering',jobRole:'Software Engineer',difficulty:'Intermediate',duration:'2 weeks',price:29,desc:'Metrics, logs, traces, SLOs and alerting.'},
-  {id:'se-13',title:'Strangler Fig Migration — Legacy Monolith',category:'software-engineering',jobRole:'Systems Analyst',difficulty:'Advanced',duration:'3 weeks',price:49,desc:'Incremental migration with feature flags.'},
-  {id:'se-14',title:'Domain-Driven Design — Banking Domain',category:'software-engineering',jobRole:'Systems Analyst',difficulty:'Advanced',duration:'3 weeks',price:49,desc:'Bounded contexts and aggregates.'},
-  {id:'se-15',title:'Performance Tuning — High-Throughput API',category:'software-engineering',jobRole:'Software Engineer',difficulty:'Advanced',duration:'2 weeks',price:49,desc:'Profile, optimise and load test to 5k RPS.'},
-  {id:'se-16',title:'Mobile Offline-First — Field Service',category:'software-engineering',jobRole:'Software Engineer',difficulty:'Intermediate',duration:'3 weeks',price:49,desc:'Offline sync and conflict resolution.'},
-  {id:'se-17',title:'Threat Modelling (STRIDE) — FinTech',category:'software-engineering',jobRole:'Systems Analyst',difficulty:'Advanced',duration:'2 weeks',price:49,desc:'Threat modelling workshop and security backlog.'},
-  {id:'se-18',title:'Data Warehouse — Snowflake on AWS',category:'software-engineering',jobRole:'Data Engineer',difficulty:'Intermediate',duration:'3 weeks',price:49,desc:'Star schema, ELT with dbt and BI layer.'},
-  {id:'se-19',title:'Tech Debt Management — Agile Delivery',category:'software-engineering',jobRole:'Software Engineer',difficulty:'Foundation',duration:'1 week',price:0,desc:'Quantify debt and sprint integration.'},
-  {id:'se-20',title:'Code Review & Quality Gates — Practices',category:'software-engineering',jobRole:'Software Engineer',difficulty:'Foundation',duration:'1 week',price:0,desc:'PR templates and Sonar gates.'},
-  {id:'se-21',title:'State Management — React Enterprise App',category:'software-engineering',jobRole:'Software Engineer',difficulty:'Intermediate',duration:'2 weeks',price:29,desc:'Redux/Zustand comparison with tests.'},
+  {id:'ba-01',title:'Stakeholder Map - Retail Banking',category:'business-analysis',jobRole:'Business Analyst',difficulty:'Foundation',duration:'2 weeks',price:0,desc:'Map stakeholders for core banking upgrade. Deliver RACI and engagement plan.',thumbnail:'assets/marketplace/ba-01.jpg'},
+  {id:'ba-02',title:'BPMN As-Is / To-Be - Insurance Claims',category:'business-analysis',jobRole:'Business Analyst',difficulty:'Intermediate',duration:'3 weeks',price:29,desc:'Model claims handling with BPMN 2.0 gateways and swimlanes.',thumbnail:'assets/marketplace/ba-02.jpg'},
+  {id:'ba-03',title:'Requirements Traceability - NHS Referral',category:'business-analysis',jobRole:'Business Analyst',difficulty:'Intermediate',duration:'2 weeks',price:29,desc:'Traceability matrix from business need to UAT for referral system.',thumbnail:'assets/marketplace/ba-03.jpg'},
+  {id:'ba-04',title:'MoSCoW Workshop - ERP Rollout',category:'business-analysis',jobRole:'Business Analyst',difficulty:'Foundation',duration:'1 week',price:0,desc:'Facilitate prioritisation workshop and produce signed-off backlog.',thumbnail:'assets/marketplace/ba-04.jpg'},
+  {id:'ba-05',title:'Business Case & Cost-Benefit - ERP',category:'business-analysis',jobRole:'Business Analyst',difficulty:'Advanced',duration:'3 weeks',price:49,desc:'Create business case with NPV, benefits register and risk log.',thumbnail:'assets/marketplace/ba-05.jpg'},
+  {id:'ba-06',title:'User Stories - Mobile Banking App',category:'business-analysis',jobRole:'Business Analyst',difficulty:'Intermediate',duration:'2 weeks',price:29,desc:'INVEST stories with Gherkin acceptance criteria for payments.',thumbnail:'assets/marketplace/ba-06.jpg'},
+  {id:'ba-07',title:'Data Lineage & GDPR Mapping',category:'business-analysis',jobRole:'Data Analyst',difficulty:'Advanced',duration:'3 weeks',price:49,desc:'Document data flows and retention for GDPR compliance.',thumbnail:'assets/marketplace/ba-07.jpg'},
+  {id:'ba-08',title:'Benefits Realisation Dashboard',category:'business-analysis',jobRole:'Change Manager',difficulty:'Intermediate',duration:'2 weeks',price:29,desc:'Design KPIs dashboard tracking adoption and cost-to-serve.',thumbnail:'assets/marketplace/ba-08.jpg'},
+  {id:'ba-09',title:'Process Mining - Order to Cash',category:'business-analysis',jobRole:'Business Analyst',difficulty:'Advanced',duration:'3 weeks',price:49,desc:'Analyse event logs and propose automation candidates.',thumbnail:'assets/marketplace/ba-09.jpg'},
+  {id:'ba-10',title:'Service Design Blueprint - GDS',category:'business-analysis',jobRole:'Business Analyst',difficulty:'Intermediate',duration:'2 weeks',price:29,desc:'Service blueprint with front/back stage for citizen portal.',thumbnail:'assets/marketplace/ba-10.jpg'},
+  {id:'ba-11',title:'Gap Analysis - Legacy to Cloud',category:'business-analysis',jobRole:'Business Analyst',difficulty:'Foundation',duration:'2 weeks',price:0,desc:'Gap register comparing legacy vs target operating model.',thumbnail:'assets/marketplace/ba-11.jpg'},
+  {id:'ba-12',title:'Risk & Impact - PSD2 Compliance',category:'business-analysis',jobRole:'Business Analyst',difficulty:'Intermediate',duration:'2 weeks',price:29,desc:'Impact assessment heatmap for regulatory change.',thumbnail:'assets/marketplace/ba-12.jpg'},
+  {id:'ba-13',title:'Customer Journey - Telecoms Onboarding',category:'business-analysis',jobRole:'Business Analyst',difficulty:'Foundation',duration:'2 weeks',price:0,desc:'Map journeys, moments of truth and NPS backlog.',thumbnail:'assets/marketplace/ba-13.jpg'},
+  {id:'ba-14',title:'KPI Tree - Retail Analytics',category:'business-analysis',jobRole:'Data Analyst',difficulty:'Intermediate',duration:'2 weeks',price:29,desc:'Decompose goals into operational KPIs and packs.',thumbnail:'assets/marketplace/ba-14.jpg'},
+  {id:'ba-15',title:'Workshop Design - Finance Reconciliation',category:'business-analysis',jobRole:'Business Analyst',difficulty:'Foundation',duration:'1 week',price:0,desc:'Cross-functional workshop to resolve reconciliation exceptions.',thumbnail:'assets/marketplace/ba-15.jpg'},
+  {id:'ba-16',title:'Backlog Grooming - E-commerce',category:'business-analysis',jobRole:'Product Owner',difficulty:'Intermediate',duration:'2 weeks',price:29,desc:'Refine 50+ items, split epics, prepare sprint backlog.',thumbnail:'assets/marketplace/ba-16.jpg'},
+  {id:'ba-17',title:'Change Impact & Comms - Merger',category:'business-analysis',jobRole:'Change Manager',difficulty:'Advanced',duration:'3 weeks',price:49,desc:'Impact assessment, comms matrix and training needs.',thumbnail:'assets/marketplace/ba-17.jpg'},
+  {id:'ba-18',title:'Feasibility Paper - CRM Selection',category:'business-analysis',jobRole:'Business Analyst',difficulty:'Advanced',duration:'3 weeks',price:49,desc:'Build vs buy scoring and recommendation.',thumbnail:'assets/marketplace/ba-18.jpg'},
+  {id:'ba-19',title:'Interview Synthesis - User Research',category:'business-analysis',jobRole:'Business Analyst',difficulty:'Foundation',duration:'2 weeks',price:0,desc:'8 interviews, synthesis and affinity maps.',thumbnail:'assets/marketplace/ba-19.jpg'},
+  {id:'ba-20',title:'Requirements Validation - Loyalty Scheme',category:'business-analysis',jobRole:'Business Analyst',difficulty:'Intermediate',duration:'2 weeks',price:29,desc:'Validation via walkthroughs with sign-off.',thumbnail:'assets/marketplace/ba-20.jpg'},
+  {id:'ba-21',title:'Value Stream Mapping - Public Sector',category:'business-analysis',jobRole:'Business Analyst',difficulty:'Intermediate',duration:'2 weeks',price:29,desc:'Map value stream and quantify improvements.',thumbnail:'assets/marketplace/ba-21.jpg'},
+  {id:'se-01',title:'UML Modelling - Microservices Order',category:'software-engineering',jobRole:'Systems Analyst',difficulty:'Intermediate',duration:'3 weeks',price:49,desc:'Class, sequence and component diagrams for order microservices.',thumbnail:'assets/marketplace/se-01.jpg'},
+  {id:'se-02',title:'Data Modelling (ERD) - CRM Platform',category:'software-engineering',jobRole:'Systems Analyst',difficulty:'Advanced',duration:'3 weeks',price:49,desc:'Conceptual, logical, physical ERDs to 3NF.',thumbnail:'assets/marketplace/se-02.jpg'},
+  {id:'se-03',title:'SDLC & CI/CD Pipeline - DevOps',category:'software-engineering',jobRole:'Software Engineer',difficulty:'Intermediate',duration:'2 weeks',price:29,desc:'SDLC workflow, branching and CI/CD quality gates.',thumbnail:'assets/marketplace/se-03.jpg'},
+  {id:'se-04',title:'API Design & Contract Testing - Payments',category:'software-engineering',jobRole:'Software Engineer',difficulty:'Advanced',duration:'3 weeks',price:49,desc:'OpenAPI spec and Pact contract tests.',thumbnail:'assets/marketplace/se-04.jpg'},
+  {id:'se-05',title:'RPA Process Automation - Finance Ops',category:'software-engineering',jobRole:'Software Engineer',difficulty:'Intermediate',duration:'2 weeks',price:29,desc:'Automate invoice matching with RPA and audit trail.',thumbnail:'assets/marketplace/se-05.jpg'},
+  {id:'se-06',title:'Event-Driven Architecture - Inventory',category:'software-engineering',jobRole:'Systems Analyst',difficulty:'Advanced',duration:'3 weeks',price:49,desc:'Event sourcing with Kafka and DLQ handling.',thumbnail:'assets/marketplace/se-06.jpg'},
+  {id:'se-07',title:'Secure Coding (OWASP Top 10) - Hardening',category:'software-engineering',jobRole:'Software Engineer',difficulty:'Advanced',duration:'2 weeks',price:49,desc:'Fix vulns, input validation and secure headers.',thumbnail:'assets/marketplace/se-07.jpg'},
+  {id:'se-08',title:'Testing Strategy Pyramid - E-commerce',category:'software-engineering',jobRole:'Software Engineer',difficulty:'Intermediate',duration:'2 weeks',price:29,desc:'Unit/integration/E2E strategy and coverage.',thumbnail:'assets/marketplace/se-08.jpg'},
+  {id:'se-09',title:'Data Pipeline (ETL) - Retail Analytics',category:'software-engineering',jobRole:'Data Engineer',difficulty:'Advanced',duration:'3 weeks',price:49,desc:'Batch/streaming pipelines and quality checks.',thumbnail:'assets/marketplace/se-09.jpg'},
+  {id:'se-10',title:'IaC - AWS Landing Zone',category:'software-engineering',jobRole:'Software Engineer',difficulty:'Advanced',duration:'3 weeks',price:49,desc:'VPC, ECS, RDS with Terraform.',thumbnail:'assets/marketplace/se-10.jpg'},
+  {id:'se-11',title:'Frontend Design System - Component Lib',category:'software-engineering',jobRole:'Software Engineer',difficulty:'Intermediate',duration:'2 weeks',price:29,desc:'Storybook, tokens and a11y components.',thumbnail:'assets/marketplace/se-11.jpg'},
+  {id:'se-12',title:'Observability - SRE Dashboards',category:'software-engineering',jobRole:'Software Engineer',difficulty:'Intermediate',duration:'2 weeks',price:29,desc:'Metrics, logs, traces, SLOs and alerting.',thumbnail:'assets/marketplace/se-12.jpg'},
+  {id:'se-13',title:'Strangler Fig Migration - Legacy Monolith',category:'software-engineering',jobRole:'Systems Analyst',difficulty:'Advanced',duration:'3 weeks',price:49,desc:'Incremental migration with feature flags.',thumbnail:'assets/marketplace/se-13.jpg'},
+  {id:'se-14',title:'Domain-Driven Design - Banking Domain',category:'software-engineering',jobRole:'Systems Analyst',difficulty:'Advanced',duration:'3 weeks',price:49,desc:'Bounded contexts and aggregates.',thumbnail:'assets/marketplace/se-14.jpg'},
+  {id:'se-15',title:'Performance Tuning - High-Throughput API',category:'software-engineering',jobRole:'Software Engineer',difficulty:'Advanced',duration:'2 weeks',price:49,desc:'Profile, optimise and load test to 5k RPS.',thumbnail:'assets/marketplace/se-15.jpg'},
+  {id:'se-16',title:'Mobile Offline-First - Field Service',category:'software-engineering',jobRole:'Software Engineer',difficulty:'Intermediate',duration:'3 weeks',price:49,desc:'Offline sync and conflict resolution.',thumbnail:'assets/marketplace/se-16.jpg'},
+  {id:'se-17',title:'Threat Modelling (STRIDE) - FinTech',category:'software-engineering',jobRole:'Systems Analyst',difficulty:'Advanced',duration:'2 weeks',price:49,desc:'Threat modelling workshop and security backlog.',thumbnail:'assets/marketplace/se-17.jpg'},
+  {id:'se-18',title:'Data Warehouse - Snowflake on AWS',category:'software-engineering',jobRole:'Data Engineer',difficulty:'Intermediate',duration:'3 weeks',price:49,desc:'Star schema, ELT with dbt and BI layer.',thumbnail:'assets/marketplace/se-18.jpg'},
+  {id:'se-19',title:'Tech Debt Management - Agile Delivery',category:'software-engineering',jobRole:'Software Engineer',difficulty:'Foundation',duration:'1 week',price:0,desc:'Quantify debt and sprint integration.',thumbnail:'assets/marketplace/se-19.jpg'},
+  {id:'se-20',title:'Code Review & Quality Gates - Practices',category:'software-engineering',jobRole:'Software Engineer',difficulty:'Foundation',duration:'1 week',price:0,desc:'PR templates and Sonar gates.',thumbnail:'assets/marketplace/se-20.jpg'},
+  {id:'se-21',title:'State Management - React Enterprise App',category:'software-engineering',jobRole:'Software Engineer',difficulty:'Intermediate',duration:'2 weeks',price:29,desc:'Redux/Zustand comparison with tests.',thumbnail:'assets/marketplace/se-21.jpg'},
 ];
 
 /* In-House Project Data */
