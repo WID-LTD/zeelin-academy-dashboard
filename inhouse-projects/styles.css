@@ -315,6 +315,12 @@ html{scroll-behavior:smooth}
   .dash-grid .card-cell button{width:100%;padding:8px 6px;font-size:10.5px!important}
   .dash-topbar{height:auto;padding:10px 16px;flex-wrap:wrap;gap:10px}
 }
+/* ─── Marketplace grid - 4 per row, balanced design perspective ─── */
+.mp-grid{display:grid;gap:20px;grid-template-columns:repeat(4,minmax(0,1fr));width:100%}
+.mp-grid .mp-card{min-width:0}
+@media(max-width:1400px){ .mp-grid{grid-template-columns:repeat(3,minmax(0,1fr));gap:18px} }
+@media(max-width:1024px){ .mp-grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:16px} }
+@media(max-width:640px){ .mp-grid{grid-template-columns:1fr;gap:14px} }
 
 /* ─── Toast notifications ─── */
 .toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(80px);background-color:#262626;color:#fff;border:1px solid #404040;border-left:4px solid #d97706;padding:12px 20px;border-radius:8px;font-size:13px;font-weight:700;box-shadow:0 8px 24px rgba(0,0,0,.5);opacity:0;transition:all .25s;z-index:10000;max-width:90vw}
