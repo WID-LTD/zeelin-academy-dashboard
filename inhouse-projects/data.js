@@ -975,6 +975,52 @@ const TRACKS = [
    }}
 ];
 
+/* Marketplace catalog — 42 projects (21 Business Analysis / 21 Software Engineering) classified by job role */
+const MARKETPLACE_PROJECTS = [
+  {id:'ba-01',title:'Stakeholder Map — Retail Banking',category:'business-analysis',jobRole:'Business Analyst',difficulty:'Foundation',duration:'2 weeks',price:0,desc:'Map stakeholders for core banking upgrade. Deliver RACI and engagement plan.'},
+  {id:'ba-02',title:'BPMN As-Is / To-Be — Insurance Claims',category:'business-analysis',jobRole:'Business Analyst',difficulty:'Intermediate',duration:'3 weeks',price:29,desc:'Model claims handling with BPMN 2.0 gateways and swimlanes.'},
+  {id:'ba-03',title:'Requirements Traceability — NHS Referral',category:'business-analysis',jobRole:'Business Analyst',difficulty:'Intermediate',duration:'2 weeks',price:29,desc:'Traceability matrix from business need to UAT for referral system.'},
+  {id:'ba-04',title:'MoSCoW Workshop — ERP Rollout',category:'business-analysis',jobRole:'Business Analyst',difficulty:'Foundation',duration:'1 week',price:0,desc:'Facilitate prioritisation workshop and produce signed-off backlog.'},
+  {id:'ba-05',title:'Business Case & Cost-Benefit — ERP',category:'business-analysis',jobRole:'Business Analyst',difficulty:'Advanced',duration:'3 weeks',price:49,desc:'Create business case with NPV, benefits register and risk log.'},
+  {id:'ba-06',title:'User Stories — Mobile Banking App',category:'business-analysis',jobRole:'Business Analyst',difficulty:'Intermediate',duration:'2 weeks',price:29,desc:'INVEST stories with Gherkin acceptance criteria for payments.'},
+  {id:'ba-07',title:'Data Lineage & GDPR Mapping',category:'business-analysis',jobRole:'Data Analyst',difficulty:'Advanced',duration:'3 weeks',price:49,desc:'Document data flows and retention for GDPR compliance.'},
+  {id:'ba-08',title:'Benefits Realisation Dashboard',category:'business-analysis',jobRole:'Change Manager',difficulty:'Intermediate',duration:'2 weeks',price:29,desc:'Design KPIs dashboard tracking adoption and cost-to-serve.'},
+  {id:'ba-09',title:'Process Mining — Order to Cash',category:'business-analysis',jobRole:'Business Analyst',difficulty:'Advanced',duration:'3 weeks',price:49,desc:'Analyse event logs and propose automation candidates.'},
+  {id:'ba-10',title:'Service Design Blueprint — GDS',category:'business-analysis',jobRole:'Business Analyst',difficulty:'Intermediate',duration:'2 weeks',price:29,desc:'Service blueprint with front/back stage for citizen portal.'},
+  {id:'ba-11',title:'Gap Analysis — Legacy to Cloud',category:'business-analysis',jobRole:'Business Analyst',difficulty:'Foundation',duration:'2 weeks',price:0,desc:'Gap register comparing legacy vs target operating model.'},
+  {id:'ba-12',title:'Risk & Impact — PSD2 Compliance',category:'business-analysis',jobRole:'Business Analyst',difficulty:'Intermediate',duration:'2 weeks',price:29,desc:'Impact assessment heatmap for regulatory change.'},
+  {id:'ba-13',title:'Customer Journey — Telecoms Onboarding',category:'business-analysis',jobRole:'Business Analyst',difficulty:'Foundation',duration:'2 weeks',price:0,desc:'Map journeys, moments of truth and NPS backlog.'},
+  {id:'ba-14',title:'KPI Tree — Retail Analytics',category:'business-analysis',jobRole:'Data Analyst',difficulty:'Intermediate',duration:'2 weeks',price:29,desc:'Decompose goals into operational KPIs and packs.'},
+  {id:'ba-15',title:'Workshop Design — Finance Reconciliation',category:'business-analysis',jobRole:'Business Analyst',difficulty:'Foundation',duration:'1 week',price:0,desc:'Cross-functional workshop to resolve reconciliation exceptions.'},
+  {id:'ba-16',title:'Backlog Grooming — E-commerce',category:'business-analysis',jobRole:'Product Owner',difficulty:'Intermediate',duration:'2 weeks',price:29,desc:'Refine 50+ items, split epics, prepare sprint backlog.'},
+  {id:'ba-17',title:'Change Impact & Comms — Merger',category:'business-analysis',jobRole:'Change Manager',difficulty:'Advanced',duration:'3 weeks',price:49,desc:'Impact assessment, comms matrix and training needs.'},
+  {id:'ba-18',title:'Feasibility Paper — CRM Selection',category:'business-analysis',jobRole:'Business Analyst',difficulty:'Advanced',duration:'3 weeks',price:49,desc:'Build vs buy scoring and recommendation.'},
+  {id:'ba-19',title:'Interview Synthesis — User Research',category:'business-analysis',jobRole:'Business Analyst',difficulty:'Foundation',duration:'2 weeks',price:0,desc:'8 interviews, synthesis and affinity maps.'},
+  {id:'ba-20',title:'Requirements Validation — Loyalty Scheme',category:'business-analysis',jobRole:'Business Analyst',difficulty:'Intermediate',duration:'2 weeks',price:29,desc:'Validation via walkthroughs with sign-off.'},
+  {id:'ba-21',title:'Value Stream Mapping — Public Sector',category:'business-analysis',jobRole:'Business Analyst',difficulty:'Intermediate',duration:'2 weeks',price:29,desc:'Map value stream and quantify improvements.'},
+  {id:'se-01',title:'UML Modelling — Microservices Order',category:'software-engineering',jobRole:'Systems Analyst',difficulty:'Intermediate',duration:'3 weeks',price:49,desc:'Class, sequence and component diagrams for order microservices.'},
+  {id:'se-02',title:'Data Modelling (ERD) — CRM Platform',category:'software-engineering',jobRole:'Systems Analyst',difficulty:'Advanced',duration:'3 weeks',price:49,desc:'Conceptual, logical, physical ERDs to 3NF.'},
+  {id:'se-03',title:'SDLC & CI/CD Pipeline — DevOps',category:'software-engineering',jobRole:'Software Engineer',difficulty:'Intermediate',duration:'2 weeks',price:29,desc:'SDLC workflow, branching and CI/CD quality gates.'},
+  {id:'se-04',title:'API Design & Contract Testing — Payments',category:'software-engineering',jobRole:'Software Engineer',difficulty:'Advanced',duration:'3 weeks',price:49,desc:'OpenAPI spec and Pact contract tests.'},
+  {id:'se-05',title:'RPA Process Automation — Finance Ops',category:'software-engineering',jobRole:'Software Engineer',difficulty:'Intermediate',duration:'2 weeks',price:29,desc:'Automate invoice matching with RPA and audit trail.'},
+  {id:'se-06',title:'Event-Driven Architecture — Inventory',category:'software-engineering',jobRole:'Systems Analyst',difficulty:'Advanced',duration:'3 weeks',price:49,desc:'Event sourcing with Kafka and DLQ handling.'},
+  {id:'se-07',title:'Secure Coding (OWASP Top 10) — Hardening',category:'software-engineering',jobRole:'Software Engineer',difficulty:'Advanced',duration:'2 weeks',price:49,desc:'Fix vulns, input validation and secure headers.'},
+  {id:'se-08',title:'Testing Strategy Pyramid — E-commerce',category:'software-engineering',jobRole:'Software Engineer',difficulty:'Intermediate',duration:'2 weeks',price:29,desc:'Unit/integration/E2E strategy and coverage.'},
+  {id:'se-09',title:'Data Pipeline (ETL) — Retail Analytics',category:'software-engineering',jobRole:'Data Engineer',difficulty:'Advanced',duration:'3 weeks',price:49,desc:'Batch/streaming pipelines and quality checks.'},
+  {id:'se-10',title:'IaC — AWS Landing Zone',category:'software-engineering',jobRole:'Software Engineer',difficulty:'Advanced',duration:'3 weeks',price:49,desc:'VPC, ECS, RDS with Terraform.'},
+  {id:'se-11',title:'Frontend Design System — Component Lib',category:'software-engineering',jobRole:'Software Engineer',difficulty:'Intermediate',duration:'2 weeks',price:29,desc:'Storybook, tokens and a11y components.'},
+  {id:'se-12',title:'Observability — SRE Dashboards',category:'software-engineering',jobRole:'Software Engineer',difficulty:'Intermediate',duration:'2 weeks',price:29,desc:'Metrics, logs, traces, SLOs and alerting.'},
+  {id:'se-13',title:'Strangler Fig Migration — Legacy Monolith',category:'software-engineering',jobRole:'Systems Analyst',difficulty:'Advanced',duration:'3 weeks',price:49,desc:'Incremental migration with feature flags.'},
+  {id:'se-14',title:'Domain-Driven Design — Banking Domain',category:'software-engineering',jobRole:'Systems Analyst',difficulty:'Advanced',duration:'3 weeks',price:49,desc:'Bounded contexts and aggregates.'},
+  {id:'se-15',title:'Performance Tuning — High-Throughput API',category:'software-engineering',jobRole:'Software Engineer',difficulty:'Advanced',duration:'2 weeks',price:49,desc:'Profile, optimise and load test to 5k RPS.'},
+  {id:'se-16',title:'Mobile Offline-First — Field Service',category:'software-engineering',jobRole:'Software Engineer',difficulty:'Intermediate',duration:'3 weeks',price:49,desc:'Offline sync and conflict resolution.'},
+  {id:'se-17',title:'Threat Modelling (STRIDE) — FinTech',category:'software-engineering',jobRole:'Systems Analyst',difficulty:'Advanced',duration:'2 weeks',price:49,desc:'Threat modelling workshop and security backlog.'},
+  {id:'se-18',title:'Data Warehouse — Snowflake on AWS',category:'software-engineering',jobRole:'Data Engineer',difficulty:'Intermediate',duration:'3 weeks',price:49,desc:'Star schema, ELT with dbt and BI layer.'},
+  {id:'se-19',title:'Tech Debt Management — Agile Delivery',category:'software-engineering',jobRole:'Software Engineer',difficulty:'Foundation',duration:'1 week',price:0,desc:'Quantify debt and sprint integration.'},
+  {id:'se-20',title:'Code Review & Quality Gates — Practices',category:'software-engineering',jobRole:'Software Engineer',difficulty:'Foundation',duration:'1 week',price:0,desc:'PR templates and Sonar gates.'},
+  {id:'se-21',title:'State Management — React Enterprise App',category:'software-engineering',jobRole:'Software Engineer',difficulty:'Intermediate',duration:'2 weeks',price:29,desc:'Redux/Zustand comparison with tests.'},
+];
+
 /* In-House Project Data */
 
 const VAULT_FOLDERS = [

@@ -100,10 +100,15 @@ function route(){
     return;
   }
   const allowed = ['portal','overview','regional-boards','boost','cv-maker','interview-prep','events-hub','calendar','recordings','live-sessions','resources'];
-  const view = allowed.includes(h) ? h : 'portal';
+  let view = h, param = null;
+  if(h.startsWith('regional-boards/')){ view='regional-boards'; param=h.split('/')[1]||null; }
+  else if(!allowed.includes(h)) view='portal';
+  else param=null;
   state.activeView=view;
+  // keep country param for regional-boards drill-down
+  window._jbCountryParam = param;
   saveState();
-  render(view);
+  render(view, param);
 }
 function showToast(msg){
   let t=document.getElementById('_toast');
@@ -305,58 +310,124 @@ function viewOverview(){
     + '<div style="flex:1;display:flex;overflow:hidden;min-height:0;">'+main+right+'</div>';
 }
 
-function viewRegionalBoards(){
+function viewRegionalBoards(countryParam){
   const q = state.boostApplications.length;
   const pct = Math.min(100, Math.round(q/5*100));
-  const boardsHtml = REGIONAL_BOARDS_DATA.map(b=>{
-    return '<div style="background-color:#181818;border:2px solid #3a3a3a;border-radius:12px;overflow:hidden;display:flex;flex-direction:column;box-sizing:border-box;">'
-      + '<div style="height:140px;background:url(\''+b.img+'\') center/cover no-repeat;border-bottom:2px solid #3a3a3a;position:relative;">'
-      + '<div style="position:absolute;top:12px;left:12px;background-color:rgba(0,0,0,0.85);border:1px solid '+b.badgeBorder+';padding:4px 10px;border-radius:6px;font-size:11px;font-weight:900;color:'+b.badgeColor+';">'+esc(b.regionLabel)+'</div></div>'
-      + '<div style="padding:24px;display:flex;flex-direction:column;justify-content:space-between;flex:1;">'
-      + '<div><h3 style="font-size:18px;font-weight:900;color:#ffffff;margin:0 0 6px 0;">'+esc(b.title)+'</h3>'
-      + '<p style="font-size:13px;font-weight:700;color:#a3a3a3;line-height:1.5;margin:0 0 20px 0;">'+esc(b.desc)+'</p></div>'
-      + '<div style="display:flex;gap:10px;">'
-      + '<a href="'+b.link+'" target="_blank" rel="noopener" style="flex:1;background-color:'+b.btnBg+';color:#ffffff;text-decoration:none;text-align:center;border:1px solid '+b.btnBorder+';padding:10px;border-radius:8px;font-size:13px;font-weight:900;box-shadow:'+b.shadow+';">Open Board \u2197</a>'
-      + '<a href="'+b.demoLink+'" target="_blank" rel="noopener" style="flex:0.7;background-color:#262626;color:#f59e0b;text-decoration:none;text-align:center;border:2px solid #d97706;padding:10px;border-radius:8px;font-size:12px;font-weight:800;">Demo</a>'
-      + '</div></div></div>';
-  }).join('');
-
+  window._jbFilter = window._jbFilter || {q:'', region:'all', category:'all', sort:'name', arrange:'grid'};
+  const F = window._jbFilter;
+  const countries = (typeof JOB_COUNTRIES!=='undefined'? JOB_COUNTRIES : REGIONAL_BOARDS_DATA.map((b,i)=>({id:b.id, name:b.regionLabel.replace(' Region',''), flag:'🌐', region:b.regionLabel, hero:b.img})));
+  const boards = (typeof JOB_BOARDS!=='undefined'? JOB_BOARDS : []);
+  function countryBoards(cid){ return boards.filter(b=>b.countryId===cid); }
+  // If drill-down to country: show its boards
+  if(countryParam){
+    const country = countries.find(c=>c.id===countryParam);
+    if(!country) countryParam=null; else {
+      let list = countryBoards(countryParam);
+      // filter by search/category inside country view
+      if(F.q) { const s=F.q.toLowerCase(); list = list.filter(b=> b.name.toLowerCase().includes(s)||b.url.toLowerCase().includes(s)||(b.desc||'').toLowerCase().includes(s)); }
+      if(F.category!=='all') list = list.filter(b=> (b.category||'general')===F.category);
+      if(F.sort==='name') list.sort((a,b)=>a.name.localeCompare(b.name));
+      else if(F.sort==='domain') list.sort((a,b)=> new URL(a.url).hostname.localeCompare(new URL(b.url).hostname));
+      function boardCard(b){
+        const host = (()=>{try{return new URL(b.url).hostname.replace('www.','')}catch{return b.url}})();
+        return '<div class="jb-bug-card" data-board="'+b.id+'" style="background:#181818;border:2px solid #2a2a2a;border-radius:14px;overflow:hidden;display:flex;flex-direction:column;">'
+        + '<div class="jb-og-img" data-url="'+esc(b.url)+'" style="height:160px;background:#0d0d0d url(\''+ (b.ogImage||country.hero) +'\') center/cover no-repeat;position:relative;border-bottom:1px solid #2a2a2a;"><div style="position:absolute;inset:0;background:linear-gradient(to top, rgba(0,0,0,.55), transparent);"></div><div style="position:absolute;bottom:10px;left:12px;background:rgba(0,0,0,.75);border:1px solid #3a3a3a;padding:4px 8px;border-radius:999px;font-size:10px;font-weight:800;color:#f59e0b;">'+esc(host)+'</div></div>'
+        + '<div style="padding:16px;flex:1;display:flex;flex-direction:column;">'
+        + '<h3 style="font-size:14px;font-weight:800;color:#fff;margin-bottom:6px;">'+esc(b.name)+'</h3>'
+        + '<p style="font-size:12px;color:#a3a3a3;line-height:1.5;flex:1;">'+esc(b.desc||'')+'</p>'
+        + '<div style="display:flex;gap:8px;margin-top:14px;"><a href="'+esc(b.url)+'" target="_blank" rel="noopener" class="jb-open" data-board="'+b.id+'" style="flex:1;background:#2563eb;color:#fff;text-align:center;padding:10px;border-radius:8px;font-size:12px;font-weight:800;text-decoration:none;">Open Board ↗</a><a href="'+esc(b.demoUrl||b.url)+'" target="_blank" rel="noopener" style="flex:.7;background:#262626;color:#f59e0b;text-align:center;padding:10px;border-radius:8px;font-size:11px;font-weight:800;text-decoration:none;border:1px solid #d97706;">Demo</a></div>'
+        + '</div></div>';
+      }
+      const main = '<div style="flex:1;padding:24px 28px;overflow-y:auto;background:#121212;">'
+        + '<div style="max-width:1100px;margin:0 auto;display:flex;flex-direction:column;gap:18px;">'
+        + '<div style="display:flex;align-items:center;gap:10px;font-size:12px;color:#a3a3a3;"><a href="#regional-boards" style="color:#f59e0b;font-weight:800;text-decoration:none;">← All Countries</a><span>•</span><span style="color:#fff;font-weight:800;">'+esc(country.flag)+' '+esc(country.name)+'</span><span style="background:#1a1a1a;border:1px solid #3a3a3a;padding:3px 8px;border-radius:999px;font-size:11px;">'+esc(country.region)+'</span></div>'
+        + '<div style="background:linear-gradient(rgba(24,24,24,.88), rgba(24,24,24,.92)), url(\''+country.hero+'\') center/cover no-repeat;border:2px solid #3a3a3a;border-radius:12px;padding:20px;display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;">'
+        + '<div><h1 style="font-size:20px;font-weight:800;color:#fff;">'+esc(country.flag)+' '+esc(country.name)+' — Job Boards</h1><p style="font-size:12px;color:#a3a3a3;margin-top:4px;">'+countryBoards(countryParam).length+' verified boards • Direct links (LinkedIn '+esc(country.name)+' differs from UK) • Workers fetch OG preview</p></div>'
+        + '<div style="display:flex;gap:8px;align-items:center;">'
+        + '<input id="jbSearch" placeholder="Search boards, e.g. Seek, LinkedIn..." value="'+esc(F.q)+'" style="padding:9px 12px;border-radius:10px;border:1px solid #3a3a3a;background:#0d0d0d;color:#fff;font-size:12px;min-width:220px;" />'
+        + '<select id="jbCategory" style="padding:9px 10px;border-radius:10px;border:1px solid #3a3a3a;background:#0d0d0d;color:#fff;font-size:12px;"><option value="all" '+(F.category==='all'?'selected':'')+'>All Categories</option><option value="general" '+(F.category==='general'?'selected':'')+'>General</option><option value="tech" '+(F.category==='tech'?'selected':'')+'>Tech</option><option value="remote" '+(F.category==='remote'?'selected':'')+'>Remote</option></select>'
+        + '<select id="jbSort" style="padding:9px 10px;border-radius:10px;border:1px solid #3a3a3a;background:#0d0d0d;color:#fff;font-size:12px;"><option value="name" '+(F.sort==='name'?'selected':'')+'>Sort: Name</option><option value="domain" '+(F.sort==='domain'?'selected':'')+'>Sort: Domain</option></select>'
+        + '<button id="jbArrange" style="padding:9px 12px;border-radius:10px;border:1px solid #3a3a3a;background:#1a1a1a;color:#fff;font-size:12px;font-weight:800;">'+(F.arrange==='list'?'Grid':'List')+'</button>'
+        + '</div></div>'
+        + '<div id="jbGrid" style="display:grid;gap:16px;grid-template-columns:'+(F.arrange==='list'?'1fr':'repeat(auto-fit,minmax(320px, 1fr))')+';">'+ list.map(boardCard).join('') + (list.length?'':'<p style="color:#737373;padding:20px;text-align:center;">No boards match.</p>') +'</div>'
+        + '</div></div>';
+      const right = '<div style="width:320px;background:#181818;border-left:2px solid #3a3a3a;display:flex;flex-direction:column;overflow-y:auto;flex-shrink:0;">'
+        + '<div style="padding:18px;">'
+        + '<h3 style="font-size:13px;font-weight:800;color:#fff;margin-bottom:10px;">Filters & Arrange</h3>'
+        + '<div style="background:#161616;border:1px solid #2a2a2a;border-radius:10px;padding:12px;margin-bottom:12px;"><div style="font-size:11px;color:#a3a3a3;margin-bottom:6px;">Region</div><div style="font-size:12px;font-weight:700;color:#fff;">'+esc(country.region)+'</div><div style="font-size:11px;color:#737373;">'+esc(country.name)+'</div></div>'
+        + '<div style="background:#161616;border:1px solid #2a2a2a;border-radius:10px;padding:12px;margin-bottom:12px;"><div style="font-size:11px;color:#a3a3a3;margin-bottom:6px;">Quota</div><div style="font-size:12px;font-weight:800;color:#fff;">'+q+' / 5 logged</div><div style="height:6px;background:#1f1f1f;border-radius:999px;overflow:hidden;margin-top:6px;"><div style="width:'+pct+'%;height:100%;background:linear-gradient(90deg,#d97706,#16a34a);"></div></div></div>'
+        + '<div style="background:#1a1a1a;border:1px solid #2a2a2a;border-radius:10px;padding:12px;"><div style="font-size:11px;font-weight:800;color:#f59e0b;margin-bottom:6px;">Recommended</div><p style="font-size:11px;color:#a3a3a3;line-height:1.5;">Boards for '+esc(country.name)+' are direct country-specific domains (e.g., LinkedIn '+esc(country.name)+' differs from UK). Open + log to satisfy 5-job quota.</p></div>'
+        + '</div>'
+        + '<div style="padding:16px;background:#161616;border-top:2px solid #3a3a3a;"><a href="#regional-boards" style="display:block;width:100%;text-align:center;padding:12px;background:transparent;border:2px solid #3a3a3a;color:#a3a3a3;border-radius:8px;font-weight:800;text-decoration:none;">← Back to Countries</a></div></div>';
+      return topbarHtml('Job Boards • '+country.name, '<span>'+esc(country.flag)+' '+esc(country.region)+'</span><span style="color:#34d399;font-weight:800;">'+list.length+' Boards</span>', 55) + '<div style="flex:1;display:flex;overflow:hidden;min-height:0;">'+main+right+'</div>';
+    }
+  }
+  // Country marketplace grid (first category: job boards country based)
+  // F and countries already defined above; reuse without redeclaring
+  let filtered = countries.slice();
+  if(F.q){ const s=F.q.toLowerCase(); filtered = filtered.filter(c=> c.name.toLowerCase().includes(s) || c.region.toLowerCase().includes(s)); }
+  if(F.region!=='all') filtered = filtered.filter(c=> c.region===F.region);
+  if(F.sort==='name') filtered.sort((a,b)=> a.name.localeCompare(b.name));
+  else if(F.sort==='region') filtered.sort((a,b)=> a.region.localeCompare(b.region));
+  const regionOpts = ['all','Africa','Europe','Oceania','North America','Asia','Caribbean','Remote'];
+  function countryCard(c){
+    const bc = (typeof JOB_BOARDS!=='undefined'? JOB_BOARDS.filter(b=>b.countryId===c.id).length : 2);
+    return '<a href="#regional-boards/'+c.id+'" style="text-decoration:none;background:#181818;border:2px solid #2a2a2a;border-radius:14px;overflow:hidden;display:flex;flex-direction:column;transition:border-color .15s;">'
+      + '<div style="height:140px;background:url(\''+c.hero+'\') center/cover no-repeat;position:relative;border-bottom:1px solid #2a2a2a;"><div style="position:absolute;top:10px;left:10px;background:rgba(0,0,0,.75);border:1px solid #3a3a3a;padding:4px 8px;border-radius:999px;font-size:11px;font-weight:800;color:#f59e0b;">'+esc(c.region)+'</div><div style="position:absolute;bottom:10px;left:10px;background:rgba(0,0,0,.7);padding:6px 10px;border-radius:10px;font-size:13px;font-weight:800;color:#fff;">'+esc(c.flag)+' '+esc(c.name)+'</div></div>'
+      + '<div style="padding:16px;flex:1;display:flex;flex-direction:column;">'
+      + '<div style="font-size:12px;color:#a3a3a3;flex:1;">'+bc+' verified job boards • Direct links</div>'
+      + '<div style="margin-top:12px;display:flex;justify-content:space-between;align-items:center;"><span style="font-size:11px;font-weight:800;color:#f59e0b;">Open Boards →</span><span style="font-size:11px;color:#737373;">'+esc(c.region)+'</span></div>'
+      + '</div></a>';
+  }
   const main = ''
-    + '<div style="flex:1;padding:36px 52px;overflow-y:auto;background-color:#121212;">'
-    + '<div style="max-width:960px;margin:0 auto;display:flex;flex-direction:column;gap:32px;">'
-    + '<div style="background:linear-gradient(rgba(24,24,24,0.9), rgba(24,24,24,0.9)), url(\'https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?auto=format&fit=crop&w=1200&q=80\') center/cover no-repeat;border:2px solid #3a3a3a;border-radius:12px;padding:32px;box-sizing:border-box;">'
-    + '<span style="font-size:12px;font-weight:800;color:#f59e0b;text-transform:uppercase;letter-spacing:0.8px;">Verified Employment Channels</span>'
-    + '<h1 style="font-size:28px;font-weight:900;color:#ffffff;margin:8px 0 10px 0;">Regional Job Board Directory</h1>'
-    + '<p style="font-size:14px;font-weight:700;color:#c0c0c0;margin:0;line-height:1.6;">Access verified country-specific and global remote job boards. Remember your cohort rule: you must track and log a minimum of 5 applications across these boards to maintain progress. Training allows multiple concurrent jobs.</p></div>'
-    + '<div style="display:grid;grid-template-columns:repeat(2, 1fr);gap:24px;">'+boardsHtml+'</div>'
+    + '<div style="flex:1;padding:24px 28px;overflow-y:auto;background:#121212;">'
+    + '<div style="max-width:1200px;margin:0 auto;display:flex;flex-direction:column;gap:18px;">'
+    + '<div style="background:linear-gradient(rgba(24,24,24,.88), rgba(24,24,24,.92)), url(\'https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?auto=format&fit=crop&w=1200&q=80\') center/cover no-repeat;border:2px solid #3a3a3a;border-radius:12px;padding:20px;display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap;align-items:center;">'
+    + '<div><h1 style="font-size:20px;font-weight:800;color:#fff;">Job Boards — Country Based</h1><p style="font-size:12px;color:#a3a3a3;margin-top:4px;">25 countries • Marketplace cards & list • Search, filter, arrange, sort — directory for job boards only. Click a country to see its boards (Workers fetch image meta).</p></div>'
+    + '<div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;">'
+    + '<input id="jbCountrySearch" placeholder="Search country or region, e.g. Nigeria, Europe..." value="'+esc(F.q)+'" style="padding:10px 12px;border-radius:10px;border:1px solid #3a3a3a;background:#0d0d0d;color:#fff;font-size:12px;min-width:260px;" />'
+    + '<select id="jbRegion" style="padding:10px 10px;border-radius:10px;border:1px solid #3a3a3a;background:#0d0d0d;color:#fff;font-size:12px;"><option value="all">All Regions</option>'+regionOpts.slice(1).map(r=>'<option '+(F.region===r?'selected':'')+' value="'+r+'">'+r+'</option>').join('')+'</select>'
+    + '<select id="jbSort" style="padding:10px 10px;border-radius:10px;border:1px solid #3a3a3a;background:#0d0d0d;color:#fff;font-size:12px;"><option value="name" '+(F.sort==='name'?'selected':'')+'>Sort: Name</option><option value="region" '+(F.sort==='region'?'selected':'')+'>Sort: Region</option></select>'
+    + '<button id="jbArrange" style="padding:10px 12px;border-radius:10px;border:1px solid #3a3a3a;background:#1a1a1a;color:#fff;font-size:12px;font-weight:800;">'+(F.arrange==='list'?'Grid':'List')+'</button>'
+    + '</div></div>'
+    + '<div id="jbCountryGrid" style="display:grid;gap:16px;grid-template-columns:'+(F.arrange==='list'?'1fr':'repeat(auto-fit,minmax(280px, 320px))')+';">'+ filtered.map(countryCard).join('') + (filtered.length?'':'<p style="color:#737373;padding:20px;">No countries match.</p>') +'</div>'
     + '</div></div>';
 
   const right = ''
-    + '<div style="width:360px;background-color:#181818;border-left:2px solid #3a3a3a;display:flex;flex-direction:column;justify-content:space-between;overflow-y:auto;flex-shrink:0;">'
-    + '<div style="padding:28px;">'
-    + '<div style="margin-bottom:24px;border-bottom:2px solid #3a3a3a;padding-bottom:16px;">'
-    + '<span style="font-size:11px;font-weight:800;color:#f59e0b;text-transform:uppercase;letter-spacing:0.8px;">Application Quota</span>'
-    + '<h3 style="font-size:18px;font-weight:900;color:#ffffff;margin:4px 0 2px 0;">Mandatory 5-Job Rule</h3>'
-    + '<p style="font-size:12px;font-weight:700;color:#c0c0c0;margin:0;">Accountability Enforcement</p></div>'
-    + '<div style="background-color:#161616;border:2px solid #3a3a3a;border-radius:10px;padding:20px;margin-bottom:24px;">'
-    + '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;">'
-    + '<span style="font-size:13px;font-weight:900;color:#ffffff;">Submitted: '+q+' / 5 Jobs</span>'
-    + '<span style="font-size:13px;font-weight:900;color:#f59e0b;">'+(5-q)+' Remaining</span></div>'
-    + '<div style="height:10px;background-color:#1f1f1f;border:1px solid #3a3a3a;border-radius:5px;overflow:hidden;margin-bottom:12px;"><div style="width:'+pct+'%;height:100%;background:linear-gradient(90deg, #d97706 0%, #16a34a 100%);"></div></div>'
-    + '<p style="font-size:12px;font-weight:700;color:#a3a3a3;margin:0;line-height:1.5;">You must log at least 5 applications using external job board links before unlocking mock interviews.</p></div>'
-    + '<div style="display:flex;flex-direction:column;gap:12px;font-size:13px;font-weight:700;color:#d4d4d4;margin-bottom:32px;">'
-    + '<label style="display:flex;align-items:center;gap:10px;cursor:pointer;"><input type="checkbox" checked style="accent-color:#16a34a;width:16px;height:16px;"> Visit Regional Job Boards</label>'
-    + '<label style="display:flex;align-items:center;gap:10px;cursor:pointer;"><input type="checkbox" '+(q>=1?'checked':'')+' style="accent-color:#16a34a;width:16px;height:16px;"> Copy Official Application Link</label>'
-    + '<label style="display:flex;align-items:center;gap:10px;cursor:pointer;"><input type="checkbox" '+(q>=3?'checked':'')+' style="accent-color:#16a34a;width:16px;height:16px;"> Log Company Name & Requirements</label>'
-    + '<label style="display:flex;align-items:center;gap:10px;cursor:pointer;"><input type="checkbox" '+(q>=5?'checked':'')+' style="accent-color:#d97706;width:16px;height:16px;"> Meet 5-Job Quota for Progression</label>'
-    + '</div></div>'
-    + '<div style="padding:24px;background-color:#161616;border-top:2px solid #3a3a3a;">'
-    + '<button onclick="window._nav(\'boost\')" style="width:100%;background:linear-gradient(135deg, #f59e0b 0%, #d97706 100%);color:#ffffff;border:1px solid #f59e0b;padding:14px;border-radius:8px;font-size:14px;font-weight:900;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px;box-shadow:0 4px 16px rgba(217, 119, 6, 0.4);">'
-    + '<span>Proceed to Boost & Accountability Log</span><svg style="width:16px;height:16px;fill:currentColor;" viewBox="0 0 24 24"><path d="M5 13h11.86l-5.43 5.43 1.42 1.42L21.14 12l-8.29-8.29-1.42 1.42L16.86 11H5v2z"/></svg></button></div></div>';
+    + '<div style="width:340px;background:#181818;border-left:2px solid #3a3a3a;display:flex;flex-direction:column;overflow-y:auto;flex-shrink:0;">'
+    + '<div style="padding:18px;">'
+    + '<h3 style="font-size:13px;font-weight:800;color:#fff;margin-bottom:10px;">Recommended</h3>'
+    + '<div style="background:#161616;border:1px solid #2a2a2a;border-radius:10px;padding:12px;margin-bottom:12px;"><div style="font-size:12px;font-weight:700;color:#fff;">Start with your region</div><p style="font-size:11px;color:#a3a3a3;margin-top:6px;line-height:1.5;">Pick your country card — each opens its dedicated boards (e.g., LinkedIn Nigeria vs LinkedIn UK). Open Board goes direct to site via Workers-fetched preview.</p></div>'
+    + '<h3 style="font-size:13px;font-weight:800;color:#fff;margin:14px 0 8px;">Filter</h3>'
+    + '<div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:12px;"><button onclick="window._jbSetRegion(\'all\')" style="padding:6px 10px;border-radius:999px;font-size:11px;font-weight:800;border:1px solid '+(F.region==='all'?'#d97706':'#3a3a3a')+';background:'+(F.region==='all'?'#d97706':'transparent')+';color:'+(F.region==='all'?'#fff':'#a3a3a3')+';">All</button>'+regionOpts.slice(1).map(r=>'<button onclick="window._jbSetRegion(\''+r+'\')" style="padding:6px 10px;border-radius:999px;font-size:11px;font-weight:800;border:1px solid '+(F.region===r?'#d97706':'#3a3a3a')+';background:'+(F.region===r?'#d97706':'transparent')+';color:'+(F.region===r?'#fff':'#a3a3a3')+';">'+r+'</button>').join('')+'</div>'
+    + '<h3 style="font-size:13px;font-weight:800;color:#fff;margin:14px 0 8px;">Quota</h3>'
+    + '<div style="background:#161616;border:1px solid #2a2a2a;border-radius:10px;padding:12px;"><div style="font-size:12px;font-weight:800;color:#fff;">'+q+' / 5 logged</div><div style="height:6px;background:#1f1f1f;border-radius:999px;overflow:hidden;margin-top:6px;"><div style="width:'+pct+'%;height:100%;background:linear-gradient(90deg,#d97706,#16a34a);"></div></div><p style="font-size:11px;color:#a3a3a3;margin-top:8px;">Log 5 applications across any country boards to unlock mocks.</p></div>'
+    + '</div>'
+    + '<div style="padding:16px;background:#161616;border-top:2px solid #3a3a3a;"><button onclick="window._nav(\'boost\')" style="width:100%;padding:12px;background:#d97706;color:#fff;border-radius:8px;font-weight:800;border:none;cursor:pointer;">Go to Boost Log</button></div></div>';
 
-  return topbarHtml('Job Acquisition Portal \u2022 Regional Job Board Directory', '<span>Active Region: <strong style="color:#f59e0b;">Global & Local</strong></span><span style="color:#34d399;font-weight:800;">Verified Boards</span>', 40)
+  return topbarHtml('Job Boards • Country Based', '<span>25 Countries</span><span style="color:#34d399;font-weight:800;">'+JOB_COUNTRIES.length+' Verified</span>', 40)
     + '<div style="flex:1;display:flex;overflow:hidden;min-height:0;">'+main+right+'</div>';
 }
+function bindRegionalBoards(){
+  const s=document.getElementById('jbCountrySearch'); if(s) s.addEventListener('input', e=>{ window._jbFilter.q=e.target.value; const m=document.getElementById('main-content'); const h=location.hash; if(h.startsWith('#regional-boards/')){ m.innerHTML=viewRegionalBoards(window._jbCountryParam); bindRegionalBoards(); const inp=document.getElementById('jbSearch'); if(inp) inp.focus(); } else { m.innerHTML=viewRegionalBoards(); bindRegionalBoards(); const inp2=document.getElementById('jbCountrySearch'); if(inp2){ inp2.focus(); const v=inp2.value; inp2.value=''; inp2.value=v; } } });
+  const r=document.getElementById('jbRegion'); if(r) r.addEventListener('change', e=>{ window._jbFilter.region=e.target.value; const m=document.getElementById('main-content'); m.innerHTML=viewRegionalBoards(window._jbCountryParam); bindRegionalBoards(); });
+  const so=document.getElementById('jbSort'); if(so) so.addEventListener('change', e=>{ window._jbFilter.sort=e.target.value; const m=document.getElementById('main-content'); m.innerHTML=viewRegionalBoards(window._jbCountryParam); bindRegionalBoards(); });
+  const ar=document.getElementById('jbArrange'); if(ar) ar.addEventListener('click', ()=>{ window._jbFilter.arrange= window._jbFilter.arrange==='grid'?'list':'grid'; const m=document.getElementById('main-content'); m.innerHTML=viewRegionalBoards(window._jbCountryParam); bindRegionalBoards(); });
+  // country-detail search
+  const s2=document.getElementById('jbSearch'); if(s2) s2.addEventListener('input', e=>{ window._jbFilter.q=e.target.value; const m=document.getElementById('main-content'); m.innerHTML=viewRegionalBoards(window._jbCountryParam); bindRegionalBoards(); });
+  const c2=document.getElementById('jbCategory'); if(c2) c2.addEventListener('change', e=>{ window._jbFilter.category=e.target.value; const m=document.getElementById('main-content'); m.innerHTML=viewRegionalBoards(window._jbCountryParam); bindRegionalBoards(); });
+  const so2=document.getElementById('jbSort'); if(so2 && document.getElementById('jbCategory')) so2.addEventListener('change', e=>{ window._jbFilter.sort=e.target.value; const m=document.getElementById('main-content'); m.innerHTML=viewRegionalBoards(window._jbCountryParam); bindRegionalBoards(); });
+  // Workers fetch OG previews for BUG cards
+  document.querySelectorAll('.jb-og-img[data-url]').forEach(el=>{
+    const url=el.getAttribute('data-url'); if(!url) return;
+    fetch('/api/og?url='+encodeURIComponent(url)).then(r=>r.json()).then(j=>{
+      if(j.image){ el.style.backgroundImage = 'url(\''+j.image.replace(/'/g,'%27')+'\')'; }
+      if(j.title){ const t=el.parentElement && el.parentElement.querySelector('h3'); if(t && j.title!==new URL(url).hostname) { /* keep orig title */ } }
+    }).catch(()=>{});
+  });
+  // board open tracking for demo (right sidebar not trending, just count)
+}
+window._jbSetRegion = (v)=>{ window._jbFilter.region=v; const m=document.getElementById('main-content'); m.innerHTML=viewRegionalBoards(); bindRegionalBoards(); };
 
 function viewBoost(){
   const apps = state.boostApplications;
@@ -1050,7 +1121,7 @@ function updateSidebar(activeRoute){
 }
 
 /* ─── Main render ─── */
-function render(view){
+function render(view, param){
   const fullWidthViews = [];
   const isFull = fullWidthViews.includes(view);
   // update sidebar even for full width (for state)
@@ -1064,7 +1135,7 @@ function render(view){
   switch(view){
     case 'portal': html = viewPortal(); break;
     case 'overview': html = viewOverview(); break;
-    case 'regional-boards': html = viewRegionalBoards(); break;
+    case 'regional-boards': html = viewRegionalBoards(param); if(typeof bindRegionalBoards==='function') setTimeout(bindRegionalBoards, 0); break;
     case 'boost': html = viewBoost(); break;
     case 'cv-maker': html = viewCVMaker(); break;
     case 'interview-prep': html = viewInterviewPrep(); break;

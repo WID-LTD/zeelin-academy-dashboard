@@ -251,6 +251,11 @@ function route(){
   /* Cohort-level legacy redirect */
   if(view==='evaluation' && !parts[1]){ location.replace('#mentorship'); return; }
 
+  /* Marketplace routes */
+  if(view==='catalog'){ render('catalog'); return; }
+  if(view==='cart'){ render('cart'); return; }
+  if(view==='checkout'){ render('checkout'); return; }
+
   render(view, parts[1]||null, parts[2]||null);
 }
 
@@ -285,6 +290,25 @@ function navLink(routeKey,label,icon,activeKey){
 }
 
 function renderSidebar(activeKey){
+  // Tailored marketplace sidebar - no other projects nav, just marketplace + back
+  if(['catalog','cart','checkout'].includes(activeKey)){
+    const cartCount = (typeof mpCart==='function'? mpCart().length : 0);
+    return `
+    <div class="sidebar-head">
+      <img src="assets/logo.png" alt="Zeelin Academy Logo">
+      <span class="sidebar-title">Project Marketplace</span>
+    </div>
+    <div class="sidebar-nav">
+      <a href="#dashboard" style="display:flex;align-items:center;gap:8px;padding:10px 12px;margin-bottom:12px;border-radius:8px;border:1px solid #3a3a3a;background:#1a1a1a;color:#a3a3a3;font-weight:700;text-decoration:none;font-size:13px;"><svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z"/></svg> Back to Projects</a>
+      <div class="sidebar-label">Marketplace</div>
+      <a href="#catalog" data-route="catalog" class="${activeKey==='catalog'?'active':''}"><svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M20 2H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zm-2 12H6v-2h14v2zm-12-4h12V8H6v2z"/></svg><span>Project Shop</span><span class="count">42</span></a>
+      <a href="#cart" data-route="cart" class="${activeKey==='cart'?'active':''}"><svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M7 18c-1.1 0-1.99.9-1.99 2S5.9 22 7 22s2-.9 2-2-.9-2-2-2zM17 18c-1.1 0-1.99.9-1.99 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zM7.08 14h8.33c.74 0 1.36-.5 1.54-1.18l2.42-8.42H6.21l-.94-2H1v2h2l3.6 7.59-1.35 2.44C4.52 15.37 5.48 17 7 17h11v-2H7l1.1-2z"/></svg><span>Cart</span><span class="count">${cartCount}</span></a>
+      <a href="#checkout" data-route="checkout" class="${activeKey==='checkout'?'active':''}"><svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 10z"/></svg><span>Checkout (Demo)</span></a>
+      <div class="sidebar-label">Categories</div>
+      <a href="javascript:void(0)" onclick="window._mpFilter={cat:'business-analysis',role:'all',q:'',sort:'name',arrange:'grid'};location.hash='#catalog'" style="display:flex;align-items:center;gap:8px;padding:8px 12px;color:#d4d4d4;font-size:13px;"><span style="width:8px;height:8px;border-radius:50%;background:#d97706;"></span> Business Analysis</a>
+      <a href="javascript:void(0)" onclick="window._mpFilter={cat:'software-engineering',role:'all',q:'',sort:'name',arrange:'grid'};location.hash='#catalog'" style="display:flex;align-items:center;gap:8px;padding:8px 12px;color:#d4d4d4;font-size:13px;"><span style="width:8px;height:8px;border-radius:50%;background:#2563eb;"></span> Software Engineering</a>
+    </div>`;
+  }
   const proj = getProject(currentProjectId);
   let html = `
     <div class="sidebar-head">
@@ -620,13 +644,131 @@ function viewDashboard(){
             <span style="font-size:13px;color:#c6c6c6;font-weight:600;">42 Projects Available</span>
           </div>
         </div>
-        <button onclick="_nav('support')" style="margin-top:28px;width:100%;padding:12px;border:1px solid #404040;background-color:transparent;color:#b5b5b5;font-size:13px;font-weight:700;border-radius:8px;cursor:pointer;transition:all 0.2s;">Explore Project Shop</button>
+        <button onclick="location.hash='#catalog'" style="margin-top:28px;width:100%;padding:12px;border:1px solid #d97706;background-color:#d97706;color:#fff;font-size:13px;font-weight:700;border-radius:8px;cursor:pointer;transition:all 0.2s;">Explore Project Shop</button>
       </div>
 
     </div>
+    ${(() => {
+      const enrolledIds = (function(){ try{return JSON.parse(localStorage.getItem('zeelin_mp_enrolled')||'[]')}catch{return []} })();
+      if (!enrolledIds.length) return '';
+      const enrolled = enrolledIds.map(id=> MARKETPLACE_PROJECTS.find(p=>p.id===id)).filter(Boolean);
+      if (!enrolled.length) return '';
+      const ba = enrolled.filter(p=>p.category==='business-analysis');
+      const se = enrolled.filter(p=>p.category==='software-engineering');
+      function miniCard(p){
+        const c = p.category==='business-analysis' ? '#f59e0b' : '#60a5fa';
+        return '<div style="background:#181818;border:2px solid #14532d;border-radius:12px;padding:18px;display:flex;flex-direction:column;"><div style="font-size:10px;font-weight:800;color:'+c+';text-transform:uppercase;">'+(p.category==='business-analysis'?'Business Analysis':'Software Engineering')+' - '+p.jobRole+'</div><div style="font-size:14px;font-weight:800;color:#fff;margin:6px 0;">'+p.title+'</div><div style="font-size:12px;color:#a3a3a3;flex:1;">'+p.desc+'</div><div style="margin-top:12px;padding:8px 10px;background:#14532d;color:#4ade80;border-radius:8px;font-size:11px;font-weight:800;text-align:center;">Enrolled - Grouped & Supported</div></div>';
+      }
+      return '<div style="margin-top:32px;">'
+        + '<h2 style="font-size:16px;font-weight:800;color:#fff;margin-bottom:6px;">My Marketplace Projects - Added to In-House Dashboard</h2>'
+        + '<p style="font-size:12px;color:#a3a3a3;margin-bottom:14px;">Purchased via demo checkout. Grouped by job role alongside your Supported / Mandate / Group projects and fully supported.</p>'
+        + (ba.length?'<h3 style="font-size:13px;font-weight:800;color:#f59e0b;margin:14px 0 8px;">Business Analysis - '+ba.length+'</h3><div style="display:grid;gap:14px;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));">'+ba.map(miniCard).join('')+'</div>':'')
+        + (se.length?'<h3 style="font-size:13px;font-weight:800;color:#60a5fa;margin:14px 0 8px;">Software Engineering - '+se.length+'</h3><div style="display:grid;gap:14px;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));">'+se.map(miniCard).join('')+'</div>':'')
+        + '</div>';
+    })()}
 
   </main>`;
 }
+
+/* --- Marketplace: helpers (cart + enrolled) --- */
+function mpCart(){ try{return JSON.parse(localStorage.getItem('zeelin_mp_cart')||'[]')}catch{return []} }
+function mpSetCart(a){ localStorage.setItem('zeelin_mp_cart', JSON.stringify(a)); window.dispatchEvent(new Event('mp-cart-changed')) }
+function mpAdd(id){ const c=mpCart(); if(c.includes(id)) return false; c.push(id); mpSetCart(c); return true }
+function mpRemove(id){ const c=mpCart().filter(x=>x!==id); mpSetCart(c) }
+function mpEnrolled(){ try{return JSON.parse(localStorage.getItem('zeelin_mp_enrolled')||'[]')}catch{return []} }
+function mpEnroll(ids){ const e=mpEnrolled(); const m=new Set([...e, ...ids]); localStorage.setItem('zeelin_mp_enrolled', JSON.stringify([...m])) }
+function mpPrice(p){ return p.price===0?'Free':'GBP '+p.price }
+function viewCatalog(){
+  const enrolled = new Set(mpEnrolled());
+  const cart = new Set(mpCart());
+  window._mpFilter = window._mpFilter || {cat:'all', role:'all', q:''};
+  const f = window._mpFilter;
+  let list = MARKETPLACE_PROJECTS.slice();
+  if(f.cat!=='all') list = list.filter(p=>p.category===f.cat);
+  if(f.role!=='all') list = list.filter(p=>p.jobRole===f.role);
+  if(f.q) { const q=f.q.toLowerCase(); list = list.filter(p=>p.title.toLowerCase().includes(q)||p.desc.toLowerCase().includes(q)); }
+  const baCount = MARKETPLACE_PROJECTS.filter(p=>p.category==='business-analysis').length;
+  const seCount = MARKETPLACE_PROJECTS.filter(p=>p.category==='software-engineering').length;
+  const grouped = f.cat==='all';
+  function card(p){
+    const isEnrolled = enrolled.has(p.id);
+    const inCart = cart.has(p.id);
+    const badgeColor = p.category==='business-analysis' ? '#d97706' : '#2563eb';
+    const badgeBg = p.category==='business-analysis' ? '#26170b' : '#172554';
+    const badgeLabel = p.category==='business-analysis' ? 'Business Analysis' : 'Software Engineering';
+    return '<div style="background:#181818;border:2px solid '+(isEnrolled?'#14532d':'#2a2a2a')+';border-radius:14px;padding:18px;display:flex;flex-direction:column;min-height:340px;position:relative;">'
+      + '<div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:10px;"><span style="background:'+badgeBg+';color:'+badgeColor+';font-size:10px;font-weight:800;padding:4px 8px;border-radius:999px;text-transform:uppercase;">'+badgeLabel+'</span><span style="background:#1a1a1a;color:#a3a3a3;font-size:10px;font-weight:700;padding:4px 8px;border-radius:999px;">'+p.jobRole+'</span>'+(p.price===0?'<span style="background:#14532d;color:#4ade80;font-size:10px;font-weight:800;padding:4px 8px;border-radius:999px;">FREE</span>':'')+'</div>'
+      + '<h3 style="font-size:15px;font-weight:800;color:#fff;line-height:1.3;margin-bottom:6px;">'+p.title+'</h3>'
+      + '<p style="font-size:12.5px;color:#a3a3a3;line-height:1.5;flex:1;">'+p.desc+'</p>'
+      + '<div style="display:flex;gap:6px;margin:12px 0;font-size:11px;color:#737373;"><span>'+p.difficulty+'</span><span>-</span><span>'+p.duration+'</span></div>'
+      + '<div style="display:flex;justify-content:space-between;align-items:center;border-top:1px solid #2a2a2a;padding-top:12px;margin-top:auto;"><span style="font-weight:800;color:'+(p.price===0?'#4ade80':'#fbbf24')+';">'+mpPrice(p)+'</span>'+(isEnrolled?'<span style="background:#14532d;color:#4ade80;font-size:11px;font-weight:800;padding:6px 10px;border-radius:8px;">Enrolled</span>':(inCart?'<a href="#cart" style="background:#262626;color:#fff;font-size:11px;font-weight:800;padding:8px 12px;border-radius:8px;text-decoration:none;">In Cart</a>':'<button onclick="window._mpAdd(\''+p.id+'\')" style="background:#d97706;color:#fff;font-size:11px;font-weight:800;padding:8px 14px;border-radius:8px;border:none;cursor:pointer;">Add to Cart</button>'))+'</div>'
+      + '</div>';
+  }
+  const categories = ['Business Analyst','Systems Analyst','Software Engineer','Data Analyst','Data Engineer','Change Manager','Product Owner'];
+  return dashTopbarHtml() + ''
+  + '<main style="flex:1;padding:24px 32px;overflow-y:auto;">'
+  + '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;flex-wrap:wrap;gap:12px;">'
+  + '<div><div style="margin-bottom:8px;"><a href="#dashboard" style="display:inline-flex;align-items:center;gap:6px;padding:6px 10px;border-radius:999px;border:1px solid #3a3a3a;background:#1a1a1a;color:#a3a3a3;font-size:11px;font-weight:700;text-decoration:none;">← Back to Projects</a></div><h1 style="font-size:22px;font-weight:800;color:#fff;">Project Shop - Marketplace</h1><p style="font-size:12.5px;color:#a3a3a3;">42 Projects Available - Business Analysis & Software Engineering, classified by job role</p></div>'
+  + '<a href="#cart" aria-label="Cart" style="display:inline-flex;align-items:center;justify-content:center;width:44px;height:44px;border-radius:12px;border:2px solid #3a3a3a;background:#1a1a1a;color:#fff;position:relative;text-decoration:none;"><svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M7 18c-1.1 0-1.99.9-1.99 2S5.9 22 7 22s2-.9 2-2-.9-2-2-2zM17 18c-1.1 0-1.99.9-1.99 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zM7.08 14h8.33c.74 0 1.36-.5 1.54-1.18l2.42-8.42H6.21l-.94-2H1v2h2l3.6 7.59-1.35 2.44C4.52 15.37 5.48 17 7 17h11v-2H7l1.1-2z"/></svg><span id="mpCartCount" style="position:absolute;top:-6px;right:-6px;background:#d97706;color:#fff;border-radius:999px;padding:2px 6px;font-size:10px;font-weight:800;min-width:18px;text-align:center;">'+mpCart().length+'</span></a>'
+  + '</div>'
+  + '<div style="background:#181818;border:1px solid #2a2a2a;border-radius:12px;padding:14px;margin-bottom:18px;">'
+  + '<div style="display:flex;gap:10px;flex-wrap:wrap;margin-bottom:10px;">'
+  + '<input id="mpSearch" placeholder="Search projects, e.g. BPMN, UML, API..." value="'+f.q.replace(/"/g,'&quot;')+'" style="flex:1;min-width:220px;padding:10px 14px;border-radius:10px;border:1px solid #3a3a3a;background:#0d0d0d;color:#fff;font-size:12.5px;" />'
+  + '<select id="mpCat" style="padding:10px 12px;border-radius:10px;border:1px solid #3a3a3a;background:#0d0d0d;color:#fff;font-size:12.5px;"><option value="all">All Categories</option><option value="business-analysis" '+(f.cat==='business-analysis'?'selected':'')+'>Business Analysis ('+baCount+')</option><option value="software-engineering" '+(f.cat==='software-engineering'?'selected':'')+'>Software Engineering ('+seCount+')</option></select>'
+  + '<select id="mpRole" style="padding:10px 12px;border-radius:10px;border:1px solid #3a3a3a;background:#0d0d0d;color:#fff;font-size:12.5px;"><option value="all">All Job Roles</option>'+categories.map(r=>'<option value="'+r+'" '+(f.role===r?'selected':'')+'>'+r+'</option>').join('')+'</select>'
+  + '</div>'
+  + '<div style="display:flex;gap:8px;flex-wrap:wrap;"><button onclick="window._mpSetFilter(\'cat\',\'all\')" style="padding:6px 12px;border-radius:999px;font-size:11px;font-weight:800;border:1px solid '+(f.cat==='all'?'#d97706':'#3a3a3a')+';background:'+(f.cat==='all'?'#d97706':'transparent')+';color:'+(f.cat==='all'?'#fff':'#a3a3a3')+';cursor:pointer;">All</button><button onclick="window._mpSetFilter(\'cat\',\'business-analysis\')" style="padding:6px 12px;border-radius:999px;font-size:11px;font-weight:800;border:1px solid '+(f.cat==='business-analysis'?'#d97706':'#3a3a3a')+';background:'+(f.cat==='business-analysis'?'#d97706':'transparent')+';color:'+(f.cat==='business-analysis'?'#fff':'#a3a3a3')+';cursor:pointer;">Business Analysis</button><button onclick="window._mpSetFilter(\'cat\',\'software-engineering\')" style="padding:6px 12px;border-radius:999px;font-size:11px;font-weight:800;border:1px solid '+(f.cat==='software-engineering'?'#2563eb':'#3a3a3a')+';background:'+(f.cat==='software-engineering'?'#2563eb':'transparent')+';color:'+(f.cat==='software-engineering'?'#fff':'#a3a3a3')+';cursor:pointer;">Software Engineering</button></div>'
+  + '</div>'
+  + (list.length===0?'<p style="text-align:center;color:#737373;padding:40px;">No projects match this filter.</p>':(grouped?''
+  + '<div style="margin-bottom:28px;"><h2 style="font-size:15px;font-weight:800;color:#f59e0b;margin-bottom:8px;">Business Analysis - '+list.filter(p=>p.category==='business-analysis').length+' projects</h2><p style="font-size:11.5px;color:#737373;margin-bottom:12px;">Stakeholder, requirements, process & change. Grouped by job role.</p><div style="display:grid;gap:16px;grid-template-columns:repeat(auto-fit,minmax(320px,1fr));">'+list.filter(p=>p.category==='business-analysis').map(card).join('')+'</div></div>'
+  + '<div><h2 style="font-size:15px;font-weight:800;color:#60a5fa;margin-bottom:8px;">Software Engineering - '+list.filter(p=>p.category==='software-engineering').length+' projects</h2><p style="font-size:11.5px;color:#737373;margin-bottom:12px;">Systems modelling, SDLC, data & delivery - grouped by job role.</p><div style="display:grid;gap:16px;grid-template-columns:repeat(auto-fit,minmax(320px,1fr));">'+list.filter(p=>p.category==='software-engineering').map(card).join('')+'</div></div>'
+  :'<div style="display:grid;gap:16px;grid-template-columns:repeat(auto-fit,minmax(320px,1fr));">'+list.map(card).join('')+'</div>'))
+  + '</main>';
+}
+function bindCatalog(){
+  const s=document.getElementById('mpSearch'), c=document.getElementById('mpCat'), r=document.getElementById('mpRole');
+  if(s) s.addEventListener('input', e=>{ window._mpFilter.q=e.target.value; const m=document.getElementById('main-content'); m.innerHTML=viewCatalog(); bindCatalog(); const inp=document.getElementById('mpSearch'); if(inp) inp.focus(); });
+  if(c) c.addEventListener('change', e=>{ window._mpFilter.cat=e.target.value; const m=document.getElementById('main-content'); m.innerHTML=viewCatalog(); bindCatalog(); });
+  if(r) r.addEventListener('change', e=>{ window._mpFilter.role=e.target.value; const m=document.getElementById('main-content'); m.innerHTML=viewCatalog(); bindCatalog(); });
+}
+window._mpSetFilter = (k,v)=>{ window._mpFilter[k]=v; if(k==='cat'&&v==='all') window._mpFilter.role='all'; const m=document.getElementById('main-content'); m.innerHTML=viewCatalog(); bindCatalog(); };
+window._mpAdd = (id)=>{ mpAdd(id); const m=document.getElementById('main-content'); if(m) { m.innerHTML=viewCatalog(); bindCatalog(); } toast('Added to cart - view cart to checkout'); };
+function viewCart(){
+  const cartIds=mpCart(); const items=cartIds.map(id=>MARKETPLACE_PROJECTS.find(p=>p.id===id)).filter(Boolean);
+  const total=items.reduce((s,p)=>s+(Number(p.price)||0),0);
+  if(items.length===0) return dashTopbarHtml()+'<main style="flex:1;padding:40px;text-align:center;"><div style="display:flex;justify-content:center;gap:8px;margin-bottom:16px;"><a href="#dashboard" style="padding:8px 12px;border-radius:999px;border:1px solid #3a3a3a;background:#1a1a1a;color:#a3a3a3;font-weight:700;text-decoration:none;font-size:12px;">← Back to Projects</a><a href="#catalog" style="padding:8px 12px;border-radius:999px;border:1px solid #d97706;background:#d97706;color:#fff;font-weight:700;text-decoration:none;font-size:12px;">← Back to Shop</a></div><div style="font-size:48px;margin-bottom:12px;"><svg width="48" height="48" viewBox="0 0 24 24" fill="#3a3a3a"><path d="M7 18c-1.1 0-1.99.9-1.99 2S5.9 22 7 22s2-.9 2-2-.9-2-2-2zM17 18c-1.1 0-1.99.9-1.99 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zM7.08 14h8.33c.74 0 1.36-.5 1.54-1.18l2.42-8.42H6.21l-.94-2H1v2h2l3.6 7.59-1.35 2.44C4.52 15.37 5.48 17 7 17h11v-2H7l1.1-2z"/></svg></div><h2 style="font-size:18px;font-weight:800;color:#fff;">Your cart is empty</h2><p style="font-size:12.5px;color:#a3a3a3;margin:8px 0 18px;">Browse the catalog and add Business Analysis or Software Engineering projects.</p><a href="#catalog" style="display:inline-block;padding:12px 22px;background:#d97706;color:#fff;border-radius:10px;font-weight:800;text-decoration:none;">Explore Project Shop</a></main>';
+  return dashTopbarHtml()+'<main style="flex:1;padding:24px 32px;max-width:800px;margin:0 auto;width:100%;">'
+  + '<div style="display:flex;gap:8px;margin-bottom:12px;"><a href="#dashboard" style="padding:8px 12px;border-radius:999px;border:1px solid #3a3a3a;background:#1a1a1a;color:#a3a3a3;font-weight:700;text-decoration:none;font-size:12px;">← Back to Projects</a><a href="#catalog" style="padding:8px 12px;border-radius:999px;border:1px solid #3a3a3a;background:#1a1a1a;color:#a3a3a3;font-weight:700;text-decoration:none;font-size:12px;">← Back to Shop</a></div>'
+  + '<h1 style="font-size:18px;font-weight:800;color:#fff;margin-bottom:12px;">Your Cart - '+items.length+' projects</h1>'
+  + '<div style="display:flex;flex-direction:column;gap:10px;margin-bottom:18px;">'+items.map(p=>'<div style="display:flex;gap:14px;align-items:center;padding:14px;background:#181818;border:1px solid #2a2a2a;border-radius:12px;"><div style="width:48px;height:48px;border-radius:8px;background:'+(p.category==='business-analysis'?'#26170b':'#172554')+';flex-shrink:0;"></div><div style="flex:1;min-width:0;"><div style="font-size:10px;font-weight:800;color:#a3a3a3;text-transform:uppercase;">'+(p.category==='business-analysis'?'Business Analysis':'Software Engineering')+' - '+p.jobRole+'</div><div style="font-size:13px;font-weight:700;color:#fff;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">'+p.title+'</div><div style="font-size:11px;color:#737373;">'+p.duration+' - '+p.difficulty+'</div></div><div style="font-weight:800;color:'+(p.price===0?'#4ade80':'#fbbf24')+';">'+mpPrice(p)+'</div><button onclick="window._mpRemove(\''+p.id+'\')" style="padding:8px;border-radius:8px;border:1px solid #3a3a3a;background:transparent;color:#ef4444;font-size:11px;font-weight:700;cursor:pointer;">Remove</button></div>').join('')+'</div>'
+  + '<div style="background:#181818;border:1px solid #2a2a2a;border-radius:12px;padding:18px;">'
+  + '<div style="display:flex;justify-content:space-between;font-weight:800;color:#fff;margin-bottom:6px;"><span>Subtotal (demo)</span><span>GBP '+total.toFixed(2)+'</span></div>'
+  + '<p style="font-size:11px;color:#737373;margin-bottom:14px;">Demo checkout - no real charge. Projects will be added to In-House Projects and behave like your enrolled courses, grouped and supported.</p>'
+  + '<div style="display:flex;gap:10px;"><button onclick="window._mpClear()" style="padding:12px 18px;border-radius:10px;border:1px solid #3a3a3a;background:transparent;color:#a3a3a3;font-weight:800;cursor:pointer;">Clear Cart</button><a href="#checkout" style="flex:1;text-align:center;padding:12px 18px;border-radius:10px;background:#d97706;color:#fff;font-weight:800;text-decoration:none;">Proceed to Checkout -></a></div>'
+  + '</div></main>';
+}
+window._mpRemove = (id)=>{ mpRemove(id); const m=document.getElementById('main-content'); if(m) m.innerHTML=viewCart(); };
+window._mpClear = ()=>{ mpSetCart([]); const m=document.getElementById('main-content'); if(m) m.innerHTML=viewCart(); };
+function viewCheckout(){
+  const cartIds=mpCart(); const items=cartIds.map(id=>MARKETPLACE_PROJECTS.find(p=>p.id===id)).filter(Boolean);
+  const total=items.reduce((s,p)=>s+(Number(p.price)||0),0);
+  if(items.length===0) return dashTopbarHtml()+'<main style="flex:1;padding:40px;text-align:center;"><div style="display:flex;justify-content:center;gap:8px;margin-bottom:16px;"><a href="#dashboard" style="padding:8px 12px;border-radius:999px;border:1px solid #3a3a3a;background:#1a1a1a;color:#a3a3a3;font-weight:700;text-decoration:none;font-size:12px;">← Back to Projects</a><a href="#catalog" style="padding:8px 12px;border-radius:999px;border:1px solid #d97706;background:#d97706;color:#fff;font-weight:700;text-decoration:none;font-size:12px;">← Back to Shop</a></div><p style="color:#a3a3a3;">Cart is empty.</p><a href="#catalog" style="color:#d97706;font-weight:800;">Browse catalog</a></main>';
+  return dashTopbarHtml()+'<main style="flex:1;padding:24px 32px;max-width:900px;margin:0 auto;width:100%;">'
+  + '<div style="display:flex;gap:8px;margin-bottom:12px;"><a href="#dashboard" style="padding:8px 12px;border-radius:999px;border:1px solid #3a3a3a;background:#1a1a1a;color:#a3a3a3;font-weight:700;text-decoration:none;font-size:12px;">← Back to Projects</a><a href="#cart" style="padding:8px 12px;border-radius:999px;border:1px solid #3a3a3a;background:#1a1a1a;color:#a3a3a3;font-weight:700;text-decoration:none;font-size:12px;">← Back to Cart</a></div>'
+  + '<h1 style="font-size:18px;font-weight:800;color:#fff;margin-bottom:14px;">Checkout - Demo Payment</h1>'
+  + '<div style="display:grid;grid-template-columns:1.6fr .9fr;gap:18px;">'
+  + '<div><div style="background:#181818;border:1px solid #2a2a2a;border-radius:12px;padding:16px;margin-bottom:14px;"><h3 style="font-size:13px;font-weight:800;color:#fff;margin-bottom:10px;">Order Summary - '+items.length+' projects</h3>'+items.map(p=>'<div style="display:flex;justify-content:space-between;padding:7px 0;border-bottom:1px solid #262626;font-size:12.5px;"><span style="color:#a3a3a3;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:260px;">'+p.title+'</span><span style="font-weight:800;color:'+(p.price===0?'#4ade80':'#fff')+';">'+mpPrice(p)+'</span></div>').join('')+'<div style="display:flex;justify-content:space-between;font-weight:800;color:#fff;margin-top:10px;"><span>Total (demo)</span><span>GBP '+total.toFixed(2)+'</span></div><p style="font-size:11px;color:#737373;margin-top:8px;">Selection -> Cart -> Checkout -> Payment Checkout (demo, no Stripe). Instantly added to My In-House Projects grouped by job role.</p></div>'
+  + '<div style="background:#181818;border:1px solid #2a2a2a;border-radius:12px;padding:16px;"><h3 style="font-size:13px;font-weight:800;color:#fff;margin-bottom:10px;">Payment - Demo Card (no real charge)</h3><input id="mpEmail" placeholder="Email for receipt" value="" style="width:100%;padding:10px 12px;border-radius:10px;border:1px solid #3a3a3a;background:#0d0d0d;color:#fff;font-size:12.5px;margin-bottom:10px;" /><input value="4242 4242 4242 4242" disabled style="width:100%;padding:10px 12px;border-radius:10px;border:1px solid #2a2a2a;background:#0f0f0f;color:#737373;font-size:12.5px;margin-bottom:8px;" /><div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:8px;"><input value="12/34" disabled style="padding:10px 12px;border-radius:10px;border:1px solid #2a2a2a;background:#0f0f0f;color:#737373;font-size:12.5px;" /><input value="123" disabled style="padding:10px 12px;border-radius:10px;border:1px solid #2a2a2a;background:#0f0f0f;color:#737373;font-size:12.5px;" /></div><p style="font-size:11px;color:#737373;margin-bottom:12px;">Demo: card fields disabled, no money moves.</p><button onclick="window._mpPay()" style="width:100%;padding:12px;border-radius:10px;background:#16a34a;color:#fff;font-weight:800;border:none;cursor:pointer;">Pay GBP '+total.toFixed(2)+' (Demo) -> Enroll</button><div id="mpErr" style="color:#fca5a5;font-size:12px;margin-top:8px;display:none;"></div></div></div>'
+  + '<div style="background:#1a1a1a;border:1px solid #2a2a2a;border-radius:12px;padding:16px;height:max-content;"><div style="font-size:12px;font-weight:800;color:#fff;margin-bottom:8px;">How it works</div><ol style="font-size:11.5px;color:#a3a3a3;line-height:1.7;margin-left:16px;"><li>Select Business Analysis or Software Engineering projects from catalog</li><li>Add to cart, review, proceed</li><li>Demo checkout - projects instantly appear in In-House Projects, grouped by job role and supported like other courses.</li></ol></div>'
+  + '</div></main>';
+}
+window._mpPay = ()=>{
+  const cart=mpCart(); if(cart.length===0) return;
+  mpEnroll(cart); mpSetCart([]);
+  const enrolledBox=document.getElementById('main-content');
+  enrolledBox.innerHTML = '<div style="text-align:center;padding:60px 20px;"><div style="width:80px;height:80px;border-radius:50%;background:#14532d;color:#4ade80;display:flex;align-items:center;justify-content:center;margin:0 auto 16px;font-size:36px;">v</div><h2 style="font-size:18px;font-weight:800;color:#fff;">Demo Payment Successful!</h2><p style="font-size:12.5px;color:#a3a3a3;margin:8px 0 18px;">No real charge. Your projects are now in <b style="color:#fff">My In-House Projects</b> (grouped alongside your 3 existing projects).</p><a href="#dashboard" style="display:inline-block;padding:12px 22px;background:#d97706;color:#fff;border-radius:10px;font-weight:800;text-decoration:none;">Go to My Projects</a></div>';
+  setTimeout(()=>{ location.hash='#dashboard'; }, 1400);
+};
 
 /* Notifications dropdown + outside-click close */
 window._toggleNotif = function(){
@@ -2856,7 +2998,10 @@ function render(view, param, param2){
       break;
     case 'checkin': main.innerHTML = viewCheckin(); break;
     case 'accountability': main.innerHTML = viewAccountability(); break;
-    case 'support': location.replace('#dashboard'); break;
+    case 'catalog': main.innerHTML = viewCatalog(); bindCatalog(); break;
+    case 'cart': main.innerHTML = viewCart(); break;
+    case 'checkout': main.innerHTML = viewCheckout(); break;
+    case 'support': main.innerHTML = viewCatalog(); bindCatalog(); break;
     case 'job-portal': location.replace('#dashboard'); break;
     default: main.innerHTML = viewDashboard();
   }
@@ -3055,12 +3200,36 @@ window._moveItem = function(pk, id){
   ov.addEventListener('click', e=>{ if(e.target===ov) ov.remove(); });
 };
 
+/* ─── Scroll bar + other features: progress, scroll-to-top, smooth --- */
+function initScrollFeatures(){
+  if(document.getElementById('scrollProgress')) return;
+  const bar=document.createElement('div'); bar.id='scrollProgress'; document.body.appendChild(bar);
+  const btn=document.createElement('button'); btn.id='scrollTopBtn'; btn.innerHTML='&#8679;'; btn.title='Scroll to top'; btn.setAttribute('aria-label','Scroll to top'); document.body.appendChild(btn);
+  btn.onclick=()=>{ const m=document.getElementById('main-content')||document.querySelector('.main'); if(m) m.scrollTo({top:0,behavior:'smooth'}); else window.scrollTo({top:0,behavior:'smooth'}); };
+  const main=document.getElementById('main-content');
+  const scroller = main || window;
+  const target = main || document.documentElement;
+  const onScroll=()=>{
+    const el = main || document.documentElement;
+    const max = el.scrollHeight - el.clientHeight;
+    const pct = max>0 ? (el.scrollTop / max * 100) : 0;
+    bar.style.width = pct + '%';
+    if(el.scrollTop>280) btn.classList.add('show'); else btn.classList.remove('show');
+  };
+  if(main) main.addEventListener('scroll', onScroll, {passive:true});
+  else window.addEventListener('scroll', onScroll, {passive:true});
+  // also observe hash change to reset
+  window.addEventListener('hashchange', ()=>{ setTimeout(onScroll, 120); });
+}
+window._initScrollFeatures = initScrollFeatures;
+
 /* ─── Init ─── */
 window.route = route;
 window.addEventListener('hashchange', route);
 window.addEventListener('DOMContentLoaded', function(){
   if(!location.hash) location.hash = '#dashboard';
   route();
+  initScrollFeatures();
 });
 
 })();

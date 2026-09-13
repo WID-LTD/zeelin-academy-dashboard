@@ -32,8 +32,8 @@
       <div class="za-glass" role="dialog" aria-modal="true">
         <div style="font-size:11px;font-weight:700;letter-spacing:.7px;text-transform:uppercase;color:#f59e0b;margin-bottom:8px;display:flex;align-items:center;gap:7px"><span style="width:7px;height:7px;border-radius:50%;background:#f59e0b;box-shadow:0 0 10px rgba(245,158,11,.7)"></span> Secure Access</div>
         <h2>Session expired</h2>
-        <p>Your 30-minute session has ended due to inactivity. Enter <b style="color:#fff">ZEELIN</b> to continue securely.</p>
-        <form id="zaForm"><div class="za-field"><input id="zaPwd" type="password" placeholder="Password" autocomplete="current-password" required/></div><button type="submit" class="za-btn">Unlock</button><div class="za-err" id="zaErr"></div></form>
+        <p>Your 30-minute session has ended due to inactivity. Enter your password to continue securely.</p>
+        <form id="zaForm" autocomplete="off" data-lpignore="true"><div class="za-field"><input id="zaPwd" type="password" placeholder="Password" autocomplete="off" autocapitalize="off" spellcheck="false" data-lpignore="true" data-form-type="other" required/></div><button type="submit" class="za-btn">Unlock</button><div class="za-err" id="zaErr"></div></form>
         <p style="margin-top:12px;font-size:11px;color:#6b6b6b;text-align:center">Protected • Anti-phishing • 30m sliding session</p>
       </div>`;
     document.body.appendChild(ov);

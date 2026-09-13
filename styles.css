@@ -312,13 +312,16 @@ svg { display: block; flex-shrink: 0; overflow: hidden; }
 .home-hello { font-size: 12px; color: var(--text-faint); font-weight: 600; text-transform: uppercase; letter-spacing: .8px; margin-bottom: 8px; }
 .home-hello h1 { font-size: 26px; font-weight: 800; color: var(--text); text-transform: none; letter-spacing: 0; }
 .home-sub { color: var(--text-dim); margin-top: 8px; max-width: 640px; }
-.enrolled { display: grid; gap: 16px; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); }
-.enr-card { background: var(--bg-raised); border: 1px solid var(--border); border-radius: var(--radius); overflow: hidden; }
-.enr-cover { height: 96px; background: linear-gradient(135deg, #33200a, #181818); display: flex; align-items: center; padding: 14px 18px; gap: 13px; }
-.enr-cover img.cover { width: 52px; height: 68px; border-radius: 6px; object-fit: cover; box-shadow: 0 4px 14px rgba(0,0,0,.5); }
-.enr-cover .t { color: #fff; font-weight: 800; font-size: 16px; line-height: 1.25; }
-.enr-cover .s { color: #caa26a; font-size: 12px; margin-top: 3px; }
-.enr-body { padding: 16px 18px 18px; }
+/* Responsive outline design: cards fill equally, bigger/bolder/clearer */
+/* 4 cards at >1400px = 2 rows x2 cols or 1 row x4; auto-fit ensures equal width, min 360 enforces bold sizing */
+.enrolled { display: grid; gap: 24px; grid-template-columns: repeat(auto-fit, minmax(360px, 1fr)); align-items: stretch; container-type: inline-size; }
+.enr-card { background: var(--bg-raised); border: 2px solid var(--border); border-radius: 16px; overflow: hidden; display:flex; flex-direction:column; min-height: 380px; box-shadow: 0 4px 20px rgba(0,0,0,.18); transition: transform .18s ease, border-color .18s ease, box-shadow .18s ease; }
+.enr-card:hover { border-color: var(--amber); transform: translateY(-3px); box-shadow: 0 12px 32px rgba(0,0,0,.28), 0 0 0 1px rgba(217,119,6,.18); }
+.enr-cover { height: 110px; background: linear-gradient(135deg, #33200a 0%, #1e1e1e 55%, #181818 100%); display: flex; align-items: center; padding: 16px 20px; gap: 14px; border-bottom: 1px solid var(--border); }
+.enr-cover img.cover { width: 58px; height: 76px; border-radius: 8px; object-fit: cover; box-shadow: 0 6px 18px rgba(0,0,0,.55); border: 1px solid rgba(255,255,255,.06); }
+.enr-cover .t { color: #fff; font-weight: 800; font-size: 16.5px; line-height: 1.28; letter-spacing: -.01em; }
+.enr-cover .s { color: #caa26a; font-size: 12.5px; margin-top: 4px; font-weight: 500; }
+.enr-body { padding: 18px 20px 20px; display:flex; flex-direction:column; flex:1; gap: 14px; }
 .stat-row { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-bottom: 14px; }
 .stat-box { background: #0d0d0d; border: 1px solid var(--border); border-radius: 9px; padding: 9px 10px; }
 .stat-box .v { font-size: 15px; font-weight: 800; color: var(--text); }
@@ -690,9 +693,11 @@ svg { display: block; flex-shrink: 0; overflow: hidden; }
   .profile-name, .profile-caret { display: none; }
   .page { padding: 20px 16px 60px; }
   .grid-2, .grid-3, .grid-4, .p-grid, .sup-grid, .alum-grid { grid-template-columns: 1fr; }
-  .enrolled { grid-template-columns: 1fr; }
+  /* keep enrolled as 1 col on mobile but preserve bold borders; 2 cols from 640px via auto-fit already */
+  .enrolled { grid-template-columns: 1fr; gap: 18px; }
+  .enr-card { min-height: 360px; }
   .home-hello h1 { font-size: 22px; }
-  .enr-cover { height: auto; flex-direction: column; align-items: flex-start; }
+  .enr-cover { height: auto; flex-direction: row; align-items: center; }
   .stat-row { grid-template-columns: repeat(3, 1fr); }
   .stat-box { padding: 7px 8px; }
   .stat-box .v { font-size: 13px; }

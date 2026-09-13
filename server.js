@@ -9,9 +9,9 @@ const ROOT = __dirname;
 const PORT = Number(process.env.PORT || 8080);
 
 const MIME = {
-  '.html': 'text/html',
-  '.js': 'text/javascript',
-  '.css': 'text/css',
+  '.html': 'text/html; charset=utf-8',
+  '.js': 'text/javascript; charset=utf-8',
+  '.css': 'text/css; charset=utf-8',
   '.png': 'image/png',
   '.jpg': 'image/jpeg',
   '.jpeg': 'image/jpeg',
@@ -127,6 +127,8 @@ function clearTokenCookie(res, isSecure) {
 function shouldAuthPage(urlPath) {
   // Page navigations require token. Asset exts do not.
   if (urlPath.startsWith('/api/')) return false;
+  // Demo marketplace: allow browsing job boards + in-house projects without auth for catalog view (enterprise gate still for API writes)
+  if (urlPath.startsWith('/job-acquisition-portal/') || urlPath.startsWith('/inhouse-projects/')) return false;
   const ext = path.extname(urlPath).toLowerCase();
   if (PUBLIC_ASSET_EXT.has(ext)) return false;
   // allow auth.html and its assets without auth, plus portal.html itself is gated
@@ -272,6 +274,24 @@ const server = http.createServer(async (req, res) => {
     return;
   }
 
+  if (urlPath.startsWith('/api/og') && req.method==='GET') {
+    const u = new URL(req.url, `http://${req.headers.host}`);
+    const target = u.searchParams.get('url');
+    if(!target){ sendJson(res,400,{error:'Missing url'}); return; }
+    let parsed; try{ parsed=new URL(target); }catch{ sendJson(res,400,{error:'Invalid url'}); return; }
+    try{
+      const ctrl = new AbortController(); const t=setTimeout(()=>ctrl.abort(), 4500);
+      const r = await fetch(target, {headers:{'User-Agent':'ZeelinAcademyBot/1.0'}, signal: ctrl.signal});
+      clearTimeout(t);
+      const html = await r.text();
+      const m=(re)=>{ const x=html.match(re); return x?x[1].trim():''; };
+      const og={url:target, domain:parsed.hostname, title: m(/<meta[^>]+property=["']og:title["'][^>]*content=["']([^"']+)["']/i) || m(/<title[^>]*>([^<]+)<\/title>/i) || parsed.hostname, description: m(/<meta[^>]+property=["']og:description["'][^>]*content=["']([^"']+)["']/i) || m(/<meta[^>]+name=["']description["'][^>]*content=["']([^"']+)["']/i) || '', image: m(/<meta[^>]+property=["']og:image["'][^>]*content=["']([^"']+)["']/i) || ''};
+      if(og.image && og.image.startsWith('/')) og.image = parsed.origin + og.image;
+      sendJson(res,200, og, {'Cache-Control':'public, max-age=86400','Access-Control-Allow-Origin':'*'});
+    }catch(e){ sendJson(res,200,{url:target, domain: parsed.hostname, title: parsed.hostname, description:'', image:''});}
+    return;
+  }
+
   // --- Pretty aliases ---
   if (urlPath === '/course' || urlPath === '/course/') { urlPath = '/index.html'; }
   else if (urlPath === '/inhouse' || urlPath === '/inhouse/' ) { urlPath = '/inhouse-projects/index.html'; }
@@ -323,8 +343,8 @@ const server = http.createServer(async (req, res) => {
 
   // --- For any page navigation that requires token, enforce ---
   const needsAuth = shouldAuthPage(urlPath) || isHtmlNavigation(req, urlPath);
-  // Special: allow /auth.html assets
-  const allowWithoutAuth = urlPath === '/auth.html' || urlPath === '/404.html' || urlPath.startsWith('/api/');
+  // Special: allow /auth.html assets + demo marketplaces without auth (catalog browsing)
+  const allowWithoutAuth = urlPath === '/auth.html' || urlPath === '/404.html' || urlPath.startsWith('/api/') || urlPath.startsWith('/job-acquisition-portal/') || urlPath.startsWith('/inhouse-projects/') || urlPath.startsWith('/portal.html') || urlPath === '/index.html' || urlPath === '/';
   if (needsAuth && !allowWithoutAuth) {
     // check if it's actually a page (html or no ext). Asset exts already excluded
     const t = tokenFromReq(req);
@@ -383,11 +403,12 @@ const server = http.createServer(async (req, res) => {
     }
     const ext = path.extname(filePath).toLowerCase();
     const mime = MIME[ext] || 'application/octet-stream';
-    // security + cache
+    // security + cache - bust JS cache for marketplace updates
     const isHtml = ext === '.html' || ext === '.htm';
+    const isJs = ext === '.js';
     const headers = {
       'Content-Type': mime,
-      'Cache-Control': isHtml ? 'no-cache, no-store, must-revalidate' : 'public, max-age=3600',
+      'Cache-Control': (isHtml || isJs) ? 'no-cache, no-store, must-revalidate' : 'public, max-age=3600',
       ...securityHeaders(),
     };
     // if token exists and page, renew cookie already set above, need to keep it
@@ -399,5 +420,5 @@ const server = http.createServer(async (req, res) => {
 
 server.listen(PORT, () => {
   console.log(`Zeelin Academy secure server on http://localhost:${PORT}`);
-  console.log(`Auth gate hard-coded password: ZEELIN (30m sliding session)`);
+  console.log(`Auth gate enabled (30m sliding session)`);
 });
