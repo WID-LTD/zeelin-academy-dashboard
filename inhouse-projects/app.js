@@ -358,7 +358,7 @@ function route(){
 
   /* Marketplace routes: catalog[/:cat[/:sector-or-role[/:role[/:pid]]]], cart, wishlist, checkout */
   if(view==='catalog'){ render('catalog', parts[1]||null, parts[2]||null, parts[3]||null, parts[4]||null); return; }
-  if(view==='modes'){ render('modes'); return; }
+  if(view==='modes'){ location.replace('#p/'+currentProjectId+'/modes'); return; }
   if(view==='cart'){ render('cart'); return; }
   if(view==='wishlist'){ render('wishlist'); return; }
   if(view==='checkout'){ render('checkout'); return; }
@@ -453,7 +453,7 @@ function renderSidebar(activeKey){
         ${modeLink('supported','Supported Project',ICON_BRIEF)}
         ${modeLink('mandate','Mandate Project',ICON_CAL)}
         ${modeLink('group','Group Project',ICON_PEOPLE)}
-        <a href="#modes" data-route="modes" class="${activeKey==='modes'?'active':''}">${svg(ICON_GRID)}<span>All Modes (classic view)</span></a>
+        <a href="#p/${currentProjectId}/modes" data-route="modes" class="${activeKey==='modes'?'active':''}">${svg(ICON_GRID)}<span>Project Modes</span></a>
       </div>
       <div class="sidebar-label">Workspace</div>
       ${projLink('home','Project Home',ICON_FOLDER)}
@@ -601,6 +601,7 @@ function projCard(p){
 
 /* ─── Dedicated Modes page: classic Supported / Mandate / Group cards ─── */
 function viewModes(){
+  /* Project-scoped dedicated modes screen: #p/:projectId/modes, no sidebar */
   const proj = getProject(currentProjectId);
   const cp = proj.catalog || null;
   return dashTopbarHtml() + `
@@ -624,17 +625,25 @@ window._enterProject = function(pid){
     if(['supported','mandate','group'].includes(pid)){ window._setMode(pid); return; }
   }
   if(state.lastCheckin === today()){
-    navigate('#p/'+pid+'/home');
+    navigate('#p/'+pid+'/modes');
     return;
   }
   openCheckinGate(pid);
+};
+
+window._enterMode = function(pid, mode){
+  if(!['supported','mandate','group'].includes(mode)) return;
+  currentProjectId = pid; state.currentProject = pid;
+  currentMode = mode; state.currentMode = mode;
+  saveState();
+  navigate('#p/'+pid+'/home');
 };
 
 window._switchProject = function(pid){
   currentProjectId = pid;
   state.currentProject = pid;
   saveState();
-  navigate('#p/'+pid+'/home');
+  navigate('#p/'+pid+'/modes');
 };
 
 function gateBlockHtml(b){
@@ -691,7 +700,7 @@ window._closeGate = function(){
 window._skipGate = function(){
   const pid = gateProjectId;
   window._closeGate();
-  if(pid) navigate('#p/'+pid+'/'+getProject(pid).entry);
+  if(pid) navigate('#p/'+pid+'/modes');
 };
 window._gateStar = function(val){
   document.querySelectorAll('#checkin-gate .gate-star').forEach(b=>{
@@ -715,7 +724,7 @@ window._submitCheckinGate = function(){
   setTimeout(()=>{
     const pid = gateProjectId;
     window._closeGate();
-    navigate('#p/'+pid+'/'+getProject(pid).entry);
+    navigate('#p/'+pid+'/modes');
   }, 1400);
 };
 
@@ -3359,7 +3368,7 @@ function updateSidebar(activeRoute){
 /* ─── Main render ─── */
 function render(view, param, param2, param3, param4){
   const layout = document.querySelector('.layout');
-  const isDash = view==='dashboard';
+  const isDash = (view==='dashboard'||view==='modes');
   if(layout) layout.classList.toggle('dash-mode', isDash);
 
   const mapped = (view==='vault'||view==='doc-editor') ? 'docs-vault' : view;
