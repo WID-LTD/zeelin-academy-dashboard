@@ -1,5 +1,9 @@
 node_modules/
 *.log
+*.xlsx
+*.xlsm
+exports/
+out/
 .DS_Store
 # Enterprise auth - local only scraper/console - never push
 job-acquisition-portal/course-builder/

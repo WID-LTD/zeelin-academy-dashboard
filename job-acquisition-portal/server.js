@@ -751,6 +751,19 @@ try {
         if(input.extractCompanyData){ log.info('Extracting company data …'); jobs=await enrichJobs(jobs); jobs.forEach(ensureRequirements); }
         // final enrichment for 13 cols
         jobs.forEach(ensureRequirements);
+        // Optional AI extraction pass (reads raw-job JSON, model structures it)
+        if(input.ai){
+          try{
+            const enrichMod=require('./course-builder/scraper/enrich');
+            if(enrichMod.aiAvailable()){
+              setStage(run,'ai-enriching'); log.info('AI enrichment pass (model structures raw ads) …');
+              enrichMod.saveRaw(run.id, jobs);
+              const er=await enrichMod.enrichJobs(jobs,{concurrency:3,onProgress:(d,t)=>{ run.aiProgress={done:d,total:t}; }});
+              jobs=er.jobs; run.aiStats=er.stats;
+              log.info(`AI enrichment: ${er.stats.ai} ai / ${er.stats.fallback} deterministic / ${er.stats.cached} cached`);
+            } else log.warn('AI requested but OPENCODE_API_KEY not set — deterministic output kept');
+          }catch(e){ log.warn('AI pass failed, keeping deterministic: '+String((e&&e.message)||e).slice(0,120)); }
+        }
         run.jobs=jobs; run.items=jobs.length; run.status='succeeded'; run.finishedAt=new Date().toISOString(); run.durationMs=Date.now()-new Date(run.startedAt).getTime(); run.cost=0.0;
         setStage(run,'finished'); log.info(`Run finished — ${jobs.length} jobs ready. Countries: ${countriesList.join(', ')} | Keywords: ${keywordsList.length} | ${input.analysisMode!=='none' ? 'analysis:'+input.analysisMode : 'no analysis'}`);
         const entry=runLog.find(r=>r.id===run.id); if(entry){ entry.status=run.status; entry.items=jobs.length; entry.finishedAt=run.finishedAt; entry.durationMs=run.durationMs; }
@@ -916,7 +929,7 @@ try {
   async function handleApi(req,res,url){
     const parts=url.pathname.split('/').filter(Boolean);
     if(parts[0]!=='api') return false;
-    if(parts[1]==='health'){ const mode=db?'local JSON DB (persistent, view previous runs)':'no-store (results are never saved)'; return sendJson(res,200,{ok:true,service:'zeelin-course-builder',mode,runs:db?db.listRuns(200).length:runs.size,time:new Date().toISOString()});}
+    if(parts[1]==='health'){ const mode=db?'local JSON DB (persistent, view previous runs)':'no-store (results are never saved)'; let ai=false; try{ ai=require('./course-builder/scraper/enrich').aiAvailable(); }catch(_){} return sendJson(res,200,{ok:true,service:'zeelin-course-builder',mode,runs:db?db.listRuns(200).length:runs.size,time:new Date().toISOString(),aiAvailable:ai});}
     if(parts[1]==='industries') return sendJson(res,200,industries);
     if(parts[1]==='cities') return sendJson(res,200,cities);
     if(parts[1]==='runs'){

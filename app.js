@@ -649,17 +649,20 @@ function renderCourses() {
     const pct = Math.max(0, Math.min(100, c.progress));
     const hours = c.completedHours + ' of ' + c.estimatedHours + 'h';
     return `
-          <div class="enr-card">
-            <div class="enr-cover"><img class="cover" src="${c.cover}" alt=""/><div><div class="t">${esc(c.title)}</div><div class="s">${esc(c.weekName)} - ${esc(c.cohort)}</div></div></div>
+          <div class="enr-card" role="button" tabindex="0" data-continue="${c.id}" aria-label="${esc(c.title)} — ${c.progress > 0 ? 'Continue course' : 'Start course'}">
+            <div class="enr-hero"><img class="cover" src="${c.cover}" alt=""/><div class="enr-hero-overlay"></div><div class="enr-badges"><span class="enr-badge">${esc(c.weekName)}</span><span class="enr-badge dim">${esc(c.short)}</span></div><div class="enr-hero-meta">${c.readiness}% readiness &bull; ${hours}</div></div>
             <div class="enr-body">
+              <h3>${esc(c.title)}</h3>
+              <div class="enr-sub">${esc(c.weekName)} - ${esc(c.cohort)}</div>
+              <div class="enr-pills"><span>READING INSIDE</span><span>VIDEOS INSIDE</span><span>DECK INSIDE</span></div>
               <div class="readiness"><div class="rl"><span>Course progress</span><b>${pct}%</b></div>${bar(pct, 'gradient')}</div>
               <div class="stat-row mt12">
                 <div class="stat-box ${c.readiness >= 60 ? 'good' : 'warn'}"><div class="v">${c.readiness}%</div><div class="l">Readiness</div></div>
                 <div class="stat-box"><div class="v">${hours}</div><div class="l">Hours</div></div>
                 <div class="stat-box warn"><div class="v">${c.daysLeft} Days</div><div class="l">Days left</div></div>
               </div>
-              <button class="btn btn-gradient btn-block" data-continue="${c.id}">${c.progress > 0 ? 'Continue Course ' : 'Start Course '}${ic('arrow', 15, 15)}</button>
             </div>
+            <div class="enr-foot"><button class="btn btn-gradient btn-block" data-continue="${c.id}">${c.progress > 0 ? 'Continue Course ' : 'Start Course '}${ic('arrow', 15, 15)}</button></div>
           </div>`;
   }).join('')}
       </div>
@@ -668,6 +671,14 @@ function renderCourses() {
     const t = e.target.closest('[data-continue]');
     if (t) {
       STATE.day = resumeCourseDay(t.dataset.continue);
+      save();
+      go('/day');
+    }
+  });
+  $('#page').addEventListener('keydown', (e) => {
+    if ((e.key === 'Enter' || e.key === ' ') && e.target.classList && e.target.classList.contains('enr-card')) {
+      e.preventDefault();
+      STATE.day = resumeCourseDay(e.target.dataset.continue);
       save();
       go('/day');
     }

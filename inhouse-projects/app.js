@@ -6,7 +6,12 @@ const STORE_KEY = 'zdash_project_v1';
 let state = loadState();
 let currentTrackId = state.selectedTrack || 'inhouse';
 if(typeof TRACKS !== 'undefined' && TRACKS.length && !TRACKS.some(t=>t.id===currentTrackId)) currentTrackId = TRACKS[0].id;
-let currentProjectId = state.currentProject || 'supported';
+/* Project-container model: currentProjectId is a catalog project id; currentMode is supported|mandate|group inside it */
+function catalog(){ return (typeof window!=='undefined' && window.ZEELIN_CATALOG) ? window.ZEELIN_CATALOG : null; }
+function defaultCatalogId(){ const c=catalog(); return (c && c.DEFAULT_PROJECT_ID) || 'supported'; }
+let currentProjectId = state.currentProject || defaultCatalogId();
+let currentMode = state.currentMode || 'supported';
+if(!['supported','mandate','group'].includes(currentMode)) currentMode = 'supported';
 let currentVaultFolderId = null;
 let quizState = null;
 let gateProjectId = null;
@@ -16,37 +21,24 @@ function loadState(){
   catch(e){ return defaultState(); }
 }
 function defaultState(){
-  return {selectedTrack:'inhouse',checkins:[],xp:0,streak:0,lastCheckin:null,quizResults:{},consistency:85,metrics:{checkins:12,reviews:4,score:92},currentProject:'supported',chats:{supported:chatSeedMap('supported'),mandate:chatSeedMap('mandate'),group:chatSeedMap('group')},vaultTrees:{supported:null,mandate:null,group:null},customTasks:[],groupTasks:{},mandateDone:{},currentRoomId:{supported:'campfire',group:'daily-standup',mandate:'log'}};
+  return {selectedTrack:'inhouse',checkins:[],xp:0,streak:0,lastCheckin:null,quizResults:{},consistency:85,metrics:{checkins:12,reviews:4,score:92},currentProject:defaultCatalogId(),currentMode:'supported',chats:{},vaultTrees:{},customTasks:[],groupTasks:{},mandateDone:{},currentRoomId:{}};
 }
 /* One-time migration from the pre-project-era shape */
 function migrateState(s){
   let changed = false;
-  if(!s.vaultTrees){
-    s.vaultTrees = { supported:seedTree('supported'), mandate:seedTree('mandate'), group:seedTree('group') };
-    changed = true;
-  }
-  ['supported','mandate','group'].forEach(k=>{ if(!Array.isArray(s.vaultTrees[k])){ s.vaultTrees[k]=seedTree(k); changed=true; } });
-  if(!s.chats){
-    s.chats = {
-      supported: s.chat ? JSON.parse(JSON.stringify(s.chat)) : CHAT_SEED.map(m=>Object.assign({},m)),
-      mandate: MANDATE_LOG_SEED.map(m=>Object.assign({},m)),
-      group: GROUP_CHAT_SEED.map(m=>Object.assign({},m))
-    };
-    changed = true;
-  }
-  if(!s.currentProject){ s.currentProject='supported'; changed=true; }
+  if(!s.vaultTrees || typeof s.vaultTrees!=='object') s.vaultTrees = {};
+  if(!s.chats || typeof s.chats!=='object') s.chats = {};
+  if(!s.currentRoomId || typeof s.currentRoomId!=='object') s.currentRoomId = {};
+  /* migrate legacy flat keys (supported/mandate/group arrays) into namespaced container keys lazily */
+  ['supported','mandate','group'].forEach(k=>{
+    if(Array.isArray(s.vaultTrees[k])){ /* keep as template source */ }
+    if(Array.isArray(s.chats[k])){ delete s.chats[k]; changed=true; }
+  });
+  const dc = (typeof defaultCatalogId==='function') ? defaultCatalogId() : 'supported';
+  if(!s.currentProject || ['supported','mandate','group'].includes(s.currentProject)){ s.currentProject=dc; changed=true; }
+  if(!['supported','mandate','group'].includes(s.currentMode)){ s.currentMode='supported'; changed=true; }
   delete s.vault; delete s.chat;
   if(changed) persist(s);
-  // Convert chat arrays to per-project room maps
-  const roomMap = {supported:'campfire',group:'daily-standup',mandate:'log'};
-  Object.keys(s.chats).forEach(pid=>{
-    if(Array.isArray(s.chats[pid])){
-      const arr = s.chats[pid];
-      s.chats[pid] = {};
-      s.chats[pid][roomMap[pid]] = arr.map(m=>Object.assign({},m));
-      changed = true;
-    }
-  });
   return s;
 }
 function persist(s){ localStorage.setItem(STORE_KEY, JSON.stringify(s)); }
@@ -120,10 +112,40 @@ function seedTree(pid){
     ]}
   ];
 }
+function vaultKey(pid, mode){
+  pid = pid || currentProjectId; mode = mode || currentMode;
+  if(['supported','mandate','group'].includes(pid) && !catalog().getCatalogProject(pid).id) return pid;
+  return pid + '__' + mode;
+}
 function vTree(pid){
-  pid = pid || currentProjectId;
+  pid = pid || vaultKey();
+  if(typeof pid!=='string' || pid.indexOf('__')===-1){
+    /* legacy flat key -> map into current container+mode */
+    if(['supported','mandate','group'].includes(pid)) pid = vaultKey(currentProjectId, pid);
+    else pid = vaultKey();
+  }
   if(!state.vaultTrees) state.vaultTrees = {};
-  if(!Array.isArray(state.vaultTrees[pid])){ state.vaultTrees[pid] = seedTree(pid); return state.vaultTrees[pid]; }
+  if(!Array.isArray(state.vaultTrees[pid])){
+    const modePart = pid.split('__')[1] || 'supported';
+    state.vaultTrees[pid] = seedTree(modePart);
+    /* inject project-specific docs: brief + deliverables for this purchased project */
+    try{
+      const c = catalog(); const projId = pid.split('__')[0];
+      const cp = c ? c.getCatalogProject(projId) : null;
+      if(cp && cp.id && typeof projectBriefDocs==='function'){
+        const ma = state.vaultTrees[pid].find(n=>n.id==='mandate-analysis');
+        if(ma){
+          ma.children = ma.children || [];
+          const docs = projectBriefDocs(cp);
+          /* avoid duplicates on re-entry */
+          docs.reverse().forEach(d=>{ if(!ma.children.some(x=>x.id===d.id)) ma.children.unshift(d); });
+          ma.name = 'MANDATE ANALYSIS — ' + cp.jobRole.toUpperCase().slice(0,40);
+        }
+      }
+    }catch(e){}
+    persist(state);
+    return state.vaultTrees[pid];
+  }
   const t = state.vaultTrees[pid];
   const legacy = t.findIndex(n=>n.id==='project-mandate');
   if(legacy>-1 && !t.some(n=>n.id==='mandate-analysis')) t.splice(legacy,1);
@@ -173,17 +195,65 @@ function vFolders(list,out,depth){
 }
 
 function getTrack(id){ return TRACKS.find(t=>t.id===id)||TRACKS[0]; }
-function getProject(id){ return PROJECTS.find(p=>p.id===id)||PROJECTS[0]; }
+/* Container-aware getProject: catalog project + current mode adapter for legacy views */
+function legacyProjectForMode(mode){
+  const base = (typeof PROJECTS!=='undefined' ? PROJECTS.find(p=>p.id===mode) : null) || {id:mode, name:mode, entry:'home', stageDesc:{brief:'',workspace:'',collaboration:''}};
+  return base;
+}
+function getProject(id){
+  const c = catalog();
+  if(c){
+    const cp = c.MARKETPLACE_PROJECTS.find(p=>p.id===id);
+    if(cp){
+      const modeBase = legacyProjectForMode(currentMode);
+      const cat = c.getCategory(cp.category);
+      return {
+        id: cp.id, name: cp.title, mode: currentMode,
+        modeLabel: currentMode==='supported'?'Guided':'On Your Own',
+        badge: cat.short+' • '+cp.jobRole,
+        grad:'linear-gradient(135deg,#d97706 0%,#f59e0b 100%)', btnBg:'linear-gradient(135deg,#d97706 0%,#f59e0b 100%)', btnLabel:'Continue Project',
+        icon:'<path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2v10z"/>',
+        desc: cp.desc, progress: 35, readiness:'—', stat2: cp.duration, stat3: cp.difficulty,
+        entry:'home', catalog: cp, category: cat,
+        stageDesc: modeBase.stageDesc || {brief:'',workspace:'',collaboration:''}
+      };
+    }
+  }
+  if(typeof PROJECTS!=='undefined'){
+    const legacy = PROJECTS.find(p=>p.id===id);
+    if(legacy) return legacy;
+    /* legacy mode id -> wrap current catalog project in that mode */
+    if(['supported','mandate','group'].includes(id)){
+      const prev = currentMode; currentMode = id;
+      const wrapped = getProject(currentProjectId);
+      currentMode = prev;
+      return Object.assign({}, wrapped, {id:id, mode:id});
+    }
+    return PROJECTS[0];
+  }
+  return {id:id||'x', name:String(id||'Project'), entry:'home', stageDesc:{brief:'',workspace:'',collaboration:''}};
+}
 function today(){ return new Date().toISOString().slice(0,10); }
 
-/* ─── Per-project Vault + Chat access ─── */
+/* ─── Per-project Vault + Chat access (namespaced by container+mode, same structure) ─── */
 function chatSeedMap(pid){
-  const def = pid==='group' ? 'daily-standup' : pid==='mandate' ? 'log' : 'campfire';
-  const src = pid==='group' ? GROUP_CHAT_SEED : pid==='mandate' ? MANDATE_LOG_SEED : CHAT_SEED;
-  const m = {}; m[def] = (src||[]).map(x=>Object.assign({},x)); return m;
+  const mode = (typeof pid==='string' && pid.indexOf('__')>-1) ? pid.split('__')[1] : pid;
+  const projId = (typeof pid==='string' && pid.indexOf('__')>-1) ? pid.split('__')[0] : null;
+  const def = mode==='group' ? 'daily-standup' : mode==='mandate' ? 'log' : 'campfire';
+  const src = mode==='group' ? GROUP_CHAT_SEED : mode==='mandate' ? MANDATE_LOG_SEED : CHAT_SEED;
+  const m = {}; m[def] = (src||[]).map(x=>Object.assign({},x));
+  try{
+    const c = (typeof catalog==='function') ? catalog() : null;
+    const cp = (c && projId) ? c.MARKETPLACE_PROJECTS.find(p=>p.id===projId) : null;
+    if(cp){
+      m[def].unshift({init:'ZA',color:'#d97706',name:'Zeelin Mentor',time:'Pinned',text:'Welcome to “'+cp.title+'” ('+cp.jobRole+' • '+cp.difficulty+' • '+cp.duration+'). Deliverables: '+(cp.deliverables||[]).slice(0,3).join('; ')+'. Use Brief → Workspace → Vault → Community in this '+mode+' mode.'});
+    }
+  }catch(e){}
+  return m;
 }
 function projChat(pid){
-  pid = pid || currentProjectId;
+  pid = pid || vaultKey();
+  if(typeof pid==='string' && ['supported','mandate','group'].includes(pid)) pid = vaultKey(currentProjectId, pid);
   if(!state.chats[pid] || Array.isArray(state.chats[pid])){
     state.chats[pid] = chatSeedMap(pid);
     saveState();
@@ -191,8 +261,10 @@ function projChat(pid){
   return state.chats[pid];
 }
 function curRoom(pid){
-  pid = pid || currentProjectId;
-  return (state.currentRoomId && state.currentRoomId[pid]) || (pid==='group'?'daily-standup':pid==='mandate'?'log':'campfire');
+  pid = pid || vaultKey();
+  if(typeof pid==='string' && ['supported','mandate','group'].includes(pid)) pid = vaultKey(currentProjectId, pid);
+  const mode = (typeof pid==='string' && pid.indexOf('__')>-1) ? pid.split('__')[1] : pid;
+  return (state.currentRoomId && state.currentRoomId[pid]) || (mode==='group'?'daily-standup':mode==='mandate'?'log':'campfire');
 }
 function roomMsgs(pid){
   const c = projChat(pid), r = curRoom(pid);
@@ -221,7 +293,32 @@ window._state = function(){ return state; };
 function navigate(hash){
   window.location.hash = hash;
 }
-const PROJECT_PAGES = ['brief','workspace','collaboration','docs-vault','home'];
+const PROJECT_PAGES = ['brief','workspace','collaboration','docs-vault','home','mode'];
+/* helpers for enrolled / wishlist */
+function mpWishlist(){ try{return JSON.parse(localStorage.getItem('zeelin_mp_wishlist')||'[]')}catch(e){return []} }
+function mpSetWishlist(a){ localStorage.setItem('zeelin_mp_wishlist', JSON.stringify(a)); }
+function mpToggleWish(id){ let w=mpWishlist(); w=w.includes(id)?w.filter(x=>x!==id):w.concat([id]); mpSetWishlist(w); return w.includes(id); }
+function myProjectIds(){
+  const c=catalog();
+  let enrolled=[]; try{enrolled=JSON.parse(localStorage.getItem('zeelin_mp_enrolled')||'[]')}catch(e){enrolled=[]}
+  /* migrate legacy 42 ids if present but catalog regenerated: keep only known ids */
+  if(c) enrolled=enrolled.filter(id=>c.MARKETPLACE_PROJECTS.some(p=>p.id===id));
+  if(!enrolled.length && c && c.DEFAULT_PROJECT_ID) enrolled=[c.DEFAULT_PROJECT_ID];
+  return enrolled;
+}
+function myProjects(){ const c=catalog(); if(!c) return []; const ids=myProjectIds(); return ids.map(id=>c.getCatalogProject(id)).filter(Boolean); }
+window._setMode = function(mode){
+  if(!['supported','mandate','group'].includes(mode)) return;
+  currentMode=mode; state.currentMode=mode; saveState();
+  const target = '#p/'+currentProjectId+'/home';
+  if(location.hash === target){ route(); }
+  else navigate(target);
+};
+window._toggleWish = function(id, ev){
+  if(ev && ev.stopPropagation) ev.stopPropagation();
+  const on=mpToggleWish(id); toast(on?'Saved to wishlist':'Removed from wishlist');
+  route();
+};
 function route(){
   const h = location.hash.slice(1);
   let parts = h ? h.split('/') : [];
@@ -231,12 +328,20 @@ function route(){
   if(!view){ render('dashboard'); return; }
   if(view==='dashboard'){ render('dashboard'); return; }
 
-  /* Project-scoped routes: #p/:project/:page/... */
+  /* Project-scoped routes: #p/:project/:page[/:mode]... supports #p/:pid/mode/:mode and #p/:pid/:page */
   if(view==='p'){
     const pid = parts[1];
-    if(!getProject(pid)){ location.replace('#dashboard'); return; }
+    const c = catalog();
+    const known = c ? c.MARKETPLACE_PROJECTS.some(p=>p.id===pid) : false;
+    if(!known){
+      /* legacy mode ids -> treat as mode switch inside current project */
+      if(['supported','mandate','group'].includes(pid)){ currentMode=pid; state.currentMode=pid; saveState(); location.replace('#p/'+currentProjectId+'/home'); return; }
+      location.replace('#dashboard'); return;
+    }
     if(currentProjectId!==pid){ currentProjectId = pid; state.currentProject = pid; saveState(); }
-    const page = parts[2] || getProject(pid).entry;
+    /* #p/:pid/mode/:mode */
+    if(parts[2]==='mode' && parts[3]){ currentMode=parts[3]; state.currentMode=parts[3]; saveState(); location.replace('#p/'+pid+'/home'); return; }
+    const page = parts[2] || 'home';
     render(page, parts[3]||null, parts[4]||null);
     return;
   }
@@ -251,9 +356,10 @@ function route(){
   /* Cohort-level legacy redirect */
   if(view==='evaluation' && !parts[1]){ location.replace('#mentorship'); return; }
 
-  /* Marketplace routes */
-  if(view==='catalog'){ render('catalog'); return; }
+  /* Marketplace routes: catalog[/:cat[/:sector-or-role[/:role[/:pid]]]], cart, wishlist, checkout */
+  if(view==='catalog'){ render('catalog', parts[1]||null, parts[2]||null, parts[3]||null, parts[4]||null); return; }
   if(view==='cart'){ render('cart'); return; }
+  if(view==='wishlist'){ render('wishlist'); return; }
   if(view==='checkout'){ render('checkout'); return; }
 
   render(view, parts[1]||null, parts[2]||null);
@@ -290,72 +396,71 @@ function navLink(routeKey,label,icon,activeKey){
 }
 
 function renderSidebar(activeKey){
-  // Tailored marketplace sidebar - no other projects nav, just marketplace + back
-  if(['catalog','cart','checkout'].includes(activeKey)){
-    const cartCount = (typeof mpCart==='function'? mpCart().length : 0);
+  const c = (typeof catalog==='function') ? catalog() : null;
+  const cartCount = (typeof mpCart==='function'? mpCart().length : 0);
+  const wishCount = (typeof mpWishlist==='function'? mpWishlist().length : 0);
+  const totalProjects = c ? c.MARKETPLACE_PROJECTS.length : 0;
+  if(['catalog','cart','wishlist','checkout'].includes(activeKey) || String(activeKey||'').startsWith('catalog')){
+    let catLinks = '';
+    if(c){ catLinks = c.CATEGORIES.map(cat=>`<a href="#catalog/${cat.id}" data-route="catalog" style="display:flex;align-items:center;gap:8px;padding:8px 12px;color:#d4d4d4;font-size:13px;text-decoration:none;"><span style="width:8px;height:8px;border-radius:50%;background:${cat.color};"></span> ${cat.short}</a>`).join(''); }
     return `
     <div class="sidebar-head">
       <img src="assets/logo.png" alt="Zeelin Academy Logo">
       <span class="sidebar-title">Project Marketplace</span>
     </div>
     <div class="sidebar-nav">
+      <a href="/portal.html" style="display:flex;align-items:center;gap:8px;padding:10px 12px;margin-bottom:8px;border-radius:8px;border:1px solid #d97706;background:#26170b;color:#f59e0b;font-weight:800;text-decoration:none;font-size:13px;">&#10219; Select Portal</a>
       <a href="#dashboard" style="display:flex;align-items:center;gap:8px;padding:10px 12px;margin-bottom:12px;border-radius:8px;border:1px solid #3a3a3a;background:#1a1a1a;color:#a3a3a3;font-weight:700;text-decoration:none;font-size:13px;"><svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z"/></svg> Back to Projects</a>
       <div class="sidebar-label">Marketplace</div>
-      <a href="#catalog" data-route="catalog" class="${activeKey==='catalog'?'active':''}"><svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M20 2H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zm-2 12H6v-2h14v2zm-12-4h12V8H6v2z"/></svg><span>Project Shop</span><span class="count">42</span></a>
-      <a href="#cart" data-route="cart" class="${activeKey==='cart'?'active':''}"><svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M7 18c-1.1 0-1.99.9-1.99 2S5.9 22 7 22s2-.9 2-2-.9-2-2-2zM17 18c-1.1 0-1.99.9-1.99 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zM7.08 14h8.33c.74 0 1.36-.5 1.54-1.18l2.42-8.42H6.21l-.94-2H1v2h2l3.6 7.59-1.35 2.44C4.52 15.37 5.48 17 7 17h11v-2H7l1.1-2z"/></svg><span>Cart</span><span class="count">${cartCount}</span></a>
-      <a href="#checkout" data-route="checkout" class="${activeKey==='checkout'?'active':''}"><svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 10z"/></svg><span>Checkout (Demo)</span></a>
-      <div class="sidebar-label">Categories</div>
-      <a href="javascript:void(0)" onclick="window._mpFilter={cat:'business-analysis',role:'all',q:'',sort:'name',arrange:'grid'};location.hash='#catalog'" style="display:flex;align-items:center;gap:8px;padding:8px 12px;color:#d4d4d4;font-size:13px;"><span style="width:8px;height:8px;border-radius:50%;background:#d97706;"></span> Business Analysis</a>
-      <a href="javascript:void(0)" onclick="window._mpFilter={cat:'software-engineering',role:'all',q:'',sort:'name',arrange:'grid'};location.hash='#catalog'" style="display:flex;align-items:center;gap:8px;padding:8px 12px;color:#d4d4d4;font-size:13px;"><span style="width:8px;height:8px;border-radius:50%;background:#2563eb;"></span> Software Engineering</a>
+      <a href="#catalog" data-route="catalog" class="${activeKey==='catalog'?'active':''}">${svg(ICON_GRID)}<span>All Categories</span><span class="count">${totalProjects}</span></a>
+      <a href="#cart" data-route="cart" class="${activeKey==='cart'?'active':''}">${svg(ICON_FOLDER)}<span>Cart</span><span class="count">${cartCount}</span></a>
+      <a href="#wishlist" data-route="wishlist" class="${activeKey==='wishlist'?'active':''}">${svg(ICON_BRIEF)}<span>Wishlist</span><span class="count">${wishCount}</span></a>
+      <a href="#checkout" data-route="checkout" class="${activeKey==='checkout'?'active':''}">${svg(ICON_CHART)}<span>Checkout</span></a>
+      <div class="sidebar-label">Categories (7)</div>
+      ${catLinks}
     </div>`;
   }
   const proj = getProject(currentProjectId);
+  const cp = proj.catalog || null;
+  const my = (typeof myProjects==='function') ? myProjects() : [];
+  const modeLink = (mode,label,icon)=>{
+    const href = '#p/'+currentProjectId+'/home';
+    const on = (typeof currentMode!=='undefined' && currentMode===mode);
+    return `<a href="${href}" onclick="event.preventDefault();window._setMode('${mode}')" data-route="mode-${mode}" class="${on?'active':''}">${svg(icon)}<span>${label}</span></a>`;
+  };
+  const projLink = (page,label,icon)=>{
+    const href = '#p/'+currentProjectId+'/'+page;
+    return `<a href="${href}" data-route="p/${currentProjectId}/${page}" class="${activeKey===page?'active':''}">${svg(icon)}<span>${label}</span></a>`;
+  };
   let html = `
     <div class="sidebar-head">
       <img src="assets/logo.png" alt="Zeelin Academy Logo">
       <span class="sidebar-title">In-House Project Training Portal</span>
     </div>
     <div class="sidebar-nav">
-      ${navLink('dashboard','Main Dashboard','M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-6h2v6zm0-8h-2V7h2v2z',activeKey)}
-      <a href="#portal" data-route="portal" class="${activeKey==='portal'?'active':''}">
-        ${svg('M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-6h2v6zm0-8h-2V7h2v2z')}
-        <span>Portal Overview</span>
-      </a>
-      <div class="sidebar-label">Stage 2: In-House Projects</div>
-  `;
-
-  TRACKS.forEach(tr => {
-    const isActive = tr.id === currentTrackId;
-    html += `
-      <div class="tree-lbl" data-track="${tr.id}" onclick="window._selectTrack('${tr.id}')">
-        ${svg(tr.icon)}${tr.name}
+      <a href="/portal.html" style="display:flex;align-items:center;gap:10px;padding:10px 12px;margin-bottom:6px;border-radius:8px;border:1px solid #d97706;background:#26170b;color:#f59e0b;font-weight:800;text-decoration:none;font-size:13px;">&#10219;<span>Select Portal</span></a>
+      ${navLink('dashboard','My Projects','M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-6h2v6zm0-8h-2V7h2v2z',activeKey)}
+      ${navLink('catalog','Marketplace','M3 3h8v8H3V3zm10 0h8v8h-8V3zM3 13h8v8H3v-8zm10 0h8v8h-8v-8z',activeKey)}
+      <div class="sidebar-label">My Projects (${my.length})</div>
+      ${my.slice(0,12).map(p=>`<a href="#p/${p.id}/home" data-route="p/${p.id}/home" class="${p.id===currentProjectId?'active':''}" title="${String(p.title).replace(/"/g,'&quot;')}">${svg(ICON_FOLDER)}<span style="white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${String(p.title).slice(0,28)}</span></a>`).join('')}
+      <div class="sidebar-label">Current Project — Modes Inside</div>
+      <div class="cohort-label">
+        <svg viewBox="0 0 24 24" fill="#a3a3a3" width="12" height="12"><path d="${ICON_FOLDER}"/></svg>
+        Cohort 001 &bull; ${(cp?String(cp.jobRole):proj.name).slice(0,32)}
       </div>
-    `;
-    if(isActive){
-      const projLink = (page,label,icon)=>{
-        const href = '#p/'+currentProjectId+'/'+page;
-        return `<a href="${href}" data-route="p/${currentProjectId}/${page}" class="${activeKey===page?'active':''}">${svg(icon)}<span>${label}</span></a>`;
-      };
-      html += `<div class="sub-nav">
-        <div class="cohort-label">
-          <svg viewBox="0 0 24 24" fill="#a3a3a3" width="12" height="12"><path d="${ICON_FOLDER}"/></svg>
-          Cohort 001 &bull; ${proj.name}
-        </div>
-        <div class="proj-chips">
-          ${PROJECTS.map(p=>`<button class="proj-chip ${p.id===currentProjectId?'active':''}" onclick="_switchProject('${p.id}')" title="${p.name}">${p.name.split(' ')[0]}</button>`).join('')}
-        </div>`;
-      [
-        {route:'home',name:'Portal Overview',icon:ICON_FOLDER},
-        {route:'brief',name:'Brief & Objectives',icon:ICON_BRIEF},
-        {route:'docs-vault',name:'Docs & Files',icon:ICON_FOLDER},
-        {route:'workspace',name:'Tools &amp; Templates',icon:ICON_WRENCH},
-        {route:'collaboration',name:'Community',icon:ICON_PEOPLE}
-      ].forEach(l => { html += projLink(l.route,l.name,l.icon); });
-      html += `<a href="javascript:void(0)" onclick="event.preventDefault();window._openGate();" data-route="gate-quiz" class="sub-link${activeKey==='gate'?' active':''}">${svg(ICO_AWARD)}<span>Final Assessment</span></a>`;
-      html += `</div>`;
-    }
-  });
-
+      <div class="sub-nav">
+        ${modeLink('supported','Supported Project',ICON_BRIEF)}
+        ${modeLink('mandate','Mandate Project',ICON_CAL)}
+        ${modeLink('group','Group Project',ICON_PEOPLE)}
+      </div>
+      <div class="sidebar-label">Workspace</div>
+      ${projLink('home','Project Home',ICON_FOLDER)}
+      ${projLink('brief','Brief & Objectives',ICON_BRIEF)}
+      ${projLink('docs-vault','Docs & Files',ICON_FOLDER)}
+      ${projLink('workspace','Tools &amp; Templates',ICON_WRENCH)}
+      ${projLink('collaboration','Community',ICON_PEOPLE)}
+      <a href="javascript:void(0)" onclick="event.preventDefault();window._openGate();" data-route="gate-quiz" class="sub-link">${svg(ICO_AWARD)}<span>Final Assessment</span></a>
+  `;
   html += `
     <div class="sidebar-label">Mentorship</div>
     ${navLink('mentorship','Mentorship Dashboard',ICON_GRID,activeKey)}
@@ -375,6 +480,7 @@ function renderSidebar(activeKey){
   </div>`;
   return html;
 }
+
 
 /* ─── Topbar ─── */
 function renderTopbar(title, pct, phaseInfo){
@@ -420,6 +526,7 @@ function dashTopbarHtml(){
 
     <!-- Right: User Stats & Profile Mock -->
     <div style="display:flex;align-items:center;gap:16px;">
+      <a href="/portal.html" title="Back to portal selector" style="display:inline-flex;align-items:center;gap:6px;padding:8px 14px;border-radius:999px;background:#1e1e1e;border:1px solid #3a3a3a;color:#f59e0b;font-size:12px;font-weight:800;text-decoration:none;white-space:nowrap;">⟡ Portals</a>
       <div style="display:flex;flex-direction:column;align-items:flex-end;background-color:#26170b;border:1px solid #d97706;border-radius:8px;padding:4px 12px;line-height:1.2;">
         <span style="font-size:10px;text-transform:uppercase;color:#f59e0b;font-weight:bold;">XP</span>
         <span style="font-size:14px;font-weight:800;color:#fbbf24;">3,450</span>
@@ -492,8 +599,12 @@ function projCard(p){
 
 /* ─── Daily Check-In gate: pops up before entering a project ─── */
 window._enterProject = function(pid){
+  const c = (typeof catalog==='function') ? catalog() : null;
+  if(c && !c.MARKETPLACE_PROJECTS.some(p=>p.id===pid)){
+    if(['supported','mandate','group'].includes(pid)){ window._setMode(pid); return; }
+  }
   if(state.lastCheckin === today()){
-    navigate('#p/'+pid+'/'+getProject(pid).entry);
+    navigate('#p/'+pid+'/home');
     return;
   }
   openCheckinGate(pid);
@@ -503,7 +614,7 @@ window._switchProject = function(pid){
   currentProjectId = pid;
   state.currentProject = pid;
   saveState();
-  navigate('#p/'+pid+'/'+getProject(pid).entry);
+  navigate('#p/'+pid+'/home');
 };
 
 function gateBlockHtml(b){
@@ -599,174 +710,402 @@ function applyCheckinRewards(){
   return true;
 }
 
+function containerCard(p){
+  const c = catalog();
+  const cat = c ? c.getCategory(p.category) : {short:p.category, color:'#f59e0b', bg:'#26170b'};
+  const enrolled = true;
+  const wish = (typeof mpWishlist==='function' && mpWishlist().includes(p.id));
+  return `
+      <div class="card-cell container-card" role="button" tabindex="0" data-clickable onclick="window._enterProject('${p.id}')" onkeydown="if(event.key==='Enter'){window._enterProject('${p.id}')}" style="background-color:#181818;border-radius:14px;overflow:hidden;border:2px solid #3f3f3f;display:flex;flex-direction:column;min-height:520px;cursor:pointer;">
+        <div style="height:190px;background:#0d0d0d url('${p.thumbnail}') center/cover no-repeat;position:relative;">
+          <div style="position:absolute;inset:0;background:linear-gradient(to top, rgba(0,0,0,.72), rgba(0,0,0,.05));"></div>
+          <div style="position:absolute;top:12px;left:12px;display:flex;gap:6px;flex-wrap:wrap;">
+            <span style="background:${cat.bg};color:${cat.color};font-size:10px;font-weight:800;padding:5px 10px;border-radius:999px;text-transform:uppercase;">${cat.short}</span>
+            <span style="background:rgba(0,0,0,.6);color:#fff;font-size:10px;font-weight:700;padding:5px 10px;border-radius:999px;">${p.jobRole}</span>
+          </div>
+          <div style="position:absolute;bottom:12px;left:16px;right:16px;">
+            <div style="font-size:11px;font-weight:800;color:#fbbf24;text-transform:uppercase;">★ ${p.rating} • ${p.learners} learners</div>
+          </div>
+        </div>
+        <div style="padding:22px 22px 18px;flex:1;display:flex;flex-direction:column;">
+          <h3 style="margin:0 0 8px 0;font-size:21px;font-weight:900;color:#ffffff;line-height:1.25;">${p.title}</h3>
+          <p style="margin:0 0 14px 0;font-size:13.5px;color:#c6c6c6;line-height:1.55;flex:1;">${p.desc}</p>
+          <div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:14px;">
+            <span style="font-size:10px;font-weight:800;padding:5px 10px;border-radius:999px;background:#26170b;color:#f59e0b;">SUPPORTED INSIDE</span>
+            <span style="font-size:10px;font-weight:800;padding:5px 10px;border-radius:999px;background:#172554;color:#60a5fa;">MANDATE INSIDE</span>
+            <span style="font-size:10px;font-weight:800;padding:5px 10px;border-radius:999px;background:#14532d;color:#4ade80;">GROUP INSIDE</span>
+          </div>
+          <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:12px;border-top:1px solid #3a3a3a;padding-top:16px;margin-bottom:6px;">
+            <div><p style="margin:0;font-size:10px;color:#8a8a8a;text-transform:uppercase;font-weight:700;">Level</p><p style="margin:4px 0 0 0;font-size:15px;font-weight:800;color:#fff;">${p.difficulty}</p></div>
+            <div><p style="margin:0;font-size:10px;color:#8a8a8a;text-transform:uppercase;font-weight:700;">Length</p><p style="margin:4px 0 0 0;font-size:15px;font-weight:800;color:#fff;">${p.duration}</p></div>
+            <div><p style="margin:0;font-size:10px;color:#8a8a8a;text-transform:uppercase;font-weight:700;">Price</p><p style="margin:4px 0 0 0;font-size:15px;font-weight:800;color:${p.price===0?'#4ade80':'#fbbf24'};">${p.price===0?'Free':'£'+p.price}</p></div>
+          </div>
+        </div>
+        <div style="padding:0 22px 22px;">
+          <button onclick="event.stopPropagation();window._enterProject('${p.id}')" style="width:100%;padding:13px;border:none;border-radius:10px;background:linear-gradient(135deg,#d97706 0%,#f59e0b 100%);color:#fff;font-size:14px;font-weight:900;cursor:pointer;">Open Project →</button>
+        </div>
+      </div>`;
+}
+
 function viewDashboard(){
-  const docsPosted = vCountDocs(vTree());
+  const c = catalog();
+  const list = (typeof myProjects==='function') ? myProjects() : [];
+  const totalN = c ? c.MARKETPLACE_PROJECTS.length : 0;
   const streakDays = state.streak || 7;
+  let docsPosted = 0; try{ docsPosted = vCountDocs(vTree()); }catch(e){}
   const statTile = (ico,bg,val,lbl,accent)=>`
         <div class="stat-tile">
           <div class="stat-ico" style="background-color:${bg};">${ico}</div>
           <div><div class="stat-val">${val}</div><div class="stat-lbl" style="color:${accent};">${lbl}</div></div>
         </div>`;
   return dashTopbarHtml() + `
-  <!-- Main Content Area -->
   <main style="flex:1;padding:32px 48px;overflow-y:auto;">
-
-    <!-- Welcome Banner -->
     <div style="margin-bottom:28px;">
-      <p style="margin:0 0 6px 0;font-size:11px;text-transform:uppercase;letter-spacing:0.05em;color:#8a8a8a;font-weight:700;">Welcome Back</p>
-      <h1 style="margin:0 0 8px 0;font-size:30px;font-weight:800;color:#ffffff;">Welcome back, John</h1>
-      <p style="margin:0;font-size:14px;color:#c6c6c6;">Pick up where you left off or explore new opportunities below.</p>
+      <p style="margin:0 0 6px 0;font-size:11px;text-transform:uppercase;letter-spacing:0.05em;color:#8a8a8a;font-weight:700;">In-House Projects</p>
+      <h1 style="margin:0 0 8px 0;font-size:30px;font-weight:900;color:#ffffff;">My Projects — ${list.length}</h1>
+      <p style="margin:0;font-size:14px;color:#c6c6c6;">Each project contains <b style="color:#fff;">Supported + Mandate + Group</b> inside. Buy more from the marketplace to grow this list.</p>
     </div>
-
-    <!-- Stats Strip -->
     <div class="stat-strip">
-      ${statTile(ICO_AWARD,'#26170b','3,450','XP Total &bull; +120 this week','#fbbf24')}
+      ${statTile(ICO_AWARD,'#26170b','3,450','XP Total • +120 this week','#fbbf24')}
       ${statTile(ICO_ZAP,'#292524',streakDays+' Days','Current Streak','#f59e0b')}
-      ${statTile(ICO_VIDEO,'#172554','9','Sessions Attended','#60a5fa')}
+      ${statTile(ICO_VIDEO,'#172554',list.length+'','Projects Owned','#60a5fa')}
       ${statTile(ICO_FILET,'#14532d',docsPosted,'Docs Posted','#4ade80')}
     </div>
-
-    <!-- Responsive Grid of Project Cards -->
     <div class="dash-grid">
-      ${PROJECTS.map(p=>projCard(p)).join('')}
-
-      <!-- Card 4: Get More Project (Catalog) -->
-      <div class="card-cell" style="background-color:#181818;border-radius:12px;padding:32px;border:1px dashed #565656;display:flex;flex-direction:column;justify-content:space-between;min-height:480px;">
+      ${list.map(p=>containerCard(p)).join('')}
+      <div class="card-cell" onclick="location.hash='#catalog'" style="background-color:#181818;border-radius:14px;padding:32px;border:2px dashed #565656;display:flex;flex-direction:column;justify-content:space-between;min-height:520px;cursor:pointer;">
         <div>
           <div style="width:52px;height:52px;background-color:#262626;border-radius:10px;margin-bottom:20px;display:flex;align-items:center;justify-content:center;">
             <svg viewBox="0 0 24 24" fill="none" stroke="#b5b5b5" stroke-width="2" width="26" height="26"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="16"/><line x1="8" y1="12" x2="16" y2="12"/></svg>
           </div>
           <span style="display:inline-block;background-color:#262626;color:#b5b5b5;font-size:10px;font-weight:700;padding:4px 10px;border-radius:100px;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:12px;">Catalog</span>
-          <h3 style="margin:0 0 10px 0;font-size:22px;font-weight:800;color:#ffffff;">Get More Project</h3>
-          <p style="margin:0 0 24px 0;font-size:13.5px;color:#c6c6c6;line-height:1.55;">Browse the project catalog and unlock advanced challenges to accelerate your career growth.</p>
+          <h3 style="margin:0 0 10px 0;font-size:22px;font-weight:900;color:#ffffff;">Get More Project</h3>
+          <p style="margin:0 0 24px 0;font-size:13.5px;color:#c6c6c6;line-height:1.55;">Browse 7 categories by job role and add projects to this dashboard.</p>
           <div style="border:1px dashed #555555;border-radius:8px;padding:16px;text-align:center;margin-top:auto;">
             <span style="display:flex;justify-content:center;margin-bottom:8px;">${ICO_BOOK}</span>
-            <span style="font-size:13px;color:#c6c6c6;font-weight:600;">42 Projects Available</span>
+            <span style="font-size:13px;color:#c6c6c6;font-weight:600;">${totalN} Projects Available</span>
           </div>
         </div>
-        <button onclick="location.hash='#catalog'" style="margin-top:28px;width:100%;padding:12px;border:1px solid #d97706;background-color:#d97706;color:#fff;font-size:13px;font-weight:700;border-radius:8px;cursor:pointer;transition:all 0.2s;">Explore Project Shop</button>
+        <button onclick="location.hash='#catalog'" style="margin-top:28px;width:100%;padding:13px;border:1px solid #d97706;background-color:#d97706;color:#fff;font-size:13px;font-weight:800;border-radius:10px;cursor:pointer;">Explore Project Shop</button>
       </div>
-
     </div>
-    ${(() => {
-      const enrolledIds = (function(){ try{return JSON.parse(localStorage.getItem('zeelin_mp_enrolled')||'[]')}catch{return []} })();
-      if (!enrolledIds.length) return '';
-      const enrolled = enrolledIds.map(id=> MARKETPLACE_PROJECTS.find(p=>p.id===id)).filter(Boolean);
-      if (!enrolled.length) return '';
-      const ba = enrolled.filter(p=>p.category==='business-analysis');
-      const se = enrolled.filter(p=>p.category==='software-engineering');
-      function miniCard(p){
-        const c = p.category==='business-analysis' ? '#f59e0b' : '#60a5fa';
-        return '<div style="background:#181818;border:2px solid #14532d;border-radius:12px;padding:18px;display:flex;flex-direction:column;"><div style="font-size:10px;font-weight:800;color:'+c+';text-transform:uppercase;">'+(p.category==='business-analysis'?'Business Analysis':'Software Engineering')+' - '+p.jobRole+'</div><div style="font-size:14px;font-weight:800;color:#fff;margin:6px 0;">'+p.title+'</div><div style="font-size:12px;color:#a3a3a3;flex:1;">'+p.desc+'</div><div style="margin-top:12px;padding:8px 10px;background:#14532d;color:#4ade80;border-radius:8px;font-size:11px;font-weight:800;text-align:center;">Enrolled - Grouped & Supported</div></div>';
-      }
-      return '<div style="margin-top:32px;">'
-        + '<h2 style="font-size:16px;font-weight:800;color:#fff;margin-bottom:6px;">My Marketplace Projects - Added to In-House Dashboard</h2>'
-        + '<p style="font-size:12px;color:#a3a3a3;margin-bottom:14px;">Purchased via demo checkout. Grouped by job role alongside your Supported / Mandate / Group projects and fully supported.</p>'
-        + (ba.length?'<h3 style="font-size:13px;font-weight:800;color:#f59e0b;margin:14px 0 8px;">Business Analysis - '+ba.length+'</h3><div style="display:grid;gap:14px;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));">'+ba.map(miniCard).join('')+'</div>':'')
-        + (se.length?'<h3 style="font-size:13px;font-weight:800;color:#60a5fa;margin:14px 0 8px;">Software Engineering - '+se.length+'</h3><div style="display:grid;gap:14px;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));">'+se.map(miniCard).join('')+'</div>':'')
-        + '</div>';
-    })()}
-
   </main>`;
 }
 
-/* --- Marketplace: helpers (cart + enrolled) --- */
-function mpCart(){ try{return JSON.parse(localStorage.getItem('zeelin_mp_cart')||'[]')}catch{return []} }
-function mpSetCart(a){ localStorage.setItem('zeelin_mp_cart', JSON.stringify(a)); window.dispatchEvent(new Event('mp-cart-changed')) }
+/* --- Marketplace: helpers (cart + enrolled + wishlist, catalog-aware) --- */
+function mpCart(){ try{return JSON.parse(localStorage.getItem('zeelin_mp_cart')||'[]')}catch(e){return []} }
+function mpSetCart(a){ localStorage.setItem('zeelin_mp_cart', JSON.stringify(a)); try{window.dispatchEvent(new Event('mp-cart-changed'))}catch(e){} }
 function mpAdd(id){ const c=mpCart(); if(c.includes(id)) return false; c.push(id); mpSetCart(c); return true }
 function mpRemove(id){ const c=mpCart().filter(x=>x!==id); mpSetCart(c) }
-function mpEnrolled(){ try{return JSON.parse(localStorage.getItem('zeelin_mp_enrolled')||'[]')}catch{return []} }
+function mpEnrolled(){ try{ const a=JSON.parse(localStorage.getItem('zeelin_mp_enrolled')||'[]'); const c=catalog(); if(c) return a.filter(id=>c.MARKETPLACE_PROJECTS.some(p=>p.id===id)); return a; }catch(e){return []} }
 function mpEnroll(ids){ const e=mpEnrolled(); const m=new Set([...e, ...ids]); localStorage.setItem('zeelin_mp_enrolled', JSON.stringify([...m])) }
 function mpPrice(p){ return p.price===0?'Free':'GBP '+p.price }
-function viewCatalog(){
-  const enrolled = new Set(mpEnrolled());
-  const cart = new Set(mpCart());
-  window._mpFilter = window._mpFilter || {cat:'all', role:'all', q:''};
-  const f = window._mpFilter;
-  let list = MARKETPLACE_PROJECTS.slice();
-  if(f.cat!=='all') list = list.filter(p=>p.category===f.cat);
-  if(f.role!=='all') list = list.filter(p=>p.jobRole===f.role);
-  if(f.q) { const q=f.q.toLowerCase(); list = list.filter(p=>p.title.toLowerCase().includes(q)||p.desc.toLowerCase().includes(q)); }
-  const baCount = MARKETPLACE_PROJECTS.filter(p=>p.category==='business-analysis').length;
-  const seCount = MARKETPLACE_PROJECTS.filter(p=>p.category==='software-engineering').length;
-  const grouped = f.cat==='all';
-  function card(p){
-    const isEnrolled = enrolled.has(p.id);
-    const inCart = cart.has(p.id);
-    const badgeColor = p.category==='business-analysis' ? '#d97706' : '#2563eb';
-    const badgeBg = p.category==='business-analysis' ? '#26170b' : '#172554';
-    const badgeLabel = p.category==='business-analysis' ? 'Business Analysis' : 'Software Engineering';
-    return '<div style="background:#181818;border:2px solid '+(isEnrolled?'#14532d':'#2a2a2a')+';border-radius:14px;overflow:hidden;display:flex;flex-direction:column;min-height:380px;position:relative;">' + '<div style="height:140px;background:#0d0d0d url(\''+p.thumbnail+'\') center/cover no-repeat;position:relative;border-bottom:1px solid #2a2a2a;"><div style="position:absolute;inset:0;background:linear-gradient(to top, rgba(0,0,0,.55), transparent);"></div><div style="position:absolute;top:10px;left:10px;display:flex;gap:6px;"><span style="background:'+badgeBg+';color:'+badgeColor+';font-size:9px;font-weight:800;padding:4px 7px;border-radius:999px;">'+badgeLabel+'</span></div></div>' + '<div style="padding:14px 18px 18px;flex:1;display:flex;flex-direction:column;">'
-      + '<div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:10px;"><span style="background:'+badgeBg+';color:'+badgeColor+';font-size:10px;font-weight:800;padding:4px 8px;border-radius:999px;text-transform:uppercase;">'+badgeLabel+'</span><span style="background:#1a1a1a;color:#a3a3a3;font-size:10px;font-weight:700;padding:4px 8px;border-radius:999px;">'+p.jobRole+'</span>'+(p.price===0?'<span style="background:#14532d;color:#4ade80;font-size:10px;font-weight:800;padding:4px 8px;border-radius:999px;">FREE</span>':'')+'</div>'
-      + '<h3 style="font-size:15px;font-weight:800;color:#fff;line-height:1.3;margin-bottom:6px;">'+p.title+'</h3>'
-      + '<p style="font-size:12.5px;color:#a3a3a3;line-height:1.5;flex:1;">'+p.desc+'</p>'
-      + '<div style="display:flex;gap:6px;margin:12px 0;font-size:11px;color:#737373;"><span>'+p.difficulty+'</span><span>-</span><span>'+p.duration+'</span></div>'
-      + '<div style="display:flex;justify-content:space-between;align-items:center;border-top:1px solid #2a2a2a;padding-top:12px;margin-top:auto;"><span style="font-weight:800;color:'+(p.price===0?'#4ade80':'#fbbf24')+';">'+mpPrice(p)+'</span>'+(isEnrolled?'<span style="background:#14532d;color:#4ade80;font-size:11px;font-weight:800;padding:6px 10px;border-radius:8px;">Enrolled</span>':(inCart?'<a href="#cart" style="background:#262626;color:#fff;font-size:11px;font-weight:800;padding:8px 12px;border-radius:8px;text-decoration:none;">In Cart</a>':'<button onclick="window._mpAdd(\''+p.id+'\')" style="background:#d97706;color:#fff;font-size:11px;font-weight:800;padding:8px 14px;border-radius:8px;border:none;cursor:pointer;">Add to Cart</button>'))+'</div>'
-      + '</div>';
+function mpFind(id){
+  const c=catalog();
+  if(c){ const hit=c.MARKETPLACE_PROJECTS.find(p=>p.id===id); if(hit) return hit; }
+  if(typeof MARKETPLACE_PROJECTS!=='undefined'){ const l=MARKETPLACE_PROJECTS.find(p=>p.id===id); if(l) return l; }
+  return null;
+}
+function mpAll(){ const c=catalog(); if(c) return c.MARKETPLACE_PROJECTS.slice(); if(typeof MARKETPLACE_PROJECTS!=='undefined') return MARKETPLACE_PROJECTS.slice(); return []; }
+
+/* Project-specific content: tools, templates, brief — real demo per purchased project */
+function toolsForProject(cp){
+  const base = (typeof PROJECT_TOOLS!=='undefined' && (PROJECT_TOOLS[currentMode]||PROJECT_TOOLS.supported)) || [];
+  if(!cp) return base;
+  const cat = cp.category;
+  const pick = {
+    core: ['excel','word','visio','powerpoint','project'],
+    technical: ['excel','word','visio','powerpoint','project'],
+    product: ['excel','word','powerpoint','project','visio'],
+    data: ['excel','word','powerpoint','project','visio'],
+    ai: ['excel','word','powerpoint','project','visio'],
+    customer: ['excel','word','powerpoint','project','visio'],
+    industry: ['excel','word','visio','powerpoint','project']
+  }[cat] || ['excel','word','visio','powerpoint','project'];
+  const pool = {};
+  Object.values(typeof PROJECT_TOOLS!=='undefined'?PROJECT_TOOLS:{}).forEach(arr=>(arr||[]).forEach(t=>{pool[t.id]=t;}));
+  let tools = pick.map(id=>pool[id]).filter(Boolean);
+  if(!tools.length) tools = base;
+  /* tag each tool with project context */
+  return tools.map(t=>Object.assign({}, t, {why: (t.why||'') + ' — tailored for: ' + cp.title}));
+}
+function templatesForProject(cp){
+  if(!cp) return [];
+  const extFor = (d)=> /\.xlsx|xls/i.test(d)?'xlsx':/\.pptx|presentation|deck/i.test(d)?'pptx':/\.vsdx|flow|diagram|map/i.test(d)?'vsdx':'docx';
+  const tpls = (cp.deliverables||[]).map((d,i)=>({name: d + ' — ' + cp.jobRole, ext: extFor(d), size: (20+i*7)+' KB', projectId: cp.id}));
+  tpls.push({name:'Project Brief — '+cp.title.slice(0,50), ext:'docx', size:'18 KB', projectId: cp.id});
+  return tpls;
+}
+function projectBriefDocs(cp){
+  if(!cp) return [];
+  return [
+    {id:'brief-'+cp.id, name:('Project Brief — '+cp.title).slice(0,80)+'.docx', kind:'doc', body:'', meta:'DOCX • '+cp.jobRole+' • '+cp.categoryName},
+    ...((cp.deliverables||[]).slice(0,4).map((d,i)=>({id:'del-'+cp.id+'-'+i, name:(d+' — '+cp.jobRole).slice(0,80)+'.docx', kind:'doc', body:'', meta:'DOCX • Deliverable '+(i+1)+' • '+cp.difficulty})))
+  ];
+}
+
+function mpCard(p){
+  const c=catalog();
+  const cat = c ? c.getCategory(p.category) : {short:p.category, color:'#d97706', bg:'#26170b'};
+  const enrolled = mpEnrolled().includes(p.id);
+  const inCart = mpCart().includes(p.id);
+  const wished = (typeof mpWishlist==='function' && mpWishlist().includes(p.id));
+  const detailHash = p.sector ? '#catalog/'+p.category+'/'+p.sector+'/'+p.roleId+'/'+p.id : '#catalog/'+p.category+'/'+p.roleId+'/'+p.id;
+  return '<div class="mp-card" style="background:#181818;border:2px solid '+(enrolled?'#14532d':'#2a2a2a')+';border-radius:14px;overflow:hidden;display:flex;flex-direction:column;min-height:420px;">'
+    + '<div onclick="location.hash=\''+detailHash+'\'" style="height:150px;background:#0d0d0d url(\''+p.thumbnail+'\') center/cover no-repeat;position:relative;border-bottom:1px solid #2a2a2a;cursor:pointer;">'
+    + '<div style="position:absolute;inset:0;background:linear-gradient(to top, rgba(0,0,0,.6), transparent);"></div>'
+    + '<div style="position:absolute;top:10px;left:10px;display:flex;gap:6px;"><span style="background:'+cat.bg+';color:'+cat.color+';font-size:9px;font-weight:800;padding:4px 7px;border-radius:999px;">'+cat.short+'</span>'+(p.price===0?'<span style="background:#14532d;color:#4ade80;font-size:9px;font-weight:800;padding:4px 7px;border-radius:999px;">FREE</span>':'')+'</div>'
+    + '<button onclick="window._toggleWish(\''+p.id+'\',event)" title="Wishlist" style="position:absolute;top:8px;right:8px;width:32px;height:32px;border-radius:50%;border:1px solid #454545;background:rgba(0,0,0,.6);color:'+(wished?'#f59e0b':'#a3a3a3')+';font-size:16px;cursor:pointer;">'+(wished?'★':'☆')+'</button></div>'
+    + '<div style="padding:14px 16px 16px;flex:1;display:flex;flex-direction:column;">'
+    + '<div style="font-size:10px;font-weight:800;color:'+cat.color+';text-transform:uppercase;">'+cat.short+' • '+p.jobRole+'</div>'
+    + '<h3 onclick="location.hash=\''+detailHash+'\'" style="font-size:14.5px;font-weight:800;color:#fff;line-height:1.35;margin:6px 0;cursor:pointer;">'+p.title+'</h3>'
+    + '<p style="font-size:12px;color:#a3a3a3;line-height:1.5;flex:1;">'+p.desc+'</p>'
+    + '<div style="font-size:11px;color:#737373;margin:10px 0;">★ '+p.rating+' • '+p.learners+' learners • '+p.difficulty+' • '+p.duration+'</div>'
+    + '<div style="display:flex;justify-content:space-between;align-items:center;border-top:1px solid #2a2a2a;padding-top:12px;margin-top:auto;gap:8px;"><span style="font-weight:800;color:'+(p.price===0?'#4ade80':'#fbbf24')+';">'+mpPrice(p)+'</span>'
+    + (enrolled?'<a href="#p/'+p.id+'/home" style="background:#14532d;color:#4ade80;font-size:11px;font-weight:800;padding:8px 12px;border-radius:8px;text-decoration:none;">Open →</a>'
+      :(inCart?'<a href="#cart" style="background:#262626;color:#fff;font-size:11px;font-weight:800;padding:8px 12px;border-radius:8px;text-decoration:none;">In Cart →</a>'
+      :'<span style="display:flex;gap:6px;"><button onclick="window._mpAdd(\''+p.id+'\')" style="background:#d97706;color:#fff;font-size:11px;font-weight:800;padding:8px 12px;border-radius:8px;border:none;cursor:pointer;">Add to Cart</button><button onclick="window._mpBuyNow(\''+p.id+'\')" style="background:transparent;border:1px solid #d97706;color:#f59e0b;font-size:11px;font-weight:800;padding:8px 12px;border-radius:8px;cursor:pointer;">Buy Now</button></span>'))
+    + '</div></div></div>';
+}
+
+/* Catalog dispatcher: category dashboard / roles / sector / role projects / detail */
+function viewCatalog(a,b,d,e){
+  const c = catalog();
+  if(!c) return dashTopbarHtml()+'<main style="padding:32px;color:#fff;">Catalog unavailable</main>';
+  window._mpFilter = window._mpFilter || {q:''};
+  if(!a) return viewCategoryDashboard();
+  if(a && !b){
+    if(a==='industry') return viewIndustrySectors();
+    return viewRolesInCategory(a);
   }
-  const categories = ['Business Analyst','Systems Analyst','Software Engineer','Data Analyst','Data Engineer','Change Manager','Product Owner'];
-  return dashTopbarHtml() + ''
+  if(a==='industry' && b && !d) return viewRolesInSector(b);
+  if(a==='industry' && b && d && !e) return viewRoleProjects(d, b);
+  if(a!=='industry' && b && !d){
+    /* could be roleId or projectId */
+    if(c.ROLES.some(r=>r.id===b)) return viewRoleProjects(b, null);
+    const maybe = c.MARKETPLACE_PROJECTS.find(p=>p.id===b);
+    if(maybe) return viewProjectDetail(maybe.id);
+    return viewRolesInCategory(a);
+  }
+  if(a!=='industry' && b && d && !e){
+    const maybe = c.MARKETPLACE_PROJECTS.find(p=>p.id===d);
+    if(maybe) return viewProjectDetail(maybe.id);
+    return viewRoleProjects(b, null);
+  }
+  if(a==='industry' && b && d && e){
+    const maybe = c.MARKETPLACE_PROJECTS.find(p=>p.id===e);
+    if(maybe) return viewProjectDetail(maybe.id);
+    return viewRolesInSector(b);
+  }
+  return viewCategoryDashboard();
+}
+
+function catalogHeaderRight(){
+  return '<span style="display:flex;gap:8px;align-items:center;">'
+    + '<a href="#wishlist" style="display:inline-flex;align-items:center;justify-content:center;min-width:44px;height:44px;padding:0 12px;border-radius:12px;border:2px solid #3a3a3a;background:#1a1a1a;color:#fff;text-decoration:none;font-size:13px;font-weight:800;">☆ '+mpWishlist().length+'</a>'
+    + '<a href="#cart" aria-label="Cart" style="display:inline-flex;align-items:center;justify-content:center;min-width:44px;height:44px;padding:0 12px;border-radius:12px;border:2px solid #3a3a3a;background:#1a1a1a;color:#fff;position:relative;text-decoration:none;font-size:13px;font-weight:800;">🛒 <span style="background:#d97706;color:#fff;border-radius:999px;padding:2px 7px;font-size:11px;font-weight:800;margin-left:4px;">'+mpCart().length+'</span></a>'
+    + '</span>';
+}
+
+function viewCategoryDashboard(){
+  const c = catalog();
+  const q = (window._mpFilter.q||'').toLowerCase();
+  let cats = c.CATEGORIES.slice();
+  return dashTopbarHtml()
   + '<main style="flex:1;padding:24px 32px;overflow-y:auto;">'
-  + '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;flex-wrap:wrap;gap:12px;">'
-  + '<div><div style="margin-bottom:8px;"><a href="#dashboard" style="display:inline-flex;align-items:center;gap:6px;padding:6px 10px;border-radius:999px;border:1px solid #3a3a3a;background:#1a1a1a;color:#a3a3a3;font-size:11px;font-weight:700;text-decoration:none;">← Back to Projects</a></div><h1 style="font-size:22px;font-weight:800;color:#fff;">Project Shop - Marketplace</h1><p style="font-size:12.5px;color:#a3a3a3;">42 Projects Available - Business Analysis & Software Engineering, classified by job role</p></div>'
-  + '<a href="#cart" aria-label="Cart" style="display:inline-flex;align-items:center;justify-content:center;width:44px;height:44px;border-radius:12px;border:2px solid #3a3a3a;background:#1a1a1a;color:#fff;position:relative;text-decoration:none;"><svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M7 18c-1.1 0-1.99.9-1.99 2S5.9 22 7 22s2-.9 2-2-.9-2-2-2zM17 18c-1.1 0-1.99.9-1.99 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zM7.08 14h8.33c.74 0 1.36-.5 1.54-1.18l2.42-8.42H6.21l-.94-2H1v2h2l3.6 7.59-1.35 2.44C4.52 15.37 5.48 17 7 17h11v-2H7l1.1-2z"/></svg><span id="mpCartCount" style="position:absolute;top:-6px;right:-6px;background:#d97706;color:#fff;border-radius:999px;padding:2px 6px;font-size:10px;font-weight:800;min-width:18px;text-align:center;">'+mpCart().length+'</span></a>'
+  + '<div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:16px;flex-wrap:wrap;gap:12px;">'
+  + '<div><div style="margin-bottom:8px;"><a href="#dashboard" style="display:inline-flex;align-items:center;gap:6px;padding:6px 10px;border-radius:999px;border:1px solid #3a3a3a;background:#1a1a1a;color:#a3a3a3;font-size:11px;font-weight:700;text-decoration:none;">← Back to Projects</a></div>'
+  + '<h1 style="font-size:24px;font-weight:900;color:#fff;">Marketplace — Shop by Category</h1>'
+  + '<p style="font-size:12.5px;color:#a3a3a3;">'+c.MARKETPLACE_PROJECTS.length+' projects • 7 categories • 5 projects per job role • Coursera-style catalog</p></div>'
+  + catalogHeaderRight()
   + '</div>'
-  + '<div style="background:#181818;border:2px solid #3a3a3a;border-radius:12px;padding:14px;margin-bottom:18px;">'
-  + '<div style="display:flex;gap:10px;flex-wrap:wrap;margin-bottom:10px;">'
-  + '<input id="mpSearch" placeholder="Search projects, e.g. BPMN, UML, API..." value="'+f.q.replace(/"/g,'&quot;')+'" style="flex:1;min-width:220px;padding:10px 14px;border-radius:10px;border:1px solid #3a3a3a;background:#0d0d0d;color:#fff;font-size:12.5px;" />'
-  + '<select id="mpCat" style="padding:10px 12px;border-radius:10px;border:1px solid #3a3a3a;background:#0d0d0d;color:#fff;font-size:12.5px;"><option value="all">All Categories</option><option value="business-analysis" '+(f.cat==='business-analysis'?'selected':'')+'>Business Analysis ('+baCount+')</option><option value="software-engineering" '+(f.cat==='software-engineering'?'selected':'')+'>Software Engineering ('+seCount+')</option></select>'
-  + '<select id="mpRole" style="padding:10px 12px;border-radius:10px;border:1px solid #3a3a3a;background:#0d0d0d;color:#fff;font-size:12.5px;"><option value="all">All Job Roles</option>'+categories.map(r=>'<option value="'+r+'" '+(f.role===r?'selected':'')+'>'+r+'</option>').join('')+'</select>'
-  + '</div>'
-  + '<div style="display:flex;gap:8px;flex-wrap:wrap;"><button onclick="window._mpSetFilter(\'cat\',\'all\')" style="padding:6px 12px;border-radius:999px;font-size:11px;font-weight:800;border:1px solid '+(f.cat==='all'?'#d97706':'#3a3a3a')+';background:'+(f.cat==='all'?'#d97706':'transparent')+';color:'+(f.cat==='all'?'#fff':'#a3a3a3')+';cursor:pointer;">All</button><button onclick="window._mpSetFilter(\'cat\',\'business-analysis\')" style="padding:6px 12px;border-radius:999px;font-size:11px;font-weight:800;border:1px solid '+(f.cat==='business-analysis'?'#d97706':'#3a3a3a')+';background:'+(f.cat==='business-analysis'?'#d97706':'transparent')+';color:'+(f.cat==='business-analysis'?'#fff':'#a3a3a3')+';cursor:pointer;">Business Analysis</button><button onclick="window._mpSetFilter(\'cat\',\'software-engineering\')" style="padding:6px 12px;border-radius:999px;font-size:11px;font-weight:800;border:1px solid '+(f.cat==='software-engineering'?'#2563eb':'#3a3a3a')+';background:'+(f.cat==='software-engineering'?'#2563eb':'transparent')+';color:'+(f.cat==='software-engineering'?'#fff':'#a3a3a3')+';cursor:pointer;">Software Engineering</button></div>'
-  + '</div>'
-  + (list.length===0?'<p style="text-align:center;color:#737373;padding:40px;">No projects match this filter.</p>':(grouped?''
-  + '<div style="margin-bottom:28px;"><h2 style="font-size:15px;font-weight:800;color:#f59e0b;margin-bottom:8px;">Business Analysis - '+list.filter(p=>p.category==='business-analysis').length+' projects</h2><p style="font-size:11.5px;color:#737373;margin-bottom:12px;">Stakeholder, requirements, process & change. Grouped by job role.</p><div class="mp-grid">'+list.filter(p=>p.category==='business-analysis').map(card).join('')+'</div></div>'
-  + '<div><h2 style="font-size:15px;font-weight:800;color:#60a5fa;margin-bottom:8px;">Software Engineering - '+list.filter(p=>p.category==='software-engineering').length+' projects</h2><p style="font-size:11.5px;color:#737373;margin-bottom:12px;">Systems modelling, SDLC, data & delivery - grouped by job role.</p><div class="mp-grid">'+list.filter(p=>p.category==='software-engineering').map(card).join('')+'</div></div>'
-  :'<div class="mp-grid">'+list.map(card).join('')+'</div>'))
+  + '<div style="background:#181818;border:2px solid #3a3a3a;border-radius:12px;padding:14px;margin-bottom:18px;"><input id="mpSearch" placeholder="Search '+c.MARKETPLACE_PROJECTS.length+' projects, roles, e.g. BPMN, API, Power BI, chatbot..." value="'+String(window._mpFilter.q||'').replace(/"/g,'&quot;')+'" style="width:100%;padding:12px 14px;border-radius:10px;border:1px solid #3a3a3a;background:#0d0d0d;color:#fff;font-size:13px;" /></div>'
+  + (q ? '<div style="margin-bottom:18px;"><h2 style="font-size:14px;color:#fff;">Results for “'+String(window._mpFilter.q||'')+'”</h2><div class="mp-grid" style="margin-top:12px;">'+c.MARKETPLACE_PROJECTS.filter(p=>(p.title+' '+p.desc+' '+p.jobRole).toLowerCase().includes(q)).slice(0,24).map(mpCard).join('')+'</div></div>' : '')
+  + '<div class="mp-grid">'+cats.map(cat=>{
+      const n = c.MARKETPLACE_PROJECTS.filter(p=>p.category===cat.id).length;
+      const roles = c.rolesForCategory(cat.id).length;
+      const extra = cat.id==='industry' ? '8 sectors • ' : '';
+      return '<div role="button" tabindex="0" data-clickable onkeydown="if(event.keyCode==13){this.click()}" onclick="location.hash=\'#catalog/'+cat.id+'\'" style="background:#181818;border:2px solid #2a2a2a;border-radius:14px;overflow:hidden;cursor:pointer;">'
+      + '<div style="height:130px;background:#0d0d0d url(\''+cat.cover+'\') center/cover no-repeat;position:relative;"><div style="position:absolute;inset:0;background:linear-gradient(to top, rgba(0,0,0,.65), transparent);"></div>'
+      + '<span style="position:absolute;top:10px;left:10px;background:'+cat.bg+';color:'+cat.color+';font-size:10px;font-weight:800;padding:4px 8px;border-radius:999px;">'+n+' PROJECTS</span></div>'
+      + '<div style="padding:16px 18px;"><div style="font-size:15px;font-weight:900;color:#fff;">'+cat.name+'</div>'
+      + '<div style="font-size:12px;color:#a3a3a3;margin:6px 0 10px;">'+cat.blurb+'</div>'
+      + '<div style="font-size:11px;font-weight:800;color:'+cat.color+';">'+extra+roles+' roles • 5 projects each →</div></div></div>';
+    }).join('')+'</div>'
   + '</main>';
 }
-function bindCatalog(){
-  const s=document.getElementById('mpSearch'), c=document.getElementById('mpCat'), r=document.getElementById('mpRole');
-  if(s) s.addEventListener('input', e=>{ window._mpFilter.q=e.target.value; const m=document.getElementById('main-content'); m.innerHTML=viewCatalog(); bindCatalog(); const inp=document.getElementById('mpSearch'); if(inp) inp.focus(); });
-  if(c) c.addEventListener('change', e=>{ window._mpFilter.cat=e.target.value; const m=document.getElementById('main-content'); m.innerHTML=viewCatalog(); bindCatalog(); });
-  if(r) r.addEventListener('change', e=>{ window._mpFilter.role=e.target.value; const m=document.getElementById('main-content'); m.innerHTML=viewCatalog(); bindCatalog(); });
+
+function viewRolesInCategory(catId){
+  const c = catalog();
+  const cat = c.getCategory(catId);
+  const roles = c.rolesForCategory(catId);
+  return dashTopbarHtml()
+  + '<main style="flex:1;padding:24px 32px;overflow-y:auto;">'
+  + '<div style="margin-bottom:8px;display:flex;gap:8px;"><a href="#dashboard" style="padding:8px 12px;border-radius:999px;border:1px solid #3a3a3a;background:#1a1a1a;color:#a3a3a3;font-weight:700;text-decoration:none;font-size:12px;">← Projects</a><a href="#catalog" style="padding:8px 12px;border-radius:999px;border:1px solid #3a3a3a;background:#1a1a1a;color:#a3a3a3;font-weight:700;text-decoration:none;font-size:12px;">← Categories</a></div>'
+  + '<div style="display:flex;justify-content:space-between;align-items:flex-start;gap:12px;flex-wrap:wrap;"><div><h1 style="font-size:22px;font-weight:900;color:#fff;">'+cat.name+'</h1><p style="font-size:12.5px;color:#a3a3a3;">'+roles.length+' job roles • each role has 5 hands-on projects</p></div>'+catalogHeaderRight()+'</div>'
+  + '<div class="mp-grid" style="margin-top:16px;">'+roles.map(r=>{
+      const n = c.projectsForRole(r.id).length;
+      return '<div role="button" tabindex="0" data-clickable onkeydown="if(event.keyCode==13){this.click()}" onclick="location.hash=\'#catalog/'+cat.id+'/'+r.id+'\'" style="background:#181818;border:2px solid #2a2a2a;border-radius:14px;padding:20px;cursor:pointer;">'
+      + '<div style="font-size:10px;font-weight:800;color:'+cat.color+';text-transform:uppercase;">'+cat.short+'</div>'
+      + '<div style="font-size:15px;font-weight:800;color:#fff;margin:6px 0;">'+r.title+'</div>'
+      + '<div style="font-size:12px;color:#a3a3a3;">'+n+' projects • BRD • BPMN • RTM • UAT</div>'
+      + '<div style="margin-top:12px;font-size:12px;font-weight:800;color:'+cat.color+';">View 5 projects →</div></div>';
+    }).join('')+'</div></main>';
 }
-window._mpSetFilter = (k,v)=>{ window._mpFilter[k]=v; if(k==='cat'&&v==='all') window._mpFilter.role='all'; const m=document.getElementById('main-content'); m.innerHTML=viewCatalog(); bindCatalog(); };
-window._mpAdd = (id)=>{ mpAdd(id); const m=document.getElementById('main-content'); if(m) { m.innerHTML=viewCatalog(); bindCatalog(); } toast('Added to cart - view cart to checkout'); };
-function viewCart(){
-  const cartIds=mpCart(); const items=cartIds.map(id=>MARKETPLACE_PROJECTS.find(p=>p.id===id)).filter(Boolean);
-  const total=items.reduce((s,p)=>s+(Number(p.price)||0),0);
-  if(items.length===0) return dashTopbarHtml()+'<main style="flex:1;padding:40px;text-align:center;"><div style="display:flex;justify-content:center;gap:8px;margin-bottom:16px;"><a href="#dashboard" style="padding:8px 12px;border-radius:999px;border:1px solid #3a3a3a;background:#1a1a1a;color:#a3a3a3;font-weight:700;text-decoration:none;font-size:12px;">← Back to Projects</a><a href="#catalog" style="padding:8px 12px;border-radius:999px;border:1px solid #d97706;background:#d97706;color:#fff;font-weight:700;text-decoration:none;font-size:12px;">← Back to Shop</a></div><div style="font-size:48px;margin-bottom:12px;"><svg width="48" height="48" viewBox="0 0 24 24" fill="#3a3a3a"><path d="M7 18c-1.1 0-1.99.9-1.99 2S5.9 22 7 22s2-.9 2-2-.9-2-2-2zM17 18c-1.1 0-1.99.9-1.99 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zM7.08 14h8.33c.74 0 1.36-.5 1.54-1.18l2.42-8.42H6.21l-.94-2H1v2h2l3.6 7.59-1.35 2.44C4.52 15.37 5.48 17 7 17h11v-2H7l1.1-2z"/></svg></div><h2 style="font-size:18px;font-weight:800;color:#fff;">Your cart is empty</h2><p style="font-size:12.5px;color:#a3a3a3;margin:8px 0 18px;">Browse the catalog and add Business Analysis or Software Engineering projects.</p><a href="#catalog" style="display:inline-block;padding:12px 22px;background:#d97706;color:#fff;border-radius:10px;font-weight:800;text-decoration:none;">Explore Project Shop</a></main>';
-  return dashTopbarHtml()+'<main style="flex:1;padding:24px 32px;max-width:800px;margin:0 auto;width:100%;">'
-  + '<div style="display:flex;gap:8px;margin-bottom:12px;"><a href="#dashboard" style="padding:8px 12px;border-radius:999px;border:1px solid #3a3a3a;background:#1a1a1a;color:#a3a3a3;font-weight:700;text-decoration:none;font-size:12px;">← Back to Projects</a><a href="#catalog" style="padding:8px 12px;border-radius:999px;border:1px solid #3a3a3a;background:#1a1a1a;color:#a3a3a3;font-weight:700;text-decoration:none;font-size:12px;">← Back to Shop</a></div>'
-  + '<h1 style="font-size:18px;font-weight:800;color:#fff;margin-bottom:12px;">Your Cart - '+items.length+' projects</h1>'
-  + '<div style="display:flex;flex-direction:column;gap:10px;margin-bottom:18px;">'+items.map(p=>'<div style="display:flex;gap:14px;align-items:center;padding:16px;background:#181818;border:2px solid #3a3a3a;border-radius:12px;"><div style="width:48px;height:48px;border-radius:8px;background:'+(p.category==='business-analysis'?'#26170b':'#172554')+';flex-shrink:0;"></div><div style="flex:1;min-width:0;"><div style="font-size:10px;font-weight:800;color:#a3a3a3;text-transform:uppercase;">'+(p.category==='business-analysis'?'Business Analysis':'Software Engineering')+' - '+p.jobRole+'</div><div style="font-size:13px;font-weight:700;color:#fff;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">'+p.title+'</div><div style="font-size:11px;color:#737373;">'+p.duration+' - '+p.difficulty+'</div></div><div style="font-weight:800;color:'+(p.price===0?'#4ade80':'#fbbf24')+';">'+mpPrice(p)+'</div><button onclick="window._mpRemove(\''+p.id+'\')" style="padding:8px;border-radius:8px;border:1px solid #3a3a3a;background:transparent;color:#ef4444;font-size:11px;font-weight:700;cursor:pointer;">Remove</button></div>').join('')+'</div>'
-  + '<div style="background:#181818;border:2px solid #3a3a3a;border-radius:12px;padding:18px;">'
-  + '<div style="display:flex;justify-content:space-between;font-weight:800;color:#fff;margin-bottom:6px;"><span>Subtotal (demo)</span><span>GBP '+total.toFixed(2)+'</span></div>'
-  + '<p style="font-size:11px;color:#737373;margin-bottom:14px;">Demo checkout - no real charge. Projects will be added to In-House Projects and behave like your enrolled courses, grouped and supported.</p>'
-  + '<div style="display:flex;gap:10px;"><button onclick="window._mpClear()" style="padding:12px 18px;border-radius:10px;border:1px solid #3a3a3a;background:transparent;color:#a3a3a3;font-weight:800;cursor:pointer;">Clear Cart</button><a href="#checkout" style="flex:1;text-align:center;padding:12px 18px;border-radius:10px;background:#d97706;color:#fff;font-weight:800;text-decoration:none;">Proceed to Checkout -></a></div>'
+
+function viewIndustrySectors(){
+  const c = catalog();
+  return dashTopbarHtml()
+  + '<main style="flex:1;padding:24px 32px;overflow-y:auto;">'
+  + '<div style="margin-bottom:8px;display:flex;gap:8px;"><a href="#dashboard" style="padding:8px 12px;border-radius:999px;border:1px solid #3a3a3a;background:#1a1a1a;color:#a3a3a3;font-weight:700;text-decoration:none;font-size:12px;">← Projects</a><a href="#catalog" style="padding:8px 12px;border-radius:999px;border:1px solid #3a3a3a;background:#1a1a1a;color:#a3a3a3;font-weight:700;text-decoration:none;font-size:12px;">← Categories</a></div>'
+  + '<div style="display:flex;justify-content:space-between;align-items:flex-start;gap:12px;flex-wrap:wrap;"><div><h1 style="font-size:22px;font-weight:900;color:#fff;">Industry-Specific — by Sector</h1><p style="font-size:12.5px;color:#a3a3a3;">8 sectors → roles → 5 projects each</p></div>'+catalogHeaderRight()+'</div>'
+  + '<div class="mp-grid" style="margin-top:16px;">'+c.SECTORS.map(s=>{
+      const roles = c.rolesForSector(s.id);
+      const n = roles.reduce((a,r)=>a+c.projectsForRole(r.id).length,0);
+      return '<div role="button" tabindex="0" data-clickable onkeydown="if(event.keyCode==13){this.click()}" onclick="location.hash=\'#catalog/industry/'+s.id+'\'" style="background:#181818;border:2px solid #2a2a2a;border-radius:14px;padding:20px;cursor:pointer;">'
+      + '<div style="font-size:10px;font-weight:800;color:#fbbf24;text-transform:uppercase;">Sector</div>'
+      + '<div style="font-size:15px;font-weight:800;color:#fff;margin:6px 0;">'+s.name+'</div>'
+      + '<div style="font-size:12px;color:#a3a3a3;">'+roles.length+' roles • '+n+' projects</div>'
+      + '<div style="margin-top:12px;font-size:12px;font-weight:800;color:#fbbf24;">View roles →</div></div>';
+    }).join('')+'</div></main>';
+}
+
+function viewRolesInSector(sectorId){
+  const c = catalog();
+  const s = c.getSector(sectorId);
+  if(!s) return viewIndustrySectors();
+  const roles = c.rolesForSector(sectorId);
+  return dashTopbarHtml()
+  + '<main style="flex:1;padding:24px 32px;overflow-y:auto;">'
+  + '<div style="margin-bottom:8px;display:flex;gap:8px;flex-wrap:wrap;"><a href="#dashboard" style="padding:8px 12px;border-radius:999px;border:1px solid #3a3a3a;background:#1a1a1a;color:#a3a3a3;font-weight:700;text-decoration:none;font-size:12px;">← Projects</a><a href="#catalog" style="padding:8px 12px;border-radius:999px;border:1px solid #3a3a3a;background:#1a1a1a;color:#a3a3a3;font-weight:700;text-decoration:none;font-size:12px;">← Categories</a><a href="#catalog/industry" style="padding:8px 12px;border-radius:999px;border:1px solid #3a3a3a;background:#1a1a1a;color:#a3a3a3;font-weight:700;text-decoration:none;font-size:12px;">← Sectors</a></div>'
+  + '<div style="display:flex;justify-content:space-between;align-items:flex-start;gap:12px;flex-wrap:wrap;"><div><h1 style="font-size:22px;font-weight:900;color:#fff;">'+s.name+'</h1><p style="font-size:12.5px;color:#a3a3a3;">'+roles.length+' roles • 5 projects each</p></div>'+catalogHeaderRight()+'</div>'
+  + '<div class="mp-grid" style="margin-top:16px;">'+roles.map(r=>{
+      return '<div role="button" tabindex="0" data-clickable onkeydown="if(event.keyCode==13){this.click()}" onclick="location.hash=\'#catalog/industry/'+s.id+'/'+r.id+'\'" style="background:#181818;border:2px solid #2a2a2a;border-radius:14px;padding:20px;cursor:pointer;">'
+      + '<div style="font-size:10px;font-weight:800;color:#fbbf24;text-transform:uppercase;">'+s.name+'</div>'
+      + '<div style="font-size:15px;font-weight:800;color:#fff;margin:6px 0;">'+r.title+'</div>'
+      + '<div style="font-size:12px;color:#a3a3a3;">5 projects • domain + compliance + delivery</div>'
+      + '<div style="margin-top:12px;font-size:12px;font-weight:800;color:#fbbf24;">View 5 projects →</div></div>';
+    }).join('')+'</div></main>';
+}
+
+function viewRoleProjects(roleId, sectorId){
+  const c = catalog();
+  const role = c.getRole(roleId);
+  const list = c.projectsForRole(roleId);
+  const back2 = role.cat==='industry' ? '#catalog/industry/'+(sectorId||role.sector||'') : '#catalog/'+role.cat;
+  const backLabel = role.cat==='industry' ? '← Sector' : '← Category';
+  return dashTopbarHtml()
+  + '<main style="flex:1;padding:24px 32px;overflow-y:auto;">'
+  + '<div style="margin-bottom:8px;display:flex;gap:8px;flex-wrap:wrap;"><a href="#dashboard" style="padding:8px 12px;border-radius:999px;border:1px solid #3a3a3a;background:#1a1a1a;color:#a3a3a3;font-weight:700;text-decoration:none;font-size:12px;">← Projects</a><a href="#catalog" style="padding:8px 12px;border-radius:999px;border:1px solid #3a3a3a;background:#1a1a1a;color:#a3a3a3;font-weight:700;text-decoration:none;font-size:12px;">← Categories</a><a href="'+back2+'" style="padding:8px 12px;border-radius:999px;border:1px solid #3a3a3a;background:#1a1a1a;color:#a3a3a3;font-weight:700;text-decoration:none;font-size:12px;">'+backLabel+'</a></div>'
+  + '<div style="display:flex;justify-content:space-between;align-items:flex-start;gap:12px;flex-wrap:wrap;"><div><h1 style="font-size:22px;font-weight:900;color:#fff;">'+role.title+'</h1><p style="font-size:12.5px;color:#a3a3a3;">'+list.length+' projects • each project contains Supported + Mandate + Group</p></div>'+catalogHeaderRight()+'</div>'
+  + '<div class="mp-grid" style="margin-top:16px;">'+list.map(mpCard).join('')+'</div></main>';
+}
+
+function viewProjectDetail(pid){
+  const p = mpFind(pid);
+  if(!p) return viewCategoryDashboard();
+  const c = catalog();
+  const cat = c.getCategory(p.category);
+  const enrolled = mpEnrolled().includes(p.id);
+  const inCart = mpCart().includes(p.id);
+  const wished = mpWishlist().includes(p.id);
+  const siblings = c.projectsForRole(p.roleId).filter(x=>x.id!==p.id).slice(0,4);
+  const backRole = p.sector ? '#catalog/'+p.category+'/'+p.sector+'/'+p.roleId : '#catalog/'+p.category+'/'+p.roleId;
+  return dashTopbarHtml()
+  + '<main style="flex:1;padding:24px 32px;overflow-y:auto;max-width:1100px;margin:0 auto;width:100%;">'
+  + '<div style="margin-bottom:12px;display:flex;gap:8px;flex-wrap:wrap;"><a href="#dashboard" style="padding:8px 12px;border-radius:999px;border:1px solid #3a3a3a;background:#1a1a1a;color:#a3a3a3;font-weight:700;text-decoration:none;font-size:12px;">← Projects</a><a href="#catalog" style="padding:8px 12px;border-radius:999px;border:1px solid #3a3a3a;background:#1a1a1a;color:#a3a3a3;font-weight:700;text-decoration:none;font-size:12px;">← Categories</a><a href="'+backRole+'" style="padding:8px 12px;border-radius:999px;border:1px solid #3a3a3a;background:#1a1a1a;color:#a3a3a3;font-weight:700;text-decoration:none;font-size:12px;">← '+p.jobRole+'</a></div>'
+  + '<div style="display:grid;grid-template-columns:1.5fr .9fr;gap:20px;">'
+  + '<div><div style="height:260px;border-radius:14px;background:#0d0d0d url(\''+p.thumbnail+'\') center/cover no-repeat;border:2px solid #2a2a2a;position:relative;overflow:hidden;"><div style="position:absolute;inset:0;background:linear-gradient(to top, rgba(0,0,0,.7), transparent);"></div><div style="position:absolute;bottom:14px;left:16px;right:16px;"><span style="background:'+cat.bg+';color:'+cat.color+';font-size:10px;font-weight:800;padding:5px 10px;border-radius:999px;">'+cat.short+'</span> <span style="background:rgba(0,0,0,.6);color:#fff;font-size:10px;font-weight:700;padding:5px 10px;border-radius:999px;">'+p.jobRole+'</span></div></div>'
+  + '<h1 style="font-size:24px;font-weight:900;color:#fff;margin:16px 0 8px;">'+p.title+'</h1>'
+  + '<div style="font-size:12.5px;color:#a3a3a3;">★ '+p.rating+' • '+p.learners+' learners • '+p.difficulty+' • '+p.duration+'</div>'
+  + '<p style="font-size:14px;color:#d4d4d4;line-height:1.7;margin:12px 0;">'+p.desc+'</p>'
+  + '<div style="display:flex;gap:6px;flex-wrap:wrap;margin:10px 0;">'+p.skills.map(s=>'<span style="background:#1a1a1a;border:1px solid #3a3a3a;color:#e5e5e5;font-size:11px;font-weight:700;padding:6px 10px;border-radius:999px;">'+s+'</span>').join('')+'</div>'
+  + '<h3 style="font-size:14px;font-weight:800;color:#fff;margin:16px 0 8px;">What you will deliver</h3>'
+  + '<ul style="font-size:13px;color:#c6c6c6;line-height:1.8;margin-left:18px;">'+p.deliverables.map(d=>'<li>'+d+'</li>').join('')+'</ul>'
+  + '<div style="background:#181818;border:2px solid #2a2a2a;border-radius:12px;padding:16px;margin-top:14px;"><div style="font-size:12px;font-weight:800;color:#fff;margin-bottom:8px;">Inside this project (grouped)</div><div style="display:grid;grid-template-columns:repeat(3,1fr);gap:10px;">'
+  + '<div style="background:#26170b;border:1px solid #d97706;border-radius:10px;padding:12px;"><div style="font-size:11px;font-weight:900;color:#f59e0b;">SUPPORTED</div><div style="font-size:11px;color:#d4d4d4;">Mentor-guided vault, tools & campfire</div></div>'
+  + '<div style="background:#172554;border:1px solid #2563eb;border-radius:10px;padding:12px;"><div style="font-size:11px;font-weight:900;color:#60a5fa;">MANDATE</div><div style="font-size:11px;color:#d4d4d4;">Solo milestones & private log</div></div>'
+  + '<div style="background:#14532d;border:1px solid #16a34a;border-radius:10px;padding:12px;"><div style="font-size:11px;font-weight:900;color:#4ade80;">GROUP</div><div style="font-size:11px;color:#d4d4d4;">Team board, standups & reviews</div></div>'
+  + '</div></div>'
+  + (siblings.length?'<h3 style="font-size:14px;font-weight:800;color:#fff;margin:18px 0 10px;">More in '+p.jobRole+'</h3><div class="mp-grid">'+siblings.map(mpCard).join('')+'</div>':'')
+  + '</div>'
+  + '<div><div style="background:#181818;border:2px solid #3a3a3a;border-radius:14px;padding:18px;position:sticky;top:16px;">'
+  + '<div style="font-size:22px;font-weight:900;color:'+(p.price===0?'#4ade80':'#fff')+';">'+mpPrice(p)+'</div>'
+  + '<div style="font-size:11px;color:#737373;margin:4px 0 14px;">One-time • lifetime access • demo checkout</div>'
+  + (enrolled?'<a href="#p/'+p.id+'/home" style="display:block;text-align:center;padding:13px;border-radius:10px;background:#14532d;color:#4ade80;font-weight:900;text-decoration:none;">Open Project →</a>'
+    :'<button onclick="window._mpAdd(\''+p.id+'\')" style="width:100%;padding:13px;border-radius:10px;background:#d97706;color:#fff;font-weight:900;border:none;cursor:pointer;margin-bottom:8px;">Add to Cart</button>'
+    +'<button onclick="window._mpBuyNow(\''+p.id+'\')" style="width:100%;padding:13px;border-radius:10px;background:#fff;color:#111;font-weight:900;border:none;cursor:pointer;margin-bottom:8px;">Buy Now</button>')
+  + '<button onclick="window._toggleWish(\''+p.id+'\',event)" style="width:100%;padding:11px;border-radius:10px;background:transparent;border:1px solid #454545;color:'+(wished?'#f59e0b':'#d4d4d4')+';font-weight:800;cursor:pointer;">'+(wished?'★ Wishlisted':'☆ Add to Wishlist')+'</button>'
+  + '<div style="font-size:11px;color:#737373;line-height:1.6;margin-top:12px;">Includes vault folders, tools & templates, and community chat — same structure for every project.</div>'
+  + '</div></div>'
   + '</div></main>';
 }
-window._mpRemove = (id)=>{ mpRemove(id); const m=document.getElementById('main-content'); if(m) m.innerHTML=viewCart(); };
-window._mpClear = ()=>{ mpSetCart([]); const m=document.getElementById('main-content'); if(m) m.innerHTML=viewCart(); };
-function viewCheckout(){
-  const cartIds=mpCart(); const items=cartIds.map(id=>MARKETPLACE_PROJECTS.find(p=>p.id===id)).filter(Boolean);
+
+function bindCatalog(){
+  const s=document.getElementById('mpSearch');
+  if(s) s.addEventListener('input', e=>{ window._mpFilter.q=e.target.value; const m=document.getElementById('main-content'); const h=location.hash; if(h.startsWith('#catalog')){ /* re-render current catalog route */ route(); const inp=document.getElementById('mpSearch'); if(inp){ inp.focus(); inp.setSelectionRange(inp.value.length, inp.value.length); } } });
+}
+window._mpSetFilter = (k,v)=>{ window._mpFilter[k]=v; route(); };
+window._mpAdd = (id)=>{ const added=mpAdd(id); toast(added?'Added to cart':'Already in cart'); route(); };
+window._mpBuyNow = (id)=>{
+  const p = (typeof mpFind==='function') ? mpFind(id) : null;
+  if(p && Number(p.price)===0 && !mpEnrolled().includes(id)){
+    mpEnroll([id]); mpRemove(id);
+    toast('Enrolled (Free) — opening project');
+    currentProjectId=id; state.currentProject=id; currentMode='supported'; state.currentMode='supported'; saveState();
+    location.hash='#p/'+id+'/home'; return;
+  }
+  if(!mpCart().includes(id) && !mpEnrolled().includes(id)) mpAdd(id);
+  location.hash='#checkout';
+};
+function viewCart(){
+  const items=mpCart().map(id=>mpFind(id)).filter(Boolean);
   const total=items.reduce((s,p)=>s+(Number(p.price)||0),0);
-  if(items.length===0) return dashTopbarHtml()+'<main style="flex:1;padding:40px;text-align:center;"><div style="display:flex;justify-content:center;gap:8px;margin-bottom:16px;"><a href="#dashboard" style="padding:8px 12px;border-radius:999px;border:1px solid #3a3a3a;background:#1a1a1a;color:#a3a3a3;font-weight:700;text-decoration:none;font-size:12px;">← Back to Projects</a><a href="#catalog" style="padding:8px 12px;border-radius:999px;border:1px solid #d97706;background:#d97706;color:#fff;font-weight:700;text-decoration:none;font-size:12px;">← Back to Shop</a></div><p style="color:#a3a3a3;">Cart is empty.</p><a href="#catalog" style="color:#d97706;font-weight:800;">Browse catalog</a></main>';
-  return dashTopbarHtml()+'<main style="flex:1;padding:24px 32px;max-width:900px;margin:0 auto;width:100%;">'
-  + '<div style="display:flex;gap:8px;margin-bottom:12px;"><a href="#dashboard" style="padding:8px 12px;border-radius:999px;border:1px solid #3a3a3a;background:#1a1a1a;color:#a3a3a3;font-weight:700;text-decoration:none;font-size:12px;">← Back to Projects</a><a href="#cart" style="padding:8px 12px;border-radius:999px;border:1px solid #3a3a3a;background:#1a1a1a;color:#a3a3a3;font-weight:700;text-decoration:none;font-size:12px;">← Back to Cart</a></div>'
-  + '<h1 style="font-size:18px;font-weight:800;color:#fff;margin-bottom:14px;">Checkout - Demo Payment</h1>'
-  + '<div style="display:grid;grid-template-columns:1.6fr .9fr;gap:18px;">'
-  + '<div><div style="background:#181818;border:2px solid #3a3a3a;border-radius:12px;padding:16px;margin-bottom:14px;"><h3 style="font-size:13px;font-weight:800;color:#fff;margin-bottom:10px;">Order Summary - '+items.length+' projects</h3>'+items.map(p=>'<div style="display:flex;justify-content:space-between;padding:7px 0;border-bottom:1px solid #262626;font-size:12.5px;"><span style="color:#a3a3a3;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:260px;">'+p.title+'</span><span style="font-weight:800;color:'+(p.price===0?'#4ade80':'#fff')+';">'+mpPrice(p)+'</span></div>').join('')+'<div style="display:flex;justify-content:space-between;font-weight:800;color:#fff;margin-top:10px;"><span>Total (demo)</span><span>GBP '+total.toFixed(2)+'</span></div><p style="font-size:11px;color:#737373;margin-top:8px;">Selection -> Cart -> Checkout -> Payment Checkout (demo, no Stripe). Instantly added to My In-House Projects grouped by job role.</p></div>'
-  + '<div style="background:#181818;border:2px solid #3a3a3a;border-radius:12px;padding:16px;"><h3 style="font-size:13px;font-weight:800;color:#fff;margin-bottom:10px;">Payment - Demo Card (no real charge)</h3><input id="mpEmail" placeholder="Email for receipt" value="" style="width:100%;padding:10px 12px;border-radius:10px;border:1px solid #3a3a3a;background:#0d0d0d;color:#fff;font-size:12.5px;margin-bottom:10px;" /><input value="4242 4242 4242 4242" disabled style="width:100%;padding:10px 12px;border-radius:10px;border:2px solid #3a3a3a;background:#0f0f0f;color:#737373;font-size:12.5px;margin-bottom:8px;" /><div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:8px;"><input value="12/34" disabled style="padding:10px 12px;border-radius:10px;border:2px solid #3a3a3a;background:#0f0f0f;color:#737373;font-size:12.5px;" /><input value="123" disabled style="padding:10px 12px;border-radius:10px;border:2px solid #3a3a3a;background:#0f0f0f;color:#737373;font-size:12.5px;" /></div><p style="font-size:11px;color:#737373;margin-bottom:12px;">Demo: card fields disabled, no money moves.</p><button onclick="window._mpPay()" style="width:100%;padding:12px;border-radius:10px;background:#16a34a;color:#fff;font-weight:800;border:none;cursor:pointer;">Pay GBP '+total.toFixed(2)+' (Demo) -> Enroll</button><div id="mpErr" style="color:#fca5a5;font-size:12px;margin-top:8px;display:none;"></div></div></div>'
-  + '<div style="background:#1a1a1a;border:2px solid #3a3a3a;border-radius:12px;padding:16px;height:max-content;"><div style="font-size:12px;font-weight:800;color:#fff;margin-bottom:8px;">How it works</div><ol style="font-size:11.5px;color:#a3a3a3;line-height:1.7;margin-left:16px;"><li>Select Business Analysis or Software Engineering projects from catalog</li><li>Add to cart, review, proceed</li><li>Demo checkout - projects instantly appear in In-House Projects, grouped by job role and supported like other courses.</li></ol></div>'
+  if(items.length===0) return dashTopbarHtml()+'<main style="flex:1;padding:40px;text-align:center;"><div style="display:flex;justify-content:center;gap:8px;margin-bottom:16px;flex-wrap:wrap;"><a href="#dashboard" style="padding:8px 12px;border-radius:999px;border:1px solid #3a3a3a;background:#1a1a1a;color:#a3a3a3;font-weight:700;text-decoration:none;font-size:12px;">← Back to Projects</a><a href="#catalog" style="padding:8px 12px;border-radius:999px;border:1px solid #d97706;background:#d97706;color:#fff;font-weight:700;text-decoration:none;font-size:12px;">← Back to Shop</a></div><h2 style="font-size:18px;font-weight:800;color:#fff;">Your cart is empty</h2><p style="font-size:12.5px;color:#a3a3a3;margin:8px 0 18px;">Browse 7 categories and add role-based projects.</p><a href="#catalog" style="display:inline-block;padding:12px 22px;background:#d97706;color:#fff;border-radius:10px;font-weight:800;text-decoration:none;">Explore Project Shop</a></main>';
+  return dashTopbarHtml()+'<main style="flex:1;padding:24px 32px;max-width:860px;margin:0 auto;width:100%;">'
+  + '<div style="display:flex;gap:8px;margin-bottom:12px;flex-wrap:wrap;"><a href="#dashboard" style="padding:8px 12px;border-radius:999px;border:1px solid #3a3a3a;background:#1a1a1a;color:#a3a3a3;font-weight:700;text-decoration:none;font-size:12px;">← Projects</a><a href="#catalog" style="padding:8px 12px;border-radius:999px;border:1px solid #3a3a3a;background:#1a1a1a;color:#a3a3a3;font-weight:700;text-decoration:none;font-size:12px;">← Shop</a><a href="#wishlist" style="padding:8px 12px;border-radius:999px;border:1px solid #3a3a3a;background:#1a1a1a;color:#a3a3a3;font-weight:700;text-decoration:none;font-size:12px;">☆ Wishlist ('+mpWishlist().length+')</a></div>'
+  + '<h1 style="font-size:20px;font-weight:900;color:#fff;margin-bottom:12px;">Your Cart — '+items.length+' projects</h1>'
+  + '<div style="display:flex;flex-direction:column;gap:10px;margin-bottom:18px;">'+items.map(p=>{
+      const c=catalog(); const cat=c.getCategory(p.category);
+      return '<div style="display:flex;gap:14px;align-items:center;padding:14px;background:#181818;border:2px solid #3a3a3a;border-radius:12px;"><div onclick="location.hash=\'#catalog/'+p.category+'/'+p.roleId+'/'+p.id+'\'" style="width:72px;height:52px;border-radius:8px;background:#0d0d0d url(\''+p.thumbnail+'\') center/cover;flex-shrink:0;cursor:pointer;"></div><div style="flex:1;min-width:0;"><div style="font-size:10px;font-weight:800;color:'+cat.color+';text-transform:uppercase;">'+cat.short+' • '+p.jobRole+'</div><div style="font-size:13px;font-weight:700;color:#fff;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">'+p.title+'</div><div style="font-size:11px;color:#737373;">'+p.duration+' • '+p.difficulty+'</div></div><div style="font-weight:800;color:'+(p.price===0?'#4ade80':'#fbbf24')+';white-space:nowrap;">'+mpPrice(p)+'</div><button onclick="window._mpRemove(\''+p.id+'\')" style="padding:8px;border-radius:8px;border:1px solid #3a3a3a;background:transparent;color:#ef4444;font-size:11px;font-weight:700;cursor:pointer;">Remove</button></div>';
+    }).join('')+'</div>'
+  + '<div style="background:#181818;border:2px solid #3a3a3a;border-radius:12px;padding:18px;">'
+  + '<div style="display:flex;justify-content:space-between;font-weight:800;color:#fff;margin-bottom:6px;"><span>Subtotal (demo)</span><span>GBP '+total.toFixed(2)+'</span></div>'
+  + '<p style="font-size:11px;color:#737373;margin-bottom:14px;">Demo checkout — no real charge. Projects join My Projects with Supported + Mandate + Group inside.</p>'
+  + '<div style="display:flex;gap:10px;"><button onclick="window._mpClear()" style="padding:12px 18px;border-radius:10px;border:1px solid #3a3a3a;background:transparent;color:#a3a3a3;font-weight:800;cursor:pointer;">Clear</button><a href="#checkout" style="flex:1;text-align:center;padding:12px 18px;border-radius:10px;background:#d97706;color:#fff;font-weight:800;text-decoration:none;">Proceed to Checkout →</a></div>'
+  + '</div></main>';
+}
+window._mpRemove = (id)=>{ mpRemove(id); route(); };
+window._mpClear = ()=>{ mpSetCart([]); route(); };
+function viewWishlist(){
+  const items=mpWishlist().map(id=>mpFind(id)).filter(Boolean);
+  return dashTopbarHtml()+'<main style="flex:1;padding:24px 32px;overflow-y:auto;">'
+  + '<div style="display:flex;gap:8px;margin-bottom:12px;flex-wrap:wrap;"><a href="#dashboard" style="padding:8px 12px;border-radius:999px;border:1px solid #3a3a3a;background:#1a1a1a;color:#a3a3a3;font-weight:700;text-decoration:none;font-size:12px;">← Projects</a><a href="#catalog" style="padding:8px 12px;border-radius:999px;border:1px solid #3a3a3a;background:#1a1a1a;color:#a3a3a3;font-weight:700;text-decoration:none;font-size:12px;">← Shop</a><a href="#cart" style="padding:8px 12px;border-radius:999px;border:1px solid #3a3a3a;background:#1a1a1a;color:#a3a3a3;font-weight:700;text-decoration:none;font-size:12px;">Cart ('+mpCart().length+')</a></div>'
+  + '<h1 style="font-size:20px;font-weight:900;color:#fff;margin-bottom:6px;">Wishlist — '+items.length+'</h1>'
+  + '<p style="font-size:12px;color:#a3a3a3;margin-bottom:14px;">Save for later, then move to cart when ready.</p>'
+  + (items.length?'<div class="mp-grid">'+items.map(mpCard).join('')+'</div>':'<div style="text-align:center;padding:40px;color:#737373;">No saved projects yet. <a href="#catalog" style="color:#f59e0b;font-weight:800;">Browse the shop</a></div>')
+  + '</main>';
+}
+function viewCheckout(){
+  const items=mpCart().map(id=>mpFind(id)).filter(Boolean);
+  const total=items.reduce((s,p)=>s+(Number(p.price)||0),0);
+  if(items.length===0) return dashTopbarHtml()+'<main style="flex:1;padding:40px;text-align:center;"><p style="color:#a3a3a3;">Cart is empty.</p><a href="#catalog" style="color:#d97706;font-weight:800;">Browse catalog</a></main>';
+  return dashTopbarHtml()+'<main style="flex:1;padding:24px 32px;max-width:960px;margin:0 auto;width:100%;">'
+  + '<div style="display:flex;gap:8px;margin-bottom:12px;flex-wrap:wrap;"><a href="#dashboard" style="padding:8px 12px;border-radius:999px;border:1px solid #3a3a3a;background:#1a1a1a;color:#a3a3a3;font-weight:700;text-decoration:none;font-size:12px;">← Projects</a><a href="#cart" style="padding:8px 12px;border-radius:999px;border:1px solid #3a3a3a;background:#1a1a1a;color:#a3a3a3;font-weight:700;text-decoration:none;font-size:12px;">← Cart</a></div>'
+  + '<h1 style="font-size:20px;font-weight:900;color:#fff;margin-bottom:14px;">Checkout — Demo Payment</h1>'
+  + '<div style="display:grid;grid-template-columns:1.5fr 1fr;gap:18px;">'
+  + '<div><div style="background:#181818;border:2px solid #3a3a3a;border-radius:12px;padding:16px;margin-bottom:14px;"><h3 style="font-size:13px;font-weight:800;color:#fff;margin-bottom:10px;">Order Summary — '+items.length+' projects</h3>'+items.map(p=>'<div style="display:flex;justify-content:space-between;padding:7px 0;border-bottom:1px solid #262626;font-size:12.5px;gap:10px;"><span style="color:#a3a3a3;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:280px;">'+p.title+'</span><span style="font-weight:800;color:'+(p.price===0?'#4ade80':'#fff')+';">'+mpPrice(p)+'</span></div>').join('')+'<div style="display:flex;justify-content:space-between;font-weight:800;color:#fff;margin-top:10px;"><span>Total (demo)</span><span>GBP '+total.toFixed(2)+'</span></div></div>'
+  + '<div style="background:#1a1a1a;border:2px solid #3a3a3a;border-radius:12px;padding:16px;"><div style="font-size:12px;font-weight:800;color:#fff;margin-bottom:8px;">How it works</div><ol style="font-size:11.5px;color:#a3a3a3;line-height:1.7;margin-left:16px;"><li>Catalog → role → project → cart</li><li>Demo pay — no Stripe, no charge</li><li>Projects appear in My Projects with all 3 modes inside</li></ol></div></div>'
+  + '<div style="background:#181818;border:2px solid #3a3a3a;border-radius:12px;padding:16px;height:max-content;"><h3 style="font-size:13px;font-weight:800;color:#fff;margin-bottom:10px;">Payment — Demo Card</h3><input id="mpEmail" placeholder="Email for receipt" style="width:100%;padding:10px 12px;border-radius:10px;border:1px solid #3a3a3a;background:#0d0d0d;color:#fff;font-size:12.5px;margin-bottom:10px;" /><input value="4242 4242 4242 4242" disabled style="width:100%;padding:10px 12px;border-radius:10px;border:2px solid #3a3a3a;background:#0f0f0f;color:#737373;font-size:12.5px;margin-bottom:8px;" /><div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:8px;"><input value="12/34" disabled style="padding:10px 12px;border-radius:10px;border:2px solid #3a3a3a;background:#0f0f0f;color:#737373;font-size:12.5px;" /><input value="123" disabled style="padding:10px 12px;border-radius:10px;border:2px solid #3a3a3a;background:#0f0f0f;color:#737373;font-size:12.5px;" /></div><button onclick="window._mpPay()" style="width:100%;padding:12px;border-radius:10px;background:#16a34a;color:#fff;font-weight:800;border:none;cursor:pointer;">Pay GBP '+total.toFixed(2)+' (Demo) → Enroll</button></div>'
   + '</div></main>';
 }
 window._mpPay = ()=>{
   const cart=mpCart(); if(cart.length===0) return;
+  const last = cart[cart.length-1];
   mpEnroll(cart); mpSetCart([]);
-  const enrolledBox=document.getElementById('main-content');
-  enrolledBox.innerHTML = '<div style="text-align:center;padding:60px 20px;"><div style="width:80px;height:80px;border-radius:50%;background:#14532d;color:#4ade80;display:flex;align-items:center;justify-content:center;margin:0 auto 16px;font-size:36px;">v</div><h2 style="font-size:18px;font-weight:800;color:#fff;">Demo Payment Successful!</h2><p style="font-size:12.5px;color:#a3a3a3;margin:8px 0 18px;">No real charge. Your projects are now in <b style="color:#fff">My In-House Projects</b> (grouped alongside your 3 existing projects).</p><a href="#dashboard" style="display:inline-block;padding:12px 22px;background:#d97706;color:#fff;border-radius:10px;font-weight:800;text-decoration:none;">Go to My Projects</a></div>';
+  try{ currentProjectId=last; state.currentProject=last; currentMode='supported'; state.currentMode='supported'; saveState(); }catch(e){}
+  const box=document.getElementById('main-content');
+  if(box) box.innerHTML = '<div style="text-align:center;padding:60px 20px;"><div style="width:80px;height:80px;border-radius:50%;background:#14532d;color:#4ade80;display:flex;align-items:center;justify-content:center;margin:0 auto 16px;font-size:36px;">✓</div><h2 style="font-size:18px;font-weight:800;color:#fff;">Demo Payment Successful!</h2><p style="font-size:12.5px;color:#a3a3a3;margin:8px 0 18px;">Projects added to <b style="color:#fff">My Projects</b> with Supported + Mandate + Group inside.</p><a href="#dashboard" style="display:inline-block;padding:12px 22px;background:#d97706;color:#fff;border-radius:10px;font-weight:800;text-decoration:none;">Go to My Projects</a></div>';
   setTimeout(()=>{ location.hash='#dashboard'; }, 1400);
 };
 
@@ -881,17 +1220,34 @@ function projModeChip(){
 function viewBrief(){
   const t = getTrack(currentTrackId);
   const proj = getProject(currentProjectId);
+  const cp = proj.catalog || null;
   const p = t.project.phases.find(x=>x.id==='brief');
   const solo = proj.mode!=='guided';
   const callout = solo
     ? `<div class="callout"><h4>Self-Directed Standard</h4><p>No mentor walkthroughs on this one — the professional standard is yours to enforce. Peer review is available in your project channel, and successful completion still unlocks direct entry into the Job Acquisition Portal (Stage 3).</p></div>`
     : `<div class="callout"><h4>Professional Standard Note</h4><p>All deliverables will be evaluated by your assigned mentor. Completing this project successfully unlocks direct entry into the Job Acquisition Portal (Stage 3).</p></div>`;
+  const projHero = cp ? `
+        <div style="display:flex;gap:14px;margin-bottom:16px;background:#0d0d0d;border:1px solid #2a2a2a;border-radius:12px;overflow:hidden;">
+          <div style="width:140px;min-height:110px;background:#0d0d0d url('${cp.thumbnail}') center/cover no-repeat;flex-shrink:0;"></div>
+          <div style="padding:14px 16px;">
+            <div style="font-size:10px;font-weight:800;color:#f59e0b;text-transform:uppercase;">${cp.categoryName} • ${cp.jobRole}</div>
+            <div style="font-size:15px;font-weight:900;color:#fff;margin:4px 0;">${cp.title}</div>
+            <div style="font-size:12px;color:#a3a3a3;">${cp.difficulty} • ${cp.duration} • ${cp.price===0?'Free':'£'+cp.price} • ★ ${cp.rating} • ${cp.learners} learners</div>
+            <div style="display:flex;gap:6px;flex-wrap:wrap;margin-top:8px;">${(cp.skills||[]).map(s=>'<span style="background:#1a1a1a;border:1px solid #3a3a3a;color:#e5e5e5;font-size:10px;font-weight:700;padding:4px 8px;border-radius:999px;">'+s+'</span>').join('')}</div>
+          </div>
+        </div>
+        <p style="font-size:14px;color:#d4d4d4;line-height:1.7;">${cp.desc}</p>
+        <h2>Deliverables for this project</h2>
+        <ul>
+          ${(cp.deliverables||[]).map(d=>'<li><strong>'+d.split('—')[0].split('/')[0].trim()+':</strong> '+d+'</li>').join('')}
+        </ul>` : '';
   return renderTopbar(proj.name+': Brief & Objectives', p.progress, `<span>${proj.modeLabel} &bull; ${proj.progress}% Project Progress</span><b>${p.progress}% Phase Complete</b>`)
     + `<div class="workspace"><div class="canvas">
       <div class="brief">
         <div class="brief-meta"><span class="brief-kicker">${proj.name}${projModeChip()} — In-House Training Project</span><span class="brief-deadline">Deadline: ${t.project.deadline}</span></div>
-        <h1>${t.project.title}</h1>
-        <p>${proj.stageDesc.brief} This practical assignment simulates real-world consulting${solo?' — fully self-directed':' with mentor support'}. You are tasked with analyzing the project domain, eliciting operational requirements from stakeholders, and modeling a comprehensive solution.</p>
+        <h1>${cp ? cp.title : t.project.title}</h1>
+        ${projHero}
+        <p>${proj.stageDesc.brief} This practical assignment simulates real-world consulting${solo?' — fully self-directed':' with mentor support'}${cp ? ' for a <b style="color:#fff">'+cp.jobRole+'</b> ('+cp.categoryName+').' : '.'} You are tasked with analyzing the project domain, eliciting operational requirements from stakeholders, and modeling a comprehensive solution.</p>
         <h2>Core Project Objectives</h2>
         <ul>
           <li><strong>Stakeholder Mapping:</strong> Identify key actors, managers, and vendors.</li>
@@ -913,7 +1269,8 @@ function viewBrief(){
 
 function viewWorkspace(){
   const proj = getProject(currentProjectId);
-  const tools = PROJECT_TOOLS[proj.id] || [];
+  const cpWs = proj.catalog || ((typeof catalog==='function'&&catalog()) ? catalog().getCatalogProject(currentProjectId) : null);
+  const tools = (typeof toolsForProject==='function' && cpWs) ? toolsForProject(cpWs) : (PROJECT_TOOLS[proj.id] || PROJECT_TOOLS[currentMode] || PROJECT_TOOLS.supported || []);
   const tpls = typeof TOOL_TEMPLATES!=='undefined' ? TOOL_TEMPLATES : {};
   const LOGO = id => 'assets/logos/'+id+'.svg';
   const DL_URL = id => ({
@@ -923,8 +1280,9 @@ function viewWorkspace(){
     visio:'https://www.microsoft.com/en-us/microsoft-365/visio/visio-for-web',
     project:'https://www.microsoft.com/microsoft-365/project/project-for-the-web'
   }[id] || '#');
+  const projTpls = (typeof templatesForProject==='function' && cpWs) ? templatesForProject(cpWs) : [];
   const toolHtml = tools.map(t => {
-    const tList = tpls[t.id] || [];
+    const tList = (tpls[t.id] || []).concat(projTpls.filter(x=>/excel/i.test(t.id)?/\.xlsx|xlsx/i.test(x.ext):/word/i.test(t.id)?/docx/i.test(x.ext):/powerpoint/i.test(t.id)?/pptx/i.test(x.ext):/visio/i.test(t.id)?/vsdx/i.test(x.ext):false).slice(0,3));
     const opts = tList.map(tpl => '<option value="'+tpl.name+'">'+tpl.name+' ('+tpl.ext.toUpperCase()+' '+tpl.size+')</option>').join('');
     return `
     <div style="background:#181818;border:1px solid #333;border-radius:12px;padding:20px 24px;display:flex;align-items:center;gap:18px;margin-bottom:12px;">
@@ -953,7 +1311,7 @@ function viewWorkspace(){
   };
 
   return `
-  <div style="flex:1;display:flex;height:100vh;overflow:hidden;">
+  <div style="flex:1;display:flex;height:100%;min-height:0;overflow:hidden;">
     <div style="flex:1;display:flex;flex-direction:column;overflow:hidden;">
 
       <div class="vault-statusbar">
@@ -1030,8 +1388,8 @@ function chatMsgHtml(m){
 }
 
 function viewCollaboration(){
-  if(currentProjectId==='group') return viewGroupChat();
-  if(currentProjectId==='mandate') return viewSoloLog();
+  if(currentMode==='group') return viewGroupChat();
+  if(currentMode==='mandate') return viewSoloLog();
   return viewCampfireCommunity();
 }
 
@@ -1051,7 +1409,7 @@ window._toggleBookmark = function(){
 function viewCampfireCommunity(){
   const msgs = roomMsgs().map(chatMsgHtml).join('');
   return `
-  <div style="flex:1;display:flex;height:100vh;overflow:hidden;">
+  <div style="flex:1;display:flex;height:100%;min-height:0;overflow:hidden;">
     <div style="flex:1;display:flex;flex-direction:column;overflow:hidden;background-color:#121212;">
 
       <!-- Status Bar -->
@@ -1155,7 +1513,7 @@ window._campfireSend = function(){
   h = h%12||12;
   chat.push({init:'JD',color:'#d97706',name:'John Doe (You)',time:h+':'+m+' '+ap,text});
   saveState();
-  if(currentProjectId==='group'){
+  if(currentMode==='group'){
     route();
     setTimeout(()=>{ const s=document.getElementById('group-stream'); if(s) s.scrollTop=999999; },0);
     return;
@@ -1319,8 +1677,8 @@ function viewSoloLog(){
 
 function viewProjectHome(){
   const proj = getProject(currentProjectId);
-  if(currentProjectId==='mandate') return viewMandateHome();
-  if(currentProjectId==='group') return viewGroupHome();
+  if(currentMode==='mandate' && typeof viewMandateHome==='function' && arguments.callee && false) return viewMandateHome();
+  if(false) return null;
   return viewSupportedHome();
 }
 
@@ -1364,8 +1722,8 @@ function pCardIcon(iconSvg, colorClass){
 }
 
 function projectPeopleBadge(){
-  if(currentProjectId==='group') return '44 people';
-  if(currentProjectId==='mandate') return 'You &bull; Solo Mandate';
+  if(currentMode==='group') return '44 people';
+  if(currentMode==='mandate') return 'You &bull; Solo Mandate';
   return 'Mentor group &bull; Cohort 001';
 }
 
@@ -1414,7 +1772,7 @@ function todosCard(){
 }
 
 function toolsCard(){
-  const tools = (typeof PROJECT_TOOLS!=='undefined' && PROJECT_TOOLS[currentProjectId]) || [];
+  const tools = (typeof PROJECT_TOOLS!=='undefined' && (PROJECT_TOOLS[currentMode]||PROJECT_TOOLS.supported)) || [];
   const cnt = tools.length;
   return `<div class="p-card">
     <div class="p-top">
@@ -1495,7 +1853,7 @@ function viewProjectHome(){
   const overallPct = Math.round(t.project.phases.reduce((a,p)=>a+p.progress,0)/t.project.phases.length);
   const msgs = roomMsgs().slice(-3).reverse();
   const docsCnt = vTree().length;
-  const tools = (typeof PROJECT_TOOLS!=='undefined' && PROJECT_TOOLS[currentProjectId]) || [];
+  const tools = (typeof PROJECT_TOOLS!=='undefined' && (PROJECT_TOOLS[currentMode]||PROJECT_TOOLS.supported)) || [];
   // Card config keeping CONTENT but using EXACT Day 1 snippet design pixel-by-pixel
   const cards = [
     {
@@ -1589,13 +1947,36 @@ function viewProjectHome(){
           </div>
         </div>`).join('');
 
+  const cp0 = proj.catalog || null;
+  const cat0 = (typeof catalog==='function' && cp0) ? catalog().getCategory(cp0.category) : null;
+  const modeHero = `
+      <div style="margin-bottom:18px;background:#0d0d0d url('${cp0?cp0.thumbnail:'assets/cards/brief.jpg'}') center/cover no-repeat;border:2px solid #2a2a2a;border-radius:14px;overflow:hidden;position:relative;">
+        <div style="position:absolute;inset:0;background:linear-gradient(to right, rgba(0,0,0,.85), rgba(0,0,0,.35));"></div>
+        <div style="position:relative;padding:22px 24px;">
+          <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:8px;">
+            <a href="#dashboard" style="font-size:11px;font-weight:800;color:#a3a3a3;text-decoration:none;border:1px solid #454545;padding:5px 10px;border-radius:999px;background:rgba(0,0,0,.5);">← My Projects</a>
+            ${cat0?`<span style="font-size:10px;font-weight:800;color:${cat0.color};background:${cat0.bg};padding:5px 10px;border-radius:999px;">${cat0.short}</span>`:''}
+            ${cp0?`<span style="font-size:10px;font-weight:700;color:#fff;background:rgba(0,0,0,.5);border:1px solid #454545;padding:5px 10px;border-radius:999px;">${cp0.jobRole}</span>`:''}
+          </div>
+          <h1 style="font-size:24px;font-weight:900;color:#fff;margin:0 0 4px;">${proj.name}</h1>
+          <p style="font-size:13px;color:#d4d4d4;margin:0 0 14px;max-width:760px;">${cp0?cp0.desc:''} — pick a mode inside. Vault, tools and chat are namespaced per mode with the same structure.</p>
+          <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:10px;max-width:760px;">
+            ${((typeof catalog==='function'&&catalog().MODE_DEFS)||[{id:'supported',name:'Supported Project',desc:''},{id:'mandate',name:'Mandate Project',desc:''},{id:'group',name:'Group Project',desc:''}]).map(m=>`
+              <button onclick="window._setMode('${m.id}')" style="text-align:left;padding:12px 14px;border-radius:10px;cursor:pointer;border:2px solid ${currentMode===m.id?'#f59e0b':'#3a3a3a'};background:${currentMode===m.id?'#26170b':'rgba(24,24,24,.85)'};">
+                <div style="font-size:11px;font-weight:900;color:${currentMode===m.id?'#f59e0b':'#fff'};">${m.name.toUpperCase()}${currentMode===m.id?' • ACTIVE':''}</div>
+                <div style="font-size:11px;color:#a3a3a3;margin-top:2px;">${m.tag||''}</div>
+              </button>`).join('')}
+          </div>
+        </div>
+      </div>`;
   return `
   <div style="flex: 1; display: flex; flex-direction: column; background-color: #121212; overflow-y: auto;">
     <div style="padding: 24px; max-width: 1200px; margin: 0 auto; width: 100%; box-sizing: border-box;">
+      ${modeHero}
       <div style="margin-bottom: 24px; border-bottom: 1px solid #2a2a2a; padding-bottom: 16px; display: flex; justify-content: space-between; align-items: center;">
         <div>
-          <h1 style="font-size: 24px; font-weight: 700; color: #ffffff; margin: 0 0 4px 0;">${proj.name} Overview</h1>
-          <p style="font-size: 13px; color: #a3a3a3; margin: 0;">${proj.name} &bull; Cohort 001 &bull; In-House Project</p>
+          <h1 style="font-size: 20px; font-weight: 800; color: #ffffff; margin: 0 0 4px 0;">${proj.name} — ${currentMode==='supported'?'Supported':currentMode==='mandate'?'Mandate':'Group'} Workspace</h1>
+          <p style="font-size: 13px; color: #a3a3a3; margin: 0;">Cohort 001 &bull; ${currentMode} mode &bull; In-House Project</p>
         </div>
         <div style="background-color: #181818; border: 1px solid #2a2a2a; padding: 8px 14px; border-radius: 8px; display: flex; align-items: center; gap: 10px;">
           <span style="font-size: 12px; color: #a3a3a3;">Overall Day Progress</span>
@@ -1738,7 +2119,7 @@ function viewVault(){
   }).join('');
 
   return `
-  <div style="display: flex; height: 100vh; background-color: #121212; color: #ffffff; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; overflow: hidden; margin: 0;">
+  <div style="display: flex; height: 100%; min-height: 0; background-color: #121212; color: #ffffff; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; overflow: hidden; margin: 0;">
 
     <!-- MAIN VAULT FILE SYSTEM CANVAS — pixel-perfect from reference/13-docs-vault.html -->
     <div style="flex: 1; display: flex; flex-direction: column; background-color: #121212; overflow: hidden;">
@@ -1843,7 +2224,7 @@ function viewFolder(folderId){
   const proj = getProject(currentProjectId);
   const hit = vFind(folderId);
   if(!hit || hit.node.kind!=='folder'){
-    return `<div style="flex:1;display:flex;align-items:center;justify-content:center;height:100vh;background:#121212;">
+    return `<div style="flex:1;display:flex;align-items:center;justify-content:center;height:100%;min-height:0;background:#121212;">
       <div style="text-align:center;">
         <p style="color:#ffffff;font-size:18px;font-weight:800;margin:0 0 8px 0;">Folder not found</p>
         <p style="color:#8a8a8a;font-size:13px;margin:0 0 16px 0;">It may have been deleted or moved.</p>
@@ -1868,7 +2249,7 @@ function viewFolder(folderId){
   }).join('<span style="color:#404040;margin:0 4px;">/</span>');
 
   return `
-  <div style="display: flex; height: 100vh; background-color: #121212; color: #ffffff; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; overflow: hidden; margin: 0;">
+  <div style="display: flex; height: 100%; min-height: 0; background-color: #121212; color: #ffffff; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; overflow: hidden; margin: 0;">
 
     <!-- MAIN VAULT FILE SYSTEM CANVAS — subfolder pixel-perfect from reference/13 -->
     <div style="flex: 1; display: flex; flex-direction: column; background-color: #121212; overflow: hidden;">
@@ -2025,7 +2406,7 @@ function viewDocEditor(docId){
   const proj = getProject(currentProjectId);
   const hit = docId ? vFind(docId) : null;
   if(!hit || hit.node.kind!=='doc'){
-    return `<div style="flex:1;display:flex;align-items:center;justify-content:center;height:100vh;background:#121212;">
+    return `<div style="flex:1;display:flex;align-items:center;justify-content:center;height:100%;min-height:0;background:#121212;">
       <div style="text-align:center;">
         <p style="color:#ffffff;font-size:18px;font-weight:800;margin:0 0 8px 0;">Document not found</p>
         <a href="#p/${currentProjectId}/docs-vault" style="color:#f59e0b;font-weight:800;font-size:13px;">&larr; Back to Docs &amp; Files</a>
@@ -2038,7 +2419,7 @@ function viewDocEditor(docId){
   window._editorCtx = {docId: docId};
 
   return `
-  <div style="display: flex; height: 100vh; background-color: #121212; color: #f3f4f6; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; overflow: hidden; margin: 0; font-weight: 500;">
+  <div style="display: flex; height: 100%; min-height: 0; background-color: #121212; color: #f3f4f6; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; overflow: hidden; margin: 0; font-weight: 500;">
 
     <!-- MAIN DOCUMENT EDITING PAGE CONTAINER — pixel-perfect from reference/15-document-editor.html -->
     <div style="flex: 1; display: flex; flex-direction: column; background-color: #121212; overflow: hidden;">
@@ -2350,7 +2731,7 @@ function viewMentorLive(){
 
   return `
   <!-- MAIN CONTENT AREA -->
-  <div style="flex:1;display:flex;height:100vh;overflow:hidden;">
+  <div style="flex:1;display:flex;height:100%;min-height:0;overflow:hidden;">
 
     <!-- BIG CANVAS -->
     <div style="flex:1;overflow-y:auto;padding:32px 40px;background-color:#121212;">
@@ -2647,7 +3028,7 @@ function viewMentorEvaluation(){
   }
 
   return `
-  <div style="flex:1;display:flex;height:100vh;overflow:hidden;">
+  <div style="flex:1;display:flex;height:100%;min-height:0;overflow:hidden;">
     <div style="flex:1;display:flex;flex-direction:column;overflow:hidden;background-color:#121212;">
 
       <div class="vault-statusbar">
@@ -2719,7 +3100,7 @@ function viewMentorSupport(){
   ];
 
   return `
-  <div style="flex:1;display:flex;height:100vh;overflow:hidden;">
+  <div style="flex:1;display:flex;height:100%;min-height:0;overflow:hidden;">
 
     <!-- MAIN CANVAS -->
     <div style="flex:1;display:flex;flex-direction:column;overflow:hidden;">
@@ -2956,7 +3337,7 @@ function updateSidebar(activeRoute){
 }
 
 /* ─── Main render ─── */
-function render(view, param, param2){
+function render(view, param, param2, param3, param4){
   const layout = document.querySelector('.layout');
   const isDash = view==='dashboard';
   if(layout) layout.classList.toggle('dash-mode', isDash);
@@ -2998,8 +3379,9 @@ function render(view, param, param2){
       break;
     case 'checkin': main.innerHTML = viewCheckin(); break;
     case 'accountability': main.innerHTML = viewAccountability(); break;
-    case 'catalog': main.innerHTML = viewCatalog(); bindCatalog(); break;
+    case 'catalog': main.innerHTML = viewCatalog(param, param2, param3, param4); bindCatalog(); break;
     case 'cart': main.innerHTML = viewCart(); break;
+    case 'wishlist': main.innerHTML = viewWishlist(); break;
     case 'checkout': main.innerHTML = viewCheckout(); break;
     case 'support': main.innerHTML = viewCatalog(); bindCatalog(); break;
     case 'job-portal': location.replace('#dashboard'); break;
