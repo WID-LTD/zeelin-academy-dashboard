@@ -823,19 +823,26 @@ img{background:#0d0d0d;}
   .dash-grid.dual{grid-template-columns:1fr;}
 }
 
-/* ─── Single-row pair polish: bigger, bolder, professional ─── */
-.dash-grid.single .container-card{box-shadow:0 20px 48px rgba(0,0,0,.5);border-color:#4a4a4a;}
-.dash-grid.single .cc-hero{border-right-color:#4a4a4a;}
-.dash-grid.single .cc-rating{font-size:12px !important;background:rgba(0,0,0,.68);border:1px solid #4a4a4a;padding:8px 14px;border-radius:999px;display:inline-block;box-shadow:0 4px 14px rgba(0,0,0,.5);}
-.dash-grid.single .cc-title{font-size:23px !important;letter-spacing:-.01em;line-height:1.22 !important;}
-.dash-grid.single .cc-desc{font-size:14.5px !important;line-height:1.65 !important;color:#d4d4d4 !important;}
-.dash-grid.single .cc-pills{gap:8px !important;margin-top:4px;}
-.dash-grid.single .cc-pills span{font-size:11px !important;font-weight:800;padding:7px 13px !important;border:1px solid rgba(255,255,255,.09);letter-spacing:.4px;}
-.dash-grid.single .cc-stats{border-top:1px solid #4a4a4a !important;background:rgba(255,255,255,.02);border-radius:10px;padding:14px !important;}
-.dash-grid.single .cc-stats p:first-child{font-size:11px !important;letter-spacing:.6px;}
-.dash-grid.single .cc-stats p:last-child{font-size:17px !important;}
-.dash-grid.single .cc-side button{padding:15px !important;font-size:14.5px !important;box-shadow:0 6px 20px rgba(217,119,6,.35);}
-.dash-grid.single .getmore-card{box-shadow:0 20px 48px rgba(0,0,0,.5);}
-.dash-grid.single .gm-body h3{font-size:23px !important;letter-spacing:-.01em;}
-.dash-grid.single .gm-body p{font-size:14.5px !important;line-height:1.65 !important;}
-.dash-grid.single .gm-side button{box-shadow:0 6px 20px rgba(217,119,6,.3);}
+/* ─── Single-row pair polish: bigger, bolder, professional, no dead space ─── */
+.dash-grid.single .container-card{box-shadow:0 20px 48px rgba(0,0,0,.5);border-color:#4a4a4a;min-height:0 !important;}
+.dash-grid.single .cc-hero{border-right-color:#4a4a4a;min-height:280px !important;}
+.dash-grid.single .cc-hero > div:nth-child(3) span{font-size:12px !important;font-weight:900 !important;}
+.dash-grid.single .cc-rating{font-size:14px !important;font-weight:900 !important;background:rgba(0,0,0,.68);border:1px solid #4a4a4a;padding:8px 14px;border-radius:999px;display:inline-block;box-shadow:0 4px 14px rgba(0,0,0,.5);}
+.dash-grid.single .cc-body{padding:20px 22px !important;}
+.dash-grid.single .cc-title{font-size:26px !important;font-weight:900;letter-spacing:-.01em;line-height:1.2 !important;margin-bottom:10px !important;}
+.dash-grid.single .cc-desc{font-size:16px !important;font-weight:600;line-height:1.6 !important;color:#e5e5e5 !important;margin-bottom:12px !important;}
+.dash-grid.single .cc-pills{gap:8px !important;margin-top:0;}
+.dash-grid.single .cc-pills span{font-size:13px !important;font-weight:900;padding:8px 15px !important;border:1px solid rgba(255,255,255,.09);letter-spacing:.4px;}
+.dash-grid.single .cc-side{padding:20px 22px !important;}
+.dash-grid.single .cc-stats{border-top:1px solid #4a4a4a !important;background:rgba(255,255,255,.02);border-radius:10px;padding:12px 14px !important;}
+.dash-grid.single .cc-stats p:first-child{font-size:12px !important;font-weight:800;letter-spacing:.6px;}
+.dash-grid.single .cc-stats p:last-child{font-size:20px !important;font-weight:900;}
+.dash-grid.single .cc-side button{padding:15px !important;font-size:16px !important;font-weight:900;box-shadow:0 6px 20px rgba(217,119,6,.35);}
+.dash-grid.single .getmore-card{box-shadow:0 20px 48px rgba(0,0,0,.5);min-height:0 !important;}
+.dash-grid.single .gm-hero{min-height:280px !important;}
+.dash-grid.single .gm-body{padding:20px 22px !important;}
+.dash-grid.single .gm-body h3{font-size:26px !important;font-weight:900;letter-spacing:-.01em;}
+.dash-grid.single .gm-body p{font-size:16px !important;font-weight:600;line-height:1.6 !important;color:#e5e5e5 !important;}
+.dash-grid.single .gm-side{padding:20px 22px !important;}
+.dash-grid.single .gm-side span{font-size:14px !important;font-weight:700;}
+.dash-grid.single .gm-side button{padding:15px !important;font-size:16px !important;font-weight:900;box-shadow:0 6px 20px rgba(217,119,6,.3);}
