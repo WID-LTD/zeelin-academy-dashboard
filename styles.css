@@ -341,7 +341,8 @@ svg { display: block; flex-shrink: 0; overflow: hidden; }
 @media (min-width: 2000px) {
   .enrolled { grid-template-columns: 1fr; gap: 16px; }
   .enr-card { flex-direction: row; align-items: stretch; min-height: 300px; }
-  .enr-hero { width: clamp(340px, 24vw, 540px); height: auto; min-height: 300px; border-bottom: none; border-right: 1px solid var(--border); flex-shrink: 0; }
+  .enr-hero { width: clamp(340px, 24vw, 540px); height: auto; min-height: 300px; align-self: stretch; border-bottom: none; border-right: 1px solid var(--border); flex-shrink: 0; }
+  .enr-hero img.cover { position: absolute; inset: 0; }
   .enr-body { flex: 1.5; justify-content: center; min-width: 0; }
   .enr-body h3 { font-size: clamp(28px, 2vw, 44px); }
   .enr-sub { font-size: clamp(15px, 1vw, 19px); }
