@@ -655,14 +655,13 @@ function renderCourses() {
               <h3>${esc(c.title)}</h3>
               <div class="enr-sub">${esc(c.weekName)} - ${esc(c.cohort)}</div>
               <div class="enr-pills"><span>READING INSIDE</span><span>VIDEOS INSIDE</span><span>DECK INSIDE</span></div>
-              <div class="readiness"><div class="rl"><span>Course progress</span><b>${pct}%</b></div>${bar(pct, 'gradient')}</div>
               <div class="stat-row mt12">
                 <div class="stat-box ${c.readiness >= 60 ? 'good' : 'warn'}"><div class="v">${c.readiness}%</div><div class="l">Readiness</div></div>
                 <div class="stat-box"><div class="v">${hours}</div><div class="l">Hours</div></div>
                 <div class="stat-box warn"><div class="v">${c.daysLeft} Days</div><div class="l">Days left</div></div>
               </div>
             </div>
-            <div class="enr-foot"><button class="btn btn-gradient btn-block" data-continue="${c.id}">${c.progress > 0 ? 'Continue Course ' : 'Start Course '}${ic('arrow', 15, 15)}</button></div>
+            <div class="enr-foot"><div class="readiness"><div class="rl"><span>Course progress</span><b>${pct}%</b></div>${bar(pct, 'gradient')}</div><button class="btn btn-gradient btn-block" data-continue="${c.id}">${c.progress > 0 ? 'Continue Course ' : 'Start Course '}${ic('arrow', 15, 15)}</button></div>
           </div>`;
   }).join('')}
       </div>

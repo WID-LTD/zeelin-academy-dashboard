@@ -336,7 +336,21 @@ svg { display: block; flex-shrink: 0; overflow: hidden; }
 .enr-pills span { font-size: 10px; font-weight: 800; padding: 5px 10px; border-radius: 999px; background: #26170b; color: #f59e0b; letter-spacing: .4px; }
 .enr-pills span:nth-child(2) { background: #172554; color: #60a5fa; }
 .enr-pills span:nth-child(3) { background: #14532d; color: #4ade80; }
-.enr-foot { padding: 0 22px 22px; }
+.enr-foot { padding: 0 22px 22px; display: flex; flex-direction: column; gap: 14px; }
+/* Ultra-wide: horizontal cards stacked vertically — image left, details middle, progress+CTA right */
+@media (min-width: 2000px) {
+  .enrolled { grid-template-columns: 1fr; gap: 16px; }
+  .enr-card { flex-direction: row; align-items: stretch; min-height: 300px; }
+  .enr-hero { width: clamp(340px, 24vw, 540px); height: auto; min-height: 300px; border-bottom: none; border-right: 1px solid var(--border); flex-shrink: 0; }
+  .enr-body { flex: 1.5; justify-content: center; min-width: 0; }
+  .enr-body h3 { font-size: clamp(24px, 1.6vw, 34px); }
+  .enr-sub { font-size: 15px; }
+  .enr-pills span { font-size: 12px; padding: 7px 14px; }
+  .stat-row { max-width: 660px; }
+  .stat-box .v { font-size: 17px; }
+  .enr-foot { width: clamp(280px, 20vw, 420px); flex-shrink: 0; border-left: 1px solid var(--border); justify-content: center; padding: clamp(20px, 2vw, 36px); }
+  .enr-foot .btn { padding: 16px; font-size: 16px; }
+}
 .stat-row { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-bottom: 14px; }
 .stat-box { background: #0d0d0d; border: 1px solid var(--border); border-radius: 9px; padding: 9px 10px; }
 .stat-box .v { font-size: 15px; font-weight: 800; color: var(--text); }
