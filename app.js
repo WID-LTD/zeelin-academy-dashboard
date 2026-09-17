@@ -650,7 +650,7 @@ function renderCourses() {
     const hours = c.completedHours + ' of ' + c.estimatedHours + 'h';
     return `
           <div class="enr-card" role="button" tabindex="0" data-continue="${c.id}" aria-label="${esc(c.title)} — ${c.progress > 0 ? 'Continue course' : 'Start course'}">
-            <div class="enr-hero"><img class="cover" src="${c.cover}" alt=""/><div class="enr-hero-overlay"></div><div class="enr-badges"><span class="enr-badge">${esc(c.weekName)}</span><span class="enr-badge dim">${esc(c.short)}</span></div><div class="enr-hero-meta">${c.readiness}% readiness &bull; ${hours}</div></div>
+            <div class="enr-hero"><img class="cover" src="${c.cover}?v=2" alt=""/><div class="enr-hero-overlay"></div><div class="enr-badges"><span class="enr-badge">${esc(c.weekName)}</span><span class="enr-badge dim">${esc(c.short)}</span></div><div class="enr-hero-meta">${c.readiness}% readiness &bull; ${hours}</div></div>
             <div class="enr-body">
               <h3>${esc(c.title)}</h3>
               <div class="enr-sub">${esc(c.weekName)} - ${esc(c.cohort)}</div>
