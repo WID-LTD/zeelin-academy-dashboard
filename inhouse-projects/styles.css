@@ -786,3 +786,20 @@ img{background:#0d0d0d;}
 .mp-related .mp-buyrow button,.mp-related .mp-buyrow a{padding:11px 12px !important;font-size:12.5px !important;}
 .mp-related .mp-buyrow > span:last-child{display:flex;gap:8px;}
 .mp-related .mp-buyrow > span:last-child > *{flex:1;text-align:center;}
+
+/* ─── Count-aware dashboard cards: 1 = full-width row, 2 = pair, 3+ = grid ─── */
+.dash-grid.dual{grid-template-columns:repeat(2,minmax(0,1fr));}
+.dash-grid.single{grid-template-columns:1fr;}
+.dash-grid.single .container-card{flex-direction:row;align-items:stretch;min-height:320px;}
+.dash-grid.single .cc-hero{width:clamp(320px,26vw,540px);height:auto !important;min-height:320px;align-self:stretch;border-bottom:none !important;border-right:2px solid #3f3f3f;}
+.dash-grid.single .cc-body{flex:1.5;justify-content:center;padding:28px;}
+.dash-grid.single .cc-body h3{font-size:clamp(22px,1.8vw,30px);}
+.dash-grid.single .cc-body p{font-size:15px;}
+.dash-grid.single .cc-side{width:clamp(280px,22vw,420px);flex-shrink:0;border-left:1px solid #3a3a3a;justify-content:center;padding:28px;}
+.dash-grid.single .cc-side button{padding:15px;font-size:15px;}
+@media(max-width:900px){
+  .dash-grid.single .container-card{flex-direction:column;}
+  .dash-grid.single .cc-hero{width:100%;height:220px !important;min-height:0;border-right:none !important;border-bottom:2px solid #3f3f3f;}
+  .dash-grid.single .cc-side{width:100%;border-left:none;padding:0 22px 22px;}
+  .dash-grid.dual{grid-template-columns:1fr;}
+}

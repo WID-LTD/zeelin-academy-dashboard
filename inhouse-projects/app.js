@@ -746,7 +746,7 @@ function containerCard(p){
   const wish = (typeof mpWishlist==='function' && mpWishlist().includes(p.id));
   return `
       <div class="card-cell container-card" role="button" tabindex="0" data-clickable onclick="window._enterProject('${p.id}')" onkeydown="if(event.key==='Enter'){window._enterProject('${p.id}')}" style="background-color:#181818;border-radius:14px;overflow:hidden;border:2px solid #3f3f3f;display:flex;flex-direction:column;min-height:520px;cursor:pointer;">
-        <div style="height:190px;background:#0d0d0d url('${p.thumbnail}') center/cover no-repeat;position:relative;">
+        <div class="cc-hero" style="height:190px;background:#0d0d0d url('${p.thumbnail}') center/cover no-repeat;position:relative;flex-shrink:0;">
           <div style="position:absolute;inset:0;background:linear-gradient(to top, rgba(0,0,0,.72), rgba(0,0,0,.05));"></div>
           <div style="position:absolute;top:12px;left:12px;display:flex;gap:6px;flex-wrap:wrap;">
             <span style="background:${cat.bg};color:${cat.color};font-size:10px;font-weight:800;padding:5px 10px;border-radius:999px;text-transform:uppercase;">${cat.short}</span>
@@ -756,21 +756,21 @@ function containerCard(p){
             <div style="font-size:11px;font-weight:800;color:#fbbf24;text-transform:uppercase;">★ ${p.rating} • ${p.learners} learners</div>
           </div>
         </div>
-        <div style="padding:22px 22px 18px;flex:1;display:flex;flex-direction:column;">
+        <div class="cc-body" style="padding:22px 22px 18px;flex:1;display:flex;flex-direction:column;min-width:0;">
           <h3 style="margin:0 0 8px 0;font-size:21px;font-weight:900;color:#ffffff;line-height:1.25;">${p.title}</h3>
           <p style="margin:0 0 14px 0;font-size:13.5px;color:#c6c6c6;line-height:1.55;flex:1;">${p.desc}</p>
-          <div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:14px;">
+          <div style="display:flex;gap:6px;flex-wrap:wrap;">
             <span style="font-size:10px;font-weight:800;padding:5px 10px;border-radius:999px;background:#26170b;color:#f59e0b;">SUPPORTED INSIDE</span>
             <span style="font-size:10px;font-weight:800;padding:5px 10px;border-radius:999px;background:#172554;color:#60a5fa;">MANDATE INSIDE</span>
             <span style="font-size:10px;font-weight:800;padding:5px 10px;border-radius:999px;background:#14532d;color:#4ade80;">GROUP INSIDE</span>
           </div>
-          <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:12px;border-top:1px solid #3a3a3a;padding-top:16px;margin-bottom:6px;">
+        </div>
+        <div class="cc-side" style="padding:0 22px 22px;display:flex;flex-direction:column;gap:12px;">
+          <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:12px;border-top:1px solid #3a3a3a;padding-top:16px;">
             <div><p style="margin:0;font-size:10px;color:#8a8a8a;text-transform:uppercase;font-weight:700;">Level</p><p style="margin:4px 0 0 0;font-size:15px;font-weight:800;color:#fff;">${p.difficulty}</p></div>
             <div><p style="margin:0;font-size:10px;color:#8a8a8a;text-transform:uppercase;font-weight:700;">Length</p><p style="margin:4px 0 0 0;font-size:15px;font-weight:800;color:#fff;">${p.duration}</p></div>
             <div><p style="margin:0;font-size:10px;color:#8a8a8a;text-transform:uppercase;font-weight:700;">Price</p><p style="margin:4px 0 0 0;font-size:15px;font-weight:800;color:${p.price===0?'#4ade80':'#fbbf24'};">${p.price===0?'Free':'£'+p.price}</p></div>
           </div>
-        </div>
-        <div style="padding:0 22px 22px;">
           <button onclick="event.stopPropagation();window._enterProject('${p.id}')" style="width:100%;padding:13px;border:none;border-radius:10px;background:linear-gradient(135deg,#d97706 0%,#f59e0b 100%);color:#fff;font-size:14px;font-weight:900;cursor:pointer;">Open Project →</button>
         </div>
       </div>`;
@@ -800,7 +800,7 @@ function viewDashboard(){
       ${statTile(ICO_VIDEO,'#172554',list.length+'','Projects Owned','#60a5fa')}
       ${statTile(ICO_FILET,'#14532d',docsPosted,'Docs Posted','#4ade80')}
     </div>
-    <div class="dash-grid">
+    <div class="dash-grid${list.length===1?' single':list.length===2?' dual':''}">
       ${list.map(p=>containerCard(p)).join('')}
       <div class="card-cell" onclick="location.hash='#catalog'" style="background-color:#181818;border-radius:14px;padding:32px;border:2px dashed #565656;display:flex;flex-direction:column;justify-content:space-between;min-height:520px;cursor:pointer;">
         <div>

@@ -644,7 +644,7 @@ function renderCourses() {
         <h1>Welcome back, ${esc(USER.name.split(' ')[0])}</h1>
         <div class="sub">You're enrolled in ${COURSES.length} courses. Pick up where you left off, or continue the day that unlocks your next XP claim.</div>
       </div>
-      <div class="enrolled">
+      <div class="enrolled${COURSES.length===1?' single':COURSES.length===2?' dual':''}">
         ${COURSES.map((c) => {
     const pct = Math.max(0, Math.min(100, c.progress));
     const hours = c.completedHours + ' of ' + c.estimatedHours + 'h';
