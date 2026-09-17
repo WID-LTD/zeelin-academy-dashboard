@@ -48,6 +48,7 @@ const COURSES = [
     completedHours: 2,
     readiness: 8,
     strength: 42,
+    daysLeft: 2,
     color: 'var(--blue)',
   },
   {
@@ -64,6 +65,7 @@ const COURSES = [
     completedHours: 0,
     readiness: 0,
     strength: 0,
+    daysLeft: 2,
     color: 'var(--green)',
   },
   {
@@ -80,6 +82,7 @@ const COURSES = [
     completedHours: 0,
     readiness: 0,
     strength: 0,
+    daysLeft: 1,
     color: 'var(--teal)',
   },
 ];
