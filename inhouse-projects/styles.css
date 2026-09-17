@@ -775,3 +775,14 @@ img{background:#0d0d0d;}
   .sidebar-nav a{padding:13px 16px;}
   .sidebar-label{font-size:13px;}
 }
+
+/* ─── Related-projects row: roomier cards, clear separation, stacked buy row ─── */
+.mp-related{grid-template-columns:repeat(auto-fit,minmax(320px,1fr)) !important;gap:24px !important;}
+.mp-related .mp-card h3{font-size:17px !important;}
+.mp-related .mp-card p{font-size:13px !important;}
+.mp-related .mp-buyrow{flex-direction:column !important;align-items:stretch !important;gap:10px !important;}
+.mp-related .mp-buyrow > span{font-size:17px;text-align:left;}
+.mp-related .mp-buyrow > span:last-child,.mp-related .mp-buyrow > a{flex:1;}
+.mp-related .mp-buyrow button,.mp-related .mp-buyrow a{padding:11px 12px !important;font-size:12.5px !important;}
+.mp-related .mp-buyrow > span:last-child{display:flex;gap:8px;}
+.mp-related .mp-buyrow > span:last-child > *{flex:1;text-align:center;}

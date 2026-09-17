@@ -890,7 +890,7 @@ function mpCard(p){
     + '<h3 onclick="location.hash=\''+detailHash+'\'" style="font-size:14.5px;font-weight:800;color:#fff;line-height:1.35;margin:6px 0;cursor:pointer;">'+p.title+'</h3>'
     + '<p style="font-size:12px;color:#a3a3a3;line-height:1.5;flex:1;">'+p.desc+'</p>'
     + '<div style="font-size:11px;color:#737373;margin:10px 0;">★ '+p.rating+' • '+p.learners+' learners • '+p.difficulty+' • '+p.duration+'</div>'
-    + '<div style="display:flex;justify-content:space-between;align-items:center;border-top:1px solid #2a2a2a;padding-top:12px;margin-top:auto;gap:8px;"><span style="font-weight:800;color:'+(p.price===0?'#4ade80':'#fbbf24')+';">'+mpPrice(p)+'</span>'
+    + '<div class="mp-buyrow" style="display:flex;justify-content:space-between;align-items:center;border-top:1px solid #2a2a2a;padding-top:12px;margin-top:auto;gap:8px;"><span style="font-weight:800;color:'+(p.price===0?'#4ade80':'#fbbf24')+';">'+mpPrice(p)+'</span>'
     + (enrolled?'<a href="#p/'+p.id+'/home" style="background:#14532d;color:#4ade80;font-size:11px;font-weight:800;padding:8px 12px;border-radius:8px;text-decoration:none;">Open →</a>'
       :(inCart?'<a href="#cart" style="background:#262626;color:#fff;font-size:11px;font-weight:800;padding:8px 12px;border-radius:8px;text-decoration:none;">In Cart →</a>'
       :'<span style="display:flex;gap:6px;"><button onclick="window._mpAdd(\''+p.id+'\')" style="background:#d97706;color:#fff;font-size:11px;font-weight:800;padding:8px 12px;border-radius:8px;border:none;cursor:pointer;">Add to Cart</button><button onclick="window._mpBuyNow(\''+p.id+'\')" style="background:transparent;border:1px solid #d97706;color:#f59e0b;font-size:11px;font-weight:800;padding:8px 12px;border-radius:8px;cursor:pointer;">Buy Now</button></span>'))
@@ -1056,7 +1056,7 @@ function viewProjectDetail(pid){
   + '<div style="background:#172554;border:1px solid #2563eb;border-radius:10px;padding:12px;"><div style="font-size:11px;font-weight:900;color:#60a5fa;">MANDATE</div><div style="font-size:11px;color:#d4d4d4;">Solo milestones & private log</div></div>'
   + '<div style="background:#14532d;border:1px solid #16a34a;border-radius:10px;padding:12px;"><div style="font-size:11px;font-weight:900;color:#4ade80;">GROUP</div><div style="font-size:11px;color:#d4d4d4;">Team board, standups & reviews</div></div>'
   + '</div></div>'
-  + (siblings.length?'<h3 style="font-size:14px;font-weight:800;color:#fff;margin:18px 0 10px;">More in '+p.jobRole+'</h3><div class="mp-grid">'+siblings.map(mpCard).join('')+'</div>':'')
+  + (siblings.length?'<h3 style="font-size:16px;font-weight:900;color:#fff;margin:20px 0 12px;">More in '+p.jobRole+'</h3><div class="mp-grid mp-related">'+siblings.map(mpCard).join('')+'</div>':'')
   + '</div>'
   + '<div><div style="background:#181818;border:2px solid #3a3a3a;border-radius:14px;padding:18px;position:sticky;top:16px;">'
   + '<div style="font-size:22px;font-weight:900;color:'+(p.price===0?'#4ade80':'#fff')+';">'+mpPrice(p)+'</div>'
