@@ -343,13 +343,20 @@ svg { display: block; flex-shrink: 0; overflow: hidden; }
   .enr-card { flex-direction: row; align-items: stretch; min-height: 300px; }
   .enr-hero { width: clamp(340px, 24vw, 540px); height: auto; min-height: 300px; border-bottom: none; border-right: 1px solid var(--border); flex-shrink: 0; }
   .enr-body { flex: 1.5; justify-content: center; min-width: 0; }
-  .enr-body h3 { font-size: clamp(24px, 1.6vw, 34px); }
-  .enr-sub { font-size: 15px; }
-  .enr-pills span { font-size: 12px; padding: 7px 14px; }
-  .stat-row { max-width: 660px; }
-  .stat-box .v { font-size: 17px; }
-  .enr-foot { width: clamp(280px, 20vw, 420px); flex-shrink: 0; border-left: 1px solid var(--border); justify-content: center; padding: clamp(20px, 2vw, 36px); }
-  .enr-foot .btn { padding: 16px; font-size: 16px; }
+  .enr-body h3 { font-size: clamp(28px, 2vw, 44px); }
+  .enr-sub { font-size: clamp(15px, 1vw, 19px); }
+  .enr-pills span { font-size: clamp(12px, 0.85vw, 15px); padding: 9px 18px; }
+  .stat-row { max-width: 760px; gap: 16px; }
+  .stat-box { padding: 16px 18px; border-radius: 12px; }
+  .stat-box .v { font-size: clamp(19px, 1.3vw, 26px); }
+  .stat-box .l { font-size: clamp(11px, 0.8vw, 14px); }
+  .enr-badges .enr-badge { font-size: 12px; padding: 7px 14px; }
+  .enr-hero-meta { font-size: 13px; }
+  .enr-foot { width: clamp(320px, 22vw, 480px); flex-shrink: 0; border-left: 1px solid var(--border); justify-content: center; gap: 20px; padding: clamp(24px, 2vw, 40px); }
+  .enr-foot .readiness .rl { font-size: 14px; }
+  .enr-foot .readiness .rl b { font-size: 17px; }
+  .enr-foot .bar { height: 14px; }
+  .enr-foot .btn { padding: 18px; font-size: clamp(16px, 1.1vw, 20px); }
 }
 .stat-row { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-bottom: 14px; }
 .stat-box { background: #0d0d0d; border: 1px solid var(--border); border-radius: 9px; padding: 9px 10px; }
