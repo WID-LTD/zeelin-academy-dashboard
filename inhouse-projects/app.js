@@ -802,20 +802,24 @@ function viewDashboard(){
     </div>
     <div class="dash-grid${list.length===1?' single':list.length===2?' dual':''}">
       ${list.map(p=>containerCard(p)).join('')}
-      <div class="card-cell" onclick="location.hash='#catalog'" style="background-color:#181818;border-radius:14px;padding:32px;border:2px dashed #565656;display:flex;flex-direction:column;justify-content:space-between;min-height:520px;cursor:pointer;">
-        <div>
-          <div style="width:52px;height:52px;background-color:#262626;border-radius:10px;margin-bottom:20px;display:flex;align-items:center;justify-content:center;">
+      <div class="card-cell getmore-card" onclick="location.hash='#catalog'" style="background-color:#181818;border-radius:14px;border:2px dashed #565656;display:flex;flex-direction:column;min-height:520px;cursor:pointer;overflow:hidden;">
+        <div class="gm-hero" style="padding:32px 32px 0;display:flex;flex-direction:column;gap:16px;flex-shrink:0;">
+          <div style="width:52px;height:52px;background-color:#262626;border-radius:10px;display:flex;align-items:center;justify-content:center;">
             <svg viewBox="0 0 24 24" fill="none" stroke="#b5b5b5" stroke-width="2" width="26" height="26"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="16"/><line x1="8" y1="12" x2="16" y2="12"/></svg>
           </div>
-          <span style="display:inline-block;background-color:#262626;color:#b5b5b5;font-size:10px;font-weight:700;padding:4px 10px;border-radius:100px;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:12px;">Catalog</span>
+          <span style="display:inline-block;background-color:#262626;color:#b5b5b5;font-size:10px;font-weight:700;padding:4px 10px;border-radius:100px;text-transform:uppercase;letter-spacing:0.5px;align-self:flex-start;">Catalog</span>
+        </div>
+        <div class="gm-body" style="padding:20px 32px;flex:1;">
           <h3 style="margin:0 0 10px 0;font-size:22px;font-weight:900;color:#ffffff;">Get More Project</h3>
-          <p style="margin:0 0 24px 0;font-size:13.5px;color:#c6c6c6;line-height:1.55;">Browse 7 categories by job role and add projects to this dashboard.</p>
-          <div style="border:1px dashed #555555;border-radius:8px;padding:16px;text-align:center;margin-top:auto;">
+          <p style="margin:0;font-size:13.5px;color:#c6c6c6;line-height:1.55;">Browse 7 categories by job role and add projects to this dashboard.</p>
+        </div>
+        <div class="gm-side" style="padding:0 32px 32px;display:flex;flex-direction:column;gap:14px;">
+          <div style="border:1px dashed #555555;border-radius:8px;padding:16px;text-align:center;">
             <span style="display:flex;justify-content:center;margin-bottom:8px;">${ICO_BOOK}</span>
             <span style="font-size:13px;color:#c6c6c6;font-weight:600;">${totalN} Projects Available</span>
           </div>
+          <button onclick="location.hash='#catalog'" style="width:100%;padding:13px;border:1px solid #d97706;background-color:#d97706;color:#fff;font-size:13px;font-weight:800;border-radius:10px;cursor:pointer;">Explore Project Shop</button>
         </div>
-        <button onclick="location.hash='#catalog'" style="margin-top:28px;width:100%;padding:13px;border:1px solid #d97706;background-color:#d97706;color:#fff;font-size:13px;font-weight:800;border-radius:10px;cursor:pointer;">Explore Project Shop</button>
       </div>
     </div>
   </main>`;
