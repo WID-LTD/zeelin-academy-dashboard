@@ -190,7 +190,7 @@ function sendJson(res, code, obj, extraHeaders) {
 function serveFile(filePath, res, req, extraHeaders) {
   const ext = path.extname(filePath).toLowerCase();
   const mime = MIME[ext] || 'application/octet-stream';
-  const headers = { 'Content-Type': mime, 'Cache-Control': ext === '.html' ? 'no-cache, no-store, must-revalidate' : 'public, max-age=3600', ...securityHeaders(), ...(extraHeaders||{}) };
+  const headers = { 'Content-Type': mime, 'Cache-Control': (ext === '.html' || ext === '.js' || ext === '.css') ? 'no-cache, no-store, must-revalidate' : 'public, max-age=3600', ...securityHeaders(), ...(extraHeaders||{}) };
   // prevent mime sniff
   headers['X-Content-Type-Options'] = 'nosniff';
   fs.stat(filePath, (err, stat) => {
@@ -452,7 +452,7 @@ const server = http.createServer(async (req, res) => {
     const isJs = ext === '.js';
     const headers = {
       'Content-Type': mime,
-      'Cache-Control': (isHtml || isJs) ? 'no-cache, no-store, must-revalidate' : 'public, max-age=3600',
+      'Cache-Control': (isHtml || isJs || ext === '.css') ? 'no-cache, no-store, must-revalidate' : 'public, max-age=3600',
       ...securityHeaders(),
     };
     // if token exists and page, renew cookie already set above, need to keep it
