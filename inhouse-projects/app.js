@@ -358,6 +358,7 @@ function route(){
 
   /* Marketplace routes: catalog[/:cat[/:sector-or-role[/:role[/:pid]]]], cart, wishlist, checkout */
   if(view==='catalog'){ render('catalog', parts[1]||null, parts[2]||null, parts[3]||null, parts[4]||null); return; }
+  if(view==='modes'){ render('modes'); return; }
   if(view==='cart'){ render('cart'); return; }
   if(view==='wishlist'){ render('wishlist'); return; }
   if(view==='checkout'){ render('checkout'); return; }
@@ -452,6 +453,7 @@ function renderSidebar(activeKey){
         ${modeLink('supported','Supported Project',ICON_BRIEF)}
         ${modeLink('mandate','Mandate Project',ICON_CAL)}
         ${modeLink('group','Group Project',ICON_PEOPLE)}
+        <a href="#modes" data-route="modes" class="${activeKey==='modes'?'active':''}">${svg(ICON_GRID)}<span>All Modes (classic view)</span></a>
       </div>
       <div class="sidebar-label">Workspace</div>
       ${projLink('home','Project Home',ICON_FOLDER)}
@@ -595,6 +597,24 @@ function projCard(p){
         </div>
         <button onclick="_enterProject('${p.id}')" style="margin-top:28px;width:100%;padding:12px;border:none;border-radius:8px;background:${p.btnBg};color:#ffffff;font-size:13px;font-weight:800;cursor:pointer;transition:transform .15s;">${p.btnLabel}</button>
       </div>`;
+}
+
+/* ─── Dedicated Modes page: classic Supported / Mandate / Group cards ─── */
+function viewModes(){
+  const proj = getProject(currentProjectId);
+  const cp = proj.catalog || null;
+  return dashTopbarHtml() + `
+  <main style="flex:1;padding:32px 48px;overflow-y:auto;">
+    <div style="margin-bottom:8px;"><a href="#dashboard" style="display:inline-flex;align-items:center;gap:6px;padding:6px 10px;border-radius:999px;border:1px solid #3a3a3a;background:#1a1a1a;color:#a3a3a3;font-size:11px;font-weight:700;text-decoration:none;">← Back to Projects</a></div>
+    <div style="margin-bottom:28px;">
+      <p style="margin:0 0 6px 0;font-size:11px;text-transform:uppercase;letter-spacing:0.05em;color:#8a8a8a;font-weight:700;">Inside ${cp ? '“' + cp.title + '”' : 'current project'}</p>
+      <h1 style="margin:0 0 8px 0;font-size:30px;font-weight:900;color:#ffffff;">Project Modes</h1>
+      <p style="margin:0;font-size:14px;color:#c6c6c6;">Pick a mode to continue — Supported, Mandate or Group — all inside the current project.</p>
+    </div>
+    <div class="dash-grid">
+      ${PROJECTS.map(p=>projCard(p)).join('')}
+    </div>
+  </main>`;
 }
 
 /* ─── Daily Check-In gate: pops up before entering a project ─── */
@@ -3380,6 +3400,7 @@ function render(view, param, param2, param3, param4){
     case 'checkin': main.innerHTML = viewCheckin(); break;
     case 'accountability': main.innerHTML = viewAccountability(); break;
     case 'catalog': main.innerHTML = viewCatalog(param, param2, param3, param4); bindCatalog(); break;
+    case 'modes': main.innerHTML = viewModes(); bindDashboard(); break;
     case 'cart': main.innerHTML = viewCart(); break;
     case 'wishlist': main.innerHTML = viewWishlist(); break;
     case 'checkout': main.innerHTML = viewCheckout(); break;
