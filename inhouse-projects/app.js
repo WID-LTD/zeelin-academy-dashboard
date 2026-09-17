@@ -753,20 +753,20 @@ function containerCard(p){
             <span style="background:rgba(0,0,0,.6);color:#fff;font-size:10px;font-weight:700;padding:5px 10px;border-radius:999px;">${p.jobRole}</span>
           </div>
           <div style="position:absolute;bottom:12px;left:16px;right:16px;">
-            <div style="font-size:11px;font-weight:800;color:#fbbf24;text-transform:uppercase;">★ ${p.rating} • ${p.learners} learners</div>
+            <div class="cc-rating" style="font-size:11px;font-weight:800;color:#fbbf24;text-transform:uppercase;">★ ${p.rating} • ${p.learners} learners</div>
           </div>
         </div>
         <div class="cc-body" style="padding:22px 22px 18px;flex:1;display:flex;flex-direction:column;min-width:0;">
-          <h3 style="margin:0 0 8px 0;font-size:21px;font-weight:900;color:#ffffff;line-height:1.25;">${p.title}</h3>
-          <p style="margin:0 0 14px 0;font-size:13.5px;color:#c6c6c6;line-height:1.55;flex:1;">${p.desc}</p>
-          <div style="display:flex;gap:6px;flex-wrap:wrap;">
+          <h3 class="cc-title" style="margin:0 0 8px 0;font-size:21px;font-weight:900;color:#ffffff;line-height:1.25;">${p.title}</h3>
+          <p class="cc-desc" style="margin:0 0 14px 0;font-size:13.5px;color:#c6c6c6;line-height:1.55;flex:1;">${p.desc}</p>
+          <div class="cc-pills" style="display:flex;gap:6px;flex-wrap:wrap;">
             <span style="font-size:10px;font-weight:800;padding:5px 10px;border-radius:999px;background:#26170b;color:#f59e0b;">SUPPORTED INSIDE</span>
             <span style="font-size:10px;font-weight:800;padding:5px 10px;border-radius:999px;background:#172554;color:#60a5fa;">MANDATE INSIDE</span>
             <span style="font-size:10px;font-weight:800;padding:5px 10px;border-radius:999px;background:#14532d;color:#4ade80;">GROUP INSIDE</span>
           </div>
         </div>
         <div class="cc-side" style="padding:0 22px 22px;display:flex;flex-direction:column;gap:12px;">
-          <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:12px;border-top:1px solid #3a3a3a;padding-top:16px;">
+          <div class="cc-stats" style="display:grid;grid-template-columns:repeat(3,1fr);gap:12px;border-top:1px solid #3a3a3a;padding-top:16px;">
             <div><p style="margin:0;font-size:10px;color:#8a8a8a;text-transform:uppercase;font-weight:700;">Level</p><p style="margin:4px 0 0 0;font-size:15px;font-weight:800;color:#fff;">${p.difficulty}</p></div>
             <div><p style="margin:0;font-size:10px;color:#8a8a8a;text-transform:uppercase;font-weight:700;">Length</p><p style="margin:4px 0 0 0;font-size:15px;font-weight:800;color:#fff;">${p.duration}</p></div>
             <div><p style="margin:0;font-size:10px;color:#8a8a8a;text-transform:uppercase;font-weight:700;">Price</p><p style="margin:4px 0 0 0;font-size:15px;font-weight:800;color:${p.price===0?'#4ade80':'#fbbf24'};">${p.price===0?'Free':'£'+p.price}</p></div>
