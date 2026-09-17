@@ -40,6 +40,31 @@ function isBlocked(p) {
   return BLOCKED_PREFIXES.some(b => p === b || p.startsWith(b + '/') || p.startsWith(b));
 }
 
+// --- Local-only scraper console (same port, loopback only) ---
+// Public/remote traffic still gets the 404 above + git never sees the
+// scraper (course-builder/ is gitignored). Local browser (127.0.0.1)
+// bypasses the block and reaches the console + backend proxy below.
+const SCRAPER_BACKEND = { host: '127.0.0.1', port: Number(process.env.SCRAPER_PORT || 8092) };
+const SCRAPER_API = ['/api/health', '/api/scrape', '/api/runs', '/api/industries', '/api/cities', '/api/curriculum', '/api/course-builder', '/api/pathway-match', '/api/pathway-result'];
+function isLoopback(req) {
+  const ip = String((req.socket && req.socket.remoteAddress) || '');
+  return ip === '127.0.0.1' || ip === '::1' || ip === '::ffff:127.0.0.1';
+}
+function isScraperApi(p) {
+  return SCRAPER_API.some(a => p === a || p.startsWith(a + '/'));
+}
+function proxyScraper(req, res, targetPath) {
+  const proxy = http.request(
+    { host: SCRAPER_BACKEND.host, port: SCRAPER_BACKEND.port, path: targetPath, method: req.method, headers: { ...req.headers, host: `${SCRAPER_BACKEND.host}:${SCRAPER_BACKEND.port}` } },
+    (up) => { res.writeHead(up.statusCode || 502, up.headers); up.pipe(res); }
+  );
+  proxy.on('error', () => {
+    res.writeHead(502, { 'Content-Type': 'application/json' });
+    res.end(JSON.stringify({ error: 'scraper backend offline — start it: node job-acquisition-portal/server.js' }));
+  });
+  req.pipe(proxy);
+}
+
 function parseCookies(req) {
   const h = req.headers.cookie || '';
   const out = {};
@@ -218,12 +243,31 @@ const server = http.createServer(async (req, res) => {
     }
   }
 
-  // --- Block scraper/console ---
-  if (isBlocked(urlPath)) {
+  // --- Block scraper/console (remote traffic only; loopback uses /scraper below) ---
+  if (isBlocked(urlPath) && !isLoopback(req)) {
     serve404(req, res);
     return;
   }
   if (urlPath.includes('..')) { res.writeHead(400, securityHeaders()); res.end('Bad request'); return; }
+
+  // --- Local scraper console on the same port (loopback + login only) ---
+  if (urlPath === '/scraper' || urlPath === '/scraper/') {
+    if (!isLoopback(req)) { serve404(req, res); return; }
+    const t = tokenFromReq(req);
+    if (!verifyToken(t)) { return redirect(res, '/'); }
+    const consolePath = path.join(ROOT, 'job-acquisition-portal', 'course-builder', 'index.html');
+    if (!fs.existsSync(consolePath)) {
+      res.writeHead(503, { 'Content-Type': 'text/plain' });
+      res.end('Scraper console not installed locally.');
+      return;
+    }
+    return serveFile(consolePath, res, req);
+  }
+  // --- Local scraper API proxy to the portal backend (loopback only) ---
+  if (isScraperApi(urlPath)) {
+    if (!isLoopback(req)) { serve404(req, res); return; }
+    return proxyScraper(req, res, rawUrl);
+  }
 
   // --- API routes ---
   if (urlPath === '/api/auth/login' && req.method === 'POST') {

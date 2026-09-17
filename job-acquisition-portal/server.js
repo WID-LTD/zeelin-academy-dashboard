@@ -25,6 +25,11 @@ const COURSE_ROOT = path.join(__dirname, 'course-builder');
   function cleanSupervisedDescription(text){
     if(!text) return '';
     let t=String(text);
+    // Decode HTML entities first ("codes" like &nbsp; seen in exports).
+    t=t.replace(/&#(\d+);/g,(_,n)=>{ const c=Number(n); return c>31&&c<0x10FFFF?String.fromCharCode(c):' '; });
+    t=t.replace(/&#x([0-9a-fA-F]+);/g,(_,h)=>{ const c=parseInt(h,16); return c>31&&c<0x10FFFF?String.fromCharCode(c):' '; });
+    t=t.replace(/&(nbsp|ensp|emsp|thinsp);/gi,' ').replace(/&(hellip|mdash|ndash|rsquo|lsquo|rdquo|ldquo);/gi,m=>({'&hellip;':'…','&mdash;':'—','&ndash;':'–','&rsquo':"'","&lsquo'":"'",'&rdquo;':'"','&ldquo;':'"'}[m.toLowerCase()]||' '));
+    t=t.replace(/&quot;/gi,'"').replace(/&#39;|&apos;/gi,"'").replace(/&lt;/gi,'<').replace(/&gt;/gi,'>').replace(/&amp;/gi,'&');
     t=t.replace(/£\s*\d{1,3}(?:,\d{3})*(?:\.\d+)?\s*[kK]?\s*[-–—]\s*£\s*\d{1,3}(?:,\d{3})*(?:\.\d+)?\s*[kK]?/gi,'');
     t=t.replace(/\$\s*\d{1,3}(?:,\d{3})*(?:\.\d+)?\s*[kK]?\s*[-–—]\s*\$\s*\d{1,3}(?:,\d{3})*(?:\.\d+)?\s*[kK]?/gi,'');
     t=t.replace(/[£$€]\s*\d{1,3}(?:,\d{3})*(?:\.\d+)?\s*[kK]?\s*(?:per|pa|p\.a\.|per year|per annum|per hour|per day)/gi,'');
@@ -38,6 +43,35 @@ const COURSE_ROOT = path.join(__dirname, 'course-builder');
     t=t.replace(/apply\s*(?:now|here|online)/gi,'');
     t=t.replace(/\s{2,}/g,' ').trim();
     return t;
+  }
+
+  // Strict role-title match: full phrase, else EVERY significant word with word
+  // boundaries (plural-tolerant). Kills "Accounting … Products" matching "Product Analyst".
+  function titleMatchesRole(title, query){
+    const t=String(title||'').toLowerCase();
+    const q=String(query||'').toLowerCase().trim();
+    if(!q) return true;
+    if(t.includes(q)) return true;
+    const words=q.split(/\s+/).filter(w=>w.length>2);
+    if(!words.length) return t.includes(q);
+    return words.every(w=>{
+      const wq=w.replace(/[.*+?^${}()|[\]\\]/g,'\\$&');
+      return new RegExp(`\\b${wq}s?\\b`).test(t);
+    });
+  }
+
+  // Attribute a globally-fetched job to a requested country by content.
+  // Remote/unknown-location jobs go to a labelled 'Remote'/'Other' tab —
+  // never forced into a wrong country, never duplicated across tabs.
+  function attributeCountry(j, countriesList){
+    const loc=`${(j.location&&j.location.label)||''} ${(j.location&&j.location.country)||''}`.toLowerCase();
+    for(const c of countriesList){
+      if(c && loc.includes(String(c).toLowerCase())){ j.country=c; return c; }
+    }
+    const remote=/\b(remote|work from home|wfh|distributed|anywhere)\b/.test(loc+' '+String(j.description||'').slice(0,500).toLowerCase()) || j.isRemote || j.isHybrid;
+    if(!j.location) j.location={label:'', country:''};
+    j.country = remote ? 'Remote' : 'Other';
+    return j.country;
   }
 
   // Per-source supported countries: UK-only boards vs global
@@ -177,15 +211,16 @@ try {
   }
   function progressOf(run){
     if(run.status==='succeeded'||run.status==='failed') return 100;
-    if(run.rolesTotal){
-      const rolePct=(run.rolesDone||0)/run.rolesTotal;
-      const adPct=(run.adsCollected||0)/(run.totalAdsGoal||1);
-      const base= run.stage==='fetching details' ? 10 : run.stage==='analyzing details' ? 70 : 5;
-      return Math.min(95, Math.round(rolePct*50 + adPct*30) + base);
-    }
-    const total=run.sourcesTotal||1;
-    const done=(run.sources||[]).filter(s=>s.status!=='running'&&s.started).length;
-    return Math.min(95, Math.round((done/total)*80)+(run.stage==='fetching details'?15:run.stage==='analyzing details'?70:5));
+    // Moves from the very first platform event: sources 55% + batches 20% + ads 17% + 3% base.
+    const srcTotal=Math.max(1,run.sourcesTotal||1);
+    const srcDone=Math.min(run.sourcesDone||(run.sources||[]).length||0,srcTotal);
+    const adsGoal=Math.max(1,run.totalAdsGoal||1);
+    const ads=Math.min(run.adsCollected||0,adsGoal);
+    const batTotal=Math.max(1,run.batchesTotal||1);
+    const batDone=Math.min(run.batchesDone||0,batTotal);
+    let pct=3 + Math.round(55*(srcDone/srcTotal) + 20*(batDone/batTotal) + 17*(ads/adsGoal));
+    if(run.stage==='analyzing details'||run.stage==='ai-enriching') pct=Math.max(pct,80);
+    return Math.min(95,pct);
   }
   const hasProxy = Boolean(config.proxy.url) || Boolean((() => { try{ return require('./course-builder/scraper/config').proxy.url; }catch(_){ return ''; }})());
   function available(sources){ return hasProxy ? sources : sources.filter(s=>!config.sources.browserSources.includes(s));}
@@ -377,9 +412,12 @@ try {
     if(typeof input.keywords==='string' && input.keywords.trim()) return [input.keywords.trim()];
     return ['junior'];
   }
+  const INVISIBLE_RE=/[\u200B-\u200F\u202A-\u202E\u2060\uFEFF]/g;
+  function cleanToken(s){ return String(s||'').replace(INVISIBLE_RE,'').replace(/\s+/g,' ').trim(); }
+  const regions=require('./course-builder/scraper/regions');
   function getCountriesList(input){
-    if(Array.isArray(input.countries) && input.countries.length) return input.countries.map(s=>String(s).trim()).filter(Boolean);
-    if(input.location) return [String(input.location).trim()];
+    if(Array.isArray(input.countries) && input.countries.length) return regions.normalizeCountries(input.countries);
+    if(input.location){ const c=regions.normalizeCountries([input.location]); if(c.length) return c; }
     return ['United Kingdom'];
   }
 
@@ -387,7 +425,10 @@ try {
     // normalize legacy fields
     if(!input.keywordsList && input.keywords) input.keywordsList=getKeywordsList(input);
     if(!input.countries) input.countries=getCountriesList(input);
-    if(!input.maxAdsPerTitle) input.maxAdsPerTitle=Number(input.maxAdsPerTitle)|| Math.max(5, Math.floor((Number(input.maxRecords)||50)/Math.max(1,getKeywordsList(input).length)));
+    // Max results = PER COUNTRY: each workbook tab (one per country) holds up to this many.
+    const perCountryCap=Math.max(1, Number(input.maxRecords)||Number(input.maxAdsPerTitle)||25);
+    input.maxRecords=perCountryCap;
+    if(!input.maxAdsPerTitle) input.maxAdsPerTitle=Math.max(1, Math.ceil(perCountryCap/Math.max(1,getKeywordsList(input).length)));
     if(!input.sheetName) input.sheetName = sanitizeSheet(input.sheetName||'Jobs');
     if(!input.analysisMode) input.analysisMode='none';
     const run={id:nextRunId(),actor:'zeelin-course-builder',mode:input.mode||'console',status:'running',input,stage:'queued',stages:[],sources:[],sourcesTotal:0,logs:[],jobs:[],items:0,cost:0.0,startedAt:new Date().toISOString(),finishedAt:null,durationMs:0, taskId:input.taskId||null, taskName:input.taskName||null};
@@ -397,9 +438,9 @@ try {
     if(db) try{ db.saveRun(run); }catch(e){ console.warn('db saveRun failed', e.message); }
     const keywordsList=getKeywordsList(input);
     const countriesList=getCountriesList(input);
-    const perTitle=Math.max(1, Number(input.maxAdsPerTitle)||25);
-    const totalCap=Number(input.maxRecords)|| keywordsList.length*perTitle*countriesList.length;
-    // For multi-country, total goal is perTitle * keywords * countries (e.g., 25*1*25=625 capped by maxRecords 50 or 500)
+    const perTitle=Math.max(1, Number(input.maxAdsPerTitle)||Math.max(1,Math.ceil(perCountryCap/Math.max(1,keywordsList.length))));
+    const totalCap=perCountryCap*countriesList.length;
+    // Total goal = per-country cap × countries (e.g., 25 × 10 countries = 250, one full tab each)
     const rawTotalGoal = keywordsList.length * perTitle * countriesList.length;
     const cappedGoal = Math.min(rawTotalGoal, totalCap);
     run.sourcesTotal=(input.jobIds&&input.jobIds.length)?1: (selectSources(input).length * Math.max(1, keywordsList.length*countriesList.length));
@@ -409,13 +450,24 @@ try {
     run.totalAdsGoal=cappedGoal;
     run.adsCollected=0;
     run.perRoleProgress={}; keywordsList.forEach(k=> run.perRoleProgress[k]={done:0, total:perTitle});
+    run.batchesTotal=0;
+    run.batchesDone=0;
+    run.sourcesDone=0;
+    run.progress=3;
     const log=makeLogger(run);
     setStage(run,'starting actor');
-    log.info(`Starting actor "zeelin-course-builder"${input.mode==='pathway'?' (Pathway match)':''} — ${keywordsList.length} roles × ${countriesList.length} countries × ${perTitle}/role (cap ${totalCap})`);
+    log.info(`Starting actor "zeelin-course-builder"${input.mode==='pathway'?' (Pathway match)':''} — ${keywordsList.length} roles × ${countriesList.length} countries × ${perCountryCap}/country (total goal ${totalCap})`);
     (async()=>{
       try{
         setStage(run,'fetching details');
-        const onSource=(r)=>run.sources.push({source:r.source,status:r.status,items:r.items,message:r.message,started:true, q:r.q||'', c:r.c||''});
+        const onSource=(r)=>{
+          run.sources.push({source:r.source,status:r.status,items:r.items,message:r.message,started:true, q:r.q||'', c:r.c||''});
+          run.sourcesDone=(run.sources||[]).length;
+          run.progress=progressOf(run);
+          const done=run.sourcesDone, total=run.sourcesTotal||done;
+          if(r.items>0) log.info(`✓ ${r.source}${r.q?` [${r.q}${r.c?' @ '+r.c:''}]`:''}: ${r.items} ads (${done}/${total} platforms, ${run.adsCollected||0}/${run.totalAdsGoal||'?'} ads)`);
+          else if(done===1||done%10===0||done===total) log.info(`… ${done}/${total} platforms checked (${run.adsCollected||0} ads so far)`);
+        };
         let allJobs=[];
         let allResults=[];
         if(input.jobIds&&input.jobIds.length){
@@ -492,25 +544,63 @@ try {
           }
           // fan-out: country × keyword, but per-source country filter to avoid 0/50 stall for UK-only boards
           const allSources=selectSources(input);
+          // Backbone split: location-agnostic JSON APIs are fetched ONCE per role
+          // (not once per country) and attributed to tabs by content location.
+          const GLOBAL_SOURCES=regions.GLOBAL_SOURCES;
+          const globalSources=allSources.filter(s=>GLOBAL_SOURCES.includes(s));
+          const localSources=allSources.filter(s=>!GLOBAL_SOURCES.includes(s));
           const batches=[];
           for(const country of countriesList){
             for(const kw of keywordsList){
-              const filtered = allSources.filter(s=> isSourceSupportedForCountry(s, country));
-              if(!filtered.length) {
-                log.info(`Skipping ${kw} @ ${country} — no sources support this country (UK-only boards filtered)`);
-                continue;
-              }
+              const filtered = localSources.filter(s=> isSourceSupportedForCountry(s, country));
+              if(!filtered.length) continue; // covered by global phase or unsupported
               batches.push({country, kw, sources: filtered});
             }
           }
           if(!batches.length){
-            log.warn(`No batches after country filter for ${countriesList.length} countries × ${keywordsList.length} keywords — check supported countries`);
-            // fallback: use all sources for first country only to avoid 0 jobs
-            batches.push({country: countriesList[0]||'United Kingdom', kw: keywordsList[0], sources: allSources});
+            if(globalSources.length){
+              log.info(`No per-country batches — all selected platforms (${globalSources.join(', ')}) are global; single fetch per role`);
+            } else {
+              log.warn(`No batches after country filter for ${countriesList.length} countries × ${keywordsList.length} keywords — check supported countries`);
+              // fallback: use all sources for first country only to avoid 0 jobs
+              batches.push({country: countriesList[0]||'United Kingdom', kw: keywordsList[0], sources: allSources});
+            }
           }
           log.info(`Fan-out plan: ${batches.length} batches (${countriesList.join(', ')}) × (${keywordsList.slice(0,3).join(', ')}${keywordsList.length>3?'…':''}) — multitasking all countries simultaneously (per-source country filter, UK-only boards only for UK)`);
-          // Intense simultaneous: run ALL batches concurrently with concurrency limit to avoid overload
-          const concurrency = Math.min(8, batches.length); // up to 8 parallel, still intense but controlled
+          // Honest denominator: global fetches + actual per-batch filtered platform counts
+          run.sourcesTotal=(globalSources.length*keywordsList.length)+batches.reduce((n,b)=>n+((b.sources||[]).length),0)||run.sourcesTotal;
+          // Global phase first: one fetch per role across location-agnostic APIs.
+          if(globalSources.length){
+            setStage(run,'fetching details');
+            log.info(`Global phase: ${globalSources.join(', ')} × ${keywordsList.length} role(s) — single fetch per role, tabs attributed by content location`);
+            for(const kw of keywordsList){
+              try{
+                const res=await scraper.run({sources: globalSources, query:kw, location:'', limit: Math.min(totalCap, 200), log:{info:()=>{}, warn:()=>{}}, onSource:(r)=> onSource({...r, q:kw, c:'global'})});
+                const beforeFilter=(res.jobs||[]).length;
+                const kept=(res.jobs||[]).filter(j=> titleMatchesRole(j.title, kw));
+                run.filteredOut=(run.filteredOut||0)+(beforeFilter-kept.length);
+                kept.forEach(j=>{
+                  j.queryKeyword=kw;
+                  attributeCountry(j, countriesList);
+                  if(!j.location) j.location={label:'', country:''};
+                  if(j.description) j.description=j.description.replace(/<[^>]*>/g,' ').replace(/\s+/g,' ').trim().slice(0,8000);
+                  j.description=cleanSupervisedDescription(j.description).slice(0,8000);
+                  ensureRequirements(j);
+                });
+                allJobs=allJobs.concat(kept);
+                if(res.results) allResults=allResults.concat(res.results);
+                run.adsCollected=allJobs.length;
+                run.jobs=allJobs.slice(); run.items=allJobs.length; // live snapshot
+                run.progress=progressOf(run);
+                const dist={}; kept.forEach(j=>{ dist[j.country]=(dist[j.country]||0)+1; });
+                log.info(`✔ Global "${kw}": ${kept.length}/${beforeFilter} on-role (${Object.entries(dist).slice(0,6).map(([k,v])=>`${k}:${v}`).join(', ')||'none'}) · total ${run.adsCollected}/${run.totalAdsGoal}`);
+              }catch(e){ log.warn(`Global "${kw}" failed: ${e.message}`); }
+            }
+          }
+          // All countries simultaneously: every country batch runs at once
+          // (~26 parallel tasks per role; roles still run one after another).
+          // Per-host governor in http.js keeps it polite per domain.
+          const concurrency = Math.min(32, batches.length); // all at once
           let completedRoles=0;
           let countriesDone=0;
           const countryProgress={}; // country -> done count
@@ -522,10 +612,13 @@ try {
           async function runWithConcurrency(items, limit, fn){
             const results=[];
             let idx=0;
+            run.batchesTotal=items.length;
+            run.progress=progressOf(run);
             async function worker(){
               while(idx < items.length){
                 const cur = idx++;
                 const item = items[cur];
+                log.info(`▶ Batch ${cur+1}/${items.length}: "${item.kw}" @ ${item.country} (${(item.sources||[]).length} platforms)…`);
                 const res = await fn(item);
                 results[cur]=res;
                 // update country count live
@@ -544,12 +637,14 @@ try {
                   completedRoles = Object.values(run.perRoleProgress).filter(p=>p.done>=perTitle).length;
                   run.rolesDone = completedRoles;
                   run.adsCollected = allJobs.length;
+                  run.jobs=allJobs.slice(); run.items=allJobs.length; // live snapshot: Output tab populates as countries finish
+                  run.batchesDone=(run.batchesDone||0)+1;
                   // include country count in progress: e.g., 9/12
-                  log.info(`Fetching job ads | Countries ${run.countriesDone}/${run.countriesTotal} · Job roles ${run.rolesDone}/${run.rolesTotal} · ${q} (${item.country}): ${run.perRoleProgress[q].done}/${perTitle*countriesList.length} ads · total ${run.adsCollected}/${run.totalAdsGoal} · Batch ${cur+1}/${batches.length}`);
+                  log.info(`✔ Batch ${cur+1}/${batches.length} done | Countries ${run.countriesDone}/${run.countriesTotal} · Roles ${run.rolesDone}/${run.rolesTotal} · ${q} (${item.country}): ${run.perRoleProgress[q].done}/${perTitle*countriesList.length} ads · total ${run.adsCollected}/${run.totalAdsGoal}`);
                   if(res.res.results) allResults=allResults.concat(res.res.results);
-                  run.sourcesTotal=Math.max(run.sourcesTotal, allResults.length||sources.length*batches.length);
+                  run.sourcesTotal=Math.max(run.sourcesTotal, allResults.length||run.sourcesTotal);
                   // update run for live preview polling
-                  run.progress = Math.min(95, Math.round((run.adsCollected/run.totalAdsGoal)*80) + 10);
+                  run.progress = progressOf(run);
                   run.stage = 'fetching details';
                 }
               }
@@ -564,12 +659,10 @@ try {
             const wrappedOnSource=(r)=> onSource({...r, q, c:country});
             try{
               const res=await scraper.run({sources: srcs, query:q, location: loc, limit: perTitle, log:{ info:()=>{}, warn:()=>{} }, onSource: wrappedOnSource});
-              // supervised: title-relevant filter before mapping (remove Salesforce noise) + HTML clean
-              res.jobs = (res.jobs||[]).filter(j=>{
-                const t=String(j.title||'').toLowerCase();
-                const qlow=q.toLowerCase();
-                return t.includes(qlow) || t.includes(qlow.split(' ')[0]);
-              });
+              // supervised: strict title-relevant filter (drops off-role ads) + HTML clean
+              const beforeFilter=(res.jobs||[]).length;
+              res.jobs = (res.jobs||[]).filter(j=> titleMatchesRole(j.title, q));
+              run.filteredOut=(run.filteredOut||0)+(beforeFilter-(res.jobs||[]).length);
               (res.jobs||[]).forEach(j=>{
                 j.queryKeyword=q;
                 j.country=country;
@@ -582,14 +675,16 @@ try {
               return {res, q, country};
             }catch(e){ log.warn(`Batch ${q}@${country} failed: ${e.message}`); return {res:{jobs:[], results:[], totalJobs:0}, q, country}; }
           });
+          if(run.filteredOut>0) log.info(`Title filter: removed ${run.filteredOut} off-role ads across batches (strict phrase/word match)`);
           if(!allJobs.length){
             // fallback single run if fan-out yielded nothing (e.g., scraper loop not triggered)
             log.info('Fan-out returned 0, trying single combined query as fallback');
+            run.sourcesTotal=(run.sourcesTotal||0)+allSources.length;
             const fallbackQ=keywordsList.join(' ');
             const res=await scraper.run({sources: allSources, query: fallbackQ, location: countriesList[0]||'', limit: totalCap, log, onSource});
             (res.jobs||[]).forEach(j=>{ j.queryKeyword=keywordsList[0]; j.country=countriesList[0]; ensureRequirements(j); });
             allJobs=res.jobs||[];
-            allResults=res.results||[];
+            allResults=allResults.concat(res.results||[]);
           }
           // Final mock fallback if still 0 (network down) — DISABLED for real-only mode (user wants no mock)
           if(false && !allJobs.length){
@@ -662,7 +757,10 @@ try {
         if(validJobs.length < totalCap && validJobs.length < rawTotalGoal){
           const need = Math.min(totalCap - validJobs.length, 100);
           if(need>0){
-            log.info(`Shortfall ${validJobs.length}/${totalCap} — going deeper to fetch ${need} more (replacement for missing)`);
+            const rare = validJobs.length < 5;
+            log.info(rare
+              ? `Rare role: only ${validJobs.length} valid ads — broadening search (ALL platforms, relaxed titles, more batches)…`
+              : `Shortfall ${validJobs.length}/${totalCap} — going deeper to fetch ${need} more (replacement for missing)`);
             // Re-run fan-out for shortfall with +2 perTitle for each keyword, limited to 1 retry to avoid infinite loop
             const extraPerTitle = Math.ceil(need / Math.max(1, keywordsList.length * countriesList.length)) + 2;
             // Simple retry: run once more with increased limit for the least-served country/role
@@ -671,58 +769,78 @@ try {
               // Find countries with least jobs
               const countryCounts={}; validJobs.forEach(j=>{ const c=j.country||'Unknown'; countryCounts[c]=(countryCounts[c]||0)+1; });
               const sortedCountries = Object.entries(countryCounts).sort((a,b)=>a[1]-b[1]).map(e=>e[0]);
-              const targetCountries = sortedCountries.length? sortedCountries.slice(0,3) : countriesList.slice(0,2);
+              const targetCountries = rare
+                ? countriesList.slice(0,5)
+                : (sortedCountries.length? sortedCountries.slice(0,3) : countriesList.slice(0,2));
               for(const c of targetCountries){
-                for(const kw of keywordsList.slice(0,2)){
+                for(const kw of (rare?keywordsList:keywordsList.slice(0,2))){
                   retryBatches.push({country:c, kw});
                 }
               }
-              const retrySources = selectSources(input);
+              // Rare roles: sweep every platform, not just the current mode's subset
+              const retrySources = rare ? config.sources.enabled.filter(s=>!config.sources.browserSources.includes(s)||hasProxy) : selectSources(input);
+              run.sourcesTotal=(run.sourcesTotal||0)+retryBatches.length*retrySources.length;
               const retryJobs=[];
-              for(const {country, kw} of retryBatches.slice(0,6)){
+              const retryOnSource=(r)=>{
+                run.sources.push({source:r.source,status:r.status==='ok'?'succeeded':r.status,items:r.items,message:r.message,started:true,q:r.q||'',c:r.c||''});
+                run.sourcesDone=(run.sources||[]).length;
+                run.progress=progressOf(run);
+              };
+              for(const {country, kw} of retryBatches.slice(0,rare?10:6)){
                 try{
-                  const res=await scraper.run({sources: retrySources, query:kw, location:country, limit: extraPerTitle, log:{info:()=>{}, warn:()=>{}}, onSource:()=>{}});
+                  const res=await scraper.run({sources: retrySources, query:kw, location:country, limit: extraPerTitle, log:{info:()=>{}, warn:()=>{}}, onSource:retryOnSource});
                   res.jobs.forEach(j=>{ j.queryKeyword=kw; j.country=country; ensureRequirements(j); });
                   retryJobs.push(...res.jobs);
                 }catch(_){}
               }
-              const retryValid = retryJobs.filter(isCompleteJob).filter(j=> !validJobs.some(v=> v.url===j.url));
+              // Rare roles: accept ANY significant-word title match (broad but still on-role)
+              const words=(kw0)=> String(kw0||'').toLowerCase().split(/\s+/).filter(w=>w.length>2);
+              const retryValid = retryJobs.filter(isCompleteJob).filter(j=>{
+                if(!rare) return true;
+                const t=String(j.title||'').toLowerCase();
+                return words(j.queryKeyword).some(w=> new RegExp(`\\b${w.replace(/[.*+?^${}()|[\]\\]/g,'\\$&')}s?\\b`).test(t));
+              }).filter(j=> !validJobs.some(v=> v.url===j.url));
               if(retryValid.length){
-                log.info(`Replacement fetch got ${retryValid.length} additional valid ads`);
+                log.info(`Broad retry got ${retryValid.length} additional ads (${rare?'relaxed-title rarity sweep':'replacement'})`);
                 validJobs.push(...retryValid);
+              } else if(rare){
+                log.warn(`Rarity sweep found nothing new — role genuinely scarce on reachable platforms (proxy/keys unlock more)`);
               }
             }catch(e){ log.warn(`Replacement fetch failed: ${e.message}`); }
           }
         }
-        // bucket handling: per-country for multi-country bulk to ensure 30-35 across 25 countries
+        // bucket handling: per-country cap — EVERY tab (incl. Remote/Other) holds at most perCountryCap
         let jobsToFilter;
         if (countriesList.length > 1) {
-          // Multi-country: distribute evenly, aim for totalCap (30-35)
-          const perCountryTarget = Math.ceil(totalCap / countriesList.length);
+          const perCountryTarget = perCountryCap;
           const byCountry={};
           validJobs.forEach(j=>{ const c=j.country||'Unknown'; (byCountry[c]=byCountry[c]||[]).push(j); });
           let balancedMulti=[];
-          // Round-robin 1 per country until totalCap
+          const taken={};
+          // Round-robin 1 per tab until totalCap, respecting the per-tab cap
           let added=true;
+          const tabOrder=[...countriesList, ...Object.keys(byCountry).filter(k=>!countriesList.includes(k))];
           while(balancedMulti.length < totalCap && added){
             added=false;
-            for(const c of countriesList){
+            for(const c of tabOrder){
+              if((taken[c]||0) >= perCountryCap) continue;
               const bucket=byCountry[c];
               if(bucket && bucket.length){
                 balancedMulti.push(bucket.shift());
+                taken[c]=(taken[c]||0)+1;
                 added=true;
                 if(balancedMulti.length >= totalCap) break;
               }
             }
           }
-          // Fill remaining from any leftover
-          if(balancedMulti.length < totalCap){
-            const remaining = Object.values(byCountry).flat();
-            balancedMulti.push(...remaining.slice(0, totalCap - balancedMulti.length));
-          }
+          const dropped=Object.values(byCountry).reduce((n,b)=>n+b.length,0);
           jobsToFilter = balancedMulti.slice(0, totalCap);
+          // Authoritative per-tab counts for progress + UI (incremental counters drift)
+          run.countryProgress={}; jobsToFilter.forEach(j=>{ run.countryProgress[j.country]=(run.countryProgress[j.country]||0)+1; });
+          run.countriesDone=Object.values(run.countryProgress).filter(v=>v>0).length;
+          if(dropped>0) log.info(`Per-tab cap applied (${perCountryCap}/tab): kept ${jobsToFilter.length}, set aside ${dropped} surplus`);
           if(jobsToFilter.length < 30) log.warn(`Multi-country shortfall ${jobsToFilter.length}/${totalCap} — collected ${validJobs.length} valid, need deeper scrape`);
-          else log.info(`Multi-country balanced ${jobsToFilter.length}/${totalCap} across ${countriesList.length} countries`);
+          else log.info(`Multi-country balanced ${jobsToFilter.length}/${totalCap} across ${tabOrder.length} tabs (cap ${perCountryCap}/tab)`);
         } else {
           // Single-country: per-role bucket
           const perRole = Math.max(1, perTitle);
@@ -741,8 +859,11 @@ try {
           jobsToFilter = balanced.length ? balanced : validJobs;
           if(jobsToFilter.length > totalCap) jobsToFilter = jobsToFilter.slice(0, totalCap);
         }
-        run.sources=allResults.map(r=>({source:r.source,status:r.status,items:r.items,message:r.message,started:true}));
-        run.sourcesTotal=allResults.length || run.sourcesTotal;
+        // merge: keep live per-source events (fan-out + fallback already pushed), add anything missing
+        const seenSrc=new Set(run.sources.map(s=>`${s.source}|${s.q}|${s.c}`));
+        allResults.forEach(r=>{ const k=`${r.source}|${r.q||''}|${r.c||''}`; if(!seenSrc.has(k)){ seenSrc.add(k); run.sources.push({source:r.source,status:r.status==='ok'?'succeeded':r.status,items:r.items,message:r.message,started:true,q:r.q||'',c:r.c||''}); } });
+        run.sourcesDone=run.sources.length;
+        run.sourcesTotal=Math.max(run.sourcesTotal||0,run.sources.length);
         setStage(run,'analyzing details');
         log.info(`Collected ${jobsToFilter.length} balanced jobs (from ${validJobs.length} valid, ${allJobs.length} unique, ${beforeDedupe} raw) — analyzing details …`);
         let jobs=applyFilters(jobsToFilter,input);
@@ -758,7 +879,8 @@ try {
             if(enrichMod.aiAvailable()){
               setStage(run,'ai-enriching'); log.info('AI enrichment pass (model structures raw ads) …');
               enrichMod.saveRaw(run.id, jobs);
-              const er=await enrichMod.enrichJobs(jobs,{concurrency:3,onProgress:(d,t)=>{ run.aiProgress={done:d,total:t}; }});
+              const AI_CONCURRENCY=Math.min(8,Math.max(1,Number(process.env.ZEELIN_AI_CONCURRENCY||6)));
+              const er=await enrichMod.enrichJobs(jobs,{concurrency:AI_CONCURRENCY,onProgress:(d,t)=>{ run.aiProgress={done:d,total:t}; }});
               jobs=er.jobs; run.aiStats=er.stats;
               log.info(`AI enrichment: ${er.stats.ai} ai / ${er.stats.fallback} deterministic / ${er.stats.cached} cached`);
             } else log.warn('AI requested but OPENCODE_API_KEY not set — deterministic output kept');
@@ -793,10 +915,13 @@ try {
     return {job, curriculum};
   }
   // ---- 13-col row + XLSX helpers ----
-  const EXPORT_HEADERS=["Company_Name","Industry","Experience_Level","Core_Functional_Skills","TOOLS","AI_Emerging_Capabilities","Key_Responsibility","Salary","Salary_Min","Salary_Max","Salary_Currency","Salary_Period","Posted_Date","Posted_Time","Source_Platform","Platform","URL","Job_URL","Job_URL_Direct","Source_URL","Scraped_At","Location_Country","Location_Region","Location_Label","Is_Remote","Is_Hybrid","Job_Type","Seniority_Level","Easy_Apply","Company_Rating","Company_Reviews_Count","Company_Size","Company_Industry","Employment_Type","Workplace_Type","Description","Skills","Query_Keyword","Company_URL","Apply_URL","Posted_Date_Raw"];
+  const EXPORT_HEADERS=["Company_Name","Industry","Experience_Level","Core_Functional_Skills","TOOLS","AI_Emerging_Capabilities","Key_Responsibility","Salary","Salary_Min","Salary_Max","Salary_Currency","Salary_Period","Salary_Est_Min","Salary_Est_Max","Salary_Est_Currency","Salary_Est_Period","Posted_Date","Posted_Time","Source_Platform","Platform","URL","Job_URL","Job_URL_Direct","Source_URL","Scraped_At","Location_Country","Location_Region","Location_Label","Is_Remote","Is_Hybrid","Job_Type","Seniority_Level","Easy_Apply","Company_Rating","Company_Reviews_Count","Company_Size","Company_Industry","Employment_Type","Workplace_Type","Description","Skills","Query_Keyword","Company_URL","Apply_URL","Posted_Date_Raw"];
   function jobToExportRow(j){
      const loc=j.location||{};
     const sal=j.salary||{};
+    const est=j.salary_est||{};
+    const salObserved=(sal.min||sal.max)?`${sal.min||''}–${sal.max||''} ${sal.currency||''}`.trim():(sal.raw||'');
+    const salDisplay=salObserved||((est.min||est.max)?`~${est.min||''}–${est.max||''} ${est.currency||''} (est.)`.trim():'NOT LISTED');
     return [
       j.Company_Name||j.company||'',
       j.Industry||j.industry||'',
@@ -805,11 +930,15 @@ try {
       (j.TOOLS||j.requirements?.tools||[]).join('; '),
       (j.AI_Emerging_Capabilities||j.requirements?.ai||[]).join('; '),
       (j.Key_Responsibility||j.requirements?.responsibilities||[]).join(' | '),
-      j.salary ? (sal.raw || ((sal.min||'') + (sal.max? '–'+sal.max:''))) : (j.Salary||''),
+      j.salary ? (sal.raw || ((sal.min||'') + (sal.max? '–'+sal.max:''))) : salDisplay,
       sal.min||'',
       sal.max||'',
       sal.currency||'',
       sal.period||'',
+      est.min||'',
+      est.max||'',
+      est.currency||'',
+      est.period||'',
       j.Posted_Date||'',
       j.Posted_Time||'',
       j.Source_Platform||j.source||j.platform||'',
@@ -833,7 +962,7 @@ try {
       j.company_industry||j.Industry||'',
       j.employmentType||'',
       j.workplaceType|| (j.is_remote?'remote': j.isHybrid?'hybrid':'on-site'),
-      (j.description||'').slice(0,500),
+      (j.description||'').slice(0,4000),
       (j.requirements?.skills||[]).join('; '),
       j.queryKeyword||j.Query_Keyword||j.title||'',
       j.company_url||'',
@@ -855,7 +984,7 @@ try {
       // init empty buckets for each requested country
       countriesList.forEach(c=>{ const key=sanitizeSheet(c); if(!groups[key]) groups[key]=[]; });
       jobs.forEach(j=>{
-        const cRaw=(j.location?.country||j.country||j.queryKeyword||'Unknown').split(',').pop().trim()||'Unknown';
+        const cRaw=(j.country||j.location?.country||j.queryKeyword||'Unknown').split(',').pop().trim()||'Unknown';
         // supervised exact match only (no substring) to avoid US->Australia collision
         let targetKey=Object.keys(groups).find(k=> k.toLowerCase()===cRaw.toLowerCase());
         if(!targetKey){
@@ -864,7 +993,8 @@ try {
           targetKey=Object.keys(groups).find(k=> k.toLowerCase()===sanitizedC);
         }
         if(!targetKey){
-          targetKey=Object.keys(groups)[0]||sanitizeSheet('Unknown');
+          // Own labelled tab (Remote/Other/…) — never forced into a wrong country.
+          targetKey=sanitizeSheet(cRaw);
           if(!groups[targetKey]) groups[targetKey]=[];
         }
         groups[targetKey].push(j);
@@ -932,6 +1062,14 @@ try {
     if(parts[1]==='health'){ const mode=db?'local JSON DB (persistent, view previous runs)':'no-store (results are never saved)'; let ai=false; try{ ai=require('./course-builder/scraper/enrich').aiAvailable(); }catch(_){} return sendJson(res,200,{ok:true,service:'zeelin-course-builder',mode,runs:db?db.listRuns(200).length:runs.size,time:new Date().toISOString(),aiAvailable:ai});}
     if(parts[1]==='industries') return sendJson(res,200,industries);
     if(parts[1]==='cities') return sendJson(res,200,cities);
+    if(parts[1]==='storage' && req.method==='GET'){
+      try{
+        const dir=path.join(__dirname,'course-builder','scraper','storage');
+        const files=fs.existsSync(dir)?fs.readdirSync(dir).map(f=>{ try{ const s=fs.statSync(path.join(dir,f)); return {name:f, bytes:s.size, modified:s.mtime.toISOString()}; }catch(_){ return null; } }).filter(Boolean):[];
+        let enriched=0; try{ enriched=Object.keys(JSON.parse(fs.readFileSync(path.join(dir,'enriched.json'),'utf8'))).length; }catch(_){}
+        return sendJson(res,200,{files:files.sort((a,b)=>b.modified.localeCompare(a.modified)), enrichedCached:enriched});
+      }catch(e){ return sendJson(res,200,{files:[], enrichedCached:0}); }
+    }
     if(parts[1]==='runs'){
       // cleanup endpoint: POST /api/runs/cleanup — remove empty/old/stuck runs
       if(parts[2]==='cleanup' && req.method==='POST'){
@@ -952,26 +1090,16 @@ try {
         let run=runs.get(parts[2]);
         if(!run && db) run=db.getRun(parts[2]);
         if(!run) return sendJson(res,404,{error:'run not found'});
+        // memory map holds slim records — hydrate full jobs from DB when needed
+        if((!run.jobs || !run.jobs.length) && db){ try{ const full=db.getRun(parts[2]); if(full && full.jobs) run={...run, jobs:full.jobs, items:full.jobs.length}; }catch(_){} }
         // ensure in-memory cache
         if(!runs.has(parts[2]) && run) runs.set(parts[2], run);
         if(parts[3]==='result') return sendJson(res,200,publicRun(run,{withJobs:true}));
         if(parts[3]==='export'){
           const body= (req.method==='POST' ? await readBody(req) : {});
-          const fmt=(url.searchParams.get('format')||body.format||'xlsx').toLowerCase();
+          // xlsx only (by design — single canonical document format)
           const sheetName=body.sheetName||run.input.sheetName||'Jobs';
           const analysisMode=body.analysisMode||run.input.analysisMode||'none';
-          if(fmt==='csv'){
-            const headers=EXPORT_HEADERS;
-            const rows=[headers.join(',')];
-            (run.jobs||[]).forEach(j=>{
-              const r=jobToExportRow(j).map(v=>`"${String(v).replace(/"/g,'""')}"`);
-              rows.push(r.join(','));
-            });
-            const csv=rows.join('\n');
-            res.writeHead(200, {'Content-Type':'text/csv', 'Content-Disposition':`attachment; filename="${sanitizeSheet(sheetName)}-${run.id}.csv"`});
-            res.end(csv);
-            return true;
-          }
           try{
             const wb=await buildExportWorkbook(run.jobs||[], {...run.input, sheetName, analysisMode}, analysisMode);
             res.writeHead(200, {
@@ -990,7 +1118,7 @@ try {
       // list runs — prefer DB, fallback to runLog
       if(db){
         try{
-          const dbRuns=db.listRuns(100).map(r=>({id:r.id, actor:r.actor, mode:r.mode, status:r.status, startedAt:r.startedAt, finishedAt:r.finishedAt, durationMs:r.durationMs, items:r.items, taskId:r.taskId}));
+          const dbRuns=db.listRuns(100).map(r=>({id:r.id, name:r.name||null, actor:r.actor, mode:r.mode, status:r.status, startedAt:r.startedAt, finishedAt:r.finishedAt, durationMs:r.durationMs, items:r.items, taskId:r.taskId, aiStats:r.aiStats||null, sourcesTotal:r.sourcesTotal||((r.sources||[]).length||0)}));
           return sendJson(res,200,{runs:dbRuns});
         }catch(_){}
       }
