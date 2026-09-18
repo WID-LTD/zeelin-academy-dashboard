@@ -1905,14 +1905,46 @@ function renderAluminal() {
   $('#page').addEventListener('click', backLink);
 }
 function renderMonday() {
+  const arch = MONDAY.map((m) => `<div style="background-color:#181818;border:1px solid #2a2a2a;border-radius:10px;overflow:hidden;margin-bottom:16px;">`
+    + `<div style="padding:16px 20px;display:flex;align-items:center;gap:12px;">`
+    + `<div style="width:36px;height:36px;border-radius:50%;background-color:#d97706;display:flex;align-items:center;justify-content:center;font-weight:bold;color:white;font-size:14px;flex-shrink:0;">ZA</div>`
+    + `<div style="flex:1;"><div style="font-size:15px;font-weight:600;color:#ffffff;">${esc(m.q)}</div>`
+    + `<div style="font-size:12.5px;color:#d4d4d4;margin-top:4px;line-height:1.55;">${esc(m.body)}</div></div>`
+    + `<span style="background-color:#382818;color:#d97706;font-size:11px;font-weight:600;padding:4px 8px;border-radius:4px;flex-shrink:0;">${esc(m.author)}</span></div></div>`).join('');
   $('#page').innerHTML = `
-    ${backBtn()}
-    <div class="page-header"><div class="eyebrow">Weekly fuel</div><h1>Monday Motivations</h1><div class="sub">A fresh brief every week. Consistency beats intensity.</div></div>
-    <div class="hero alt"><img src="${MONDAY_FEATURED.avatar}" alt="" style="width:90px;height:90px;object-fit:cover;border-radius:12px"/><div><span class="hbadge">${esc(MONDAY_FEATURED.badge)}</span><div class="htitle">${esc(MONDAY_FEATURED.title)}</div><div class="hsub">${esc(MONDAY_FEATURED.body)}</div></div></div>
-    <div class="grid grid-3 mt16">${MONDAY.map((m) => `<div class="p-card" style="padding:18px"><div class="card-title">${ic('sun', 18, 18)} ${esc(m.q)}</div><div class="pt-sub mt8">${esc(m.body)}</div><div class="mt12"><span class="pill pill-amber">${esc(m.author)}</span></div></div>`).join('')}</div>`;
+    <div style="padding:24px;max-width:900px;margin:0 auto;width:100%;box-sizing:border-box;">
+      <div style="background:linear-gradient(135deg, #2c1a0e 0%, #1a1a1a 100%);border:1px solid #3d2411;border-radius:12px;padding:40px 20px;text-align:center;margin-bottom:24px;position:relative;overflow:hidden;">
+        <h1 style="font-size:28px;font-weight:700;color:#ffffff;margin:0 0 12px 0;letter-spacing:-0.5px;">Monday Motivations</h1>
+        <div style="display:inline-block;background-color:#b45309;color:#ffffff;font-size:13px;font-weight:600;padding:8px 16px;border-radius:6px;margin-bottom:16px;">Start your week with purpose and peak exam readiness mindset.</div>
+        <p style="font-size:13px;color:#d4d4d4;max-width:500px;margin:0 auto;line-height:1.5;">Weekly inspirational insights, focus directives, and success strategies tailored for Zeelin Academy candidates.</p>
+      </div>
+      <div style="background-color:#181818;border:1px solid #2a2a2a;border-radius:10px;overflow:hidden;margin-bottom:24px;">
+        <div style="padding:20px;border-bottom:1px solid #2a2a2a;display:flex;align-items:center;justify-content:space-between;">
+          <div style="display:flex;align-items:center;gap:12px;">
+            <div style="width:36px;height:36px;border-radius:50%;background-color:#d97706;display:flex;align-items:center;justify-content:center;font-weight:bold;color:white;font-size:14px;">ZA</div>
+            <div>
+              <div style="font-size:14px;font-weight:600;color:#ffffff;">Zeelin Academy Leadership</div>
+              <div style="font-size:12px;color:#a3a3a3;">Monday Edition &bull; Aug 3</div>
+            </div>
+          </div>
+          <div style="display:flex;gap:8px;">
+            <span style="background-color:#382818;color:#d97706;font-size:11px;font-weight:600;padding:4px 8px;border-radius:4px;">${esc(MONDAY_FEATURED.badge)}</span>
+          </div>
+        </div>
+        <div style="padding:20px;">
+          <h2 style="font-size:18px;font-weight:600;color:#ffffff;margin:0 0 16px 0;">${esc(MONDAY_FEATURED.title)}</h2>
+          <div style="width:100%;height:320px;border-radius:8px;overflow:hidden;background-color:#262626;position:relative;margin-bottom:16px;">
+            <img src="${MONDAY_FEATURED.image}" alt="Team motivation study" style="width:100%;height:100%;object-fit:cover;">
+          </div>
+          <p style="font-size:13px;color:#d4d4d4;line-height:1.6;margin:0 0 12px 0;">${esc(MONDAY_FEATURED.body)}</p>
+          <p style="font-size:13px;color:#d4d4d4;line-height:1.6;margin:0;">Take 5 minutes today to map out your calendar events, review the recording backlog if needed, and engage with your peers in the community. You have got this!</p>
+        </div>
+      </div>
+      <div style="font-size:11px;font-weight:600;color:#737373;letter-spacing:0.5px;margin:0 0 12px 2px;">PAST BRIEFS</div>
+      ${arch}
+    </div>`;
   $('#page').addEventListener('click', backLink);
 }
-
 /* ============ BOOT ============ */
 window.addEventListener('hashchange', () => { route(); });
 renderSidebar();
