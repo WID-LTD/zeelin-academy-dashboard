@@ -296,6 +296,7 @@ function route() {
     case 'profile': renderProfile(); return;
     case 'accountability': renderAccountability(); return;
     case 'roadmap': renderRoadmap(); return;
+    case 'board': renderBoard(); return;
     case 'community': renderCommunity(); return;
     case 'calendar': renderCalendar(); return;
     case 'recordings': renderRecordings(); return;
@@ -331,9 +332,9 @@ window._navDay = function(n){ STATE.day = n; save(); if((parseHash()[0]||'home')
 function dayGroupsHTML(r){
   const grp = (label, links) => `<div class="dg-label">${label}</div>` + links.map((l) => `<a class="dg-link${r===l.route?' active':''}" href="${l.href}">${ic(l.icon,13,13)}<span>${l.text}</span></a>`).join('');
   return `<div class="day-groups">`
-    + grp('Community', [
+    + grp('General Community', [
       { route:'monday', href:'#/monday', icon:'sun', text:'Monday Motivation' },
-      { route:'community', href:'#/community', icon:'chat', text:'Community' },
+      { route:'community', href:'#/community', icon:'chat', text:'General Community' },
       { route:'calendar', href:'#/calendar', icon:'calendar', text:'Calendar' },
       { route:'recordings', href:'#/recordings', icon:'video', text:'Recordings' },
     ])
@@ -371,6 +372,37 @@ window._sendPost = function(){
   socialSave(s); route(); toast('Posted to community');
 };
 window._newPost = function(){ const ta = $('#composerText'); if(ta){ ta.focus(); ta.scrollIntoView({behavior:'smooth',block:'center'}); } };
+/* general message board (admin-only, read-only) */
+const GENERAL_BOARD = [
+  { id:'g1', title:'Welcome to Cohort 001 — Start Here', body:'Welcome to the Core / Classic Business Analysis track. Complete your Daily Check-In first, then open Day 1 from the sidebar. Your streak starts the day you claim XP.', meta:'Zeelin Admin \u2022 Pinned \u2022 Aug 1' },
+  { id:'g2', title:'Live Workshop Schedule — August 2026', body:'Two live sessions this month: Effective Communication on Tue Aug 4 at 4:00 PM and the Cohort 001 Weekly Q&A on Sat Aug 8 at 2:00 PM. Add them to your calendar from the Calendar page.', meta:'Zeelin Admin \u2022 Aug 2' },
+  { id:'g3', title:'How Mock Quizzes Are Scored', body:'Every chapter quiz has 5 questions and needs 4 correct to pass. Retakes are unlimited and only your best attempt counts toward readiness.', meta:'Zeelin Admin \u2022 Aug 5' },
+  { id:'g4', title:'Scheduled Maintenance — Recordings Archive', body:'The recordings archive will be briefly unavailable this Sunday between 2:00 AM and 4:00 AM while we publish the new workshop replays.', meta:'Zeelin Admin \u2022 Aug 9' },
+];
+function renderBoard() {
+  const cards = GENERAL_BOARD.map((g) => `<div style="background-color:#181818;border:1px solid #2a2a2a;border-radius:10px;overflow:hidden;margin-bottom:20px;">`
+    + `<div style="padding:16px 20px;border-bottom:1px solid #2a2a2a;display:flex;align-items:center;justify-content:space-between;">`
+    + `<div style="display:flex;align-items:center;gap:12px;">`
+    + `<div style="width:36px;height:36px;border-radius:50%;background-color:#d97706;display:flex;align-items:center;justify-content:center;font-weight:bold;color:white;font-size:14px;">ZA</div>`
+    + `<div><div style="font-size:14px;font-weight:600;color:#ffffff;">Zeelin Admin</div>`
+    + `<div style="font-size:12px;color:#a3a3a3;">${esc(g.meta)}</div></div></div>`
+    + `<span style="background-color:#382818;color:#d97706;font-size:11px;font-weight:600;padding:4px 8px;border-radius:4px;">Announcement</span></div>`
+    + `<div style="padding:20px;">`
+    + `<h3 style="font-size:16px;font-weight:600;color:#ffffff;margin:0 0 10px 0;">${esc(g.title)}</h3>`
+    + `<p style="font-size:13px;color:#d4d4d4;line-height:1.5;margin:0;">${esc(g.body)}</p>`
+    + `</div></div>`).join('');
+  $('#page').innerHTML = `
+    <div style="padding:24px;max-width:900px;margin:0 auto;width:100%;box-sizing:border-box;">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:24px;border-bottom:1px solid #2a2a2a;padding-bottom:16px;">
+        <div>
+          <h1 style="font-size:22px;font-weight:700;color:#ffffff;margin:0 0 4px 0;">General Message Board</h1>
+          <p style="font-size:13px;color:#a3a3a3;margin:0;">Official announcements from the Zeelin Admin — read-only, no replies.</p>
+        </div>
+      </div>
+      ${cards}
+    </div>`;
+  $('#page').addEventListener('click', backLink);
+}
 /* calendar demo store */
 let CAL_VIEW = { y:2026, m:7 };
 const MONTHS = ['January','February','March','April','May','June','July','August','September','October','November','December'];
@@ -426,8 +458,8 @@ function renderSidebar() {
     </div>
     <div style="padding:12px 8px;display:flex;flex-direction:column;gap:4px;font-size:13px;">
       ${navA('home','#/','info','User Guide')}
-      ${navA('community','#/community','feed','Feed / Updates','4')}
-      ${navA('community','#/community','users','Community')}
+      ${navA('board','#/board','feed','General Message Board','4')}
+      ${navA('community','#/community','users','General Community')}
       ${navA('monday','#/monday','heart','Monday Motivations')}
       ${lbl('EVENTS')}
       ${navA('calendar','#/calendar','calendar','Parenting Calendar','3',true)}
@@ -953,7 +985,7 @@ function wirePrevQA(page) {
 function dayCommunityCards(){
   const defs = [
     { k:'monday', icon:'sun', tile:'amber', title:'Monday Motivation', sub:'A fresh brief to start your week', pct:100, cls:'green', href:'/monday', btn:'Read Brief' },
-    { k:'community', icon:'chat', tile:'blue', title:'Community', sub:COMMUNITY.posts.length + ' posts from your cohort', pct:100, cls:'green', href:'/community', btn:'Join Community' },
+    { k:'community', icon:'chat', tile:'blue', title:'General Community', sub:COMMUNITY.posts.length + ' posts from your cohort', pct:100, cls:'green', href:'/community', btn:'Join Now' },
     { k:'calendar', icon:'calendar', tile:'green', title:'Calendar', sub:CALENDAR_EVENTS.length + ' live events scheduled', pct:100, cls:'green', href:'/calendar', btn:'View Calendar' },
     { k:'recordings', icon:'video', tile:'purple', title:'Recordings', sub:RECORDINGS.length + ' replays in the archive', pct:100, cls:'green', href:'/recordings', btn:'Browse Replays' },
   ];
@@ -1686,7 +1718,7 @@ function renderCommunity() {
     <div style="padding:24px;max-width:900px;margin:0 auto;width:100%;box-sizing:border-box;">
       <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:24px;border-bottom:1px solid #2a2a2a;padding-bottom:16px;">
         <div>
-          <h1 style="font-size:22px;font-weight:700;color:#ffffff;margin:0 0 4px 0;">Zeelin Academy Community</h1>
+          <h1 style="font-size:22px;font-weight:700;color:#ffffff;margin:0 0 4px 0;">Zeelin Academy General Community</h1>
           <p style="font-size:13px;color:#a3a3a3;margin:0;">Connect with peers, share exam prep strategies, and discuss coursework.</p>
         </div>
         <div style="display:flex;gap:10px;">
