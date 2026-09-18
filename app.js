@@ -308,10 +308,14 @@ function route() {
 
 /* ============ REFERENCE TREE HELPERS ============ */
 const TREE_WEEKS = [
-  { id: 'w1', label: 'Week 1 - Foundations', days: [1, 2, 3] },
-  { id: 'w2', label: 'Week 2', days: [4, 5] },
-  { id: 'w3', label: 'Week 3', days: [6, 7] },
+  { id: 'w1', label: 'Week 1 - Foundations', days: [1, 2, 3, 4, 5, 6] },
+  { id: 'w2', label: 'Week 2', days: [] },
+  { id: 'w3', label: 'Week 3', days: [] },
+  { id: 'w4', label: 'Week 4', days: [] },
+  { id: 'w5', label: 'Week 5', days: [] },
+  { id: 'w6', label: 'Week 6', days: [] },
 ];
+const TREE_DAYS = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
 const PLUS_D = 'M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-2 10h-4v4h-2v-4H7v-2h4V7h2v4h4v2z';
 const CHEV_D = 'M8.59 16.59L13.17 12 8.59 7.41 10 6l6 6-6 6-1.41-1.41z';
 const FOLDER_D = 'M10 4H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V8c0-1.1-.9-2-2-2h-8l-2-2z';
@@ -324,6 +328,12 @@ window._navDay = function(n){ STATE.day = n; save(); go('/day'); };
 function dayGroupsHTML(r){
   const grp = (label, links) => `<div class="dg-label">${label}</div>` + links.map((l) => `<a class="dg-link${r===l.route?' active':''}" href="${l.href}">${ic(l.icon,13,13)}<span>${l.text}</span></a>`).join('');
   return `<div class="day-groups">`
+    + grp('Community', [
+      { route:'monday', href:'#/monday', icon:'sun', text:'Monday Motivation' },
+      { route:'community', href:'#/community', icon:'chat', text:'Community' },
+      { route:'calendar', href:'#/calendar', icon:'calendar', text:'Calendar' },
+      { route:'recordings', href:'#/recordings', icon:'video', text:'Recordings' },
+    ])
     + grp('Main', [
       { route:'checkin', href:'#/checkin', icon:'user-check', text:'Check-In' },
       { route:'roadmap', href:'#/roadmap', icon:'compass', text:'Reading Roadmap' },
@@ -333,12 +343,6 @@ function dayGroupsHTML(r){
       { route:'book', href:'#'+dayReadingHref(STATE.day), icon:'book', text:'Daily Reading' },
       { route:'videos', href:'#/videos', icon:'video', text:'Video Tutorials' },
       { route:'visual', href:'#/visual/'+deckIdForDay(STATE.day), icon:'layers', text:'Visual Deck' },
-    ])
-    + grp('Community', [
-      { route:'monday', href:'#/monday', icon:'sun', text:'Monday Motivation' },
-      { route:'community', href:'#/community', icon:'chat', text:'Community' },
-      { route:'calendar', href:'#/calendar', icon:'calendar', text:'Calendar' },
-      { route:'recordings', href:'#/recordings', icon:'video', text:'Recordings' },
     ])
     + `</div>`;
 }
@@ -398,12 +402,14 @@ function renderSidebar() {
     const isOpen = open.includes(w.id);
     const days = w.days.map((n) => {
       const act = isDayRoute && STATE.day === n;
+    const wd = TREE_DAYS[(n - 1) % 6] || '';
       let h = `<div style="padding-left:16px;display:flex;flex-direction:column;gap:2px;font-size:12px;">`
         + `<a onclick="window._navDay(${n})" style="display:flex;align-items:center;gap:8px;padding:6px 10px;color:${act?'#d97706':'#a3a3a3'};${act?'background-color:#2a2218;':''}border-radius:4px;text-decoration:none;cursor:pointer;">`
-        + `<svg style="width:12px;height:12px;fill:currentColor;" viewBox="0 0 24 24"><path d="${PLUS_D}"/></svg><span>Day ${n}</span></a>`;
+        + `<svg style="width:12px;height:12px;fill:currentColor;" viewBox="0 0 24 24"><path d="${PLUS_D}"/></svg><span>Day ${n}</span><span style="color:#5a5a5a;">&bull; ${wd}</span></a>`;
       if (n === 1) h += dayGroupsHTML(r);
       return h + `</div>`;
-    }).join('');
+    }).join('')
+    + (!w.days.length ? `<div style="padding:6px 10px 6px 26px;font-size:11.5px;color:#5a5a5a;">Demo &mdash; unlocks in full program</div>` : '');
     const wAct = w.id === 'w1';
     return `<div style="padding-left:16px;display:flex;flex-direction:column;gap:2px;${w.id!=='w1'?'margin-top:4px;':''}">`
       + `<div onclick="window._navTree('${w.id}')" style="display:flex;align-items:center;justify-content:space-between;padding:6px 10px;color:#a3a3a3;border-radius:6px;cursor:pointer;${wAct?'background-color:#222222;':''}">`
@@ -941,6 +947,15 @@ function wirePrevQA(page) {
     }
   });
 }
+function dayCommunityCards(){
+  const defs = [
+    { k:'monday', icon:'sun', tile:'amber', title:'Monday Motivation', sub:'A fresh brief to start your week', pct:100, cls:'green', href:'/monday', btn:'Read Brief' },
+    { k:'community', icon:'chat', tile:'blue', title:'Community', sub:COMMUNITY.posts.length + ' posts from your cohort', pct:100, cls:'green', href:'/community', btn:'Join Community' },
+    { k:'calendar', icon:'calendar', tile:'green', title:'Calendar', sub:CALENDAR_EVENTS.length + ' live events scheduled', pct:100, cls:'green', href:'/calendar', btn:'View Calendar' },
+    { k:'recordings', icon:'video', tile:'purple', title:'Recordings', sub:RECORDINGS.length + ' replays in the archive', pct:100, cls:'green', href:'/recordings', btn:'Browse Replays' },
+  ];
+  return defs.map(dashCard);
+}
 function renderDay() {
   const d = STATE.day;
   const cardData = dayCard(d);
@@ -963,7 +978,7 @@ function renderDay() {
     </div>
 
     <div class="p-grid">
-      ${[checkinCardHTML(), accountabilityCardHTML()].concat(cardData.cards.filter((c) => c.k !== 'checkin').map(dashCard)).join('')}
+      ${[checkinCardHTML(), accountabilityCardHTML()].concat(cardData.cards.filter((c) => c.k !== 'checkin').map(dashCard)).concat(dayCommunityCards()).join('')}
     </div>
 
     <div class="dash-wide-grid">
