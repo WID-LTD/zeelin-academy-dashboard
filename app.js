@@ -323,7 +323,7 @@ function chevSvg(px, open){ return `<svg style="width:${px}px;height:${px}px;fil
 function folderSvg(px){ return `<svg style="width:${px}px;height:${px}px;fill:#d97706;" viewBox="0 0 24 24"><path d="${FOLDER_D}"/></svg>`; }
 function treeOpen(){ try { return JSON.parse(localStorage.getItem('zdash_tree') || '["w1"]'); } catch { return ['w1']; } }
 function treeSave(o){ try { localStorage.setItem('zdash_tree', JSON.stringify(o)); } catch {} }
-window._navTree = function(w){ const o = treeOpen(); const i = o.indexOf(w); if (i > -1) o.splice(i, 1); else o.push(w); treeSave(o); renderSidebar(); };
+window._navTree = function(w){ const o = treeOpen(); const next = (o.length === 1 && o[0] === w) ? [] : [w]; treeSave(next); renderSidebar(); };
 window._navDay = function(n){ STATE.day = n; save(); if((parseHash()[0]||'home')==='day'){ route(); } else { go('/day'); } };
 function dayGroupsHTML(r){
   const grp = (label, links) => `<div class="dg-label">${label}</div>` + links.map((l) => `<a class="dg-link${r===l.route?' active':''}" href="${l.href}">${ic(l.icon,13,13)}<span>${l.text}</span></a>`).join('');
