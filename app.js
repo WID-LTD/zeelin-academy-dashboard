@@ -309,11 +309,11 @@ function route() {
 /* ============ REFERENCE TREE HELPERS ============ */
 const TREE_WEEKS = [
   { id: 'w1', label: 'Week 1 - Foundations', days: [1, 2, 3, 4, 5, 6] },
-  { id: 'w2', label: 'Week 2', days: [] },
-  { id: 'w3', label: 'Week 3', days: [] },
-  { id: 'w4', label: 'Week 4', days: [] },
-  { id: 'w5', label: 'Week 5', days: [] },
-  { id: 'w6', label: 'Week 6', days: [] },
+  { id: 'w2', label: 'Week 2', days: [1, 2, 3, 4, 5, 6] },
+  { id: 'w3', label: 'Week 3', days: [1, 2, 3, 4, 5, 6] },
+  { id: 'w4', label: 'Week 4', days: [1, 2, 3, 4, 5, 6] },
+  { id: 'w5', label: 'Week 5', days: [1, 2, 3, 4, 5, 6] },
+  { id: 'w6', label: 'Week 6', days: [1, 2, 3, 4, 5, 6] },
 ];
 const TREE_DAYS = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
 const PLUS_D = 'M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-2 10h-4v4h-2v-4H7v-2h4V7h2v4h4v2z';
@@ -324,7 +324,7 @@ function folderSvg(px){ return `<svg style="width:${px}px;height:${px}px;fill:#d
 function treeOpen(){ try { return JSON.parse(localStorage.getItem('zdash_tree') || '["w1"]'); } catch { return ['w1']; } }
 function treeSave(o){ try { localStorage.setItem('zdash_tree', JSON.stringify(o)); } catch {} }
 window._navTree = function(w){ const o = treeOpen(); const i = o.indexOf(w); if (i > -1) o.splice(i, 1); else o.push(w); treeSave(o); renderSidebar(); };
-window._navDay = function(n){ STATE.day = n; save(); go('/day'); };
+window._navDay = function(n){ STATE.day = n; save(); if((parseHash()[0]||'home')==='day'){ route(); } else { go('/day'); } };
 function dayGroupsHTML(r){
   const grp = (label, links) => `<div class="dg-label">${label}</div>` + links.map((l) => `<a class="dg-link${r===l.route?' active':''}" href="${l.href}">${ic(l.icon,13,13)}<span>${l.text}</span></a>`).join('');
   return `<div class="day-groups">`
