@@ -323,6 +323,9 @@ function chevSvg(px, open){ return `<svg style="width:${px}px;height:${px}px;fil
 function folderSvg(px){ return `<svg style="width:${px}px;height:${px}px;fill:#d97706;" viewBox="0 0 24 24"><path d="${FOLDER_D}"/></svg>`; }
 function treeOpen(){ try { return JSON.parse(localStorage.getItem('zdash_tree') || '["w1"]'); } catch { return ['w1']; } }
 function treeSave(o){ try { localStorage.setItem('zdash_tree', JSON.stringify(o)); } catch {} }
+function cohortOpen(){ try { const v = localStorage.getItem('zdash_cohort'); return v === null ? true : v === '1'; } catch { return true; } }
+function cohortSave(o){ try { localStorage.setItem('zdash_cohort', o ? '1' : '0'); } catch {} }
+window._navCohort = function(){ cohortSave(!cohortOpen()); renderSidebar(); };
 window._navTree = function(w){ const o = treeOpen(); const next = (o.length === 1 && o[0] === w) ? [] : [w]; treeSave(next); renderSidebar(); };
 window._navDay = function(n){ STATE.day = n; save(); if((parseHash()[0]||'home')==='day'){ route(); } else { go('/day'); } };
 function dayGroupsHTML(r){
@@ -435,15 +438,15 @@ function renderSidebar() {
           <span style="display:flex;align-items:center;gap:10px;">${chevSvg(14,true)}${folderSvg(16)}<span style="font-weight:500;">Core / Classic Business Analysis</span></span>
         </div>
         <div style="padding-left:16px;display:flex;flex-direction:column;gap:2px;">
-          <div style="display:flex;align-items:center;justify-content:space-between;padding:8px 12px;color:#e5e5e5;border-radius:6px;cursor:pointer;">
-            <span style="display:flex;align-items:center;gap:8px;">${chevSvg(12,true)}${folderSvg(14)}<span>Cohort 001 - Parenting</span></span>
+          <div onclick="window._navCohort()" title="Collapse cohort" style="display:flex;align-items:center;justify-content:space-between;padding:8px 12px;color:#e5e5e5;border-radius:6px;cursor:pointer;">
+            <span style="display:flex;align-items:center;gap:8px;">${chevSvg(12,cohortOpen())}${folderSvg(14)}<span>Cohort 001 - Parenting</span></span>
           </div>
-          <div style="padding-left:16px;display:flex;flex-direction:column;gap:2px;">
+          ${cohortOpen() ? `<div style="padding-left:16px;display:flex;flex-direction:column;gap:2px;">
             <div style="display:flex;align-items:center;justify-content:space-between;padding:8px 12px;color:#d4d4d4;border-radius:6px;cursor:pointer;">
               <span style="display:flex;align-items:center;gap:8px;">${chevSvg(12,true)}${folderSvg(14)}<span>MODULE 1</span></span>
             </div>
             ${TREE_WEEKS.map(weekHTML).join('')}
-          </div>
+          </div>` : ''}
         </div>
       </div>
       ${lbl('Account')}
