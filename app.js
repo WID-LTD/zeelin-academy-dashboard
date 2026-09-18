@@ -70,6 +70,7 @@ const DEFAULTS = {
   day: 1, completedDays: [],
   ci: {}, stars: null, improve: '', unclear: '',
   prevDoneDay: {}, prevA: {},
+  commPosts: [], commLikes: {},
 };
 function dateStamp() { const d = new Date(); return d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0'); }
 function nowHMS() { const d = new Date(); return d.toTimeString ? d.toTimeString().slice(0, 8) : '--:--:--'; }
@@ -296,6 +297,7 @@ function route() {
     case 'community': renderCommunity(); return;
     case 'calendar': renderCalendar(); return;
     case 'recordings': renderRecordings(); return;
+    case 'guide': renderGuide(); return;
     case 'support': renderSupport(); return;
     case 'aluminal': renderAluminal(); return;
     case 'monday': renderMonday(); return;
@@ -304,33 +306,78 @@ function route() {
 }
 
 /* ============ SIDEBAR / TOPBAR ============ */
+/* ============ SIDEBAR (reference pixel replica: tree + active states) ============ */
+const REF_P = {
+  info: 'M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-6h2v6zm0-8h-2V7h2v2z',
+  feed: 'M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-5 14H7v-2h7v2zm3-4H7v-2h10v2zm0-4H7V7h10v2z',
+  people: 'M16 11c1.66 0 2.99-1.34 2.99-3S17.66 5 16 5c-1.66 0-3 1.34-3 3s1.34 3 3 3zm-8 0c1.66 0 2.99-1.34 2.99-3S9.66 5 8 5C6.34 5 5 6.34 5 8s1.34 3 3 3zm0 2c-2.33 0-7 1.17-7 3.5V19h14v-2.5c0-2.33-4.67-3.5-7-3.5zm8 0c-.29 0-.62.02-.97.05 1.16.84 1.97 1.97 1.97 3.45V19h6v-2.5c0-2.33-4.67-3.5-7-3.5z',
+  heart: 'M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z',
+  cal: 'M19 3h-1V1h-2v2H8V1H6v2H5c-1.11 0-1.99.9-1.99 2L3 19c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm0 16H5V8h14v11z',
+  rec: 'M18 3v2h-2V3H8v2H6V3H4v18h2v-2h2v2h8v-2h2v2h2V3h-2zM8 17H6v-2h2v2zm0-4H6v-2h2v2zm0-4H6V7h2v2zm10 8h-2v-2h2v2zm0-4h-2v-2h2v2zm0-4h-2V7h2v2z',
+  chev: 'M8.59 16.59L13.17 12 8.59 7.41 10 6l6 6-6 6-1.41-1.41z',
+  folder: 'M10 4H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V8c0-1.1-.9-2-2-2h-8l-2-2z',
+  docplus: 'M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-2 10h-4v4h-2v-4H7v-2h4V7h2v4h4v2z',
+};
+function refSvg(d, size, color, rot) {
+  return `<svg style="width:${size}px;height:${size}px;fill:${color};${rot ? 'transform:rotate(90deg);' : ''}" viewBox="0 0 24 24"><path d="${d}"/></svg>`;
+}
+const TREE_WEEKS = [
+  { n: 1, label: 'Week 1', days: [1, 2] },
+  { n: 2, label: 'Week 2', days: [3, 4] },
+  { n: 3, label: 'Week 3', days: [5, 6, 7] },
+];
 function renderSidebar() {
   const cur = parseHash()[0] || 'home';
+  const activeLink = (key, href, icon, label, badge) => {
+    const on = cur === key;
+    return `<a href="${href}" style="display:flex;align-items:center;${badge ? 'justify-content:space-between;' : 'gap:10px;'}padding:10px 12px;color:${on ? '#ffffff' : '#a3a3a3'};${on ? 'background-color:#262626;font-weight:500;' : ''}border-radius:6px;text-decoration:none;">${badge ? `<div style="display:flex;align-items:center;gap:10px;">${refSvg(icon, 16, 'currentColor')}<span>${label}</span></div><span style="background-color:${on && key === 'calendar' ? '#382818' : '#2a2a2a'};color:${on && key === 'calendar' ? '#d97706' : '#a3a3a3'};font-size:11px;padding:2px 6px;border-radius:10px;">${badge}</span>` : `${refSvg(icon, 16, 'currentColor')}<span>${label}</span>`}</a>`;
+  };
+  const expWeek = (TREE_WEEKS.find((w) => w.days.includes(STATE.day)) || TREE_WEEKS[0]).n;
+  const weeksHtml = TREE_WEEKS.map((w, wi) => {
+    const exp = w.n === expWeek;
+    const daysHtml = exp ? `<div style="padding-left:16px;display:flex;flex-direction:column;gap:2px;font-size:12px;">${w.days.map((d) => {
+      const on = d === STATE.day;
+      return `<a href="#/day" data-day="${d}" style="display:flex;align-items:center;gap:8px;padding:6px 10px;color:${on ? '#d97706' : '#a3a3a3'};${on ? 'background-color:#2a2218;' : ''}border-radius:4px;text-decoration:none;">${refSvg(REF_P.docplus, 12, 'currentColor')}<span>Day ${d}</span></a>`;
+    }).join('')}</div>` : '';
+    return `<div style="padding-left:16px;display:flex;flex-direction:column;gap:2px;${wi > 0 ? 'margin-top:4px;' : ''}"><div data-week="${w.n}" style="display:flex;align-items:center;justify-content:space-between;padding:6px 10px;color:#a3a3a3;border-radius:6px;cursor:pointer;${exp ? 'background-color:#222222;' : ''}"><div style="display:flex;align-items:center;gap:6px;">${refSvg(REF_P.chev, 10, '#a3a3a3', exp)}<span style="font-size:12px;${exp && w.n === 1 ? 'font-weight:500;color:#fff;' : ''}">${w.label}</span></div></div>${daysHtml}</div>`;
+  }).join('');
+  const extraSection = cur === 'support'
+    ? `<div style="padding:16px 12px 6px 12px;font-size:11px;font-weight:600;color:#737373;letter-spacing:0.5px;">SUPPORT</div><a href="#/support" style="display:flex;align-items:center;gap:10px;padding:10px 12px;color:#ffffff;background-color:#262626;border-radius:6px;text-decoration:none;font-weight:500;">${refSvg(REF_P.info, 16, 'currentColor')}<span>Get Support</span></a>`
+    : cur === 'aluminal'
+      ? `<div style="padding:16px 12px 6px 12px;font-size:11px;font-weight:600;color:#737373;letter-spacing:0.5px;">ALUMINAL</div><a href="#/aluminal" style="display:flex;align-items:center;gap:10px;padding:10px 12px;color:#ffffff;background-color:#262626;border-radius:6px;text-decoration:none;font-weight:500;">${refSvg(REF_P.info, 16, 'currentColor')}<span>Aluminal</span></a>`
+      : '';
   $('#sidebar').innerHTML = `
-    <nav class="snav">
-      <div class="snav-label">Main</div>
-      <a href="#/checkin" data-route="checkin">${ic('user-check', 16, 16)}<span>Check-In</span></a>
-      <a href="#/roadmap" data-route="roadmap">${ic('compass', 16, 16)}<span>Reading Roadmap</span></a>
-      <a href="#/accountability" data-route="accountability">${ic('chart', 16, 16)}<span>Accountability</span></a>
-
-      <div class="snav-label">Learning</div>
-      <a href="${dayReadingHref(STATE.day)}" data-route="book">${ic('book', 16, 16)}<span>Daily Reading</span></a>
-      <a href="#/videos" data-route="videos">${ic('video', 16, 16)}<span>Video Tutorials</span></a>
-      <a href="#/visual/${deckIdForDay(STATE.day)}" data-route="visual">${ic('layers', 16, 16)}<span>Visual Deck</span></a>
-
-      <div class="snav-label">Community</div>
-      <a href="#/monday" data-route="monday">${ic('sun', 16, 16)}<span>Monday Motivation</span></a>
-      <a href="#/community" data-route="community">${ic('chat', 16, 16)}<span>Community</span></a>
-      <a href="#/calendar" data-route="calendar">${ic('calendar', 16, 16)}<span>Calendar</span></a>
-      <a href="#/recordings" data-route="recordings">${ic('video', 16, 16)}<span>Recordings</span></a>
-
-      <div class="snav-label">Account</div>
-      <a href="#/profile" data-route="profile">${ic('user', 16, 16)}<span>Profile &amp; Insights</span></a>
-      <a href="#/support" data-route="support">${ic('help', 16, 16)}<span>Support</span></a>
-      <a href="#/aluminal" data-route="aluminal">${ic('crown', 16, 16)}<span>Aluminal</span></a>
-    </nav>
-    <div class="sidebar-badge">Level ${USER.level} Learner<br><b>${STATE.xp.toLocaleString()} XP</b> total</div>`;
-  setActiveSidebar(cur);
+    <div style="padding:20px 16px;border-bottom:1px solid #2a2a2a;display:flex;align-items:center;gap:10px;">
+      <div style="width:28px;height:28px;background-color:#d97706;border-radius:6px;display:flex;align-items:center;justify-content:center;font-weight:bold;color:#fff;font-size:14px;">Z</div>
+      <span style="font-size:14px;font-weight:600;color:#ffffff;letter-spacing:-0.2px;line-height:1.2;">Zeelin Academy Exam Readiness System</span>
+    </div>
+    <div style="padding:12px 8px;display:flex;flex-direction:column;gap:4px;font-size:13px;">
+      ${activeLink('guide', '#/guide', REF_P.info, 'User Guide')}
+      ${activeLink('home', '#/', REF_P.feed, 'Feed / Updates', '4')}
+      ${activeLink('community', '#/community', REF_P.people, 'Community')}
+      ${activeLink('monday', '#/monday', REF_P.heart, 'Monday Motivations')}
+      <div style="padding:16px 12px 6px 12px;font-size:11px;font-weight:600;color:#737373;letter-spacing:0.5px;">EVENTS</div>
+      ${activeLink('calendar', '#/calendar', REF_P.cal, 'Parenting Calendar', '3')}
+      ${activeLink('recordings', '#/recordings', REF_P.rec, 'Recordings')}
+      <div style="padding:16px 12px 6px 12px;font-size:11px;font-weight:600;color:#737373;letter-spacing:0.5px;">CORE / CLASSIC BUSINESS ANALYSIS</div>
+      <div style="display:flex;flex-direction:column;">
+        <div style="display:flex;align-items:center;justify-content:space-between;padding:10px 12px;color:#ffffff;border-radius:6px;cursor:pointer;">
+          <div style="display:flex;align-items:center;gap:10px;">${refSvg(REF_P.chev, 14, '#a3a3a3', true)}${refSvg(REF_P.folder, 16, '#d97706')}<span style="font-weight:500;">Core / Classic Business Analysis</span></div>
+        </div>
+        <div style="padding-left:16px;display:flex;flex-direction:column;gap:2px;">
+          <div style="display:flex;align-items:center;justify-content:space-between;padding:8px 12px;color:#e5e5e5;border-radius:6px;cursor:pointer;">
+            <div style="display:flex;align-items:center;gap:8px;">${refSvg(REF_P.chev, 12, '#a3a3a3', true)}${refSvg(REF_P.folder, 14, '#d97706')}<span>Cohort 001 - Parenting</span></div>
+          </div>
+          <div style="padding-left:16px;display:flex;flex-direction:column;gap:2px;">
+            <div style="display:flex;align-items:center;justify-content:space-between;padding:8px 12px;color:#d4d4d4;border-radius:6px;cursor:pointer;">
+              <div style="display:flex;align-items:center;gap:8px;">${refSvg(REF_P.chev, 12, '#a3a3a3', true)}${refSvg(REF_P.folder, 14, '#d97706')}<span>Module 1</span></div>
+            </div>
+            ${weeksHtml}
+          </div>
+        </div>
+      </div>
+      ${extraSection}
+    </div>`;
 }
 function renderTopbar() {
   const claimed = claimedToday();
@@ -1526,44 +1573,268 @@ function renderProfile() {
 }
 
 /* ============ SECONDARY PAGES ============ */
-function renderCommunity() {
-  $('#page').innerHTML = `
-    ${backBtn()}
-    <div class="page-header"><div class="eyebrow">Your network</div><h1>Community Feed</h1></div>
-    <div class="post-composer">${ic('user', 16, 16)}<textarea placeholder="New post"></textarea></div>
-    <div class="card mt16">
-      ${COMMUNITY.posts.map((p) => `<div class="post-card">${ic('users', 16, 16)}<div><div class="post-author">${esc(p.author)} <span class="pill ${p.tagCls}">${esc(p.tag)}</span></div><div class="post-body">${esc(p.body)}</div><div class="post-react">${esc(p.reacts)} - ${esc(p.time)}</div></div></div>`).join('')}
-    </div>`;
-  $('#page').addEventListener('click', backLink);
-}
-function renderCalendar() {
-  const ev = CALENDAR_EVENTS;
-  const days = [];
-  for (let i = 1; i <= 28; i++) days.push(i);
-  const todayCell = 4;
-  $('#page').innerHTML = `
-    ${backBtn()}
-    <div class="page-header"><div class="eyebrow">Schedule</div><h1>Calendar</h1></div>
-    <div class="cal-head"><span class="pill pill-amber">August 2026</span><div class="cal-btns"><button class="btn btn-sm btn-outline">Add</button><button class="btn btn-sm btn-outline">View</button></div></div>
-    <div class="cal-grid">
-      ${['Su', 'Mo', 'Tu', 'We', 'Th', 'Fr', 'Sa'].map((d) => `<div class="cal-dow">${d}</div>`).join('')}
-      ${Array.from({ length: 6 }).map(() => `<div class="cal-day pm"><span class="d"></span></div>`).join('')}
-      ${Array.from({ length: 28 }).map((_, i) => {
-        const n = i + 1;
-        const hasEvent = ev.some((e) => e.date === n);
-        const dot = ev.filter((e) => e.date === n).map((e) => `<span class="cal-dot ${e.color}"></span>`).join('');
-        return `<div class="cal-day${n === todayCell ? ' today' : ''}"><span class="d">${n}</span>${dot}</div>`;
-      }).join('')}
+/* ============ COMMUNITY (reference 02 pixel replica, demo-functional) ============ */
+const GUIDE_POSTS = [
+  { id: 'g1', init: 'CN', color: '#059669', name: 'Chiamaka N.', meta: 'Cohort 001 Student &bull; 4 hours ago', tag: 'Study Group', tagBg: '#064e3b', tagColor: '#34d399', title: 'Looking for partners to review Business Analysis Foundation Day 1 & 2', body: 'Hi everyone! I am putting together a virtual review session this weekend to go over requirements elicitation techniques. Let me know if you want to join!', likes: 14, comments: 6 },
+  { id: 'g2', init: 'MA', color: '#7c3aed', name: 'Marcus Adeleke', meta: 'Exam Candidate &bull; 1 day ago', tag: 'General', tagBg: '#2e1065', tagColor: '#c084fc', title: 'Exam readiness checklist tips that saved my preparation', body: 'Just wanted to drop a quick note thanking the mentors. Following the structured weekly coursework and checking the recordings daily makes the practice exams much easier to navigate.', likes: 28, comments: 11 },
+];
+function guidePostCard(p) {
+  const liked = !!(STATE.commLikes || {})[p.id];
+  const n = p.likes + (liked ? 1 : 0);
+  return `<div style="background-color:#181818;border:1px solid #2a2a2a;border-radius:10px;overflow:hidden;margin-bottom:20px;">
+    <div style="padding:16px 20px;border-bottom:1px solid #2a2a2a;display:flex;align-items:center;justify-content:space-between;">
+      <div style="display:flex;align-items:center;gap:12px;">
+        <div style="width:36px;height:36px;border-radius:50%;background-color:${p.color};display:flex;align-items:center;justify-content:center;font-weight:bold;color:white;font-size:14px;">${esc(p.init)}</div>
+        <div><div style="font-size:14px;font-weight:600;color:#ffffff;">${esc(p.name)}</div><div style="font-size:12px;color:#a3a3a3;">${p.meta}</div></div>
+      </div>
+      <span style="background-color:${p.tagBg};color:${p.tagColor};font-size:11px;font-weight:600;padding:4px 8px;border-radius:4px;">${esc(p.tag)}</span>
     </div>
-    ${ev.map((e) => `<div class="event-row"><div class="event-dcol ${e.dcol}"><div class="bd">${e.date}</div><div class="bt">${e.dow}</div></div><div class="event-body"><div class="event-title">${esc(e.title)}</div><div class="event-meta">${esc(e.meta)}</div><div class="pill ${e.pills[0].cls}">${esc(e.pills[0].text)}</div></div></div>`).join('')}`;
-  $('#page').addEventListener('click', backLink);
+    <div style="padding:20px;">
+      <h3 style="font-size:16px;font-weight:600;color:#ffffff;margin:0 0 10px 0;">${esc(p.title)}</h3>
+      <p style="font-size:13px;color:#d4d4d4;line-height:1.5;margin:0 0 16px 0;">${esc(p.body)}</p>
+      <div style="display:flex;gap:16px;font-size:13px;color:#a3a3a3;border-top:1px solid #262626;padding-top:12px;">
+        <span data-like="${p.id}" style="cursor:pointer;display:flex;align-items:center;gap:6px;color:${liked ? '#d97706' : '#a3a3a3'};">&#128077; ${n} Likes</span>
+        <span style="display:flex;align-items:center;gap:6px;">&#128172; ${p.comments} Comments</span>
+      </div>
+    </div>
+  </div>`;
 }
-function renderRecordings() {
+function renderCommunity() {
+  if (!Array.isArray(STATE.commPosts)) STATE.commPosts = [];
+  if (!STATE.commLikes || typeof STATE.commLikes !== 'object') STATE.commLikes = {};
+  const mine = STATE.commPosts.map((p) => guidePostCard(p)).join('');
   $('#page').innerHTML = `
-    ${backBtn()}
-    <div class="page-header"><div class="eyebrow">Playbacks</div><h1>Event Recordings & Archives</h1></div>
-    ${RECORDINGS.map((r) => `<div class="rec-card"><div class="rec-thumb"><img src="${r.cover}" alt=""/><span class="play-ov"><span class="pb">${ic('play', 24, 24)}</span></span></div><div><div class="feed-title">${esc(r.title)}</div><div class="rec-meta">${esc(r.meta)} - <span class="pill ${r.badge.cls}">${esc(r.badge.text)}</span></div><div class="rec-meta mt8"><img class="rec-av" src="${r.host.avatar}" alt=""/><span>${esc(r.host.name)}</span></div><div class="v-btns"><button class="btn btn-outline">Replay Recording</button></div></div></div>`).join('')}`;
-  $('#page').addEventListener('click', backLink);
+    <div style="padding:24px;max-width:900px;margin:0 auto;width:100%;box-sizing:border-box;">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:24px;border-bottom:1px solid #2a2a2a;padding-bottom:16px;">
+        <div>
+          <h1 style="font-size:22px;font-weight:700;color:#ffffff;margin:0 0 4px 0;">Zeelin Academy Community</h1>
+          <p style="font-size:13px;color:#a3a3a3;margin:0;">Connect with peers, share exam prep strategies, and discuss coursework.</p>
+        </div>
+        <div style="display:flex;gap:10px;">
+          <button data-newpost style="background-color:#d97706;color:#ffffff;border:none;padding:8px 16px;border-radius:6px;font-size:13px;font-weight:600;cursor:pointer;">New Post</button>
+        </div>
+      </div>
+      <div data-newpost style="background-color:#181818;border:1px solid #2a2a2a;border-radius:10px;padding:16px;margin-bottom:20px;display:flex;gap:12px;align-items:center;cursor:pointer;">
+        <div style="width:36px;height:36px;border-radius:50%;background-color:#d97706;display:flex;align-items:center;justify-content:center;font-weight:bold;color:white;font-size:14px;">ZA</div>
+        <div style="flex:1;background-color:#222222;border:1px solid #2e2e2e;border-radius:6px;padding:10px 14px;color:#737373;font-size:13px;">Share your thoughts, questions or study tips with the community...</div>
+      </div>
+      ${mine}
+      ${GUIDE_POSTS.map((p) => guidePostCard(p)).join('')}
+    </div>`;
+  $('#page').addEventListener('click', (e) => {
+    backLink(e);
+    const like = e.target.closest('[data-like]');
+    if (like) {
+      const id = like.dataset.like;
+      STATE.commLikes[id] = !STATE.commLikes[id];
+      save(); route(); return;
+    }
+    if (e.target.closest('[data-newpost]')) {
+      const ov = openModal(`<div style="font-size:16px;font-weight:700;color:#fff;margin-bottom:12px;">New Post</div>
+        <input id="npTitle" class="form-input" placeholder="Post title..." style="margin-bottom:10px;"/>
+        <textarea id="npBody" class="form-textarea" rows="4" placeholder="Share your thoughts, questions or study tips..."></textarea>
+        <div style="display:flex;justify-content:flex-end;gap:10px;margin-top:14px;"><button class="btn btn-outline" id="npCancel">Cancel</button><button class="btn btn-gradient" id="npPost">Post</button></div>`);
+      $('#npCancel', ov).addEventListener('click', closeDashOverlay);
+      $('#npPost', ov).addEventListener('click', () => {
+        const t = $('#npTitle', ov).value.trim(), b = $('#npBody', ov).value.trim();
+        if (!t || !b) { toast('Add a title and message first'); return; }
+        STATE.commPosts.unshift({ id: 'u' + Date.now(), init: 'JD', color: '#d97706', name: 'John Doe (You)', meta: 'Just now', tag: 'Intro', tagBg: '#382818', tagColor: '#d97706', title: t, body: b, likes: 0, comments: 0 });
+        save(); closeDashOverlay(); toast('Posted to community'); route();
+      });
+    }
+  });
+}
+/* ============ USER GUIDE (reference 01 pixel replica) ============ */
+function renderGuide() {
+  $('#page').innerHTML = `
+    <div style="padding:24px;max-width:900px;margin:0 auto;width:100%;box-sizing:border-box;">
+      <div style="font-size:13px;color:#a3a3a3;margin-bottom:12px;display:flex;align-items:center;gap:6px;"><span>User Guide</span><span>/</span><span style="color:#ffffff;">Day 1 Overview</span></div>
+      <div style="background:linear-gradient(135deg,#2c1a0e 0%,#1a1a1a 100%);border:1px solid #3d2411;border-radius:12px;padding:40px 20px;text-align:center;margin-bottom:24px;position:relative;overflow:hidden;">
+        <h1 style="font-size:28px;font-weight:700;color:#ffffff;margin:0 0 12px 0;letter-spacing:-0.5px;">Zeelin Academy Exam Readiness</h1>
+        <div style="display:inline-block;background-color:#b45309;color:#ffffff;font-size:13px;font-weight:600;padding:8px 16px;border-radius:6px;margin-bottom:16px;">Start here. Five minutes now saves hours later.</div>
+        <p style="font-size:13px;color:#d4d4d4;max-width:500px;margin:0 auto;line-height:1.5;">A quick tour of your Exam Readiness Hub so you know exactly where everything lives, and how to get the most out of the next weeks.</p>
+      </div>
+      <div style="background-color:#181818;border:1px solid #2a2a2a;border-radius:10px;overflow:hidden;margin-bottom:24px;">
+        <div style="padding:20px;border-bottom:1px solid #2a2a2a;display:flex;align-items:center;justify-content:space-between;">
+          <div style="display:flex;align-items:center;gap:12px;">
+            <div style="width:36px;height:36px;border-radius:50%;background-color:#d97706;display:flex;align-items:center;justify-content:center;font-weight:bold;color:white;font-size:14px;">ZA</div>
+            <div><div style="font-size:14px;font-weight:600;color:#ffffff;">Zeelin Admin | Support Team</div><div style="font-size:12px;color:#a3a3a3;">Lead Educator &bull; Aug 1</div></div>
+          </div>
+          <div style="display:flex;gap:8px;">
+            <span style="background-color:#262626;color:#d97706;font-size:11px;font-weight:600;padding:4px 8px;border-radius:4px;">Admin</span>
+            <span style="background-color:#262626;color:#38bdf8;font-size:11px;font-weight:600;padding:4px 8px;border-radius:4px;">Navigator</span>
+          </div>
+        </div>
+        <div style="padding:20px;">
+          <h2 style="font-size:18px;font-weight:600;color:#ffffff;margin:0 0 16px 0;">MUST WATCH FIRST! Welcome to Zeelin Academy</h2>
+          <div data-watch="v1" style="width:100%;height:320px;border-radius:8px;overflow:hidden;background-color:#262626;position:relative;cursor:pointer;">
+            <img src="${VIDEOS[0].thumb}" alt="Learning platform preview" style="width:100%;height:100%;object-fit:cover;"/>
+            <div style="position:absolute;inset:0;background:rgba(0,0,0,0.3);display:flex;align-items:center;justify-content:center;">
+              <div style="width:60px;height:60px;background-color:#d97706;border-radius:50%;display:flex;align-items:center;justify-content:center;box-shadow:0 4px 12px rgba(0,0,0,0.5);cursor:pointer;">
+                <svg style="width:24px;height:24px;fill:white;margin-left:3px;" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>`;
+  $('#page').addEventListener('click', (e) => {
+    backLink(e);
+    const w = e.target.closest('[data-watch]');
+    if (w) go('/watch/' + w.dataset.watch);
+  });
+}
+/* ============ CALENDAR (reference 04 pixel replica, demo-functional) ============ */
+let calView = { m: 7, y: 2026 };
+const MON_ABBR = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+const MON_FULL = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
+function calEventDotColor(c) { return c === 'blue' ? '#38bdf8' : '#d97706'; }
+function renderCalendar() {
+  const { m, y } = calView;
+  const first = new Date(y, m, 1);
+  const startOffset = (first.getDay() + 6) % 7;
+  const dim = new Date(y, m + 1, 0).getDate();
+  const prevDim = new Date(y, m, 0).getDate();
+  const cells = [];
+  for (let i = 0; i < startOffset; i++) cells.push({ n: prevDim - startOffset + 1 + i, muted: true });
+  for (let n = 1; n <= dim; n++) cells.push({ n, muted: false });
+  let nx = 1;
+  while (cells.length % 7 !== 0) { cells.push({ n: nx++, muted: true, next: true }); }
+  const evs = CALENDAR_EVENTS.filter((e) => (e.month || 8) - 1 === m && (e.year || 2026) === y);
+  const dotsFor = (n) => evs.filter((e) => e.date === n).map((e) => `<div style="width:4px;height:4px;background-color:${calEventDotColor(e.color)};border-radius:50%;margin:2px auto 0 auto;"></div>`).join('');
+  const tagStyle = (e) => e.color === 'blue' ? 'background-color:#1e293b;color:#38bdf8;' : 'background-color:#382818;color:#d97706;';
+  $('#page').innerHTML = `
+    <div style="padding:24px;max-width:900px;margin:0 auto;width:100%;box-sizing:border-box;">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:24px;border-bottom:1px solid #2a2a2a;padding-bottom:16px;">
+        <div>
+          <h1 style="font-size:22px;font-weight:700;color:#ffffff;margin:0 0 4px 0;"> Calendar &amp; Live Events</h1>
+          <p style="font-size:13px;color:#a3a3a3;margin:0;">Interactive schedule view for ${MON_FULL[m]} ${y} live workshops and Q&amp;A sessions.</p>
+        </div>
+        <div style="display:flex;gap:10px;">
+          <span style="background-color:#262626;color:#d97706;font-size:12px;font-weight:600;padding:6px 12px;border-radius:6px;border:1px solid #3d2411;">${MON_FULL[m]} ${y}</span>
+        </div>
+      </div>
+      <div style="background-color:#181818;border:1px solid #2a2a2a;border-radius:10px;padding:20px;margin-bottom:24px;">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;">
+          <span style="font-size:15px;font-weight:600;color:#ffffff;">${MON_FULL[m]} ${y}</span>
+          <div style="display:flex;gap:6px;">
+            <button data-calnav="-1" style="background-color:#262626;color:#a3a3a3;border:1px solid #333333;padding:4px 10px;border-radius:4px;font-size:12px;cursor:pointer;">&lt;</button>
+            <button data-calnav="1" style="background-color:#262626;color:#a3a3a3;border:1px solid #333333;padding:4px 10px;border-radius:4px;font-size:12px;cursor:pointer;">&gt;</button>
+          </div>
+        </div>
+        <div style="display:grid;grid-template-columns:repeat(7,1fr);text-align:center;font-size:12px;font-weight:600;color:#737373;margin-bottom:8px;padding-bottom:8px;border-bottom:1px solid #262626;">
+          <span>Mon</span><span>Tue</span><span>Wed</span><span>Thu</span><span>Fri</span><span>Sat</span><span>Sun</span>
+        </div>
+        <div style="display:grid;grid-template-columns:repeat(7,1fr);gap:4px;text-align:center;font-size:12px;">
+          ${cells.map((c) => `<div style="padding:10px;color:${c.muted ? '#404040' : '#a3a3a3'};">${c.next ? '' : c.n}${(!c.muted && !c.next) ? dotsFor(c.n) : ''}</div>`).join('')}
+        </div>
+      </div>
+      ${evs.length ? evs.map((e) => `
+      <div style="background-color:#181818;border:1px solid #2a2a2a;border-radius:10px;overflow:hidden;margin-bottom:16px;display:flex;align-items:stretch;">
+        <div style="background-color:#26170b;border-right:1px solid #3d2411;padding:20px;display:flex;flex-direction:column;align-items:center;justify-content:center;min-width:90px;text-align:center;">
+          <span style="font-size:11px;font-weight:600;color:#d97706;text-transform:uppercase;letter-spacing:0.5px;">${MON_ABBR[(e.month || 8) - 1]}</span>
+          <span style="font-size:24px;font-weight:700;color:#ffffff;line-height:1.1;">${String(e.date).padStart(2, '0')}</span>
+          <span style="font-size:11px;color:#a3a3a3;">${esc(e.dow || '')} &bull; ${esc((e.meta || '').split('—')[0].split('·')[0].trim())}</span>
+        </div>
+        <div style="padding:20px;flex:1;display:flex;flex-direction:column;justify-content:center;">
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;">
+            <h3 style="font-size:16px;font-weight:600;color:#ffffff;margin:0;">${esc(e.title)}</h3>
+            <span style="${tagStyle(e)}font-size:11px;font-weight:600;padding:3px 8px;border-radius:4px;">${esc((e.pills && e.pills[0] && e.pills[0].text) || 'Session')}</span>
+          </div>
+          <p style="font-size:13px;color:#d4d4d4;margin:0 0 12px 0;">${esc(e.meta)}</p>
+          <div style="display:flex;gap:12px;">
+            <button data-addcal="${e.id}" style="background-color:#d97706;color:#ffffff;border:none;padding:6px 14px;border-radius:4px;font-size:12px;font-weight:600;cursor:pointer;">Add to Calendar</button>
+            <button data-evdetail="${e.id}" style="background-color:#262626;color:#a3a3a3;border:1px solid #333333;padding:6px 14px;border-radius:4px;font-size:12px;font-weight:600;cursor:pointer;">View Details</button>
+          </div>
+        </div>
+      </div>`).join('') : `<p style="color:#737373;font-size:13px;text-align:center;padding:20px;">No sessions scheduled for ${MON_FULL[m]} ${y} yet.</p>`}
+    </div>`;
+  $('#page').addEventListener('click', (e) => {
+    backLink(e);
+    const nav = e.target.closest('[data-calnav]');
+    if (nav) {
+      let m2 = calView.m + Number(nav.dataset.calnav), y2 = calView.y;
+      if (m2 < 0) { m2 = 11; y2--; } if (m2 > 11) { m2 = 0; y2++; }
+      calView = { m: m2, y: y2 }; route(); return;
+    }
+    const add = e.target.closest('[data-addcal]');
+    if (add) {
+      const ev = CALENDAR_EVENTS.find((x) => x.id === add.dataset.addcal);
+      if (ev) {
+        const dt = `${ev.year || 2026}${String(ev.month || 8).padStart(2, '0')}${String(ev.date).padStart(2, '0')}`;
+        const ics = ['BEGIN:VCALENDAR', 'VERSION:2.0', 'BEGIN:VEVENT', `UID:${ev.id}@zeelin.academy`, `DTSTART:${dt}T140000`, `SUMMARY:${ev.title}`, 'END:VEVENT', 'END:VCALENDAR'].join('\r\n');
+        const a = document.createElement('a');
+        a.href = URL.createObjectURL(new Blob([ics], { type: 'text/calendar' }));
+        a.download = 'zeelin-' + ev.id + '.ics';
+        document.body.appendChild(a); a.click(); a.remove();
+      }
+      toast('Added to calendar'); return;
+    }
+    const det = e.target.closest('[data-evdetail]');
+    if (det) {
+      const ev = CALENDAR_EVENTS.find((x) => x.id === det.dataset.evdetail);
+      if (!ev) return;
+      const ov = openModal(`<div style="font-size:17px;font-weight:700;color:#fff;margin-bottom:8px;">${esc(ev.title)}</div>
+        <div style="font-size:13px;color:#a3a3a3;margin-bottom:12px;">${esc(ev.meta)}</div>
+        <div style="display:flex;justify-content:flex-end;margin-top:14px;"><button class="btn btn-gradient" id="evOk">Got it</button></div>`);
+      $('#evOk', ov).addEventListener('click', closeDashOverlay);
+    }
+  });
+}
+let recFilter = 'All';
+function renderRecordings() {
+  const cats = ['All', ...new Set(RECORDINGS.map((r) => r.badge.text))];
+  const list = recFilter === 'All' ? RECORDINGS : RECORDINGS.filter((r) => r.badge.text === recFilter);
+  const hostMeta = [
+    { init: 'ZA', color: '#d97706', sub: 'Live Workshop Replay &bull; Recorded Jul 28', tag: 'Current Event', tagBg: '#382818', tagColor: '#d97706' },
+    { init: 'OE', color: '#2563eb', sub: 'Previous Workshop Replay &bull; Recorded Jul 20', tag: 'Previous Event', tagBg: '#1e293b', tagColor: '#38bdf8' },
+  ];
+  $('#page').innerHTML = `
+    <div style="padding:24px;max-width:900px;margin:0 auto;width:100%;box-sizing:border-box;">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:24px;border-bottom:1px solid #2a2a2a;padding-bottom:16px;">
+        <div>
+          <h1 style="font-size:22px;font-weight:700;color:#ffffff;margin:0 0 4px 0;">Event Recordings &amp; Archives</h1>
+          <p style="font-size:13px;color:#a3a3a3;margin:0;">Access video replays of current events, previous workshops, and cohort sessions.</p>
+        </div>
+        <div style="display:flex;gap:10px;">
+          <select id="recCat" style="background-color:#181818;border:1px solid #2a2a2a;padding:6px 12px;border-radius:6px;font-size:13px;color:#a3a3a3;cursor:pointer;font-family:inherit;">${cats.map((c) => `<option value="${c}"${c === recFilter ? ' selected' : ''}>${c === 'All' ? 'All Categories' : esc(c)}</option>`).join('')}</select>
+        </div>
+      </div>
+      ${list.map((r, i) => {
+        const hm = hostMeta[i % hostMeta.length];
+        const vid = VIDEOS[i % VIDEOS.length].id;
+        return `<div style="background-color:#181818;border:1px solid #2a2a2a;border-radius:10px;overflow:hidden;margin-bottom:24px;">
+        <div style="padding:20px;border-bottom:1px solid #2a2a2a;display:flex;align-items:center;justify-content:space-between;">
+          <div style="display:flex;align-items:center;gap:12px;">
+            <div style="width:36px;height:36px;border-radius:50%;background-color:${hm.color};display:flex;align-items:center;justify-content:center;font-weight:bold;color:white;font-size:14px;">${hm.init}</div>
+            <div>
+              <div style="font-size:14px;font-weight:600;color:#ffffff;">${esc(r.host.name)}</div>
+              <div style="font-size:12px;color:#a3a3a3;">${hm.sub}</div>
+            </div>
+          </div>
+          <span style="background-color:${hm.tagBg};color:${hm.tagColor};font-size:11px;font-weight:600;padding:4px 8px;border-radius:4px;">${hm.tag}</span>
+        </div>
+        <div style="padding:20px;">
+          <h2 style="font-size:18px;font-weight:600;color:#ffffff;margin:0 0 16px 0;">${esc(r.title)}</h2>
+          <div data-playrec="${vid}" style="width:100%;height:320px;border-radius:8px;overflow:hidden;background-color:#262626;position:relative;cursor:pointer;">
+            <img src="${r.cover}" alt="Recording video thumbnail" style="width:100%;height:100%;object-fit:cover;"/>
+            <div style="position:absolute;inset:0;background:rgba(0,0,0,0.3);display:flex;align-items:center;justify-content:center;">
+              <div style="width:60px;height:60px;background-color:#d97706;border-radius:50%;display:flex;align-items:center;justify-content:center;box-shadow:0 4px 12px rgba(0,0,0,0.5);cursor:pointer;">
+                <svg style="width:24px;height:24px;fill:white;margin-left:3px;" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>`;
+      }).join('') || '<p style="color:#737373;font-size:13px;text-align:center;padding:20px;">No recordings in this category.</p>'}
+    </div>`;
+  $('#page').addEventListener('click', (e) => {
+    backLink(e);
+    const pr = e.target.closest('[data-playrec]');
+    if (pr) go('/watch/' + pr.dataset.playrec);
+  });
+  const sel = $('#recCat');
+  if (sel) sel.addEventListener('change', (e) => { recFilter = e.target.value; route(); });
 }
 function renderSupport() {
   $('#page').innerHTML = `
@@ -1593,6 +1864,12 @@ function renderMonday() {
 
 /* ============ BOOT ============ */
 window.addEventListener('hashchange', () => { route(); });
+$('#sidebar').addEventListener('click', (e) => {
+  const day = e.target.closest('[data-day]');
+  if (day) { e.preventDefault(); STATE.day = Number(day.dataset.day); save(); go('/day'); return; }
+  const week = e.target.closest('[data-week]');
+  if (week) { e.preventDefault(); const w = TREE_WEEKS.find((x) => x.n === Number(week.dataset.week)); if (w) { STATE.day = w.days[0]; save(); go('/day'); } }
+});
 renderSidebar();
 renderTopbar();
 route();
