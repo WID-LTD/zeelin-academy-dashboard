@@ -297,6 +297,7 @@ function route() {
     case 'accountability': renderAccountability(); return;
     case 'roadmap': renderRoadmap(); return;
     case 'board': renderBoard(); return;
+    case 'guide': renderGuide(); return;
     case 'community': renderCommunity(); return;
     case 'calendar': renderCalendar(); return;
     case 'recordings': renderRecordings(); return;
@@ -457,7 +458,7 @@ function renderSidebar() {
       <span style="font-size:14px;font-weight:600;color:#ffffff;letter-spacing:-0.2px;line-height:1.2;">Zeelin Academy Exam Readiness System</span>
     </div>
     <div style="padding:12px 8px;display:flex;flex-direction:column;gap:4px;font-size:13px;">
-      ${navA('home','#/','info','User Guide')}
+      ${navA('guide','#/guide','info','User Guide')}
       ${navA('board','#/board','feed','General Message Board','4')}
       ${navA('community','#/community','users','General Community')}
       ${navA('monday','#/monday','heart','Monday Motivations')}
@@ -1691,6 +1692,47 @@ function renderProfile() {
 }
 
 /* ============ SECONDARY PAGES ============ */
+function renderGuide() {
+  $('#page').innerHTML = `
+    <div style="padding:24px;max-width:900px;margin:0 auto;width:100%;box-sizing:border-box;">
+      <div style="font-size:13px;color:#a3a3a3;margin-bottom:12px;display:flex;align-items:center;gap:6px;">
+        <span>User Guide</span><span>/</span><span style="color:#ffffff;">Day 1 Overview</span>
+      </div>
+      <div style="background:linear-gradient(135deg, #2c1a0e 0%, #1a1a1a 100%);border:1px solid #3d2411;border-radius:12px;padding:40px 20px;text-align:center;margin-bottom:24px;position:relative;overflow:hidden;">
+        <h1 style="font-size:28px;font-weight:700;color:#ffffff;margin:0 0 12px 0;letter-spacing:-0.5px;">Zeelin Academy Exam Readiness</h1>
+        <div style="display:inline-block;background-color:#b45309;color:#ffffff;font-size:13px;font-weight:600;padding:8px 16px;border-radius:6px;margin-bottom:16px;">Start here. Five minutes now saves hours later.</div>
+        <p style="font-size:13px;color:#d4d4d4;max-width:500px;margin:0 auto;line-height:1.5;">A quick tour of your Exam Readiness Hub so you know exactly where everything lives, and how to get the most out of the next weeks.</p>
+      </div>
+      <div style="background-color:#181818;border:1px solid #2a2a2a;border-radius:10px;overflow:hidden;margin-bottom:24px;">
+        <div style="padding:20px;border-bottom:1px solid #2a2a2a;display:flex;align-items:center;justify-content:space-between;">
+          <div style="display:flex;align-items:center;gap:12px;">
+            <div style="width:36px;height:36px;border-radius:50%;background-color:#d97706;display:flex;align-items:center;justify-content:center;font-weight:bold;color:white;font-size:14px;">ZA</div>
+            <div>
+              <div style="font-size:14px;font-weight:600;color:#ffffff;">Zeelin Admin | Support Team</div>
+              <div style="font-size:12px;color:#a3a3a3;">Lead Educator &bull; Aug 1</div>
+            </div>
+          </div>
+          <div style="display:flex;gap:8px;">
+            <span style="background-color:#262626;color:#d97706;font-size:11px;font-weight:600;padding:4px 8px;border-radius:4px;">Admin</span>
+            <span style="background-color:#262626;color:#38bdf8;font-size:11px;font-weight:600;padding:4px 8px;border-radius:4px;">Navigator</span>
+          </div>
+        </div>
+        <div style="padding:20px;">
+          <h2 style="font-size:18px;font-weight:600;color:#ffffff;margin:0 0 16px 0;">MUST WATCH FIRST! Welcome to Zeelin Academy</h2>
+          <div style="width:100%;height:320px;border-radius:8px;overflow:hidden;background-color:#262626;position:relative;">
+            <img src="assets/stock/classroom.jpg" alt="Learning platform preview" style="width:100%;height:100%;object-fit:cover;">
+            <div style="position:absolute;inset:0;background:rgba(0,0,0,0.3);display:flex;align-items:center;justify-content:center;">
+              <div onclick="window._playWelcome()" style="width:60px;height:60px;background-color:#d97706;border-radius:50%;display:flex;align-items:center;justify-content:center;box-shadow:0 4px 12px rgba(0,0,0,0.5);cursor:pointer;">
+                <svg style="width:24px;height:24px;fill:white;margin-left:3px;" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>`;
+  $('#page').addEventListener('click', backLink);
+}
+window._playWelcome = function(){ go('/watch/v1'); };
 function renderCommunity() {
   const posts = allPosts();
   const card = (p) => {
