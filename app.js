@@ -4,6 +4,9 @@ try{ if(typeof window!=='undefined' && window.localStorage && window.localStorag
 
 /* ============ ICONS (Material filled) ============ */
 const ICONS = {
+  info: '<svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-6h2v6zm0-8h-2V7h2v2z"/></svg>',
+  feed: '<svg viewBox="0 0 24 24" fill="currentColor"><path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-5 14H7v-2h7v2zm3-4H7v-2h10v2zm0-4H7V7h10v2z"/></svg>',
+  rec: '<svg viewBox="0 0 24 24" fill="currentColor"><path d="M18 3v2h-2V3H8v2H6V3H4v18h2v-2h2v2h8v-2h2v2h2V3h-2zM8 17H6v-2h2v2zm0-4H6v-2h2v2zm0-4H6V7h2v2zm10 8h-2v-2h2v2zm0-4h-2v-2h2v2zm0-4h-2V7h2v2z"/></svg>',
   book: '<svg viewBox="0 0 24 24" fill="currentColor"><path d="M18 2H6c-1.1 0-2 .9-2 2v16c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zM6 4h5v8l-2.5-1.5L6 12V4z"/></svg>',
   video: '<svg viewBox="0 0 24 24" fill="currentColor"><path d="M17 10.5V7c0-.55-.45-1-1-1H4c-.55 0-1 .45-1 1v10c0 .55.45 1 1 1h12c.55 0 1-.45 1-1v-3.5l4 4v-11l-4 4z"/></svg>',
   play: '<svg viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>',
@@ -303,35 +306,147 @@ function route() {
   }
 }
 
+/* ============ REFERENCE TREE HELPERS ============ */
+const TREE_WEEKS = [
+  { id: 'w1', label: 'Week 1 - Foundations', days: [1, 2, 3] },
+  { id: 'w2', label: 'Week 2', days: [4, 5] },
+  { id: 'w3', label: 'Week 3', days: [6, 7] },
+];
+const PLUS_D = 'M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-2 10h-4v4h-2v-4H7v-2h4V7h2v4h4v2z';
+const CHEV_D = 'M8.59 16.59L13.17 12 8.59 7.41 10 6l6 6-6 6-1.41-1.41z';
+const FOLDER_D = 'M10 4H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V8c0-1.1-.9-2-2-2h-8l-2-2z';
+function chevSvg(px, open){ return `<svg style="width:${px}px;height:${px}px;fill:#a3a3a3;${open?'transform:rotate(90deg);':''}" viewBox="0 0 24 24"><path d="${CHEV_D}"/></svg>`; }
+function folderSvg(px){ return `<svg style="width:${px}px;height:${px}px;fill:#d97706;" viewBox="0 0 24 24"><path d="${FOLDER_D}"/></svg>`; }
+function treeOpen(){ try { return JSON.parse(localStorage.getItem('zdash_tree') || '["w1"]'); } catch { return ['w1']; } }
+function treeSave(o){ try { localStorage.setItem('zdash_tree', JSON.stringify(o)); } catch {} }
+window._navTree = function(w){ const o = treeOpen(); const i = o.indexOf(w); if (i > -1) o.splice(i, 1); else o.push(w); treeSave(o); renderSidebar(); };
+window._navDay = function(n){ STATE.day = n; save(); go('/day'); };
+function dayGroupsHTML(r){
+  const grp = (label, links) => `<div class="dg-label">${label}</div>` + links.map((l) => `<a class="dg-link${r===l.route?' active':''}" href="${l.href}">${ic(l.icon,13,13)}<span>${l.text}</span></a>`).join('');
+  return `<div class="day-groups">`
+    + grp('Main', [
+      { route:'checkin', href:'#/checkin', icon:'user-check', text:'Check-In' },
+      { route:'roadmap', href:'#/roadmap', icon:'compass', text:'Reading Roadmap' },
+      { route:'accountability', href:'#/accountability', icon:'chart', text:'Accountability' },
+    ])
+    + grp('Learning', [
+      { route:'book', href:'#'+dayReadingHref(STATE.day), icon:'book', text:'Daily Reading' },
+      { route:'videos', href:'#/videos', icon:'video', text:'Video Tutorials' },
+      { route:'visual', href:'#/visual/'+deckIdForDay(STATE.day), icon:'layers', text:'Visual Deck' },
+    ])
+    + grp('Community', [
+      { route:'monday', href:'#/monday', icon:'sun', text:'Monday Motivation' },
+      { route:'community', href:'#/community', icon:'chat', text:'Community' },
+      { route:'calendar', href:'#/calendar', icon:'calendar', text:'Calendar' },
+      { route:'recordings', href:'#/recordings', icon:'video', text:'Recordings' },
+    ])
+    + `</div>`;
+}
+/* social demo store */
+function socialState(){ try { return Object.assign({ likes:{}, posts:[] }, JSON.parse(localStorage.getItem('zdash_social') || '{}')); } catch { return { likes:{}, posts:[] }; } }
+function socialSave(s){ try { localStorage.setItem('zdash_social', JSON.stringify(s)); } catch {} }
+const POST_META = {
+  p1: { title:'Looking for partners to review Business Analysis Foundation Day 1 & 2', role:'Cohort 001 Student', time:'4 hours ago', color:'#059669', tag:'Study Group', tagBg:'#064e3b', tagColor:'#34d399' },
+  p2: { title:'Exam readiness checklist tips that saved my preparation', role:'Exam Candidate', time:'1 day ago', color:'#7c3aed', tag:'General', tagBg:'#2e1065', tagColor:'#c084fc' },
+};
+function postNums(p){
+  const m = String(p.reacts||'').match(/(\d+)\s*likes?\s*[^\d]*(\d+)\s*repl/i);
+  return { likes: m?Number(m[1]):0, replies: m?Number(m[2]):0 };
+}
+window._likePost = function(id, el){ const s = socialState(); s.likes[id] = (s.likes[id]||0)+1; socialSave(s); const b = el.querySelector('b'); if(b) b.textContent = postLikes(id); toast('Liked'); };
+function postLikes(p){ const s = socialState(); const n = postNums(p); return n.likes + (s.likes[p.id]||0); }
+function allPosts(){ const mine = socialState().posts || []; return [...mine, ...COMMUNITY.posts]; }
+window._sendPost = function(){
+  const ta = $('#composerText'); const v = (ta.value||'').trim();
+  if(!v){ toast('Write something first'); return; }
+  const s = socialState();
+  s.posts.unshift({ id:'u'+Date.now(), author:'John Doe', initials:'JD', color:'#d97706', tag:'General', reacts:'0 likes · 0 replies', time:'Just now', title:'', body:v, mine:true });
+  socialSave(s); route(); toast('Posted to community');
+};
+window._newPost = function(){ const ta = $('#composerText'); if(ta){ ta.focus(); ta.scrollIntoView({behavior:'smooth',block:'center'}); } };
+/* calendar demo store */
+let CAL_VIEW = { y:2026, m:7 };
+const MONTHS = ['January','February','March','April','May','June','July','August','September','October','November','December'];
+window._calNav = function(d){ let m = CAL_VIEW.m + d, y = CAL_VIEW.y; while(m<0){m+=12;y--;} while(m>11){m-=12;y++;} CAL_VIEW = {y:y,m:m}; route(); };
+window._calAdd = function(t){ toast('Added to your calendar (demo)'); };
+window._calDetails = function(id){
+  const e = CALENDAR_EVENTS.find((x)=>x.id===id); if(!e) return;
+  const el = $('#calDet-'+id); if(el) el.style.display = el.style.display==='none'?'block':'none';
+};
+/* recordings demo store */
+let REC_FILTER = 'all';
+window._recFilter = function(v){ REC_FILTER = v; route(); };
+const REC_VIDEO = { r1:'v1', r2:'v2' };
+window._playRec = function(id){ go('/watch/' + (REC_VIDEO[id] || 'v1')); };
+
+
 /* ============ SIDEBAR / TOPBAR ============ */
 function renderSidebar() {
-  const cur = parseHash()[0] || 'home';
+  const r = parseHash()[0] || 'home';
+  const open = treeOpen();
+  const navA = (route, href, icon, text, badge, badgeHot) => {
+    const act = r === route;
+    return `<a href="${href}" style="display:flex;align-items:center;${badge?'justify-content:space-between;':'gap:10px;'}padding:10px 12px;color:${act?'#ffffff':'#a3a3a3'};${act?'background-color:#262626;font-weight:500;':''}border-radius:6px;text-decoration:none;">`
+      + (badge
+        ? `<span style="display:flex;align-items:center;gap:10px;">${ic(icon,16,16)}<span>${text}</span></span><span style="background-color:${act&&badgeHot?'#382818':'#2a2a2a'};color:${act&&badgeHot?'#d97706':'#a3a3a3'};font-size:11px;padding:2px 6px;border-radius:10px;">${badge}</span>`
+        : `${ic(icon,16,16)}<span>${text}</span>`) + `</a>`;
+  };
+  const lbl = (t) => `<div style="padding:16px 12px 6px 12px;font-size:11px;font-weight:600;color:#737373;letter-spacing:0.5px;">${t}</div>`;
+  const dayRoutes = ['day','book','videos','visual','roadmap','checkin','accountability'];
+  const isDayRoute = dayRoutes.includes(r);
+  const weekHTML = (w) => {
+    const isOpen = open.includes(w.id);
+    const days = w.days.map((n) => {
+      const act = isDayRoute && STATE.day === n;
+      let h = `<div style="padding-left:16px;display:flex;flex-direction:column;gap:2px;font-size:12px;">`
+        + `<a onclick="window._navDay(${n})" style="display:flex;align-items:center;gap:8px;padding:6px 10px;color:${act?'#d97706':'#a3a3a3'};${act?'background-color:#2a2218;':''}border-radius:4px;text-decoration:none;cursor:pointer;">`
+        + `<svg style="width:12px;height:12px;fill:currentColor;" viewBox="0 0 24 24"><path d="${PLUS_D}"/></svg><span>Day ${n}</span></a>`;
+      if (n === 1) h += dayGroupsHTML(r);
+      return h + `</div>`;
+    }).join('');
+    const wAct = w.id === 'w1';
+    return `<div style="padding-left:16px;display:flex;flex-direction:column;gap:2px;${w.id!=='w1'?'margin-top:4px;':''}">`
+      + `<div onclick="window._navTree('${w.id}')" style="display:flex;align-items:center;justify-content:space-between;padding:6px 10px;color:#a3a3a3;border-radius:6px;cursor:pointer;${wAct?'background-color:#222222;':''}">`
+      + `<span style="display:flex;align-items:center;gap:6px;">${chevSvg(10,isOpen)}<span style="font-size:12px;${wAct?'font-weight:500;color:#fff;':''}">${w.label}</span></span></div>`
+      + (isOpen ? days : '') + `</div>`;
+  };
   $('#sidebar').innerHTML = `
-    <nav class="snav">
-      <div class="snav-label">Main</div>
-      <a href="#/checkin" data-route="checkin">${ic('user-check', 16, 16)}<span>Check-In</span></a>
-      <a href="#/roadmap" data-route="roadmap">${ic('compass', 16, 16)}<span>Reading Roadmap</span></a>
-      <a href="#/accountability" data-route="accountability">${ic('chart', 16, 16)}<span>Accountability</span></a>
-
-      <div class="snav-label">Learning</div>
-      <a href="${dayReadingHref(STATE.day)}" data-route="book">${ic('book', 16, 16)}<span>Daily Reading</span></a>
-      <a href="#/videos" data-route="videos">${ic('video', 16, 16)}<span>Video Tutorials</span></a>
-      <a href="#/visual/${deckIdForDay(STATE.day)}" data-route="visual">${ic('layers', 16, 16)}<span>Visual Deck</span></a>
-
-      <div class="snav-label">Community</div>
-      <a href="#/monday" data-route="monday">${ic('sun', 16, 16)}<span>Monday Motivation</span></a>
-      <a href="#/community" data-route="community">${ic('chat', 16, 16)}<span>Community</span></a>
-      <a href="#/calendar" data-route="calendar">${ic('calendar', 16, 16)}<span>Calendar</span></a>
-      <a href="#/recordings" data-route="recordings">${ic('video', 16, 16)}<span>Recordings</span></a>
-
-      <div class="snav-label">Account</div>
-      <a href="#/profile" data-route="profile">${ic('user', 16, 16)}<span>Profile &amp; Insights</span></a>
-      <a href="#/support" data-route="support">${ic('help', 16, 16)}<span>Support</span></a>
-      <a href="#/aluminal" data-route="aluminal">${ic('crown', 16, 16)}<span>Aluminal</span></a>
-    </nav>
-    <div class="sidebar-badge">Level ${USER.level} Learner<br><b>${STATE.xp.toLocaleString()} XP</b> total</div>`;
-  setActiveSidebar(cur);
+    <div style="padding:20px 16px;border-bottom:1px solid #2a2a2a;display:flex;align-items:center;gap:10px;">
+      <div style="width:28px;height:28px;background-color:#d97706;border-radius:6px;display:flex;align-items:center;justify-content:center;font-weight:bold;color:#fff;font-size:14px;">Z</div>
+      <span style="font-size:14px;font-weight:600;color:#ffffff;letter-spacing:-0.2px;line-height:1.2;">Zeelin Academy Exam Readiness System</span>
+    </div>
+    <div style="padding:12px 8px;display:flex;flex-direction:column;gap:4px;font-size:13px;">
+      ${navA('home','#/','info','User Guide')}
+      ${navA('community','#/community','feed','Feed / Updates','4')}
+      ${navA('community','#/community','users','Community')}
+      ${navA('monday','#/monday','heart','Monday Motivations')}
+      ${lbl('EVENTS')}
+      ${navA('calendar','#/calendar','calendar','Parenting Calendar','3',true)}
+      ${navA('recordings','#/recordings','rec','Recordings')}
+      ${lbl('CORE / CLASSIC BUSINESS ANALYSIS')}
+      <div style="display:flex;flex-direction:column;">
+        <div style="display:flex;align-items:center;justify-content:space-between;padding:10px 12px;color:#ffffff;border-radius:6px;cursor:pointer;">
+          <span style="display:flex;align-items:center;gap:10px;">${chevSvg(14,true)}${folderSvg(16)}<span style="font-weight:500;">Core / Classic Business Analysis</span></span>
+        </div>
+        <div style="padding-left:16px;display:flex;flex-direction:column;gap:2px;">
+          <div style="display:flex;align-items:center;justify-content:space-between;padding:8px 12px;color:#e5e5e5;border-radius:6px;cursor:pointer;">
+            <span style="display:flex;align-items:center;gap:8px;">${chevSvg(12,true)}${folderSvg(14)}<span>Cohort 001 - Parenting</span></span>
+          </div>
+          <div style="padding-left:16px;display:flex;flex-direction:column;gap:2px;">
+            <div style="display:flex;align-items:center;justify-content:space-between;padding:8px 12px;color:#d4d4d4;border-radius:6px;cursor:pointer;">
+              <span style="display:flex;align-items:center;gap:8px;">${chevSvg(12,true)}${folderSvg(14)}<span>MODULE 1</span></span>
+            </div>
+            ${TREE_WEEKS.map(weekHTML).join('')}
+          </div>
+        </div>
+      </div>
+      ${lbl('Account')}
+      ${navA('profile','#/profile','user','Profile & Insights')}
+      ${navA('support','#/support','help','Support')}
+      ${navA('aluminal','#/aluminal','crown','Aluminal')}
+    </div>`;
 }
+
 function renderTopbar() {
   const claimed = claimedToday();
   const routeName = parseHash()[0] || 'home';
@@ -1527,42 +1642,157 @@ function renderProfile() {
 
 /* ============ SECONDARY PAGES ============ */
 function renderCommunity() {
+  const posts = allPosts();
+  const card = (p) => {
+    const meta = POST_META[p.id] || { title:'', role:'Cohort 001 Student', time:p.time||'Just now', color:p.color||'#d97706', tag:p.tag||'General', tagBg:'#2e1065', tagColor:'#c084fc' };
+    const n = postNums(p);
+    const title = meta.title || p.title || String(p.body||'').slice(0,80);
+    const body = (meta.title || p.title) ? p.body : '';
+    const likes = n.likes + ((socialState().likes[p.id])||0);
+    return `<div style="background-color:#181818;border:1px solid #2a2a2a;border-radius:10px;overflow:hidden;margin-bottom:20px;">`
+      + `<div style="padding:16px 20px;border-bottom:1px solid #2a2a2a;display:flex;align-items:center;justify-content:space-between;">`
+      + `<div style="display:flex;align-items:center;gap:12px;">`
+      + `<div style="width:36px;height:36px;border-radius:50%;background-color:${meta.color};display:flex;align-items:center;justify-content:center;font-weight:bold;color:white;font-size:14px;">${esc(p.initials||'ZA')}</div>`
+      + `<div><div style="font-size:14px;font-weight:600;color:#ffffff;">${esc(p.author)}</div>`
+      + `<div style="font-size:12px;color:#a3a3a3;">${esc(meta.role)} &bull; ${esc(meta.time)}</div></div></div>`
+      + `<span style="background-color:${meta.tagBg};color:${meta.tagColor};font-size:11px;font-weight:600;padding:4px 8px;border-radius:4px;">${esc(meta.tag)}</span></div>`
+      + `<div style="padding:20px;">`
+      + `<h3 style="font-size:16px;font-weight:600;color:#ffffff;margin:0 0 10px 0;">${esc(title)}</h3>`
+      + (body ? `<p style="font-size:13px;color:#d4d4d4;line-height:1.5;margin:0 0 16px 0;">${esc(body)}</p>` : '')
+      + `<div style="display:flex;gap:16px;font-size:13px;color:#a3a3a3;border-top:1px solid #262626;padding-top:12px;">`
+      + `<span onclick="window._likePost('${p.id}',this)" style="cursor:pointer;display:flex;align-items:center;gap:6px;">&#128077; <b>${likes}</b>&nbsp;Likes</span>`
+      + `<span style="display:flex;align-items:center;gap:6px;">&#128172; ${n.replies} Comments</span>`
+      + `</div></div></div>`;
+  };
   $('#page').innerHTML = `
-    ${backBtn()}
-    <div class="page-header"><div class="eyebrow">Your network</div><h1>Community Feed</h1></div>
-    <div class="post-composer">${ic('user', 16, 16)}<textarea placeholder="New post"></textarea></div>
-    <div class="card mt16">
-      ${COMMUNITY.posts.map((p) => `<div class="post-card">${ic('users', 16, 16)}<div><div class="post-author">${esc(p.author)} <span class="pill ${p.tagCls}">${esc(p.tag)}</span></div><div class="post-body">${esc(p.body)}</div><div class="post-react">${esc(p.reacts)} - ${esc(p.time)}</div></div></div>`).join('')}
+    <div style="padding:24px;max-width:900px;margin:0 auto;width:100%;box-sizing:border-box;">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:24px;border-bottom:1px solid #2a2a2a;padding-bottom:16px;">
+        <div>
+          <h1 style="font-size:22px;font-weight:700;color:#ffffff;margin:0 0 4px 0;">Zeelin Academy Community</h1>
+          <p style="font-size:13px;color:#a3a3a3;margin:0;">Connect with peers, share exam prep strategies, and discuss coursework.</p>
+        </div>
+        <div style="display:flex;gap:10px;">
+          <button onclick="window._newPost()" style="background-color:#d97706;color:#ffffff;border:none;padding:8px 16px;border-radius:6px;font-size:13px;font-weight:600;cursor:pointer;">New Post</button>
+        </div>
+      </div>
+      <div style="background-color:#181818;border:1px solid #2a2a2a;border-radius:10px;padding:16px;margin-bottom:20px;">
+        <div style="display:flex;gap:12px;align-items:flex-start;">
+          <div style="width:36px;height:36px;border-radius:50%;background-color:#d97706;display:flex;align-items:center;justify-content:center;font-weight:bold;color:white;font-size:14px;flex-shrink:0;">JD</div>
+          <textarea id="composerText" rows="2" placeholder="Share your thoughts, questions or study tips with the community..." style="flex:1;background-color:#222222;border:1px solid #2e2e2e;border-radius:6px;padding:10px 14px;color:#e5e5e5;font-size:13px;font-family:inherit;resize:vertical;outline:none;"></textarea>
+        </div>
+        <div style="display:flex;justify-content:flex-end;margin-top:10px;">
+          <button onclick="window._sendPost()" style="background-color:#d97706;color:#ffffff;border:none;padding:8px 18px;border-radius:6px;font-size:13px;font-weight:600;cursor:pointer;">Post</button>
+        </div>
+      </div>
+      ${posts.map(card).join('')}
     </div>`;
   $('#page').addEventListener('click', backLink);
 }
 function renderCalendar() {
-  const ev = CALENDAR_EVENTS;
-  const days = [];
-  for (let i = 1; i <= 28; i++) days.push(i);
-  const todayCell = 4;
+  const y = CAL_VIEW.y, m = CAL_VIEW.m;
+  const first = (new Date(y, m, 1).getDay() + 6) % 7;
+  const dim = new Date(y, m + 1, 0).getDate();
+  const prevDim = new Date(y, m, 0).getDate();
+  const ev = CALENDAR_EVENTS.filter((e) => e.year === y && (e.month - 1) === m);
+  const dotColor = { amber:'#d97706', blue:'#38bdf8' };
+  let cells = '';
+  for (let i = first - 1; i >= 0; i--) cells += `<div style="padding:10px;color:#404040;">${prevDim - i}</div>`;
+  for (let d = 1; d <= dim; d++) {
+    const dots = ev.filter((e) => e.date === d).map((e) => `<div style="width:4px;height:4px;background-color:${dotColor[e.color]||'#d97706'};border-radius:50%;margin:2px auto 0 auto;"></div>`).join('');
+    cells += `<div style="padding:10px;color:#a3a3a3;">${d}${dots}</div>`;
+  }
+  const mShort = MONTHS[m].slice(0, 3);
+  const cards = ev.map((e) => {
+    const time = String(e.meta||'').split('\u2014')[0].trim();
+    const pill = (e.pills&&e.pills[0]) || { text:'Session', cls:'' };
+    const pillStyle = pill.cls === 'pill-blue'
+      ? 'background-color:#1e293b;color:#38bdf8;'
+      : 'background-color:#382818;color:#d97706;';
+    return `<div style="background-color:#181818;border:1px solid #2a2a2a;border-radius:10px;overflow:hidden;margin-bottom:16px;display:flex;align-items:stretch;">`
+      + `<div style="background-color:#26170b;border-right:1px solid #3d2411;padding:20px;display:flex;flex-direction:column;align-items:center;justify-content:center;min-width:90px;text-align:center;">`
+      + `<span style="font-size:11px;font-weight:600;color:#d97706;text-transform:uppercase;letter-spacing:0.5px;">${mShort}</span>`
+      + `<span style="font-size:24px;font-weight:700;color:#ffffff;line-height:1.1;">${String(e.date).padStart(2,'0')}</span>`
+      + `<span style="font-size:11px;color:#a3a3a3;">${esc(e.dow||'')} &bull; ${esc(time)}</span></div>`
+      + `<div style="padding:20px;flex:1;display:flex;flex-direction:column;justify-content:center;">`
+      + `<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;">`
+      + `<h3 style="font-size:16px;font-weight:600;color:#ffffff;margin:0;">${esc(e.title)}</h3>`
+      + `<span style="${pillStyle}font-size:11px;font-weight:600;padding:3px 8px;border-radius:4px;">${esc(pill.text)}</span></div>`
+      + `<p style="font-size:13px;color:#d4d4d4;margin:0 0 12px 0;">${esc(e.meta)}</p>`
+      + `<div id="calDet-${e.id}" style="display:none;font-size:13px;color:#d4d4d4;background:#141414;border:1px solid #2a2a2a;border-radius:6px;padding:10px 12px;margin-bottom:12px;">${esc(e.title)} — ${esc(e.meta)}. Join via the cohort channel at the scheduled time.</div>`
+      + `<div style="display:flex;gap:12px;">`
+      + `<button onclick="window._calAdd('${e.id}')" style="background-color:#d97706;color:#ffffff;border:none;padding:6px 14px;border-radius:4px;font-size:12px;font-weight:600;cursor:pointer;">Add to Calendar</button>`
+      + `<button onclick="window._calDetails('${e.id}')" style="background-color:#262626;color:#a3a3a3;border:1px solid #333333;padding:6px 14px;border-radius:4px;font-size:12px;font-weight:600;cursor:pointer;">View Details</button>`
+      + `</div></div></div>`;
+  }).join('');
   $('#page').innerHTML = `
-    ${backBtn()}
-    <div class="page-header"><div class="eyebrow">Schedule</div><h1>Calendar</h1></div>
-    <div class="cal-head"><span class="pill pill-amber">August 2026</span><div class="cal-btns"><button class="btn btn-sm btn-outline">Add</button><button class="btn btn-sm btn-outline">View</button></div></div>
-    <div class="cal-grid">
-      ${['Su', 'Mo', 'Tu', 'We', 'Th', 'Fr', 'Sa'].map((d) => `<div class="cal-dow">${d}</div>`).join('')}
-      ${Array.from({ length: 6 }).map(() => `<div class="cal-day pm"><span class="d"></span></div>`).join('')}
-      ${Array.from({ length: 28 }).map((_, i) => {
-        const n = i + 1;
-        const hasEvent = ev.some((e) => e.date === n);
-        const dot = ev.filter((e) => e.date === n).map((e) => `<span class="cal-dot ${e.color}"></span>`).join('');
-        return `<div class="cal-day${n === todayCell ? ' today' : ''}"><span class="d">${n}</span>${dot}</div>`;
-      }).join('')}
-    </div>
-    ${ev.map((e) => `<div class="event-row"><div class="event-dcol ${e.dcol}"><div class="bd">${e.date}</div><div class="bt">${e.dow}</div></div><div class="event-body"><div class="event-title">${esc(e.title)}</div><div class="event-meta">${esc(e.meta)}</div><div class="pill ${e.pills[0].cls}">${esc(e.pills[0].text)}</div></div></div>`).join('')}`;
+    <div style="padding:24px;max-width:900px;margin:0 auto;width:100%;box-sizing:border-box;">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:24px;border-bottom:1px solid #2a2a2a;padding-bottom:16px;">
+        <div>
+          <h1 style="font-size:22px;font-weight:700;color:#ffffff;margin:0 0 4px 0;">Calendar &amp; Live Events</h1>
+          <p style="font-size:13px;color:#a3a3a3;margin:0;">Interactive schedule view for ${MONTHS[m]} ${y} live workshops and Q&amp;A sessions.</p>
+        </div>
+        <div style="display:flex;gap:10px;">
+          <span style="background-color:#262626;color:#d97706;font-size:12px;font-weight:600;padding:6px 12px;border-radius:6px;border:1px solid #3d2411;">${MONTHS[m]} ${y}</span>
+        </div>
+      </div>
+      <div style="background-color:#181818;border:1px solid #2a2a2a;border-radius:10px;padding:20px;margin-bottom:24px;">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;">
+          <span style="font-size:15px;font-weight:600;color:#ffffff;">${MONTHS[m]} ${y}</span>
+          <div style="display:flex;gap:6px;">
+            <button onclick="window._calNav(-1)" style="background-color:#262626;color:#a3a3a3;border:1px solid #333333;padding:4px 10px;border-radius:4px;font-size:12px;cursor:pointer;">&lt;</button>
+            <button onclick="window._calNav(1)" style="background-color:#262626;color:#a3a3a3;border:1px solid #333333;padding:4px 10px;border-radius:4px;font-size:12px;cursor:pointer;">&gt;</button>
+          </div>
+        </div>
+        <div style="display:grid;grid-template-columns:repeat(7,1fr);text-align:center;font-size:12px;font-weight:600;color:#737373;margin-bottom:8px;padding-bottom:8px;border-bottom:1px solid #262626;">
+          <span>Mon</span><span>Tue</span><span>Wed</span><span>Thu</span><span>Fri</span><span>Sat</span><span>Sun</span>
+        </div>
+        <div style="display:grid;grid-template-columns:repeat(7,1fr);gap:4px;text-align:center;font-size:12px;">${cells}</div>
+      </div>
+      ${cards || `<p style="font-size:13px;color:#737373;text-align:center;padding:12px;">No live events this month — check back soon.</p>`}
+    </div>`;
   $('#page').addEventListener('click', backLink);
 }
 function renderRecordings() {
+  const HOST = {
+    r1: { init:'ZA', color:'#d97706', name:'Zeelin Academy Education Team', sub:'Live Workshop Replay &bull; Recorded Jul 28', tag:'Current Event', tagBg:'#382818', tagColor:'#d97706' },
+    r2: { init:'OE', color:'#2563eb', name:'Dr. O. Emeka', sub:'Previous Workshop Replay &bull; Recorded Jul 20', tag:'Previous Event', tagBg:'#1e293b', tagColor:'#38bdf8' },
+  };
+  const list = RECORDINGS.filter((x) => REC_FILTER === 'all' || (REC_FILTER === 'current' ? /current/i.test(x.badge.text) : /previous/i.test(x.badge.text)));
+  const cards = list.map((x) => {
+    const h = HOST[x.id] || { init:'ZA', color:'#d97706', name:x.host.name, sub:x.meta, tag:x.badge.text, tagBg:'#382818', tagColor:'#d97706' };
+    return `<div style="background-color:#181818;border:1px solid #2a2a2a;border-radius:10px;overflow:hidden;margin-bottom:24px;">`
+      + `<div style="padding:20px;border-bottom:1px solid #2a2a2a;display:flex;align-items:center;justify-content:space-between;">`
+      + `<div style="display:flex;align-items:center;gap:12px;">`
+      + `<div style="width:36px;height:36px;border-radius:50%;background-color:${h.color};display:flex;align-items:center;justify-content:center;font-weight:bold;color:white;font-size:14px;">${h.init}</div>`
+      + `<div><div style="font-size:14px;font-weight:600;color:#ffffff;">${esc(h.name)}</div>`
+      + `<div style="font-size:12px;color:#a3a3a3;">${h.sub}</div></div></div>`
+      + `<span style="background-color:${h.tagBg};color:${h.tagColor};font-size:11px;font-weight:600;padding:4px 8px;border-radius:4px;">${esc(h.tag)}</span></div>`
+      + `<div style="padding:20px;">`
+      + `<h2 style="font-size:18px;font-weight:600;color:#ffffff;margin:0 0 16px 0;">${esc(x.title)}</h2>`
+      + `<div style="width:100%;height:320px;border-radius:8px;overflow:hidden;background-color:#262626;position:relative;">`
+      + `<img src="${x.cover}" alt="Recording video thumbnail" style="width:100%;height:100%;object-fit:cover;">`
+      + `<div style="position:absolute;inset:0;background:rgba(0,0,0,0.3);display:flex;align-items:center;justify-content:center;">`
+      + `<div onclick="window._playRec('${x.id}')" style="width:60px;height:60px;background-color:#d97706;border-radius:50%;display:flex;align-items:center;justify-content:center;box-shadow:0 4px 12px rgba(0,0,0,0.5);cursor:pointer;">`
+      + `<svg style="width:24px;height:24px;fill:white;margin-left:3px;" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>`
+      + `</div></div></div></div></div>`;
+  }).join('');
   $('#page').innerHTML = `
-    ${backBtn()}
-    <div class="page-header"><div class="eyebrow">Playbacks</div><h1>Event Recordings & Archives</h1></div>
-    ${RECORDINGS.map((r) => `<div class="rec-card"><div class="rec-thumb"><img src="${r.cover}" alt=""/><span class="play-ov"><span class="pb">${ic('play', 24, 24)}</span></span></div><div><div class="feed-title">${esc(r.title)}</div><div class="rec-meta">${esc(r.meta)} - <span class="pill ${r.badge.cls}">${esc(r.badge.text)}</span></div><div class="rec-meta mt8"><img class="rec-av" src="${r.host.avatar}" alt=""/><span>${esc(r.host.name)}</span></div><div class="v-btns"><button class="btn btn-outline">Replay Recording</button></div></div></div>`).join('')}`;
+    <div style="padding:24px;max-width:900px;margin:0 auto;width:100%;box-sizing:border-box;">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:24px;border-bottom:1px solid #2a2a2a;padding-bottom:16px;">
+        <div>
+          <h1 style="font-size:22px;font-weight:700;color:#ffffff;margin:0 0 4px 0;">Event Recordings &amp; Archives</h1>
+          <p style="font-size:13px;color:#a3a3a3;margin:0;">Access video replays of current events, previous workshops, and cohort sessions.</p>
+        </div>
+        <div style="display:flex;gap:10px;">
+          <select onchange="window._recFilter(this.value)" style="background-color:#181818;border:1px solid #2a2a2a;padding:6px 12px;border-radius:6px;font-size:13px;color:#a3a3a3;cursor:pointer;outline:none;font-family:inherit;">`
+          + `<option value="all"${REC_FILTER==='all'?' selected':''}>All Categories</option>`
+          + `<option value="current"${REC_FILTER==='current'?' selected':''}>Current Event</option>`
+          + `<option value="previous"${REC_FILTER==='previous'?' selected':''}>Previous Event</option>`
+          + `</select>
+        </div>
+      </div>
+      ${cards || `<p style="font-size:13px;color:#737373;text-align:center;padding:12px;">No recordings in this category.</p>`}
+    </div>`;
   $('#page').addEventListener('click', backLink);
 }
 function renderSupport() {

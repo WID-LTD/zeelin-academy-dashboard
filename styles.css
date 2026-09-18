@@ -1157,3 +1157,11 @@ svg { display: block; flex-shrink: 0; overflow: hidden; }
   .dash-modal.ci-modal { width: 1100px; }
   .star-row .starb { width: 52px; height: 52px; }
 }
+
+/* day groups under Day 1 (reference tree) */
+.day-groups{padding:2px 0 4px 16px;}
+.dg-label{padding:10px 10px 2px;font-size:10.5px;font-weight:700;letter-spacing:.6px;text-transform:uppercase;color:#737373;}
+.dg-link{display:flex;align-items:center;gap:8px;padding:6px 10px;color:#a3a3a3;font-size:12.5px;border-radius:4px;cursor:pointer;text-decoration:none;}
+.dg-link:hover{color:#fff;background:#222;}
+.dg-link.active{color:#d97706;background:#2a2218;font-weight:600;}
+.dg-link .sv{width:13px;height:13px;flex-shrink:0;}
