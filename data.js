@@ -9,7 +9,7 @@ const USER = {
   avatar: A + 'avatar_1.png',
   initials: 'JD',
   memberSince: 'Jan 2026',
-  cohort: 'Cohort 001',
+  cohort: 'Cohort 001 - Parenting',
   streak: 5,
   xp: 2950,
   role: 'Software Engineering Learner',
@@ -22,7 +22,7 @@ const COURSES = [
     title: 'Business Analysis Foundation',
     short: 'BA Foundation',
     cover: A + 'books/foundation_in_bussiness_analysis_pratice.png',
-    cohort: 'Cohort 001',
+    cohort: 'Cohort 001 - Parenting',
     days: [1, 2],
     week: 1,
     weekName: 'Foundations',
@@ -39,7 +39,7 @@ const COURSES = [
     title: 'Software Engineering',
     short: 'Software Eng',
     cover: A + 'books/system_modelling_techniques.png',
-    cohort: 'Cohort 001',
+    cohort: 'Cohort 001 - Parenting',
     days: [3, 4],
     week: 2,
     weekName: 'Analysis & Design',
@@ -56,7 +56,7 @@ const COURSES = [
     title: 'Prompt Engineering',
     short: 'Prompt Eng',
     cover: A + 'books/project_management.png',
-    cohort: 'Cohort 001',
+    cohort: 'Cohort 001 - Parenting',
     days: [5, 6],
     week: 3,
     weekName: 'Modelling & Delivery',
@@ -73,7 +73,7 @@ const COURSES = [
     title: 'Job Readiness Sprint',
     short: 'Job Sprint',
     cover: A + 'books/bussiness_change.png',
-    cohort: 'Cohort 001',
+    cohort: 'Cohort 001 - Parenting',
     days: [7],
     week: 4,
     weekName: 'Career Launch',
@@ -760,10 +760,10 @@ const VISUAL = {
 
 /* ---------- Community / feed / calendar / recordings / support / aluminal ---------- */
 const FEED = [
-  { id: 'f1', who: 'Cohort 001', title: 'New session uploaded', body: 'Day 1 recap: watch the latest tutorial before your mock quiz.', time: '2h ago', color: 'var(--green)' },
+  { id: 'f1', who: 'Cohort 001 · Parenting', title: 'New session uploaded', body: 'Day 1 recap: watch the latest tutorial before your mock quiz.', time: '2h ago', color: 'var(--green)' },
   { id: 'f2', who: 'Mentor · Amina', title: 'Your accountability check is due', body: 'Submit your daily check-in to keep your 5-day streak alive.', time: '5h ago', color: 'var(--amber)' },
   { id: 'f3', who: 'Zeelin Academy', title: 'Monday Motivation delivered', body: 'A fresh motivational brief landed in your Monday Motivations feed.', time: '1d ago', color: 'var(--blue)' },
-  { id: 'f4', who: 'Cohort 001', title: 'Calendar updated', body: 'The live workshop has been added for August 4 / Q&A on August 8.', time: '1d ago', color: 'var(--green)' },
+  { id: 'f4', who: 'Cohort 001 · Parenting', title: 'Calendar updated', body: 'The live workshop has been added for August 4 / Q&A on August 8.', time: '1d ago', color: 'var(--green)' },
 ];
 
 const MONDAY = [
@@ -817,7 +817,7 @@ const COMMUNITY = {
 const CALENDAR_EVENTS = [
   {
     id: 'c1', date: 4, month: 8, year: 2026, dow: 'Tue', offset: 0, color: 'amber', dcol: '',
-    title: 'Live Workshop: Effective Communication & Study Balance',
+    title: 'Live Workshop: Effective Communication in Parenting & Study Balance',
     pills: [{ text: 'Live Session', cls: 'pill-amber' }],
     meta: '4:00 PM — 5:00 PM · Live on Zoom',
   },
@@ -831,7 +831,7 @@ const CALENDAR_EVENTS = [
 
 const RECORDINGS = [
   { id: 'r1', title: 'Orientation & Business Analysis Foundation Overview', meta: '28 Jul 2026 · 48 min', cover: S + 'IMG-20260605-WA0031.jpg', badge: { text: 'Current Event', cls: 'pill-amber' }, host: { name: 'Zeelin Academy', avatar: S + 'IMG-20260605-WA0031.jpg', cls: '' } },
-  { id: 'r2', title: 'Strategies & Time Management Masterclass', meta: '19 Jul 2026 · 55 min', cover: S + 'IMG-20260605-WA0036.jpg', badge: { text: 'Previous Event', cls: 'pill-blue' }, host: { name: 'Olaniyi Emeka · OE', avatar: S + 'IMG-20260605-WA0032.jpg', cls: '' } },
+  { id: 'r2', title: 'Parenting Strategies & Time Management Masterclass', meta: '19 Jul 2026 · 55 min', cover: S + 'IMG-20260605-WA0036.jpg', badge: { text: 'Previous Event', cls: 'pill-blue' }, host: { name: 'Olaniyi Emeka · OE', avatar: S + 'IMG-20260605-WA0032.jpg', cls: '' } },
 ];
 
 const SUPPORT = {

@@ -209,6 +209,9 @@ try {
     if(removed) console.log(`[cleanup] removed ${removed} empty/old runs`);
     return removed;
   }
+  // Monotonic: progress never visibly regresses when the denominator grows
+  // (retries broaden the sweep); success/failure still pin to 100.
+  function bumpProgress(run){ run.progress=Math.max(run.progress||0, progressOf(run)); return run.progress; }
   function progressOf(run){
     if(run.status==='succeeded'||run.status==='failed') return 100;
     // Moves from the very first platform event: sources 55% + batches 20% + ads 17% + 3% base.
@@ -433,6 +436,7 @@ try {
     if(!input.analysisMode) input.analysisMode='none';
     const run={id:nextRunId(),actor:'zeelin-course-builder',mode:input.mode||'console',status:'running',input,stage:'queued',stages:[],sources:[],sourcesTotal:0,logs:[],jobs:[],items:0,cost:0.0,startedAt:new Date().toISOString(),finishedAt:null,durationMs:0, taskId:input.taskId||null, taskName:input.taskName||null};
     runs.set(run.id,run);
+    try{ require('./course-builder/scraper/tor').runStart(run.id); }catch(_){}
     runLog.unshift({id:run.id,actor:run.actor,mode:run.mode,status:'running',startedAt:run.startedAt,items:0, taskId:run.taskId});
     if(runLog.length>200) runLog.pop();
     if(db) try{ db.saveRun(run); }catch(e){ console.warn('db saveRun failed', e.message); }
@@ -463,7 +467,7 @@ try {
         const onSource=(r)=>{
           run.sources.push({source:r.source,status:r.status,items:r.items,message:r.message,started:true, q:r.q||'', c:r.c||''});
           run.sourcesDone=(run.sources||[]).length;
-          run.progress=progressOf(run);
+          bumpProgress(run);
           const done=run.sourcesDone, total=run.sourcesTotal||done;
           if(r.items>0) log.info(`✓ ${r.source}${r.q?` [${r.q}${r.c?' @ '+r.c:''}]`:''}: ${r.items} ads (${done}/${total} platforms, ${run.adsCollected||0}/${run.totalAdsGoal||'?'} ads)`);
           else if(done===1||done%10===0||done===total) log.info(`… ${done}/${total} platforms checked (${run.adsCollected||0} ads so far)`);
@@ -539,6 +543,7 @@ try {
               setStage(run,'finished'); log.info(`Run finished — ${jobs.length} jobs ready. Countries: ${countriesList.join(', ')} | Keywords: ${keywordsList.length} | no analysis`);
               const entry=runLog.find(r=>r.id===run.id); if(entry){ entry.status=run.status; entry.items=jobs.length; entry.finishedAt=run.finishedAt; entry.durationMs=run.durationMs; }
               if(db) try{ db.saveRun(run);}catch(e){}
+              try{ require('./course-builder/scraper/tor').runEnd(run.id); }catch(_){}
               return;
             }
           }
@@ -591,7 +596,7 @@ try {
                 if(res.results) allResults=allResults.concat(res.results);
                 run.adsCollected=allJobs.length;
                 run.jobs=allJobs.slice(); run.items=allJobs.length; // live snapshot
-                run.progress=progressOf(run);
+                bumpProgress(run);
                 const dist={}; kept.forEach(j=>{ dist[j.country]=(dist[j.country]||0)+1; });
                 log.info(`✔ Global "${kw}": ${kept.length}/${beforeFilter} on-role (${Object.entries(dist).slice(0,6).map(([k,v])=>`${k}:${v}`).join(', ')||'none'}) · total ${run.adsCollected}/${run.totalAdsGoal}`);
               }catch(e){ log.warn(`Global "${kw}" failed: ${e.message}`); }
@@ -613,7 +618,7 @@ try {
             const results=[];
             let idx=0;
             run.batchesTotal=items.length;
-            run.progress=progressOf(run);
+            bumpProgress(run);
             async function worker(){
               while(idx < items.length){
                 const cur = idx++;
@@ -644,7 +649,7 @@ try {
                   if(res.res.results) allResults=allResults.concat(res.res.results);
                   run.sourcesTotal=Math.max(run.sourcesTotal, allResults.length||run.sourcesTotal);
                   // update run for live preview polling
-                  run.progress = progressOf(run);
+                  bumpProgress(run);
                   run.stage = 'fetching details';
                 }
               }
@@ -784,7 +789,7 @@ try {
               const retryOnSource=(r)=>{
                 run.sources.push({source:r.source,status:r.status==='ok'?'succeeded':r.status,items:r.items,message:r.message,started:true,q:r.q||'',c:r.c||''});
                 run.sourcesDone=(run.sources||[]).length;
-                run.progress=progressOf(run);
+                bumpProgress(run);
               };
               for(const {country, kw} of retryBatches.slice(0,rare?10:6)){
                 try{
@@ -803,6 +808,7 @@ try {
               if(retryValid.length){
                 log.info(`Broad retry got ${retryValid.length} additional ads (${rare?'relaxed-title rarity sweep':'replacement'})`);
                 validJobs.push(...retryValid);
+                run.retryAdded=(run.retryAdded||0)+retryValid.length;
               } else if(rare){
                 log.warn(`Rarity sweep found nothing new — role genuinely scarce on reachable platforms (proxy/keys unlock more)`);
               }
@@ -865,7 +871,7 @@ try {
         run.sourcesDone=run.sources.length;
         run.sourcesTotal=Math.max(run.sourcesTotal||0,run.sources.length);
         setStage(run,'analyzing details');
-        log.info(`Collected ${jobsToFilter.length} balanced jobs (from ${validJobs.length} valid, ${allJobs.length} unique, ${beforeDedupe} raw) — analyzing details …`);
+        log.info(`Collected ${jobsToFilter.length} balanced jobs (from ${validJobs.length} valid, ${allJobs.length+(run.retryAdded||0)} unique, ${beforeDedupe+(run.retryAdded||0)} raw) — analyzing details …`);
         let jobs=applyFilters(jobsToFilter,input);
         // re-ensure for filtered
         jobs.forEach(ensureRequirements);
@@ -890,10 +896,12 @@ try {
         setStage(run,'finished'); log.info(`Run finished — ${jobs.length} jobs ready. Countries: ${countriesList.join(', ')} | Keywords: ${keywordsList.length} | ${input.analysisMode!=='none' ? 'analysis:'+input.analysisMode : 'no analysis'}`);
         const entry=runLog.find(r=>r.id===run.id); if(entry){ entry.status=run.status; entry.items=jobs.length; entry.finishedAt=run.finishedAt; entry.durationMs=run.durationMs; }
         if(db) try{ db.saveRun(run); }catch(e){ console.warn('db saveRun finish failed', e.message); }
+        try{ require('./course-builder/scraper/tor').runEnd(run.id); }catch(_){}
       }catch(err){
         run.status='failed'; run.finishedAt=new Date().toISOString(); run.message=err.message; setStage(run,'failed'); log.warn(`Run failed: ${err.message}`);
         const entry=runLog.find(r=>r.id===run.id); if(entry) entry.status=run.status;
         if(db) try{ db.saveRun(run); }catch(e){ console.warn('db saveRun fail failed', e.message); }
+        try{ require('./course-builder/scraper/tor').runEnd(run.id); }catch(_){}
       }
     })();
     return run;
@@ -1059,7 +1067,7 @@ try {
   async function handleApi(req,res,url){
     const parts=url.pathname.split('/').filter(Boolean);
     if(parts[0]!=='api') return false;
-    if(parts[1]==='health'){ const mode=db?'local JSON DB (persistent, view previous runs)':'no-store (results are never saved)'; let ai=false; try{ ai=require('./course-builder/scraper/enrich').aiAvailable(); }catch(_){} return sendJson(res,200,{ok:true,service:'zeelin-course-builder',mode,runs:db?db.listRuns(200).length:runs.size,time:new Date().toISOString(),aiAvailable:ai});}
+    if(parts[1]==='health'){ const mode=db?'local JSON DB (persistent, view previous runs)':'no-store (results are never saved)'; let ai=false; try{ ai=require('./course-builder/scraper/enrich').aiAvailable(); }catch(_){} let torst=null,poolst=null; try{ torst=require('./course-builder/scraper/tor').status(); }catch(_){} try{ poolst=require('./course-builder/scraper/pool').status(); }catch(_){} const px=!!(process.env.ZEELIN_PROXY_URL); return sendJson(res,200,{ok:true,service:'zeelin-course-builder',mode,runs:db?db.listRuns(200).length:runs.size,time:new Date().toISOString(),aiAvailable:ai,proxy:px,tor:torst,pool:poolst});}
     if(parts[1]==='industries') return sendJson(res,200,industries);
     if(parts[1]==='cities') return sendJson(res,200,cities);
     if(parts[1]==='storage' && req.method==='GET'){
