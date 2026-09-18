@@ -323,7 +323,7 @@ const CHEV_D = 'M8.59 16.59L13.17 12 8.59 7.41 10 6l6 6-6 6-1.41-1.41z';
 const FOLDER_D = 'M10 4H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V8c0-1.1-.9-2-2-2h-8l-2-2z';
 function chevSvg(px, open){ return `<svg style="width:${px}px;height:${px}px;fill:#a3a3a3;${open?'transform:rotate(90deg);':''}" viewBox="0 0 24 24"><path d="${CHEV_D}"/></svg>`; }
 function folderSvg(px){ return `<svg style="width:${px}px;height:${px}px;fill:#d97706;" viewBox="0 0 24 24"><path d="${FOLDER_D}"/></svg>`; }
-function treeOpen(){ try { return JSON.parse(localStorage.getItem('zdash_tree') || '["w1"]'); } catch { return ['w1']; } }
+function treeOpen(){ try { const o = JSON.parse(localStorage.getItem('zdash_tree') || '["w1"]'); return Array.isArray(o) && o.length ? [o[o.length - 1]] : ['w1']; } catch { return ['w1']; } }
 function treeSave(o){ try { localStorage.setItem('zdash_tree', JSON.stringify(o)); } catch {} }
 function cohortOpen(){ try { const v = localStorage.getItem('zdash_cohort'); return v === null ? true : v === '1'; } catch { return true; } }
 function cohortSave(o){ try { localStorage.setItem('zdash_cohort', o ? '1' : '0'); } catch {} }
