@@ -71,6 +71,7 @@ const DEFAULTS = {
   ci: {}, stars: null, improve: '', unclear: '',
   prevDoneDay: {}, prevA: {},
   commPosts: [], commLikes: {},
+  feedPosts: [], feedLikes: {}, feedRead: false,
 };
 function dateStamp() { const d = new Date(); return d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0'); }
 function nowHMS() { const d = new Date(); return d.toTimeString ? d.toTimeString().slice(0, 8) : '--:--:--'; }
@@ -298,6 +299,7 @@ function route() {
     case 'calendar': renderCalendar(); return;
     case 'recordings': renderRecordings(); return;
     case 'guide': renderGuide(); return;
+    case 'feed': renderFeed(); return;
     case 'support': renderSupport(); return;
     case 'aluminal': renderAluminal(); return;
     case 'monday': renderMonday(); return;
@@ -326,6 +328,48 @@ const TREE_WEEKS = [
   { n: 2, label: 'Week 2', days: [3, 4] },
   { n: 3, label: 'Week 3', days: [5, 6, 7] },
 ];
+/* Same-origin reader: point the Day-1 project subtree at the real in-house current project */
+function inhousePid() {
+  try {
+    const s = JSON.parse(localStorage.getItem('zdash_project_v1') || 'null');
+    if (s && s.currentProject) return s.currentProject;
+  } catch (e) {}
+  try {
+    const enrolled = JSON.parse(localStorage.getItem('zeelin_mp_enrolled') || '[]');
+    if (Array.isArray(enrolled) && enrolled.length) return enrolled[0];
+  } catch (e) {}
+  return 'business-analyst-p1';
+}
+function projectSubtree(pid) {
+  const ih = (hash) => '/inhouse-projects/' + hash;
+  const leaf = (href, icon, label) => `<a href="${href}" style="display:flex;align-items:center;gap:8px;padding:6px 10px;color:#a3a3a3;border-radius:4px;text-decoration:none;">${refSvg(icon, 12, 'currentColor')}<span>${label}</span></a>`;
+  const sub = (label) => `<div style="padding:8px 10px 2px 10px;font-size:10px;font-weight:700;color:#737373;letter-spacing:0.5px;text-transform:uppercase;">${label}</div>`;
+  const mode = (m, label) => `<a href="${ih('#p/' + pid + '/modes')}" title="${label} — select mode" style="display:flex;align-items:center;gap:8px;padding:6px 10px;color:#a3a3a3;border-radius:4px;text-decoration:none;">${refSvg(REF_P.folder, 12, '#d97706')}<span>${label}</span></a>`;
+  return `<div style="padding-left:16px;display:flex;flex-direction:column;gap:2px;font-size:12px;border-left:1px solid #2a2a2a;margin-left:10px;">
+    <div style="padding:6px 10px;color:#e5e5e5;font-weight:600;">Current Project — Modes Inside</div>
+    <div style="padding:0 10px 4px 10px;color:#737373;font-size:11px;">Cohort 001 &bull; Business Analyst</div>
+    ${mode('supported', 'Supported Project')}
+    ${mode('mandate', 'Mandate Project')}
+    ${mode('group', 'Group Project')}
+    <a href="${ih('#p/' + pid + '/modes')}" style="display:flex;align-items:center;gap:8px;padding:6px 10px;color:#d97706;border-radius:4px;text-decoration:none;font-weight:600;">${refSvg(REF_P.folder, 12, 'currentColor')}<span>Project Modes</span></a>
+    ${sub('Workspace')}
+    ${leaf(ih('#p/' + pid + '/home'), REF_P.folder, 'Project Home')}
+    ${leaf(ih('#p/' + pid + '/brief'), REF_P.feed, 'Brief &amp; Objectives')}
+    ${leaf(ih('#p/' + pid + '/docs-vault'), REF_P.folder, 'Docs &amp; Files')}
+    ${leaf(ih('#p/' + pid + '/workspace'), REF_P.feed, 'Tools &amp; Templates')}
+    ${leaf(ih('#p/' + pid + '/collaboration'), REF_P.people, 'Community')}
+    ${leaf(ih('#p/' + pid + '/home'), REF_P.info, 'Final Assessment')}
+    ${sub('Mentorship')}
+    ${leaf(ih('#mentorship'), REF_P.people, 'Mentorship Dashboard')}
+    ${leaf(ih('#mentorship/live-sessions'), REF_P.cal, 'Live Sessions &amp; Calendar')}
+    ${leaf(ih('#mentorship/recordings'), REF_P.rec, 'Recordings Library')}
+    ${leaf(ih('#mentorship/evaluation'), REF_P.feed, 'Evaluation Log &amp; Reviews')}
+    ${leaf(ih('#mentorship/support'), REF_P.info, 'Support Center')}
+    ${sub('Daily Routine')}
+    ${leaf(ih('#checkin'), REF_P.info, 'Daily Check-In')}
+    ${leaf(ih('#accountability'), REF_P.feed, 'Accountability')}
+  </div>`;
+}
 function renderSidebar() {
   const cur = parseHash()[0] || 'home';
   const activeLink = (key, href, icon, label, badge) => {
@@ -333,11 +377,13 @@ function renderSidebar() {
     return `<a href="${href}" style="display:flex;align-items:center;${badge ? 'justify-content:space-between;' : 'gap:10px;'}padding:10px 12px;color:${on ? '#ffffff' : '#a3a3a3'};${on ? 'background-color:#262626;font-weight:500;' : ''}border-radius:6px;text-decoration:none;">${badge ? `<div style="display:flex;align-items:center;gap:10px;">${refSvg(icon, 16, 'currentColor')}<span>${label}</span></div><span style="background-color:${on && key === 'calendar' ? '#382818' : '#2a2a2a'};color:${on && key === 'calendar' ? '#d97706' : '#a3a3a3'};font-size:11px;padding:2px 6px;border-radius:10px;">${badge}</span>` : `${refSvg(icon, 16, 'currentColor')}<span>${label}</span>`}</a>`;
   };
   const expWeek = (TREE_WEEKS.find((w) => w.days.includes(STATE.day)) || TREE_WEEKS[0]).n;
+  const pid = inhousePid();
   const weeksHtml = TREE_WEEKS.map((w, wi) => {
     const exp = w.n === expWeek;
     const daysHtml = exp ? `<div style="padding-left:16px;display:flex;flex-direction:column;gap:2px;font-size:12px;">${w.days.map((d) => {
       const on = d === STATE.day;
-      return `<a href="#/day" data-day="${d}" style="display:flex;align-items:center;gap:8px;padding:6px 10px;color:${on ? '#d97706' : '#a3a3a3'};${on ? 'background-color:#2a2218;' : ''}border-radius:4px;text-decoration:none;">${refSvg(REF_P.docplus, 12, 'currentColor')}<span>Day ${d}</span></a>`;
+      const row = `<a href="#/day" data-day="${d}" style="display:flex;align-items:center;gap:8px;padding:6px 10px;color:${on ? '#d97706' : '#a3a3a3'};${on ? 'background-color:#2a2218;' : ''}border-radius:4px;text-decoration:none;">${refSvg(REF_P.docplus, 12, 'currentColor')}<span>Day ${d}</span></a>`;
+      return d === 1 ? row + projectSubtree(pid) : row;
     }).join('')}</div>` : '';
     return `<div style="padding-left:16px;display:flex;flex-direction:column;gap:2px;${wi > 0 ? 'margin-top:4px;' : ''}"><div data-week="${w.n}" style="display:flex;align-items:center;justify-content:space-between;padding:6px 10px;color:#a3a3a3;border-radius:6px;cursor:pointer;${exp ? 'background-color:#222222;' : ''}"><div style="display:flex;align-items:center;gap:6px;">${refSvg(REF_P.chev, 10, '#a3a3a3', exp)}<span style="font-size:12px;${exp && w.n === 1 ? 'font-weight:500;color:#fff;' : ''}">${w.label}</span></div></div>${daysHtml}</div>`;
   }).join('');
@@ -353,11 +399,11 @@ function renderSidebar() {
     </div>
     <div style="padding:12px 8px;display:flex;flex-direction:column;gap:4px;font-size:13px;">
       ${activeLink('guide', '#/guide', REF_P.info, 'User Guide')}
-      ${activeLink('home', '#/', REF_P.feed, 'Feed / Updates', '4')}
+      ${activeLink('feed', '#/feed', REF_P.feed, 'Feed / Updates', (STATE.feedRead ? '' : '4'))}
       ${activeLink('community', '#/community', REF_P.people, 'Community')}
       ${activeLink('monday', '#/monday', REF_P.heart, 'Monday Motivations')}
       <div style="padding:16px 12px 6px 12px;font-size:11px;font-weight:600;color:#737373;letter-spacing:0.5px;">EVENTS</div>
-      ${activeLink('calendar', '#/calendar', REF_P.cal, 'Parenting Calendar', '3')}
+      ${activeLink('calendar', '#/calendar', REF_P.cal, 'Calendar', '3')}
       ${activeLink('recordings', '#/recordings', REF_P.rec, 'Recordings')}
       <div style="padding:16px 12px 6px 12px;font-size:11px;font-weight:600;color:#737373;letter-spacing:0.5px;">CORE / CLASSIC BUSINESS ANALYSIS</div>
       <div style="display:flex;flex-direction:column;">
@@ -366,7 +412,7 @@ function renderSidebar() {
         </div>
         <div style="padding-left:16px;display:flex;flex-direction:column;gap:2px;">
           <div style="display:flex;align-items:center;justify-content:space-between;padding:8px 12px;color:#e5e5e5;border-radius:6px;cursor:pointer;">
-            <div style="display:flex;align-items:center;gap:8px;">${refSvg(REF_P.chev, 12, '#a3a3a3', true)}${refSvg(REF_P.folder, 14, '#d97706')}<span>Cohort 001 - Parenting</span></div>
+            <div style="display:flex;align-items:center;gap:8px;">${refSvg(REF_P.chev, 12, '#a3a3a3', true)}${refSvg(REF_P.folder, 14, '#d97706')}<span>Cohort 001</span></div>
           </div>
           <div style="padding-left:16px;display:flex;flex-direction:column;gap:2px;">
             <div style="display:flex;align-items:center;justify-content:space-between;padding:8px 12px;color:#d4d4d4;border-radius:6px;cursor:pointer;">
@@ -1573,6 +1619,86 @@ function renderProfile() {
 }
 
 /* ============ SECONDARY PAGES ============ */
+/* ============ FEED / UPDATES (reference language, demo-functional) ============ */
+let feedFilter = 'All';
+function feedCategory(who) {
+  if (/mentor/i.test(who)) return 'Mentors';
+  if (/zeelin/i.test(who)) return 'Academy';
+  return 'Cohort';
+}
+function feedAvatarColor(who) {
+  if (/mentor/i.test(who)) return '#d97706';
+  if (/zeelin/i.test(who)) return '#2563eb';
+  return '#16a34a';
+}
+function feedInitials(who) {
+  const clean = who.replace(/^Mentor\s*[·•]\s*/i, '');
+  const parts = clean.split(/\s+/).filter(Boolean);
+  return ((parts[0] || 'Z')[0] + (parts[1] || 'A')[0]).toUpperCase();
+}
+function renderFeed() {
+  if (!Array.isArray(STATE.feedPosts)) STATE.feedPosts = [];
+  if (!STATE.feedLikes || typeof STATE.feedLikes !== 'object') STATE.feedLikes = {};
+  const mine = STATE.feedPosts.map((p) => ({ id: p.id, who: 'John Doe (You)', title: p.title, body: p.body, time: 'Just now', likes: 0, mine: true }));
+  const seeds = FEED.map((f) => ({ id: f.id, who: f.who, title: f.title, body: f.body, time: f.time, likes: 0 }));
+  const all = [...mine, ...seeds];
+  const cats = ['All', ...new Set(all.map((p) => feedCategory(p.who)))];
+  if (!cats.includes(feedFilter)) feedFilter = 'All';
+  const list = feedFilter === 'All' ? all : all.filter((p) => feedCategory(p.who) === feedFilter);
+  const card = (p) => {
+    const liked = !!STATE.feedLikes[p.id];
+    const n = p.likes + (liked ? 1 : 0);
+    return `<div style="background-color:#181818;border:1px solid #2a2a2a;border-radius:10px;overflow:hidden;margin-bottom:16px;">
+    <div style="padding:16px 20px;display:flex;gap:12px;">
+      <div style="width:36px;height:36px;border-radius:50%;background-color:${feedAvatarColor(p.who)};display:flex;align-items:center;justify-content:center;font-weight:bold;color:white;font-size:13px;flex-shrink:0;">${feedInitials(p.who)}</div>
+      <div style="flex:1;min-width:0;">
+        <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;"><span style="font-size:13px;font-weight:700;color:#ffffff;">${esc(p.who)}</span><span style="background-color:#262626;color:#a3a3a3;font-size:10px;font-weight:600;padding:3px 8px;border-radius:999px;">${feedCategory(p.who)}</span><span style="font-size:11px;color:#737373;margin-left:auto;">${esc(p.time)}</span></div>
+        <div style="font-size:14px;font-weight:700;color:#fff;margin-top:6px;">${esc(p.title)}</div>
+        <div style="font-size:13px;color:#d4d4d4;line-height:1.55;margin-top:4px;">${esc(p.body)}</div>
+        <div style="display:flex;gap:16px;font-size:12px;color:#a3a3a3;border-top:1px solid #262626;padding-top:10px;margin-top:12px;">
+          <span data-feellike="${p.id}" style="cursor:pointer;display:flex;align-items:center;gap:6px;color:${liked ? '#d97706' : '#a3a3a3'};">&#128077; ${n || ''} ${n === 1 ? 'Like' : 'Likes'}</span>
+        </div>
+      </div>
+    </div>
+  </div>`;
+  };
+  $('#page').innerHTML = `
+    <div style="padding:24px;max-width:900px;margin:0 auto;width:100%;box-sizing:border-box;">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:20px;border-bottom:1px solid #2a2a2a;padding-bottom:16px;">
+        <div>
+          <h1 style="font-size:22px;font-weight:700;color:#ffffff;margin:0 0 4px 0;">Feed / Updates</h1>
+          <p style="font-size:13px;color:#a3a3a3;margin:0;">Latest announcements from your cohort, mentors and Zeelin Academy.</p>
+        </div>
+        <div style="display:flex;gap:10px;">
+          ${STATE.feedRead ? '' : '<button data-feedread style="background-color:#262626;color:#a3a3a3;border:1px solid #333333;padding:8px 16px;border-radius:6px;font-size:13px;font-weight:600;cursor:pointer;">Mark all read</button>'}
+          <button data-feednew style="background-color:#d97706;color:#ffffff;border:none;padding:8px 16px;border-radius:6px;font-size:13px;font-weight:600;cursor:pointer;">New Update</button>
+        </div>
+      </div>
+      <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:20px;">${cats.map((c) => `<button data-feedfilter="${c}" style="padding:6px 14px;border-radius:999px;font-size:12px;font-weight:700;border:1px solid ${feedFilter === c ? '#d97706' : '#3a3a3a'};background:${feedFilter === c ? '#d97706' : 'transparent'};color:${feedFilter === c ? '#fff' : '#a3a3a3'};cursor:pointer;">${c}</button>`).join('')}</div>
+      ${list.map(card).join('') || '<p style="color:#737373;font-size:13px;text-align:center;padding:20px;">No updates in this category.</p>'}
+    </div>`;
+  $('#page').addEventListener('click', (e) => {
+    backLink(e);
+    const like = e.target.closest('[data-feellike]');
+    if (like) { STATE.feedLikes[like.dataset.feellike] = !STATE.feedLikes[like.dataset.feellike]; save(); route(); return; }
+    const f = e.target.closest('[data-feedfilter]');
+    if (f) { feedFilter = f.dataset.feedfilter; route(); return; }
+    if (e.target.closest('[data-feedread]')) { STATE.feedRead = true; save(); toast('All caught up'); route(); return; }
+    if (e.target.closest('[data-feednew]')) {
+      const ov = openModal(`<div style="font-size:16px;font-weight:700;color:#fff;margin-bottom:12px;">New Update</div>
+        <input id="fuTitle" class="form-input" placeholder="Update title..." style="margin-bottom:10px;"/>
+        <textarea id="fuBody" class="form-textarea" rows="4" placeholder="What should the cohort know?"></textarea>
+        <div style="display:flex;justify-content:flex-end;gap:10px;margin-top:14px;"><button class="btn btn-outline" id="fuCancel">Cancel</button><button class="btn btn-gradient" id="fuPost">Post Update</button></div>`);
+      $('#fuCancel', ov).addEventListener('click', closeDashOverlay);
+      $('#fuPost', ov).addEventListener('click', () => {
+        const t = $('#fuTitle', ov).value.trim(), b = $('#fuBody', ov).value.trim();
+        if (!t || !b) { toast('Add a title and message first'); return; }
+        STATE.feedPosts.unshift({ id: 'f' + Date.now(), title: t, body: b });
+        save(); closeDashOverlay(); toast('Update posted'); route();
+      });
+    }
+  });
+}
 /* ============ COMMUNITY (reference 02 pixel replica, demo-functional) ============ */
 const GUIDE_POSTS = [
   { id: 'g1', init: 'CN', color: '#059669', name: 'Chiamaka N.', meta: 'Cohort 001 Student &bull; 4 hours ago', tag: 'Study Group', tagBg: '#064e3b', tagColor: '#34d399', title: 'Looking for partners to review Business Analysis Foundation Day 1 & 2', body: 'Hi everyone! I am putting together a virtual review session this weekend to go over requirements elicitation techniques. Let me know if you want to join!', likes: 14, comments: 6 },
