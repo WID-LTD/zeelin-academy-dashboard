@@ -1211,3 +1211,12 @@ svg { display: block; flex-shrink: 0; overflow: hidden; }
 @media (min-width: 3000px) {
   .enrolled.single{zoom:1.6;}
 }
+
+/* single/dual rows need full width to breathe — stack below 1300px */
+@media (max-width: 1300px) {
+  .enrolled.single .enr-card,.enrolled.dual .enr-card{flex-direction:column;min-height:0;}
+  .enrolled.dual{grid-template-columns:1fr;}
+  .enrolled.single .enr-hero,.enrolled.dual .enr-hero{width:100%;height:300px;min-height:0;border-right:none;border-bottom:1px solid var(--border);}
+  .enrolled.single .enr-hero img.cover,.enrolled.dual .enr-hero img.cover{position:absolute;inset:0;}
+  .enrolled.single .enr-foot,.enrolled.dual .enr-foot{width:100%;border-left:none;}
+}
