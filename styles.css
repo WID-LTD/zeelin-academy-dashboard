@@ -1170,3 +1170,36 @@ svg { display: block; flex-shrink: 0; overflow: hidden; }
 .cat-head{display:flex;align-items:center;gap:12px;margin:6px 0 16px;}
 .cat-title{font-size:19px;font-weight:800;color:#fff;letter-spacing:-.01em;}
 .cat-badge{font-size:10.5px;font-weight:800;letter-spacing:.6px;text-transform:uppercase;color:#4ade80;background:#14532d;border:1px solid #16a34a;padding:4px 10px;border-radius:999px;}
+
+/* single course: full-width row, tall, big bold content filling top-to-bottom */
+.enrolled.single .enr-card{min-height:420px;}
+.enrolled.single .enr-hero{width:clamp(340px,30vw,560px);min-height:420px;}
+.enrolled.single .enr-body{justify-content:center;padding:32px;gap:0;}
+.enrolled.single .enr-body h3{font-size:clamp(26px,2.4vw,38px);margin-bottom:10px;}
+.enrolled.single .enr-sub{font-size:15px;font-weight:600;}
+.enrolled.single .enr-pills{margin:16px 0;}
+.enrolled.single .enr-pills span{font-size:13px;font-weight:900;padding:9px 17px;}
+.enrolled.single .enr-foot{width:clamp(300px,24vw,440px);justify-content:center;padding:32px;gap:18px;}
+.enrolled.single .readiness .rl{font-size:14px;}
+.enrolled.single .readiness .rl b{font-size:17px;}
+.enrolled.single .enr-foot .bar{height:12px;}
+.enrolled.single .stat-box{padding:14px;}
+.enrolled.single .stat-box .v{font-size:19px;}
+.enrolled.single .stat-box .l{font-size:12px;font-weight:700;}
+.enrolled.single .enr-foot .btn{padding:16px;font-size:16px;}
+/* two courses: side-by-side row cards, project-pair pattern */
+.enrolled.dual .enr-card{flex-direction:row;align-items:stretch;min-height:300px;}
+.enrolled.dual .enr-hero{width:30%;min-width:150px;height:auto;min-height:300px;align-self:stretch;border-bottom:none;border-right:1px solid var(--border);flex-shrink:0;}
+.enrolled.dual .enr-hero img.cover{position:absolute;inset:0;}
+.enrolled.dual .enr-body{flex:1;justify-content:center;min-width:0;padding:22px;}
+.enrolled.dual .enr-body h3{font-size:19px;}
+.enrolled.dual .enr-sub{font-size:13px;}
+.enrolled.dual .enr-foot{width:32%;min-width:165px;flex-shrink:0;border-left:1px solid var(--border);justify-content:center;padding:22px;gap:10px;}
+.enrolled.dual .stat-box .v{font-size:14px;}
+.enrolled.dual .enr-foot .btn{padding:12px;font-size:13px;}
+@media (max-width: 900px) {
+  .enrolled.single .enr-card,.enrolled.dual .enr-card{flex-direction:column;}
+  .enrolled.single .enr-hero,.enrolled.dual .enr-hero{width:100%;min-height:0;}
+  .enrolled.single .enr-hero img.cover,.enrolled.dual .enr-hero img.cover{position:static;}
+  .enrolled.single .enr-foot,.enrolled.dual .enr-foot{width:100%;border-left:none;}
+}

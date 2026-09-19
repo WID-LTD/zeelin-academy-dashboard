@@ -444,6 +444,10 @@ function renderSidebar() {
       + (isOpen ? days : '') + `</div>`;
   };
   $('#sidebar').innerHTML = `
+    <div style="padding:20px 16px;border-bottom:1px solid #2a2a2a;display:flex;align-items:center;gap:10px;">
+      <div style="width:28px;height:28px;background-color:#d97706;border-radius:6px;display:flex;align-items:center;justify-content:center;font-weight:bold;color:#fff;font-size:14px;">Z</div>
+      <span style="font-size:14px;font-weight:600;color:#ffffff;letter-spacing:-0.2px;line-height:1.2;">Zeelin Job Readiness System</span>
+    </div>
     <div style="padding:12px 8px;display:flex;flex-direction:column;gap:4px;font-size:13px;">
       ${navA('guide','#/guide','info','User Guide')}
       ${navA('board','#/board','feed','General Message Board','4')}
