@@ -443,6 +443,29 @@ try {
     const run={id:nextRunId(),actor:'zeelin-course-builder',mode:input.mode||'console',status:'running',input,stage:'queued',stages:[],sources:[],sourcesTotal:0,logs:[],jobs:[],items:0,cost:0.0,startedAt:new Date().toISOString(),finishedAt:null,durationMs:0, taskId:input.taskId||null, taskName:input.taskName||null};
     runs.set(run.id,run);
     try{ require('./course-builder/scraper/tor').runStart(run.id); }catch(_){}
+    // Eager Tor boot (background): if any rescue-eligible board is selected,
+    // warm the daemon now so on-failure rescue is instant, not +40s.
+    try{
+      const torMod=require('./course-builder/scraper/tor');
+      const sel=selectSources(input);
+      if(torMod.enabled() && sel.some(s=>/indeed|linkedin|glassdoor|upwork|ziprecruiter|milkround|cutshort|dice|monster|careerbuilder|snagajob|builtin|simplyhired|jobs-/.test(s))){
+        torMod.ensure().catch(()=>{});
+      }
+      // Warm DNS for every selected board host in the background (cold
+      // resolver costs 10-20s per new host; cache makes later hits instant).
+      try{
+        const httpMod=require('./course-builder/scraper/http');
+        if(httpMod.warmHosts) httpMod.warmHosts([
+          'boards-api.greenhouse.io','api.lever.co','api.ashbyhq.com','remotive.com',
+          'www.arbeitnow.com','arbeitnow.com','jobicy.com','hackernews.io','hn.algolia.com',
+          'remoteok.com','weworkremotely.com','www.dice.com','builtin.com','www.monster.com',
+          'www.careerbuilder.com','www.simplyhired.com','www.snagajob.com','www.reed.co.uk',
+          'api.adzuna.com','serpapi.com','jobs-api14.p.rapidapi.com','www.indeed.com',
+          'www.indeed.co.uk','www.linkedin.com','www.glassdoor.com','www.upwork.com',
+          'www.ziprecruiter.com','www.milkround.com','cutshort.io','opencode.ai',
+        ]);
+      }catch(_){}
+    }catch(_){}
     runLog.unshift({id:run.id,actor:run.actor,mode:run.mode,status:'running',startedAt:run.startedAt,items:0, taskId:run.taskId});
     if(runLog.length>200) runLog.pop();
     if(db) try{ db.saveRun(run); }catch(e){ console.warn('db saveRun failed', e.message); }

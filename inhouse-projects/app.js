@@ -11,6 +11,7 @@ function catalog(){ return (typeof window!=='undefined' && window.ZEELIN_CATALOG
 function defaultCatalogId(){ const c=catalog(); return (c && c.DEFAULT_PROJECT_ID) || 'supported'; }
 let currentProjectId = state.currentProject || defaultCatalogId();
 let currentMode = state.currentMode || 'supported';
+let isProjectScope = false;
 if(!['supported','mandate','group'].includes(currentMode)) currentMode = 'supported';
 let currentVaultFolderId = null;
 let quizState = null;
@@ -337,6 +338,7 @@ function route(){
   const h = location.hash.slice(1);
   let parts = h ? h.split('/') : [];
   let view = parts[0];
+  isProjectScope = false;
 
   /* Default */
   if(!view){ render('dashboard'); return; }
@@ -356,6 +358,7 @@ function route(){
     /* #p/:pid/mode/:mode */
     if(parts[2]==='mode' && parts[3]){ currentMode=parts[3]; state.currentMode=parts[3]; saveState(); location.replace('#p/'+pid+'/home'); return; }
     const page = parts[2] || 'home';
+    isProjectScope = true;
     render(page, parts[3]||null, parts[4]||null);
     return;
   }
@@ -450,7 +453,7 @@ function renderSidebar(activeKey){
   let html = `
     <div class="sidebar-head">
       <img src="assets/logo.png" alt="Zeelin Academy Logo">
-      <span class="sidebar-title">Work Experience Dashboard</span>
+      <span class="sidebar-title">${(typeof isProjectScope!=='undefined'&&isProjectScope)?'Work Experience Dashboard':'Work Experience Portal'}</span>
     </div>
     <div class="sidebar-nav">
       <a href="/portal.html" style="display:flex;align-items:center;gap:10px;padding:10px 12px;margin-bottom:6px;border-radius:8px;border:1px solid #d97706;background:#26170b;color:#f59e0b;font-weight:800;text-decoration:none;font-size:13px;">&#10219;<span>Select Portal</span></a>
@@ -534,7 +537,7 @@ function dashTopbarHtml(){
     <!-- Left: Branding -->
     <div style="display:flex;align-items:center;gap:12px;">
       <img src="assets/logo.png" alt="Zeelin Academy Logo" style="height:40px;width:auto;object-fit:contain;">
-      <span style="font-size:22px;font-weight:800;color:#ffffff;">Work Experience Dashboard</span>
+      <span style="font-size:22px;font-weight:800;color:#ffffff;">Work Experience Portal</span>
     </div>
 
     <!-- Center: Page Title -->
@@ -804,7 +807,7 @@ function viewDashboard(){
   return dashTopbarHtml() + `
   <main style="flex:1;padding:32px 48px;overflow-y:auto;">
     <div style="margin-bottom:28px;">
-      <p style="margin:0 0 6px 0;font-size:11px;text-transform:uppercase;letter-spacing:0.05em;color:#8a8a8a;font-weight:700;">Work Experience Dashboard</p>
+      <p style="margin:0 0 6px 0;font-size:11px;text-transform:uppercase;letter-spacing:0.05em;color:#8a8a8a;font-weight:700;">Work Experience Portal</p>
       <h1 style="margin:0 0 8px 0;font-size:30px;font-weight:900;color:#ffffff;display:flex;align-items:center;gap:10px;">PROJECT&nbsp;<span id="projTitleName">${esc(projOwner())}</span><button onclick="event.stopPropagation();window._editOwner()" title="Rename" aria-label="Rename project collection" style="background:transparent;border:1px solid #3a3a3a;border-radius:8px;color:#a3a3a3;width:30px;height:30px;display:inline-flex;align-items:center;justify-content:center;cursor:pointer;"><svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04c.39-.39.39-1.02 0-1.41l-2.34-2.34c-.39-.39-1.02-.39-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z"/></svg></button></h1>
       <p style="margin:0;font-size:14px;color:#c6c6c6;">Each project contains <b style="color:#fff;">Supported + Mandate + Group</b> inside. Buy more from the marketplace to grow this list.</p>
     </div>
