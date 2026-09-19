@@ -451,9 +451,9 @@ function renderSidebar(activeKey){
     return `<a href="${href}" data-route="p/${currentProjectId}/${page}" class="${activeKey===page?'active':''}">${svg(icon)}<span>${label}</span></a>`;
   };
   let html = `
-    <div class="sidebar-head">
-      <img src="assets/logo.png" alt="Zeelin Academy Logo">
-      <span class="sidebar-title">ZEELIN JOB READINESS SYSTEM</span>
+    <div class="sidebar-head" style="padding:22px 16px;border-bottom:2px solid #3a3a3a;display:flex;flex-direction:column;align-items:center;gap:12px;text-align:center;">
+      <img src="assets/logo.png" alt="Zeelin Academy Logo" style="height:42px;width:auto;object-fit:contain;flex-shrink:0;">
+      <span class="sidebar-title" style="font-size:13px;font-weight:800;color:#ffffff;letter-spacing:1px;line-height:1.4;text-align:center;">ZEELIN JOB READINESS SYSTEM</span>
     </div>
     <div class="sidebar-nav">
       <a href="/portal.html" style="display:flex;align-items:center;gap:10px;padding:10px 12px;margin-bottom:6px;border-radius:8px;border:1px solid #d97706;background:#26170b;color:#f59e0b;font-weight:800;text-decoration:none;font-size:13px;">&#10219;<span>Select Portal</span></a>

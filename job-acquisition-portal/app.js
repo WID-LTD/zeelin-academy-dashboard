@@ -174,7 +174,7 @@ function renderSidebar(activeRoute){
 
   return ''
   + '<div style="padding:14px 10px;display:flex;flex-direction:column;gap:6px;font-size:14px;font-weight:700;overflow-y:auto;flex:1;">'
-  + '<div style="display:flex;flex-direction:column;align-items:center;gap:10px;padding:16px 8px 14px;border-bottom:2px solid #3a3a3a;margin:-14px -10px 8px;text-align:center;"><img src="assets/logo.png" alt="Zeelin logo" style="height:46px;width:auto;object-fit:contain;flex-shrink:0;"><span style="font-size:11px;font-weight:800;color:#ffffff;letter-spacing:0.8px;line-height:1.3;text-align:center;">ZEELIN JOB<br/>READINESS SYSTEM</span></div>'
+  + '<div style="display:flex;flex-direction:column;align-items:center;gap:12px;padding:22px 16px;border-bottom:2px solid #3a3a3a;margin:-14px -10px 8px;text-align:center;"><img src="assets/logo.png" alt="Zeelin logo" style="height:42px;width:auto;object-fit:contain;flex-shrink:0;"><span style="font-size:13px;font-weight:800;color:#ffffff;letter-spacing:1px;line-height:1.4;text-align:center;">ZEELIN JOB READINESS SYSTEM</span></div>'
   + portalLink(isPortal)
   + topLink(isOverview)
   + '<div style="padding:18px 12px 6px 12px;font-size:12px;font-weight:800;color:#f59e0b;letter-spacing:0.8px;">STAGE 3: CAREER GATE</div>'
@@ -211,7 +211,6 @@ function topbarHtml(title, rightHtml, progressPct){
   return '<div style="height:78px;background-color:#181818;border-top:2px solid #3f3f3f;border-bottom:2px solid #3f3f3f;display:flex;align-items:center;justify-content:space-between;padding:0 32px;gap:16px;flex-shrink:0;">'
     + '<div style="display:flex;align-items:center;gap:12px;flex-shrink:0;">'
     + '<button onclick="document.getElementById(\'sidebar\').classList.add(\'open\');document.getElementById(\'sidebarOverlay\').classList.add(\'show\')" style="display:none;" class="topbar-hamburger">☰</button>'
-    + '<img src="assets/logo.png" alt="Zeelin logo" style="height:42px;width:auto;object-fit:contain;flex-shrink:0;">'
     + '</div>'
     + '<div style="flex:1;display:flex;align-items:center;justify-content:center;gap:12px;min-width:280px;">'
     + '<span style="font-size:26px;font-weight:900;letter-spacing:1.2px;color:#ffffff;white-space:nowrap;text-align:center;width:100%;">'+esc(title.split(" •")[0])+'</span>'
