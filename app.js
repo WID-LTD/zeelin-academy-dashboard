@@ -789,9 +789,9 @@ function renderCourses() {
       <div class="home-welcome">
         <div class="home-hello">Welcome back</div>
         <h1>Welcome back, ${esc(USER.name.split(' ')[0])}</h1>
-        <div class="sub">You're enrolled in ${COURSES.length} courses. Pick up where you left off, or continue the day that unlocks your next XP claim.</div>
+        <div class="sub">You're enrolled in ${COURSES.length} course${COURSES.length === 1 ? '' : 's'}. Pick up where you left off, or continue the day that unlocks your next XP claim.</div>
       </div>
-      <div class="cat-head"><span class="cat-title">Core / Classic Business Analysis</span><span class="cat-badge">Purchased</span></div>
+      <div class="cat-head"><span class="cat-title">${esc((COURSES[0] && COURSES[0].category) || 'Core / Classic Business Analysis')}</span><span class="cat-badge">Purchased</span></div>
       <div class="enrolled${COURSES.length===1?' single':COURSES.length===2?' dual':''}">
         ${COURSES.map((c) => {
     const pct = Math.max(0, Math.min(100, c.progress));
