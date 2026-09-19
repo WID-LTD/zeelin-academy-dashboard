@@ -1294,7 +1294,7 @@ function viewBrief(){
   return renderTopbar(proj.name+': Brief & Objectives', p.progress, `<span>${proj.modeLabel} &bull; ${proj.progress}% Project Progress</span><b>${p.progress}% Phase Complete</b>`)
     + `<div class="workspace"><div class="canvas">
       <div class="brief">
-        <div class="brief-meta"><span class="brief-kicker">${proj.name}${projModeChip()} — Work Experience Dashboard</span><span class="brief-deadline">Deadline: ${t.project.deadline}</span></div>
+        <div class="brief-meta"><span class="brief-kicker">${proj.name}${projModeChip()} — Work Experience Portal</span><span class="brief-deadline">Deadline: ${t.project.deadline}</span></div>
         <h1>${cp ? cp.title : t.project.title}</h1>
         ${projHero}
         <p>${proj.stageDesc.brief} This practical assignment simulates real-world consulting${solo?' — fully self-directed':' with mentor support'}${cp ? ' for a <b style="color:#fff">'+cp.jobRole+'</b> ('+cp.categoryName+').' : '.'} You are tasked with analyzing the project domain, eliciting operational requirements from stakeholders, and modeling a comprehensive solution.</p>
@@ -2026,7 +2026,7 @@ function viewProjectHome(){
       <div style="margin-bottom: 24px; border-bottom: 1px solid #2a2a2a; padding-bottom: 16px; display: flex; justify-content: space-between; align-items: center;">
         <div>
           <h1 style="font-size: 20px; font-weight: 800; color: #ffffff; margin: 0 0 4px 0;">${proj.name} — ${currentMode==='supported'?'Supported':currentMode==='mandate'?'Mandate':'Group'} Workspace</h1>
-          <p style="font-size: 13px; color: #a3a3a3; margin: 0;">Cohort 001 &bull; ${currentMode} mode &bull; Work Experience Dashboard</p>
+          <p style="font-size: 13px; color: #a3a3a3; margin: 0;">Cohort 001 &bull; ${currentMode} mode &bull; Work Experience Portal</p>
         </div>
         <div style="background-color: #181818; border: 1px solid #2a2a2a; padding: 8px 14px; border-radius: 8px; display: flex; align-items: center; gap: 10px;">
           <span style="font-size: 12px; color: #a3a3a3;">Overall Day Progress</span>
@@ -3177,7 +3177,7 @@ function viewMentorSupport(){
             <!-- Hero -->
             <div style="text-align:center;padding:48px 24px 32px;">
               <h1 style="font-size:28px;font-weight:700;color:#ffffff;margin:0 0 8px 0;">Project Support Center</h1>
-              <p style="font-size:14px;color:#a3a3a3;margin:0;">Get assistance with your Stage 2 Work Experience Dashboard. Our mentors and support team are here to help you succeed.</p>
+              <p style="font-size:14px;color:#a3a3a3;margin:0;">Get assistance with your Stage 2 Work Experience Portal. Our mentors and support team are here to help you succeed.</p>
             </div>
 
             <!-- 3 Cards -->
@@ -3261,9 +3261,9 @@ function viewSupport(){
     `<div class="faq-item ${i===0?'open':''}" onclick="this.classList.toggle('open')"><div class="faq-q">${f.q} <span>+</span></div><div class="faq-a">${f.a}</div></div>`
   ).join('');
 
-  return renderTopbar('Work Experience Dashboard Support Center',0,'')
+  return renderTopbar('Work Experience Portal Support Center',0,'')
     + `<div class="content"><div class="support-wrap" style="max-width:860px;margin:0 auto">
-      <div class="support-hero" style="text-align:center;padding:48px 24px 32px"><h1 style="font-size:28px;font-weight:700;color:#fff;margin:0 0 8px">Project Support Center</h1><p style="font-size:14px;color:#a3a3a3;margin:0">Get assistance with your Stage 2 Work Experience Dashboard.</p></div>
+      <div class="support-hero" style="text-align:center;padding:48px 24px 32px"><h1 style="font-size:28px;font-weight:700;color:#fff;margin:0 0 8px">Project Support Center</h1><p style="font-size:14px;color:#a3a3a3;margin:0">Get assistance with your Stage 2 Work Experience Portal.</p></div>
       <div class="grid3" style="margin-bottom:32px">
         <div class="scard"><svg viewBox="0 0 24 24" fill="#d97706" width="36" height="36"><path d="M20 2H4c-1.1 0-1.99.9-1.99 2L2 22l4-4h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zm-2 12H6v-2h12v2zm0-3H6V9h12v2zm0-3H6V6h12v2z"/></svg><h3>Community Chat</h3><p>Ask questions and collaborate with your cohort peers and mentors.</p></div>
         <div class="scard"><svg viewBox="0 0 24 24" fill="#d97706" width="36" height="36"><path d="M12 3v10.55c-.59-.34-1.27-.55-2-.55-2.21 0-4 1.79-4 4s1.79 4 4 4 4-1.79 4-4V7h4V3h-6z"/></svg><h3>Mentor Office Hours</h3><p>Schedule 1-on-1 sessions with your assigned project mentor.</p></div>
@@ -3283,7 +3283,7 @@ function viewJobPortal(){
       <div>
         <div style="font-size:64px;margin-bottom:16px">&#x1F680;</div>
         <h1 style="font-size:28px;font-weight:700;color:#fff;margin:0 0 8px">Job Acquisition Portal</h1>
-        <p style="font-size:14px;color:#a3a3a3;margin:0 0 24px;max-width:400px">Stage 3 will be unlocked once you pass your Work Experience Dashboard milestone quiz. Complete your project to gain access.</p>
+        <p style="font-size:14px;color:#a3a3a3;margin:0 0 24px;max-width:400px">Stage 3 will be unlocked once you pass your Work Experience Portal milestone quiz. Complete your project to gain access.</p>
         <button class="btn btn-amber" onclick="window._nav('portal')">Return to Project Hub</button>
       </div>
     </div>`;

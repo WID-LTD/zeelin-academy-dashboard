@@ -485,7 +485,7 @@ function renderTopbar() {
   const crumb = routeName === 'home' ? 'Your Courses' : `${esc(dayCard(STATE.day).title)} - Day ${STATE.day} of 7`;
   $('#topbar').innerHTML = `
     <button class="burger" id="burger">${ic('burger', 20, 20)}</button>
-    <div class="tb-brand"><img class="tb-logo" src="${A}logo.png" alt="Zeelin logo"/><div><div class="tb-name">ZEELIN JOB TRAINING ${routeName==='home'?'PORTAL':'DASHBOARD'}</div></div></div>
+    <div class="tb-brand"><img class="tb-logo" src="${A}logo.png" alt="Zeelin logo"/><div><div class="tb-name">ZEELIN JOB TRAINING PORTAL</div></div></div>
     <div class="crumb"><b>${crumb}</b></div>
     <div class="top-actions">
       <a href="/portal.html" class="top-chip" style="text-decoration:none;border-color:#3a3a3a;background:#1e1e1e;color:#f59e0b" title="Switch Portal">${ic('layers', 14, 14)} Portals</a>

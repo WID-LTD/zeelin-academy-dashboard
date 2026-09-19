@@ -322,7 +322,7 @@ function viewOverview(){
     + '<button onclick="window._nav(\'regional-boards\')" style="width:100%;background:linear-gradient(135deg, #f59e0b 0%, #d97706 100%);color:#ffffff;border:1px solid #f59e0b;padding:14px;border-radius:8px;font-size:14px;font-weight:900;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px;box-shadow:0 4px 16px rgba(217, 119, 6, 0.4);">'
     + '<span>Go to Regional Job Boards</span><svg style="width:16px;height:16px;fill:currentColor;" viewBox="0 0 24 24"><path d="M5 13h11.86l-5.43 5.43 1.42 1.42L21.14 12l-8.29-8.29-1.42 1.42L16.86 11H5v2z"/></svg></button></div></div>';
 
-  return topbarHtml('ZEELIN JOB ACQUISITION DASHBOARD \u2022 Career Mission Control', '<span>Readiness Index: <strong style="color:#34d399;">95%</strong></span><span style="color:#f59e0b;font-weight:800;">Cohort 001</span>', 25)
+  return topbarHtml('ZEELIN JOB ACQUISITION PORTAL \u2022 Career Mission Control', '<span>Readiness Index: <strong style="color:#34d399;">95%</strong></span><span style="color:#f59e0b;font-weight:800;">Cohort 001</span>', 25)
     + '<div style="flex:1;display:flex;overflow:hidden;min-height:0;">'+main+right+'</div>';
 }
 
@@ -515,7 +515,7 @@ function viewBoost(){
     + '<button onclick="window._nav(\'cv-maker\')" style="width:100%;background:linear-gradient(135deg, #f59e0b 0%, #d97706 100%);color:#ffffff;border:1px solid #f59e0b;padding:14px;border-radius:8px;font-size:14px;font-weight:900;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px;box-shadow:0 4px 16px rgba(217, 119, 6, 0.4);">'
     + '<span>Proceed to CV Maker & Portfolio</span><svg style="width:16px;height:16px;fill:currentColor;" viewBox="0 0 24 24"><path d="M5 13h11.86l-5.43 5.43 1.42 1.42L21.14 12l-8.29-8.29-1.42 1.42L16.86 11H5v2z"/></svg></button></div></div>';
 
-  return topbarHtml('ZEELIN JOB ACQUISITION DASHBOARD \u2022 Boost & Accountability', '<span>Quota Status: <strong style="color:#f59e0b;">'+q+' / 5 Logged</strong></span><span style="color:#34d399;font-weight:800;">Active Enforcement</span>', Math.round(q/5*100))
+  return topbarHtml('ZEELIN JOB ACQUISITION PORTAL \u2022 Boost & Accountability', '<span>Quota Status: <strong style="color:#f59e0b;">'+q+' / 5 Logged</strong></span><span style="color:#34d399;font-weight:800;">Active Enforcement</span>', Math.round(q/5*100))
     + '<div style="flex:1;display:flex;overflow:hidden;min-height:0;">'+main+right+'</div>';
 }
 
@@ -606,7 +606,7 @@ function viewCVMaker(){
     + '<div style="display:grid;grid-template-columns:repeat(5, 1fr);gap:10px;">'+cardsHtml+'</div></div>'
     + '</div></div>';
 
-  return topbarHtml('ZEELIN JOB ACQUISITION DASHBOARD \u2022 ATS Resume Generator', '<span>ATS Match Score: <strong style="color:#34d399;">98% Optimized</strong></span><span style="color:#f59e0b;font-weight:800;">Dynamic Live Preview</span>', 90)
+  return topbarHtml('ZEELIN JOB ACQUISITION PORTAL \u2022 ATS Resume Generator', '<span>ATS Match Score: <strong style="color:#34d399;">98% Optimized</strong></span><span style="color:#f59e0b;font-weight:800;">Dynamic Live Preview</span>', 90)
     + '<div style="flex:1;display:flex;overflow:hidden;min-height:0;">'+mainLeft+mainRight+'</div>';
 }
 
@@ -663,7 +663,7 @@ function viewInterviewPrep(){
     + '<button onclick="window._nav(\'overview\')" style="width:100%;background:linear-gradient(135deg, #f59e0b 0%, #d97706 100%);color:#ffffff;border:1px solid #f59e0b;padding:14px;border-radius:8px;font-size:14px;font-weight:900;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px;box-shadow:0 4px 16px rgba(217, 119, 6, 0.4);">'
     + '<span>Return to Mission Control</span><svg style="width:16px;height:16px;fill:currentColor;" viewBox="0 0 24 24"><path d="M5 13h11.86l-5.43 5.43 1.42 1.42L21.14 12l-8.29-8.29-1.42 1.42L16.86 11H5v2z"/></svg></button></div></div>';
 
-  return topbarHtml('ZEELIN JOB ACQUISITION DASHBOARD \u2022 Interview Prep & Mock Center', '<span>Live Timetable: <strong style="color:#34d399;">Booking Open</strong></span><span style="color:#f59e0b;font-weight:800;">Mock & Assignments</span>', 75)
+  return topbarHtml('ZEELIN JOB ACQUISITION PORTAL \u2022 Interview Prep & Mock Center', '<span>Live Timetable: <strong style="color:#34d399;">Booking Open</strong></span><span style="color:#f59e0b;font-weight:800;">Mock & Assignments</span>', 75)
     + '<div style="flex:1;display:flex;overflow:hidden;min-height:0;">'+main+right+'</div>';
 }
 
@@ -1047,7 +1047,7 @@ window._downloadCV = function(){
   window.print && window.print();
 };
 window._downloadPrompt = function(){
-  const blob = new Blob(['ZEELIN JOB ACQUISITION DASHBOARD — BA_SupplyChain_Interview_Prompt.docx (demo)\n\n1. Describe your stakeholder conflict resolution approach.\n2. Defend your carrying cost multiplier model.\n3. Explain MoSCoW prioritization under scope creep.\n\nCohort 001 — Submit via drag & drop.'], {type:'application/vnd.openxmlformats-officedocument.wordprocessingml.document'});
+  const blob = new Blob(['ZEELIN JOB ACQUISITION PORTAL — BA_SupplyChain_Interview_Prompt.docx (demo)\n\n1. Describe your stakeholder conflict resolution approach.\n2. Defend your carrying cost multiplier model.\n3. Explain MoSCoW prioritization under scope creep.\n\nCohort 001 — Submit via drag & drop.'], {type:'application/vnd.openxmlformats-officedocument.wordprocessingml.document'});
   const url=URL.createObjectURL(blob);
   const a=document.createElement('a'); a.href=url; a.download='BA_SupplyChain_Interview_Prompt.docx'; a.click(); URL.revokeObjectURL(url);
   showToast('Downloaded BA_SupplyChain_Interview_Prompt.docx');
