@@ -444,9 +444,8 @@ function renderSidebar() {
       + (isOpen ? days : '') + `</div>`;
   };
   $('#sidebar').innerHTML = `
-    <div style="padding:18px 16px;border-bottom:2px solid #3a3a3a;display:flex;align-items:center;gap:12px;">
-      <img src="assets/logo.png" alt="Zeelin logo" style="height:42px;width:auto;object-fit:contain;flex-shrink:0;">
-      <span style="font-size:11px;font-weight:800;color:#ffffff;letter-spacing:0.8px;line-height:1.3;">ZEELIN JOB<br/>READINESS SYSTEM</span>
+    <div style="padding:22px 16px;border-bottom:2px solid #3a3a3a;display:flex;align-items:center;justify-content:center;text-align:center;">
+      <span style="font-size:13px;font-weight:800;color:#ffffff;letter-spacing:1px;line-height:1.4;">ZEELIN JOB READINESS SYSTEM</span>
     </div>
     <div style="padding:12px 8px;display:flex;flex-direction:column;gap:4px;font-size:13px;">
       ${navA('guide','#/guide','info','User Guide')}
