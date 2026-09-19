@@ -846,3 +846,6 @@ img{background:#0d0d0d;}
 .dash-grid.single .gm-side{padding:20px 22px !important;}
 .dash-grid.single .gm-side span{font-size:14px !important;font-weight:700;}
 .dash-grid.single .gm-side button{padding:15px !important;font-size:16px !important;font-weight:900;box-shadow:0 6px 20px rgba(217,119,6,.3);}
+
+/* project listing area renders at 70% overall (compounds with portal 80%) */
+.dash-grid{zoom:.875;}
