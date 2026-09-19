@@ -25,7 +25,7 @@ function defaultState(){
       certs:'CCNA, Junior Cybersecurity Analyst',
       level:'Senior Specialist',
       industry:'Supply Chain Analytics & Enterprise Systems',
-      summary:'Results-driven professional with rigorous in-house enterprise training and verified credentials. Specialized in supply chain optimization, stakeholder elicitation, financial modeling, and advanced inventory carrying cost analysis.',
+      summary:'Results-driven professional with rigorous work-experience enterprise training and verified credentials. Specialized in supply chain optimization, stakeholder elicitation, financial modeling, and advanced inventory carrying cost analysis.',
       jobDesc:'Seeking Senior Business Analyst with expertise in supply chain optimization, stakeholder elicitation, financial modeling, inventory carrying cost formulas, and advanced Microsoft Excel reporting standards.',
       template:'executive'
     },
@@ -91,14 +91,31 @@ function navigate(hash){
   }
   window.location.hash = hash;
 }
+/* scraper presence probe — course-builder/ is gitignored, so production 404s */
+window.__HAS_SCRAPER = undefined;
+function probeScraper(){
+  var done=function(ok){
+    window.__HAS_SCRAPER = !!ok;
+    try{
+      var cur=String(location.hash||'').replace(/^#/,'');
+      if(!ok && (cur==='portal' || cur.indexOf('portal/course-builder')===0 || cur.indexOf('portal/job-scraper')===0)) location.hash='overview';
+    }catch(e){}
+  };
+  try{
+    var c = (typeof AbortController!=='undefined') ? new AbortController() : null;
+    var t = setTimeout(function(){ try{if(c) c.abort();}catch(e){} done(false); }, 4000);
+    fetch('course-builder/index.html', {method:'HEAD', cache:'no-store', signal: c?c.signal:undefined}).then(function(r){ clearTimeout(t); done(r && r.ok); }).catch(function(){ clearTimeout(t); done(false); });
+  }catch(e){ done(false); }
+}
 function route(){
   let h = (location.hash.slice(1) || 'portal').toLowerCase().replace(/^#/, '').replace(/\/+$/,'');
   // Dedicated portal selector: #portal and sub-routes portal/<name>/overview
   if(h==='portal/job-acquisition' || h==='portal/job-acquisition/overview' || h==='portal/job-acquisition-portal/overview' || h==='portal/job-acquisition-portal') h='overview';
   if(h==='portal/course-builder' || h==='portal/course-builder/overview' || h==='portal/job-scraper/overview' || h==='portal/job-scraper'){
-    window.location.href='course-builder/';
-    return;
+    if(window.__HAS_SCRAPER===false){ h='overview'; }
+    else { window.location.href='course-builder/'; return; }
   }
+  if(h==='portal' && window.__HAS_SCRAPER===false) h='overview';
   const allowed = ['portal','overview','regional-boards','boost','cv-maker','interview-prep','events-hub','calendar','recordings','live-sessions','resources'];
   let view = h, param = null;
   if(h.startsWith('regional-boards/')){ view='regional-boards'; param=h.split('/')[1]||null; }
@@ -581,7 +598,7 @@ function viewCVMaker(){
     + '<p id="cv-contact" style="font-size:11px;margin:3px 0 0 0;font-weight:600;color:#555555;">'+esc(d.location)+' \u2022 '+esc(d.email)+' \u2022 Experience Level: '+esc(d.level)+' \u2022 Focus: '+esc(d.industry)+'</p></div>'
     + '<div style="margin-bottom:16px;"><h4 style="font-size:13px;font-weight:900;border-bottom:1px solid '+t.color+';padding-bottom:2px;margin:0 0 6px 0;text-transform:uppercase;">Professional Background & Summary</h4><p id="cv-summary-text" style="font-size:11px;line-height:1.5;margin:0;font-weight:600;text-align:justify;">'+esc(d.summary)+'</p></div>'
     + '<div style="margin-bottom:16px;"><h4 style="font-size:13px;font-weight:900;border-bottom:1px solid '+t.color+';padding-bottom:2px;margin:0 0 6px 0;text-transform:uppercase;">Certifications & Core Competencies</h4><p id="cv-certs" style="font-size:11px;line-height:1.4;margin:0;font-weight:600;"><strong>Certifications:</strong> '+esc(d.certs)+'.<br><strong>Focus:</strong> '+esc(d.industry)+' ('+esc(d.level)+').</p></div>'
-    + '<div style="margin-bottom:12px;"><h4 style="font-size:13px;font-weight:900;border-bottom:1px solid '+t.color+';padding-bottom:2px;margin:0 0 6px 0;text-transform:uppercase;">Verified In-House Project Deliverables</h4>'
+    + '<div style="margin-bottom:12px;"><h4 style="font-size:13px;font-weight:900;border-bottom:1px solid '+t.color+';padding-bottom:2px;margin:0 0 6px 0;text-transform:uppercase;">Verified Work Experience Deliverables</h4>'
     + '<div style="margin-bottom:8px;"><div style="display:flex;justify-content:space-between;font-weight:900;font-size:11px;"><span>Retail Supply Chain Optimization Model</span><span>Grade: 92/100</span></div><p style="font-size:10px;line-height:1.4;margin:2px 0 0 0;font-weight:600;text-align:justify;">Engineered robust spreadsheet financial models mapping annual carrying cost multipliers and inventory turnover metrics. Verified by Lead Mentor Dr. O. Emeka under enterprise standards (#WID-VERIFIED-9210).</p></div>'
     + '<div><div style="display:flex;justify-content:space-between;font-weight:900;font-size:11px;"><span>Business Requirements Specification (BRS)</span><span>Grade: 93/100</span></div><p style="font-size:10px;line-height:1.4;margin:2px 0 0 0;font-weight:600;text-align:justify;">Conducted thorough stakeholder interviews, documented functional specifications, and created precise MoSCoW prioritization matrices.</p></div></div>'
     + '<div style="margin-top:12px;border:1px dashed #a3a3a3;border-radius:6px;padding:8px;text-align:center;font-size:9px;color:#737373;">AI Disclaimer: This CV was enhanced via AI API — verify all facts before submission. Cohort 001 — Stage 3</div>'
@@ -684,7 +701,7 @@ function viewEventsHub(){
     + '<div style="padding:24px;background-color:#161616;border-top:2px solid #3a3a3a;">'
     + '<button onclick="window._nav(\'calendar\')" style="width:100%;background:linear-gradient(135deg, #f59e0b 0%, #d97706 100%);color:#ffffff;border:1px solid #f59e0b;padding:14px;border-radius:8px;font-size:14px;font-weight:900;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px;box-shadow:0 4px 16px rgba(217, 119, 6, 0.4);"><span>View Full Calendar & Bookings</span><svg style="width:16px;height:16px;fill:currentColor;" viewBox="0 0 24 24"><path d="M5 13h11.86l-5.43 5.43 1.42 1.42L21.14 12l-8.29-8.29-1.42 1.42L16.86 11H5v2z"/></svg></button></div></div>';
 
-  return topbarHtml('In-House Training Portal \u2022 Events & Sessions Hub', '<span style="color:#f59e0b;font-weight:800;">Cohort 001 Active</span>', 60)
+  return topbarHtml('Work Experience Dashboard \u2022 Events & Sessions Hub', '<span style="color:#f59e0b;font-weight:800;">Cohort 001 Active</span>', 60)
     + '<div style="flex:1;display:flex;overflow:hidden;min-height:0;">'+main+right+'</div>';
 }
 
@@ -770,7 +787,7 @@ function viewCalendar(){
     + '<button onclick="window._nav(\'resources\')" style="width:100%;background:#262626;color:#d4d4d4;border:1px solid #404040;padding:12px;border-radius:8px;font-size:13px;font-weight:800;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px;"><span>\uD83D\uDCCB</span> Go to Mock Resources <svg style="width:14px;height:14px;fill:currentColor;" viewBox="0 0 24 24"><path d="M5 13h11.86l-5.43 5.43 1.42 1.42L21.14 12l-8.29-8.29-1.42 1.42L16.86 11H5v2z"/></svg></button>'
     + '</div></div>';
 
-  return topbarHtml('In-House Training Portal \u2022 Calendar & Live Sessions Hub', '<span style="color:#f59e0b;font-weight:800;">Cohort 001 Active</span> <span style="color:#a3a3a3;">• Interactive Demo</span>', 55)
+  return topbarHtml('Work Experience Dashboard \u2022 Calendar & Live Sessions Hub', '<span style="color:#f59e0b;font-weight:800;">Cohort 001 Active</span> <span style="color:#a3a3a3;">• Interactive Demo</span>', 55)
     + '<div style="flex:1;display:flex;overflow:hidden;min-height:0;">'+main+right+'</div>';
 }
 
@@ -819,7 +836,7 @@ function viewResources(){
     + '</div>'
     + '<div style="padding:24px;background:#161616;border-top:2px solid #3a3a3a;"><button onclick="window._nav(\'calendar\')" style="width:100%;background:#262626;color:#d4d4d4;border:1px solid #404040;padding:12px;border-radius:8px;font-size:13px;font-weight:800;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px;"><span>\u2190 Back to Calendar</span></button></div></div>';
 
-  return topbarHtml('In-House Training Portal \u2022 Mock Interview Resources Library', '<span style="color:#f59e0b;font-weight:800;">Resources</span> <span style="color:#a3a3a3;">• Interactive</span>', 80)
+  return topbarHtml('Work Experience Dashboard \u2022 Mock Interview Resources Library', '<span style="color:#f59e0b;font-weight:800;">Resources</span> <span style="color:#a3a3a3;">• Interactive</span>', 80)
     + '<div style="flex:1;display:flex;overflow:hidden;min-height:0;">'+main+right+'</div>';
 }
 
@@ -854,7 +871,7 @@ function viewRecordings(){
     + '</div>'
     + '<div style="padding:24px;background:#161616;border-top:2px solid #3a3a3a;"><button onclick="window._nav(\'calendar\')" style="width:100%;background:linear-gradient(135deg, #f59e0b 0%, #d97706 100%);color:#fff;border:1px solid #f59e0b;padding:14px;border-radius:8px;font-size:13px;font-weight:900;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px;"><span>Go to Calendar & Live</span><svg style="width:14px;height:14px;fill:currentColor;" viewBox="0 0 24 24"><path d="M5 13h11.86l-5.43 5.43 1.42 1.42L21.14 12l-8.29-8.29-1.42 1.42L16.86 11H5v2z"/></svg></button></div></div>';
 
-  return topbarHtml('In-House Training Portal \u2022 Recordings Library & Archive Hub', '<span style="color:#f59e0b;font-weight:800;">Cohort 001 Archive</span> <span style="color:#a3a3a3;">• On-Demand</span>', 70)
+  return topbarHtml('Work Experience Dashboard \u2022 Recordings Library & Archive Hub', '<span style="color:#f59e0b;font-weight:800;">Cohort 001 Archive</span> <span style="color:#a3a3a3;">• On-Demand</span>', 70)
     + '<div style="flex:1;display:flex;overflow:hidden;min-height:0;">'+main+right+'</div>';
 }
 
@@ -1162,12 +1179,17 @@ function closeSidebar(){
 }
 
 /* ─── Init ─── */
+/* continuous stage scale — identical layout at every desktop width (base 1) */
+function fitStage(){ try{ var w = window.innerWidth || 1600; document.body.style.zoom = (w < 1024) ? '' : Math.min(2.4, Math.max(1, (w / 1600) * 1)); }catch(e){} }
+window.addEventListener('resize', fitStage);
+fitStage();
 window.addEventListener('hashchange', function(){
   closeSidebar();
   route();
 });
 window.addEventListener('DOMContentLoaded', function(){
   if(!location.hash) location.hash = 'portal';
+  probeScraper();
   route();
   const ov=document.getElementById('sidebarOverlay');
   if(ov) ov.addEventListener('click', closeSidebar);

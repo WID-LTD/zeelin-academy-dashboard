@@ -48,7 +48,6 @@ body {
   font-size: 14.5px;
   line-height: 1.55;
   -webkit-font-smoothing: antialiased;
-  zoom: 0.8;
 }
 
 a { color: inherit; text-decoration: none; }
@@ -354,27 +353,6 @@ svg { display: block; flex-shrink: 0; overflow: hidden; }
   .enrolled.dual { grid-template-columns: 1fr; }
 }
 /* Ultra-wide: horizontal cards stacked vertically — image left, details middle, progress+CTA right */
-@media (min-width: 2000px) {
-  .enrolled { grid-template-columns: 1fr; gap: 16px; }
-  .enr-card { flex-direction: row; align-items: stretch; min-height: 300px; }
-  .enr-hero { width: clamp(340px, 24vw, 540px); height: auto; min-height: 300px; align-self: stretch; border-bottom: none; border-right: 1px solid var(--border); flex-shrink: 0; }
-  .enr-hero img.cover { position: absolute; inset: 0; }
-  .enr-body { flex: 1.5; justify-content: center; min-width: 0; }
-  .enr-body h3 { font-size: clamp(28px, 2vw, 44px); }
-  .enr-sub { font-size: clamp(15px, 1vw, 19px); }
-  .enr-pills span { font-size: clamp(12px, 0.85vw, 15px); padding: 9px 18px; }
-  .stat-row { max-width: 760px; gap: 16px; }
-  .stat-box { padding: 16px 18px; border-radius: 12px; }
-  .stat-box .v { font-size: clamp(19px, 1.3vw, 26px); }
-  .stat-box .l { font-size: clamp(11px, 0.8vw, 14px); }
-  .enr-badges .enr-badge { font-size: 12px; padding: 7px 14px; }
-  .enr-hero-meta { font-size: 13px; }
-  .enr-foot { width: clamp(320px, 22vw, 480px); flex-shrink: 0; border-left: 1px solid var(--border); justify-content: center; gap: 20px; padding: clamp(24px, 2vw, 40px); }
-  .enr-foot .readiness .rl { font-size: 14px; }
-  .enr-foot .readiness .rl b { font-size: 17px; }
-  .enr-foot .bar { height: 14px; }
-  .enr-foot .btn { padding: 18px; font-size: clamp(16px, 1.1vw, 20px); }
-}
 .stat-row { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-bottom: 14px; }
 .stat-box { background: #0d0d0d; border: 1px solid var(--border); border-radius: 9px; padding: 9px 10px; }
 .stat-box .v { font-size: 15px; font-weight: 800; color: var(--text); }
@@ -1085,79 +1063,6 @@ svg { display: block; flex-shrink: 0; overflow: hidden; }
   .acc-layout { grid-template-columns: 1fr; }
 }
 /* ============ ULTRA-WIDE (min 2000px): big, bold, full-screen ============ */
-@media (min-width: 2000px) {
-  /* shell: uncap page, fluid padding */
-  .page { max-width: none; padding: clamp(28px, 2.5vw, 56px) clamp(24px, 3vw, 64px) 90px; }
-  .page-header h1 { font-size: clamp(28px, 1.8vw, 38px); }
-  .page-header .sub { font-size: 16px; max-width: 900px; }
-  /* controls: bigger buttons, thicker bars, larger chips */
-  .btn { padding: 15px 26px; font-size: 16px; border-radius: 12px; }
-  .btn-block { padding: 17px 26px; font-size: 17px; }
-  .bar { height: 10px; }
-  .top-chip { font-size: 14px; padding: 9px 16px; }
-  .crumb { font-size: 15px; }
-  /* sidebar + topbar scale */
-  .sidebar { width: 330px; }
-  .snav a { font-size: 16px; padding: 13px 16px; }
-  .snav-label { font-size: 13px; }
-  .sidebar-badge { font-size: 14px; }
-  .topbar { min-height: 78px; }
-  .tb-brand .tb-name { font-size: 19px; }
-  .tb-brand .tb-sub { font-size: 13px; }
-  /* day dashboard cards: 4 across, roomier */
-  .p-grid { grid-template-columns: repeat(4, 1fr); gap: 26px; }
-  .p-card { padding: 26px; border-radius: 16px; }
-  .p-card .pt-title { font-size: 18px; }
-  .p-card .pt-sub { font-size: 14px; }
-  .grid-2 { grid-template-columns: repeat(2, 1fr); }
-  .grid-3 { grid-template-columns: repeat(4, 1fr); }
-  .grid-4 { grid-template-columns: repeat(5, 1fr); }
-  /* reading: wider measure, larger type */
-  .chapter-canvas { max-width: 1150px; padding: 56px 64px; font-size: 17px; }
-  .chapter-canvas h2 { font-size: 27px; }
-  .chapter-canvas h3 { font-size: 19px; }
-  .chapter-canvas .callout { font-size: 16px; padding: 16px 20px; }
-  .check-item { font-size: 15px; }
-  /* quiz + checkin: wider, bigger touch targets */
-  .q-card { max-width: 1100px; padding: 44px 52px; }
-  .q-card h2 { font-size: 24px; }
-  .option { font-size: 17px; padding: 18px 22px; }
-  .quiz-score { max-width: 1000px; }
-  .ci-wrap .ci-form { grid-template-columns: 1fr 340px; gap: 26px; }
-  .ci-label { font-size: 17px; }
-  .ci-claim .xp { font-size: 38px; }
-  .ci-claim-txt { font-size: 15px; }
-  .radio-chip, .check-chip { font-size: 15px; padding: 12px 20px; }
-  textarea.fb-area, .fb-area { font-size: 15px; }
-  /* videos: bigger thumbnails + text */
-  .video-row { gap: 24px; padding: 20px; border-radius: 16px; }
-  .video-row .thumb-wrap { width: 280px; height: 160px; }
-  .video-row h3 { font-size: 20px !important; }
-  .video-row p { font-size: 15px !important; }
-  .video-row label { font-size: 14px !important; }
-  .video-row button { font-size: 14px !important; padding: 12px 22px !important; }
-  /* visual deck: taller stage, bigger display type */
-  .deck-stage { min-height: 620px; border-radius: 20px; }
-  .deck-body { padding: 40px 48px; }
-  .deck-kicker { font-size: 14px; }
-  .deck-title { font-size: clamp(36px, 2.4vw, 52px); }
-  .deck-sub { font-size: 19px; }
-  .deck-bullets li { font-size: 18px; }
-  /* support/alumni cards: 4 across, taller art */
-  .sup-grid, .alum-grid { grid-template-columns: repeat(4, 1fr); gap: 22px; }
-  .sup-card .himg { height: 190px; }
-  .sup-card .body { padding: 20px 22px; font-size: 15px; }
-  /* calendar: roomier cells */
-  .cal-day { min-height: 122px; padding: 12px; }
-  .cal-day .d { font-size: 15px; }
-  .cal-dow { font-size: 13px; padding: 12px 0; }
-  .cal-dot { width: 12px; height: 12px; }
-  /* overlays scale with viewport */
-  .gate-card { width: 680px; }
-  .gate-card .qnum, .q-card .qnum { font-size: 14px; }
-  .dash-modal.ci-modal { width: 1100px; }
-  .star-row .starb { width: 52px; height: 52px; }
-}
 
 /* day groups under Day 1 (reference tree) */
 .day-groups{padding:2px 0 4px 16px;}
@@ -1206,12 +1111,6 @@ svg { display: block; flex-shrink: 0; overflow: hidden; }
 }
 
 /* single course row: identical to 1K at any size, uniformly scaled on big displays */
-@media (min-width: 2000px) {
-  .enrolled.single{max-width:1500px;zoom:1.3;}
-}
-@media (min-width: 3000px) {
-  .enrolled.single{zoom:1.6;}
-}
 
 /* single/dual rows need full width to breathe — stack below 1300px */
 @media (max-width: 1300px) {

@@ -60,14 +60,20 @@ const COURSE_ROOT = path.join(__dirname, 'course-builder');
     });
   }
 
-  // Attribute a globally-fetched job to a requested country by content.
-  // Remote/unknown-location jobs go to a labelled 'Remote'/'Other' tab —
-  // never forced into a wrong country, never duplicated across tabs.
+  // Attribute a globally-fetched job to a requested country via the world
+  // cities DB (city/state matching). Remote/unknown-location jobs go to a
+  // labelled 'Remote'/'Other' tab — never forced into a wrong country.
   function attributeCountry(j, countriesList){
-    const loc=`${(j.location&&j.location.label)||''} ${(j.location&&j.location.country)||''}`.toLowerCase();
-    for(const c of countriesList){
-      if(c && loc.includes(String(c).toLowerCase())){ j.country=c; return c; }
-    }
+    const locText=`${(j.location&&j.location.label)||''} ${(j.location&&j.location.country)||''}`;
+    try {
+      const isos=countriesList.map(c=>regions.isoFor(c)).filter(Boolean);
+      const hit=regions.resolveCountryISO(locText, isos);
+      if(hit){
+        const back=countriesList.find(c=>regions.isoFor(c)===hit);
+        if(back){ j.country=back; return back; }
+      }
+    } catch(_){}
+    const loc=locText.toLowerCase();
     const remote=/\b(remote|work from home|wfh|distributed|anywhere)\b/.test(loc+' '+String(j.description||'').slice(0,500).toLowerCase()) || j.isRemote || j.isHybrid;
     if(!j.location) j.location={label:'', country:''};
     j.country = remote ? 'Remote' : 'Other';
@@ -229,8 +235,8 @@ try {
   function available(sources){ return hasProxy ? sources : sources.filter(s=>!config.sources.browserSources.includes(s));}
   const SOURCE_OPTIONS={
     all: config.sources.enabled,
-    fast: ['reed','milkround','greenhouse','remotive-jobicy','adzuna','lever','ashby','workday','bamboohr'],
-    deep: ['reed','milkround','indeed','google-jobs','cutshort','linkedin-jobs','glassdoor','upwork','ziprecruiter','greenhouse','remotive-jobicy','lever','ashby','workday','bamboohr'],
+    fast: config.sources.fast,
+    deep: config.sources.deep,
   };
   function selectSources(input){
     let base;
@@ -554,12 +560,27 @@ try {
           const GLOBAL_SOURCES=regions.GLOBAL_SOURCES;
           const globalSources=allSources.filter(s=>GLOBAL_SOURCES.includes(s));
           const localSources=allSources.filter(s=>!GLOBAL_SOURCES.includes(s));
+          // Optional city narrowing: researched world-cities DB maps the city
+          // to its country; that country's batch searches the city, others
+          // use country names. Empty city = countries as-is (cities still
+          // auto-used for matching/attribution).
+          const cityOverride={};
+          if(input.city && String(input.city).trim()){
+            const cRaw=String(input.city).trim();
+            try{
+              const isos=countriesList.map(c=>regions.isoFor(c)).filter(Boolean);
+              const hit=regions.resolveCountryISO(cRaw, isos);
+              const back=hit && countriesList.find(c=>regions.isoFor(c)===hit);
+              if(back){ cityOverride[back]=cRaw; log.info(`City filter: "${cRaw}" narrows the ${back} batch (other countries unchanged)`); }
+              else log.warn(`City "${cRaw}" is not in the requested countries — ignored (using country names)`);
+            }catch(_){}
+          }
           const batches=[];
           for(const country of countriesList){
             for(const kw of keywordsList){
               const filtered = localSources.filter(s=> isSourceSupportedForCountry(s, country));
               if(!filtered.length) continue; // covered by global phase or unsupported
-              batches.push({country, kw, sources: filtered});
+              batches.push({country, kw, sources: filtered, loc: cityOverride[country]||country});
             }
           }
           if(!batches.length){
@@ -658,8 +679,8 @@ try {
             await Promise.all(workers);
             return results;
           }
-          await runWithConcurrency(batches, concurrency, async ({country, kw, sources: batchSources})=>{
-            const q=kw; const loc=country;
+          await runWithConcurrency(batches, concurrency, async ({country, kw, sources: batchSources, loc: batchLoc})=>{
+            const q=kw; const loc=batchLoc||country;
             const srcs = batchSources || allSources;
             const wrappedOnSource=(r)=> onSource({...r, q, c:country});
             try{
@@ -794,7 +815,7 @@ try {
               for(const {country, kw} of retryBatches.slice(0,rare?10:6)){
                 try{
                   const res=await scraper.run({sources: retrySources, query:kw, location:country, limit: extraPerTitle, log:{info:()=>{}, warn:()=>{}}, onSource:retryOnSource});
-                  res.jobs.forEach(j=>{ j.queryKeyword=kw; j.country=country; ensureRequirements(j); });
+                  res.jobs.forEach(j=>{ j.queryKeyword=kw; attributeCountry(j, countriesList); ensureRequirements(j); });
                   retryJobs.push(...res.jobs);
                 }catch(_){}
               }
@@ -864,6 +885,19 @@ try {
           if(shortfall.length) log.warn(`Shortfall per role — ${shortfall.join(', ')} (consider broader websites or larger perTitle)`);
           jobsToFilter = balanced.length ? balanced : validJobs;
           if(jobsToFilter.length > totalCap) jobsToFilter = jobsToFilter.slice(0, totalCap);
+        }
+        // Final same-tab title+company dedupe: cross-posted URL variants of one
+        // posting collapse to a single row per tab (legit multi-country
+        // postings still appear once in EACH matching tab).
+        {
+          const seenTC=new Set(); const deduped=[];
+          for(const j of jobsToFilter){
+            const k=`${String(j.title||'').toLowerCase().replace(/[^a-z0-9]+/g,' ').trim()}|${String(j.company||'').toLowerCase().trim()}|${j.country||''}`;
+            if(seenTC.has(k)) continue;
+            seenTC.add(k); deduped.push(j);
+          }
+          if(deduped.length!==jobsToFilter.length) log.info(`Same-tab dedupe: ${jobsToFilter.length} → ${deduped.length} rows`);
+          jobsToFilter=deduped;
         }
         // merge: keep live per-source events (fan-out + fallback already pushed), add anything missing
         const seenSrc=new Set(run.sources.map(s=>`${s.source}|${s.q}|${s.c}`));

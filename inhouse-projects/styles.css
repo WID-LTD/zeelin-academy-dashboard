@@ -1,7 +1,7 @@
 *{margin:0;padding:0;box-sizing:border-box}
 :root{--bg:#121212;--surface:#181818;--surface2:#161616;--surface3:#1a1a1a;--border:#3a3a3a;--border2:#454545;--text:#ececec;--text2:#d4d4d4;--text3:#b5b5b5;--muted:#8a8a8a;--amber:#d97706;--amber-light:#f59e0b;--amber-bg:rgba(217,119,6,.1);--green:#16a34a;--green-bg:#14532d;--green-text:#4ade80;--blue:#3b82f6;--red:#ef4444;--radius:12px;--radius-sm:8px;--radius-xs:6px}
 html,body{height:100%;overflow:hidden}
-body{background:var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,'Helvetica Neue',sans-serif;font-size:14px;line-height:1.5;zoom:.8}
+body{background:var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,'Helvetica Neue',sans-serif;font-size:14px;line-height:1.5}
 a{color:var(--amber);text-decoration:none}
 button{cursor:pointer;font-family:inherit}
 
@@ -766,15 +766,6 @@ img{background:#0d0d0d;}
 }
 
 /* ============ ULTRA-WIDE (min 2000px): identical layout, uniformly scaled ============ */
-@media (min-width: 2000px) {
-  /* Scale the whole canvas so 2560x1656 looks exactly like 1440x920, just bigger */
-  #main-content{zoom:1.35;}
-  .sidebar{width:330px;}
-  .sidebar-title{font-size:17px;}
-  .sidebar-nav{font-size:15px;}
-  .sidebar-nav a{padding:13px 16px;}
-  .sidebar-label{font-size:13px;}
-}
 
 /* ─── Related-projects row: roomier cards, clear separation, stacked buy row ─── */
 .mp-related{grid-template-columns:repeat(auto-fit,minmax(320px,1fr)) !important;gap:24px !important;}

@@ -42,6 +42,7 @@ function migrateState(s){
   return s;
 }
 function persist(s){ localStorage.setItem(STORE_KEY, JSON.stringify(s)); }
+function esc(s){ return String(s==null?'':s).replace(/[&<>"']/g, (c)=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
 function saveState(){ persist(state); }
 function uid(){ return 'n'+Date.now().toString(36)+Math.random().toString(36).slice(2,7); }
 function fmtSize(b){ return b>1048576 ? (b/1048576).toFixed(1)+' MB' : Math.max(1,Math.round(b/1024))+' KB'; }
@@ -307,6 +308,19 @@ function myProjectIds(){
   return enrolled;
 }
 function myProjects(){ const c=catalog(); if(!c) return []; const ids=myProjectIds(); return ids.map(id=>c.getCatalogProject(id)).filter(Boolean); }
+function projOwner(){ try{ const s=localStorage.getItem('zeelin_project_owner'); if(s) return s; }catch(e){} return ((typeof USER!=='undefined'&&USER.name)||'MY').split(' ')[0].toUpperCase(); }
+function projOwnerSave(v){ v=String(v||'').trim().toUpperCase().slice(0,24); if(!v) return; try{localStorage.setItem('zeelin_project_owner',v)}catch(e){} route(); }
+window._editOwner = function(){
+  const h=document.getElementById('projTitleName'); if(!h) return;
+  const cur=projOwner();
+  const inp=document.createElement('input'); inp.id='projTitleInput'; inp.value=cur; inp.maxLength=24;
+  inp.setAttribute('style','font:inherit;font-weight:900;color:#fff;background:#0d0d0d;border:2px solid #d97706;border-radius:8px;padding:2px 10px;width:220px;outline:none;text-transform:uppercase;');
+  h.replaceWith(inp); inp.focus(); inp.select();
+  let done=false;
+  const commit=(save)=>{ if(done) return; done=true; if(save) projOwnerSave(inp.value); else route(); };
+  inp.addEventListener('keydown',e=>{ if(e.key==='Enter') commit(true); if(e.key==='Escape') commit(false); e.stopPropagation(); });
+  inp.addEventListener('blur',()=>commit(true));
+};
 window._setMode = function(mode){
   if(!['supported','mandate','group'].includes(mode)) return;
   currentMode=mode; state.currentMode=mode; saveState();
@@ -436,13 +450,13 @@ function renderSidebar(activeKey){
   let html = `
     <div class="sidebar-head">
       <img src="assets/logo.png" alt="Zeelin Academy Logo">
-      <span class="sidebar-title">In-House Project Training Portal</span>
+      <span class="sidebar-title">Work Experience Dashboard</span>
     </div>
     <div class="sidebar-nav">
       <a href="/portal.html" style="display:flex;align-items:center;gap:10px;padding:10px 12px;margin-bottom:6px;border-radius:8px;border:1px solid #d97706;background:#26170b;color:#f59e0b;font-weight:800;text-decoration:none;font-size:13px;">&#10219;<span>Select Portal</span></a>
       ${navLink('dashboard','My Projects','M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-6h2v6zm0-8h-2V7h2v2z',activeKey)}
       ${navLink('catalog','Marketplace','M3 3h8v8H3V3zm10 0h8v8h-8V3zM3 13h8v8H3v-8zm10 0h8v8h-8v-8z',activeKey)}
-      <div class="sidebar-label">My Projects (${my.length})</div>
+      <div class="sidebar-label">PROJECT ${projOwner()} (${my.length})</div>
       ${my.slice(0,12).map(p=>`<a href="#p/${p.id}/home" data-route="p/${p.id}/home" class="${p.id===currentProjectId?'active':''}" title="${String(p.title).replace(/"/g,'&quot;')}">${svg(ICON_FOLDER)}<span style="white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${String(p.title).slice(0,28)}</span></a>`).join('')}
       <div class="sidebar-label">Current Project — Modes Inside</div>
       <div class="cohort-label">
@@ -520,7 +534,7 @@ function dashTopbarHtml(){
     <!-- Left: Branding -->
     <div style="display:flex;align-items:center;gap:12px;">
       <img src="assets/logo.png" alt="Zeelin Academy Logo" style="height:40px;width:auto;object-fit:contain;">
-      <span style="font-size:22px;font-weight:800;color:#ffffff;">In-House Project Dashboard</span>
+      <span style="font-size:22px;font-weight:800;color:#ffffff;">Work Experience Dashboard</span>
     </div>
 
     <!-- Center: Page Title -->
@@ -790,8 +804,8 @@ function viewDashboard(){
   return dashTopbarHtml() + `
   <main style="flex:1;padding:32px 48px;overflow-y:auto;">
     <div style="margin-bottom:28px;">
-      <p style="margin:0 0 6px 0;font-size:11px;text-transform:uppercase;letter-spacing:0.05em;color:#8a8a8a;font-weight:700;">In-House Projects</p>
-      <h1 style="margin:0 0 8px 0;font-size:30px;font-weight:900;color:#ffffff;">My Projects — ${list.length}</h1>
+      <p style="margin:0 0 6px 0;font-size:11px;text-transform:uppercase;letter-spacing:0.05em;color:#8a8a8a;font-weight:700;">Work Experience Dashboard</p>
+      <h1 style="margin:0 0 8px 0;font-size:30px;font-weight:900;color:#ffffff;display:flex;align-items:center;gap:10px;">PROJECT&nbsp;<span id="projTitleName">${esc(projOwner())}</span><button onclick="event.stopPropagation();window._editOwner()" title="Rename" aria-label="Rename project collection" style="background:transparent;border:1px solid #3a3a3a;border-radius:8px;color:#a3a3a3;width:30px;height:30px;display:inline-flex;align-items:center;justify-content:center;cursor:pointer;"><svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04c.39-.39.39-1.02 0-1.41l-2.34-2.34c-.39-.39-1.02-.39-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z"/></svg></button></h1>
       <p style="margin:0;font-size:14px;color:#c6c6c6;">Each project contains <b style="color:#fff;">Supported + Mandate + Group</b> inside. Buy more from the marketplace to grow this list.</p>
     </div>
     <div class="stat-strip">
@@ -1277,7 +1291,7 @@ function viewBrief(){
   return renderTopbar(proj.name+': Brief & Objectives', p.progress, `<span>${proj.modeLabel} &bull; ${proj.progress}% Project Progress</span><b>${p.progress}% Phase Complete</b>`)
     + `<div class="workspace"><div class="canvas">
       <div class="brief">
-        <div class="brief-meta"><span class="brief-kicker">${proj.name}${projModeChip()} — In-House Training Project</span><span class="brief-deadline">Deadline: ${t.project.deadline}</span></div>
+        <div class="brief-meta"><span class="brief-kicker">${proj.name}${projModeChip()} — Work Experience Dashboard</span><span class="brief-deadline">Deadline: ${t.project.deadline}</span></div>
         <h1>${cp ? cp.title : t.project.title}</h1>
         ${projHero}
         <p>${proj.stageDesc.brief} This practical assignment simulates real-world consulting${solo?' — fully self-directed':' with mentor support'}${cp ? ' for a <b style="color:#fff">'+cp.jobRole+'</b> ('+cp.categoryName+').' : '.'} You are tasked with analyzing the project domain, eliciting operational requirements from stakeholders, and modeling a comprehensive solution.</p>
@@ -2009,7 +2023,7 @@ function viewProjectHome(){
       <div style="margin-bottom: 24px; border-bottom: 1px solid #2a2a2a; padding-bottom: 16px; display: flex; justify-content: space-between; align-items: center;">
         <div>
           <h1 style="font-size: 20px; font-weight: 800; color: #ffffff; margin: 0 0 4px 0;">${proj.name} — ${currentMode==='supported'?'Supported':currentMode==='mandate'?'Mandate':'Group'} Workspace</h1>
-          <p style="font-size: 13px; color: #a3a3a3; margin: 0;">Cohort 001 &bull; ${currentMode} mode &bull; In-House Project</p>
+          <p style="font-size: 13px; color: #a3a3a3; margin: 0;">Cohort 001 &bull; ${currentMode} mode &bull; Work Experience Dashboard</p>
         </div>
         <div style="background-color: #181818; border: 1px solid #2a2a2a; padding: 8px 14px; border-radius: 8px; display: flex; align-items: center; gap: 10px;">
           <span style="font-size: 12px; color: #a3a3a3;">Overall Day Progress</span>
@@ -3160,7 +3174,7 @@ function viewMentorSupport(){
             <!-- Hero -->
             <div style="text-align:center;padding:48px 24px 32px;">
               <h1 style="font-size:28px;font-weight:700;color:#ffffff;margin:0 0 8px 0;">Project Support Center</h1>
-              <p style="font-size:14px;color:#a3a3a3;margin:0;">Get assistance with your Stage 2 In-House Project. Our mentors and support team are here to help you succeed.</p>
+              <p style="font-size:14px;color:#a3a3a3;margin:0;">Get assistance with your Stage 2 Work Experience Dashboard. Our mentors and support team are here to help you succeed.</p>
             </div>
 
             <!-- 3 Cards -->
@@ -3244,9 +3258,9 @@ function viewSupport(){
     `<div class="faq-item ${i===0?'open':''}" onclick="this.classList.toggle('open')"><div class="faq-q">${f.q} <span>+</span></div><div class="faq-a">${f.a}</div></div>`
   ).join('');
 
-  return renderTopbar('In-House Project Support Center',0,'')
+  return renderTopbar('Work Experience Dashboard Support Center',0,'')
     + `<div class="content"><div class="support-wrap" style="max-width:860px;margin:0 auto">
-      <div class="support-hero" style="text-align:center;padding:48px 24px 32px"><h1 style="font-size:28px;font-weight:700;color:#fff;margin:0 0 8px">Project Support Center</h1><p style="font-size:14px;color:#a3a3a3;margin:0">Get assistance with your Stage 2 In-House Project.</p></div>
+      <div class="support-hero" style="text-align:center;padding:48px 24px 32px"><h1 style="font-size:28px;font-weight:700;color:#fff;margin:0 0 8px">Project Support Center</h1><p style="font-size:14px;color:#a3a3a3;margin:0">Get assistance with your Stage 2 Work Experience Dashboard.</p></div>
       <div class="grid3" style="margin-bottom:32px">
         <div class="scard"><svg viewBox="0 0 24 24" fill="#d97706" width="36" height="36"><path d="M20 2H4c-1.1 0-1.99.9-1.99 2L2 22l4-4h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zm-2 12H6v-2h12v2zm0-3H6V9h12v2zm0-3H6V6h12v2z"/></svg><h3>Community Chat</h3><p>Ask questions and collaborate with your cohort peers and mentors.</p></div>
         <div class="scard"><svg viewBox="0 0 24 24" fill="#d97706" width="36" height="36"><path d="M12 3v10.55c-.59-.34-1.27-.55-2-.55-2.21 0-4 1.79-4 4s1.79 4 4 4 4-1.79 4-4V7h4V3h-6z"/></svg><h3>Mentor Office Hours</h3><p>Schedule 1-on-1 sessions with your assigned project mentor.</p></div>
@@ -3266,7 +3280,7 @@ function viewJobPortal(){
       <div>
         <div style="font-size:64px;margin-bottom:16px">&#x1F680;</div>
         <h1 style="font-size:28px;font-weight:700;color:#fff;margin:0 0 8px">Job Acquisition Portal</h1>
-        <p style="font-size:14px;color:#a3a3a3;margin:0 0 24px;max-width:400px">Stage 3 will be unlocked once you pass your In-House Project milestone quiz. Complete your project to gain access.</p>
+        <p style="font-size:14px;color:#a3a3a3;margin:0 0 24px;max-width:400px">Stage 3 will be unlocked once you pass your Work Experience Dashboard milestone quiz. Complete your project to gain access.</p>
         <button class="btn btn-amber" onclick="window._nav('portal')">Return to Project Hub</button>
       </div>
     </div>`;
@@ -3641,6 +3655,10 @@ window._initScrollFeatures = initScrollFeatures;
 
 /* ─── Init ─── */
 window.route = route;
+/* continuous stage scale — identical layout at every desktop width (base 0.8) */
+function fitStage(){ try{ var w = window.innerWidth || 1600; document.body.style.zoom = (w < 1024) ? '' : Math.min(2.4, Math.max(1, (w / 1600) * 0.8)); }catch(e){} }
+window.addEventListener('resize', fitStage);
+fitStage();
 window.addEventListener('hashchange', route);
 window.addEventListener('DOMContentLoaded', function(){
   if(!location.hash) location.hash = '#dashboard';

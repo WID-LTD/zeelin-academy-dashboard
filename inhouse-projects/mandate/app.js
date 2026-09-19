@@ -3057,6 +3057,10 @@ window._moveItem = function(pk, id){
 
 /* ─── Init ─── */
 window.route = route;
+/* continuous stage scale — identical layout at every desktop width (base 1) */
+function fitStage(){ try{ var w = window.innerWidth || 1600; document.body.style.zoom = (w < 1024) ? '' : Math.min(2.4, Math.max(1, (w / 1600) * 1)); }catch(e){} }
+window.addEventListener('resize', fitStage);
+fitStage();
 window.addEventListener('hashchange', route);
 window.addEventListener('DOMContentLoaded', function(){
   if(!location.hash) location.hash = '#dashboard';

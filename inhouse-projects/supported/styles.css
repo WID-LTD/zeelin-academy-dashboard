@@ -717,7 +717,3 @@ input:focus,textarea:focus{border-color:var(--amber)!important;outline:none}
 @media(max-width:900px){.p-grid{grid-template-columns:1fr;}}
 
 /* ============ ULTRA-WIDE (min 2000px): identical layout, uniformly scaled ============ */
-@media (min-width: 2000px) {
-  .main{zoom:1.35;}
-  .sidebar{width:330px;}
-}

@@ -959,10 +959,10 @@ const TODAY = new Date(2026, 7, 4); // 4 Aug 2026 (month is 0-indexed)
 
 
 const TRACKS = [
-  {id:'inhouse',name:'In-House Program',icon:'M12 2L2 12h3v8h6v-6h2v6h6v-8h3L12 2z',
+  {id:'inhouse',name:'Work Experience Program',icon:'M12 2L2 12h3v8h6v-6h2v6h6v-8h3L12 2z',
    project:{
      title:'Supported Project',
-     subtitle:'Cohort 001 - In-House Training Track',
+     subtitle:'Cohort 001 - Work Experience Track',
      deadline:'Aug 28, 2026',
       phases:[
         {id:'brief',name:'Brief & Objectives',icon:'M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2z',progress:100,route:'brief'},
