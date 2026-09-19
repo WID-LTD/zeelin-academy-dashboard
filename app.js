@@ -331,19 +331,16 @@ window._navCohort = function(){ cohortSave(!cohortOpen()); renderSidebar(); };
 window._navTree = function(w){ const o = treeOpen(); const next = (o.length === 1 && o[0] === w) ? [] : [w]; treeSave(next); renderSidebar(); };
 window._navDay = function(n){ STATE.day = n; save(); if((parseHash()[0]||'home')==='day'){ route(); } else { go('/day'); } };
 function dayGroupsHTML(r){
-  const grp = (label, links) => `<div class="dg-label">${label}</div>` + links.map((l) => `<a class="dg-link${r===l.route?' active':''}" href="${l.href}">${ic(l.icon,13,13)}<span>${l.text}</span></a>`).join('');
-  return `<div class="day-groups">`
-    + grp('Learning', [
-      { route:'book', href:'#'+dayReadingHref(STATE.day), icon:'book', text:'Daily Reading' },
-      { route:'videos', href:'#/videos', icon:'video', text:'Video Tutorials' },
-      { route:'visual', href:'#/visual/'+deckIdForDay(STATE.day), icon:'layers', text:'Visual Deck' },
-    ])
-    + grp('Main', [
-      { route:'checkin', href:'#/checkin', icon:'user-check', text:'Check-In' },
-      { route:'roadmap', href:'#/roadmap', icon:'compass', text:'Reading Roadmap' },
-      { route:'accountability', href:'#/accountability', icon:'chart', text:'Accountability' },
-    ])
-    + `</div>`;
+  const links = [
+    { route:'checkin', href:'#/checkin', icon:'user-check', text:'Check-In' },
+    { route:'roadmap', href:'#/roadmap', icon:'compass', text:'Reading Roadmap' },
+    { route:'book', href:'#'+dayReadingHref(STATE.day), icon:'book', text:'Daily Reading' },
+    { route:'videos', href:'#/videos', icon:'video', text:'Video Tutorials' },
+    { route:'visual', href:'#/visual/'+deckIdForDay(STATE.day), icon:'layers', text:'Visual Summary' },
+    { route:'calendar', href:'#/calendar', icon:'calendar', text:'Calendar' },
+    { route:'accountability', href:'#/accountability', icon:'chart', text:'Accountability' },
+  ];
+  return `<div class="day-groups">` + links.map((l) => `<a class="dg-link${r===l.route?' active':''}" href="${l.href}">${ic(l.icon,13,13)}<span>${l.text}</span></a>`).join('') + `</div>`;
 }
 /* social demo store */
 function socialState(){ try { return Object.assign({ likes:{}, posts:[] }, JSON.parse(localStorage.getItem('zdash_social') || '{}')); } catch { return { likes:{}, posts:[] }; } }
