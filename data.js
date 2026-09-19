@@ -53,6 +53,24 @@ const COURSES = [
     strength: 0,
     color: 'var(--blue)',
   },
+  {
+    id: 'process-modelling',
+    title: 'Business Process Modelling',
+    short: 'Process Modelling',
+    category: 'Core / Classic Business Analysis',
+    cover: A + 'books/modelling_buussiness_process.png',
+    cohort: 'Cohort 001',
+    days: [5, 6],
+    week: 3,
+    weekName: 'Process Design',
+    progress: 0,
+    estimatedHours: 24,
+    completedHours: 0,
+    daysLeft: 4,
+    readiness: 0,
+    strength: 0,
+    color: 'var(--green)',
+  },
 ];
 
 const TRACKING = COURSES[0];
