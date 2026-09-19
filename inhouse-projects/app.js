@@ -533,15 +533,16 @@ function renderPanel(title, sub, items, btnText, btnHash){
 /* ═══ MAIN DASHBOARD VIEW (reference/11) — renders without sidebar ═══ */
 function dashTopbarHtml(){
   return `
-  <header class="dash-topbar" style="height:70px;background-color:#181818;border-bottom:1px solid #3f3f3f;display:flex;align-items:center;justify-content:space-between;padding:0 32px;">
-    <!-- Left: Branding -->
-    <div style="display:flex;align-items:center;gap:12px;">
-      <img src="assets/logo.png" alt="Zeelin Academy Logo" style="height:40px;width:auto;object-fit:contain;">
-      <span style="font-size:22px;font-weight:800;color:#ffffff;">ZEELIN WORK EXPERIENCE PORTAL</span>
+  <header class="dash-topbar" style="height:78px;background-color:#181818;border-top:2px solid #3f3f3f;border-bottom:2px solid #3f3f3f;display:flex;align-items:center;justify-content:space-between;padding:0 32px;gap:16px;">
+    <!-- Left: Logo -->
+    <div style="display:flex;align-items:center;gap:12px;flex-shrink:0;">
+      <img src="assets/logo.png" alt="Zeelin Academy Logo" style="height:42px;width:auto;object-fit:contain;">
     </div>
 
-    <!-- Center: Page Title -->
-    <div style="font-size:16px;font-weight:600;color:#e5e5e5;">Your Projects</div>
+    <!-- Center: Portal Title - expanded to cover previous areas, bold and wide -->
+    <div style="flex:1;display:flex;align-items:center;justify-content:center;min-width:280px;">
+      <span style="font-size:26px;font-weight:900;letter-spacing:1.2px;color:#ffffff;white-space:nowrap;text-align:center;width:100%;">ZEELIN WORK EXPERIENCE PORTAL</span>
+    </div>
 
     <!-- Right: User Stats & Profile Mock -->
     <div style="display:flex;align-items:center;gap:16px;">
@@ -807,7 +808,6 @@ function viewDashboard(){
   return dashTopbarHtml() + `
   <main style="flex:1;padding:32px 48px;overflow-y:auto;">
     <div style="margin-bottom:28px;">
-      <p style="margin:0 0 6px 0;font-size:11px;text-transform:uppercase;letter-spacing:0.05em;color:#8a8a8a;font-weight:700;">Work Experience Portal</p>
       <h1 style="margin:0 0 8px 0;font-size:30px;font-weight:900;color:#ffffff;display:flex;align-items:center;gap:10px;">PROJECT&nbsp;<span id="projTitleName">${esc(projOwner())}</span><button onclick="event.stopPropagation();window._editOwner()" title="Rename" aria-label="Rename project collection" style="background:transparent;border:1px solid #3a3a3a;border-radius:8px;color:#a3a3a3;width:30px;height:30px;display:inline-flex;align-items:center;justify-content:center;cursor:pointer;"><svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04c.39-.39.39-1.02 0-1.41l-2.34-2.34c-.39-.39-1.02-.39-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z"/></svg></button></h1>
       <p style="margin:0;font-size:14px;color:#c6c6c6;">Each project contains <b style="color:#fff;">Supported + Mandate + Group</b> inside. Buy more from the marketplace to grow this list.</p>
     </div>

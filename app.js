@@ -485,9 +485,8 @@ function renderTopbar() {
   const crumb = routeName === 'home' ? 'Your Courses' : `${esc(dayCard(STATE.day).title)} - Day ${STATE.day} of 7`;
   $('#topbar').innerHTML = `
     <button class="burger" id="burger">${ic('burger', 20, 20)}</button>
-    <div class="tb-brand"><img class="tb-logo" src="${A}logo.png" alt="Zeelin logo"/><div><div class="tb-name">ZEELIN JOB TRAINING PORTAL</div></div></div>
-    <div class="crumb"><b>${crumb}</b></div>
-    <div class="top-actions">
+    <div class="tb-brand" style="flex:1;display:flex;align-items:center;justify-content:center;gap:14px;padding:10px 0;border-top:2px solid #2a2a2a;border-bottom:2px solid #2a2a2a;height:58px;min-width:320px;"><img class="tb-logo" src="${A}logo.png" alt="Zeelin logo" style="height:36px;"/><div class="tb-name" style="font-size:20px;font-weight:900;letter-spacing:0.8px;color:#ffffff;white-space:nowrap;">ZEELIN JOB TRAINING PORTAL</div></div>
+    <div class="top-actions" style="flex-shrink:0;">
       <a href="/portal.html" class="top-chip" style="text-decoration:none;border-color:#3a3a3a;background:#1e1e1e;color:#f59e0b" title="Switch Portal">${ic('layers', 14, 14)} Portals</a>
       <span class="top-chip top-xp">${ic('zap', 15, 15)} ${STATE.xp.toLocaleString()} XP</span>
       <span class="top-chip top-streak">${ic('fire', 15, 15)} ${STATE.streak}</span>
