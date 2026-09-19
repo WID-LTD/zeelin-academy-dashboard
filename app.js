@@ -336,8 +336,7 @@ function dayGroupsHTML(r){
     + grp('General Community', [
       { route:'monday', href:'#/monday', icon:'sun', text:'Monday Motivation' },
       { route:'community', href:'#/community', icon:'chat', text:'General Community' },
-      { route:'calendar', href:'#/calendar', icon:'calendar', text:'Calendar' },
-      { route:'recordings', href:'#/recordings', icon:'video', text:'Recordings' },
+
     ])
     + grp('Main', [
       { route:'checkin', href:'#/checkin', icon:'user-check', text:'Check-In' },
@@ -463,7 +462,7 @@ function renderSidebar() {
       ${navA('community','#/community','users','General Community')}
       ${navA('monday','#/monday','heart','Monday Motivations')}
       ${lbl('EVENTS')}
-      ${navA('calendar','#/calendar','calendar','Parenting Calendar','3',true)}
+      ${navA('calendar','#/calendar','calendar','Calendar','3',true)}
       ${navA('recordings','#/recordings','rec','Recordings')}
       ${lbl('CORE / CLASSIC BUSINESS ANALYSIS')}
       <div style="display:flex;flex-direction:column;">
@@ -472,7 +471,7 @@ function renderSidebar() {
         </div>
         <div style="padding-left:16px;display:flex;flex-direction:column;gap:2px;">
           <div onclick="window._navCohort()" title="Collapse cohort" style="display:flex;align-items:center;justify-content:space-between;padding:8px 12px;color:#e5e5e5;border-radius:6px;cursor:pointer;">
-            <span style="display:flex;align-items:center;gap:8px;">${chevSvg(12,cohortOpen())}${folderSvg(14)}<span>Cohort 001 - Parenting</span></span>
+            <span style="display:flex;align-items:center;gap:8px;">${chevSvg(12,cohortOpen())}${folderSvg(14)}<span>Cohort 001</span></span>
           </div>
           ${cohortOpen() ? `<div style="padding-left:16px;display:flex;flex-direction:column;gap:2px;">
             <div style="display:flex;align-items:center;justify-content:space-between;padding:8px 12px;color:#d4d4d4;border-radius:6px;cursor:pointer;">
@@ -482,6 +481,8 @@ function renderSidebar() {
           </div>` : ''}
         </div>
       </div>
+      ${navA('calendar','#/calendar','calendar','Calendar','3',true)}
+      ${navA('recordings','#/recordings','rec','Recordings')}
       ${lbl('Account')}
       ${navA('profile','#/profile','user','Profile & Insights')}
       ${navA('support','#/support','help','Support')}
@@ -495,7 +496,7 @@ function renderTopbar() {
   const crumb = routeName === 'home' ? 'Your Courses' : `${esc(dayCard(STATE.day).title)} - Day ${STATE.day} of 7`;
   $('#topbar').innerHTML = `
     <button class="burger" id="burger">${ic('burger', 20, 20)}</button>
-    <div class="tb-brand"><img class="tb-logo" src="${A}logo.png" alt="Zeelin logo"/><div><div class="tb-name">Zeelin Academy</div><div class="tb-sub">Exam Readiness Dashboard</div></div></div>
+    <div class="tb-brand"><img class="tb-logo" src="${A}logo.png" alt="Zeelin logo"/><div><div class="tb-name">Zeelin Academy</div></div></div>
     <div class="crumb"><b>${crumb}</b></div>
     <div class="top-actions">
       <a href="/portal.html" class="top-chip" style="text-decoration:none;border-color:#3a3a3a;background:#1e1e1e;color:#f59e0b" title="Switch Portal">${ic('layers', 14, 14)} Portals</a>
@@ -801,6 +802,7 @@ function renderCourses() {
         <h1>Welcome back, ${esc(USER.name.split(' ')[0])}</h1>
         <div class="sub">You're enrolled in ${COURSES.length} courses. Pick up where you left off, or continue the day that unlocks your next XP claim.</div>
       </div>
+      <div class="cat-head"><span class="cat-title">Core / Classic Business Analysis</span><span class="cat-badge">Purchased</span></div>
       <div class="enrolled${COURSES.length===1?' single':COURSES.length===2?' dual':''}">
         ${COURSES.map((c) => {
     const pct = Math.max(0, Math.min(100, c.progress));
@@ -985,8 +987,6 @@ function wirePrevQA(page) {
 }
 function dayCommunityCards(){
   const defs = [
-    { k:'monday', icon:'sun', tile:'amber', title:'Monday Motivation', sub:'A fresh brief to start your week', pct:100, cls:'green', href:'/monday', btn:'Read Brief' },
-    { k:'community', icon:'chat', tile:'blue', title:'General Community', sub:COMMUNITY.posts.length + ' posts from your cohort', pct:100, cls:'green', href:'/community', btn:'Join Now' },
     { k:'calendar', icon:'calendar', tile:'green', title:'Calendar', sub:CALENDAR_EVENTS.length + ' live events scheduled', pct:100, cls:'green', href:'/calendar', btn:'View Calendar' },
     { k:'recordings', icon:'video', tile:'purple', title:'Recordings', sub:RECORDINGS.length + ' replays in the archive', pct:100, cls:'green', href:'/recordings', btn:'Browse Replays' },
   ];
@@ -1014,7 +1014,7 @@ function renderDay() {
     </div>
 
     <div class="p-grid">
-      ${[checkinCardHTML(), accountabilityCardHTML()].concat(cardData.cards.filter((c) => c.k !== 'checkin').map(dashCard)).concat(dayCommunityCards()).join('')}
+      ${[checkinCardHTML()].concat(cardData.cards.filter((c) => c.k !== 'checkin').map(dashCard)).concat(dayCommunityCards()).concat([accountabilityCardHTML()]).join('')}
     </div>
 
     <div class="dash-wide-grid">
