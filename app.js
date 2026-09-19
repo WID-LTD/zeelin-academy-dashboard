@@ -446,7 +446,7 @@ function renderSidebar() {
   $('#sidebar').innerHTML = `
     <div style="padding:20px 16px;border-bottom:1px solid #2a2a2a;display:flex;align-items:center;gap:10px;">
       <div style="width:28px;height:28px;background-color:#d97706;border-radius:6px;display:flex;align-items:center;justify-content:center;font-weight:bold;color:#fff;font-size:14px;">Z</div>
-      <span style="font-size:14px;font-weight:600;color:#ffffff;letter-spacing:-0.2px;line-height:1.2;">Zeelin Job Readiness System</span>
+      <span style="font-size:11px;font-weight:800;color:#ffffff;letter-spacing:0.8px;line-height:1.2;">ZEELIN JOB<br/>READINESS SYSTEM</span>
     </div>
     <div style="padding:12px 8px;display:flex;flex-direction:column;gap:4px;font-size:13px;">
       ${navA('guide','#/guide','info','User Guide')}
@@ -485,7 +485,7 @@ function renderTopbar() {
   const crumb = routeName === 'home' ? 'Your Courses' : `${esc(dayCard(STATE.day).title)} - Day ${STATE.day} of 7`;
   $('#topbar').innerHTML = `
     <button class="burger" id="burger">${ic('burger', 20, 20)}</button>
-    <div class="tb-brand"><img class="tb-logo" src="${A}logo.png" alt="Zeelin logo"/><div><div class="tb-name">Zeelin Academy</div></div></div>
+    <div class="tb-brand"><img class="tb-logo" src="${A}logo.png" alt="Zeelin logo"/><div><div class="tb-name">ZEELIN JOB TRAINING ${routeName==='home'?'PORTAL':'DASHBOARD'}</div></div></div>
     <div class="crumb"><b>${crumb}</b></div>
     <div class="top-actions">
       <a href="/portal.html" class="top-chip" style="text-decoration:none;border-color:#3a3a3a;background:#1e1e1e;color:#f59e0b" title="Switch Portal">${ic('layers', 14, 14)} Portals</a>

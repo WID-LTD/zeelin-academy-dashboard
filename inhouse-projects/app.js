@@ -453,7 +453,7 @@ function renderSidebar(activeKey){
   let html = `
     <div class="sidebar-head">
       <img src="assets/logo.png" alt="Zeelin Academy Logo">
-      <span class="sidebar-title">${(typeof isProjectScope!=='undefined'&&isProjectScope)?'Work Experience Dashboard':'Work Experience Portal'}</span>
+      <span class="sidebar-title">ZEELIN JOB READINESS SYSTEM</span>
     </div>
     <div class="sidebar-nav">
       <a href="/portal.html" style="display:flex;align-items:center;gap:10px;padding:10px 12px;margin-bottom:6px;border-radius:8px;border:1px solid #d97706;background:#26170b;color:#f59e0b;font-weight:800;text-decoration:none;font-size:13px;">&#10219;<span>Select Portal</span></a>
@@ -537,7 +537,7 @@ function dashTopbarHtml(){
     <!-- Left: Branding -->
     <div style="display:flex;align-items:center;gap:12px;">
       <img src="assets/logo.png" alt="Zeelin Academy Logo" style="height:40px;width:auto;object-fit:contain;">
-      <span style="font-size:22px;font-weight:800;color:#ffffff;">Work Experience Portal</span>
+      <span style="font-size:22px;font-weight:800;color:#ffffff;">ZEELIN WORK EXPERIENCE PORTAL</span>
     </div>
 
     <!-- Center: Page Title -->

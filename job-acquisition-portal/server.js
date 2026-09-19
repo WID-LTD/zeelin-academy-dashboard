@@ -443,29 +443,6 @@ try {
     const run={id:nextRunId(),actor:'zeelin-course-builder',mode:input.mode||'console',status:'running',input,stage:'queued',stages:[],sources:[],sourcesTotal:0,logs:[],jobs:[],items:0,cost:0.0,startedAt:new Date().toISOString(),finishedAt:null,durationMs:0, taskId:input.taskId||null, taskName:input.taskName||null};
     runs.set(run.id,run);
     try{ require('./course-builder/scraper/tor').runStart(run.id); }catch(_){}
-    // Eager Tor boot (background): if any rescue-eligible board is selected,
-    // warm the daemon now so on-failure rescue is instant, not +40s.
-    try{
-      const torMod=require('./course-builder/scraper/tor');
-      const sel=selectSources(input);
-      if(torMod.enabled() && sel.some(s=>/indeed|linkedin|glassdoor|upwork|ziprecruiter|milkround|cutshort|dice|monster|careerbuilder|snagajob|builtin|simplyhired|jobs-/.test(s))){
-        torMod.ensure().catch(()=>{});
-      }
-      // Warm DNS for every selected board host in the background (cold
-      // resolver costs 10-20s per new host; cache makes later hits instant).
-      try{
-        const httpMod=require('./course-builder/scraper/http');
-        if(httpMod.warmHosts) httpMod.warmHosts([
-          'boards-api.greenhouse.io','api.lever.co','api.ashbyhq.com','remotive.com',
-          'www.arbeitnow.com','arbeitnow.com','jobicy.com','hackernews.io','hn.algolia.com',
-          'remoteok.com','weworkremotely.com','www.dice.com','builtin.com','www.monster.com',
-          'www.careerbuilder.com','www.simplyhired.com','www.snagajob.com','www.reed.co.uk',
-          'api.adzuna.com','serpapi.com','jobs-api14.p.rapidapi.com','www.indeed.com',
-          'www.indeed.co.uk','www.linkedin.com','www.glassdoor.com','www.upwork.com',
-          'www.ziprecruiter.com','www.milkround.com','cutshort.io','opencode.ai',
-        ]);
-      }catch(_){}
-    }catch(_){}
     runLog.unshift({id:run.id,actor:run.actor,mode:run.mode,status:'running',startedAt:run.startedAt,items:0, taskId:run.taskId});
     if(runLog.length>200) runLog.pop();
     if(db) try{ db.saveRun(run); }catch(e){ console.warn('db saveRun failed', e.message); }
@@ -493,6 +470,38 @@ try {
     (async()=>{
       try{
         setStage(run,'fetching details');
+        // Link probe: 1 quick direct fetch decides the transport strategy.
+        // Stalled link => Tor-first for eligible hosts (per-host learning:
+        // Tor-403s automatically fall back to direct).
+        try{
+          const httpMod0=require('./course-builder/scraper/http');
+          if(httpMod0.setPreferTor){
+            let directOk=false;
+            try{ await httpMod0.fetchText('https://remotive.com/api/remote-jobs?limit=1',{timeoutMs:8000,retries:0}); directOk=true; }catch(_){}
+            httpMod0.setPreferTor(!directOk);
+            log.info(directOk?'Link probe: direct path healthy — direct-first':'Link probe: direct stalled — Tor-first for eligible hosts');
+          }
+        }catch(_){}
+        // Eager Tor boot (background): rescue-eligible boards get an instant
+        // daemon instead of +40s on first failure.
+        try{
+          const torMod=require('./course-builder/scraper/tor');
+          const sel0=selectSources(input);
+          if(torMod.enabled() && sel0.some(s=>/indeed|linkedin|glassdoor|upwork|ziprecruiter|milkround|cutshort|dice|monster|careerbuilder|snagajob|builtin|simplyhired|jobs-|greenhouse|lever|ashby|remotive|arbeitnow|jobicy|hackernews|remoteok/.test(s))){
+            torMod.ensure().catch(()=>{});
+          }
+        }catch(_){}
+        // Awaited DNS warm-up BEFORE batches: cold resolver costs 10-20s per
+        // new host; paying ~25s once beats wave-1 mass timeouts.
+        try{
+          const httpMod=require('./course-builder/scraper/http');
+          if(httpMod.warmHostsAwait) await httpMod.warmHostsAwait([
+            'boards-api.greenhouse.io','api.lever.co','api.ashbyhq.com','remotive.com',
+            'jobicy.com','hn.algolia.com','remoteok.com','www.reed.co.uk',
+            'serpapi.com','jobs-api14.p.rapidapi.com',
+          ], 25000);
+          log.info('DNS warm-up done — launching batches');
+        }catch(_){}
         const onSource=(r)=>{
           run.sources.push({source:r.source,status:r.status,items:r.items,message:r.message,started:true, q:r.q||'', c:r.c||''});
           run.sourcesDone=(run.sources||[]).length;
@@ -646,10 +655,10 @@ try {
               }catch(e){ log.warn(`Global "${kw}" failed: ${e.message}`); }
             }
           }
-          // All countries simultaneously: every country batch runs at once
-          // (~26 parallel tasks per role; roles still run one after another).
-          // Per-host governor in http.js keeps it polite per domain.
-          const concurrency = Math.min(32, batches.length); // all at once
+          // Countries run in waves: small runs go fully parallel (~26 tasks);
+          // deep 25-country runs stagger in waves so this link isn't
+          // self-DDoSed (all-at-once deep collapsed to 412 timeouts, 0 jobs).
+          const concurrency = batches.length<=8 ? batches.length : (input.sourceMode==='deep' ? 4 : 12);
           let completedRoles=0;
           let countriesDone=0;
           const countryProgress={}; // country -> done count
@@ -661,9 +670,12 @@ try {
           async function runWithConcurrency(items, limit, fn){
             const results=[];
             let idx=0;
+            let workersStarted=0;
             run.batchesTotal=items.length;
             bumpProgress(run);
             async function worker(){
+              const myIdx = workersStarted++;
+              if(myIdx>0) await new Promise(r=>setTimeout(r, Math.min(myIdx*400, 4000))); // stagger herd
               while(idx < items.length){
                 const cur = idx++;
                 const item = items[cur];
@@ -953,6 +965,20 @@ try {
         setStage(run,'finished'); log.info(`Run finished — ${jobs.length} jobs ready. Countries: ${countriesList.join(', ')} | Keywords: ${keywordsList.length} | ${input.analysisMode!=='none' ? 'analysis:'+input.analysisMode : 'no analysis'}`);
         const entry=runLog.find(r=>r.id===run.id); if(entry){ entry.status=run.status; entry.items=jobs.length; entry.finishedAt=run.finishedAt; entry.durationMs=run.durationMs; }
         if(db) try{ db.saveRun(run); }catch(e){ console.warn('db saveRun finish failed', e.message); }
+        // Auto-save workbook to the ZEELIN folder (named after the role).
+        if(jobs.length && ExcelJS){
+          try{
+            const outDir=process.env.ZEELIN_EXPORT_DIR||'/home/wizzyboypondec/Downloads/PROJECTS/ZEELIN';
+            fs.mkdirSync(outDir,{recursive:true});
+            const wb=await buildExportWorkbook(jobs, run.input, run.input.analysisMode||'none');
+            const fname=`${sanitizeSheet(run.input.sheetName||keywordsList[0]||'Jobs')}-${run.id}.xlsx`;
+            const fpath=path.join(outDir, fname);
+            await wb.xlsx.writeFile(fpath);
+            run.savedFile=fpath;
+            if(db) try{ db.saveRun(run); }catch(_){}
+            log.info(`Workbook saved: ${fpath}`);
+          }catch(e){ log.warn(`Auto-save failed (export still available): ${String((e&&e.message)||e).slice(0,120)}`); }
+        }
         try{ require('./course-builder/scraper/tor').runEnd(run.id); }catch(_){}
       }catch(err){
         run.status='failed'; run.finishedAt=new Date().toISOString(); run.message=err.message; setStage(run,'failed'); log.warn(`Run failed: ${err.message}`);
@@ -1027,7 +1053,7 @@ try {
       j.company_industry||j.Industry||'',
       j.employmentType||'',
       j.workplaceType|| (j.is_remote?'remote': j.isHybrid?'hybrid':'on-site'),
-      (j.description||'').slice(0,4000),
+      (j.description||'').slice(0,12000),
       (j.requirements?.skills||[]).join('; '),
       j.queryKeyword||j.Query_Keyword||j.title||'',
       j.company_url||'',
@@ -1084,6 +1110,25 @@ try {
       ws.autoFilter={from:{row:1,column:1}, to:{row:1,column:EXPORT_HEADERS.length}};
       ws.views=[{state:'frozen', ySplit:1}];
     });
+    // Job Titles index: every ad scraped, one row each — title, company,
+    // country tab, platform, posted date, direct URL.
+    if(jobs.length){
+      const ws=wb.addWorksheet('Job Titles');
+      const hdr=['#','Job Title','Company','Country_Tab','Platform','Posted_Date','URL'];
+      ws.addRow(hdr);
+      const h0=ws.getRow(1);
+      h0.font={bold:true, color:{argb:'FFFFFFFF'}};
+      h0.fill={type:'pattern', pattern:'solid', fgColor:{argb:'FF16A34A'}};
+      h0.commit();
+      jobs.forEach((j,i)=>{
+        const cRaw=(j.country||(j.location&&j.location.country)||'');
+        ws.addRow([i+1, j.title||'', j.company||j.Company_Name||'', cRaw,
+          j.source||j.platform||'', String(j.postedAt||j.Posted_Date||'').slice(0,10), j.url||j.job_url||'']);
+      });
+      ws.columns=[{header:'#',width:6},{header:'Job Title',width:50},{header:'Company',width:28},{header:'Country_Tab',width:18},{header:'Platform',width:16},{header:'Posted_Date',width:13},{header:'URL',width:40}];
+      ws.autoFilter={from:{row:1,column:1}, to:{row:1,column:7}};
+      ws.views=[{state:'frozen', ySplit:1}];
+    }
     // analysis sheets
     const mode=analysisMode||input.analysisMode||'none';
     if(mode!=='none' && jobs.length){
