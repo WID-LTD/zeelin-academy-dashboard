@@ -35,6 +35,24 @@ const COURSES = [
     strength: 88,
     color: 'var(--amber)',
   },
+  {
+    id: 'requirements-engineering',
+    title: 'Requirements Engineering',
+    short: 'Req Eng',
+    category: 'Core / Classic Business Analysis',
+    cover: A + 'books/requirements_engineering.png',
+    cohort: 'Cohort 001',
+    days: [3, 4],
+    week: 2,
+    weekName: 'Elicitation',
+    progress: 0,
+    estimatedHours: 28,
+    completedHours: 0,
+    daysLeft: 3,
+    readiness: 0,
+    strength: 0,
+    color: 'var(--blue)',
+  },
 ];
 
 const TRACKING = COURSES[0];

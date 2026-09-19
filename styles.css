@@ -1203,3 +1203,12 @@ svg { display: block; flex-shrink: 0; overflow: hidden; }
   .enrolled.single .enr-hero img.cover,.enrolled.dual .enr-hero img.cover{position:static;}
   .enrolled.single .enr-foot,.enrolled.dual .enr-foot{width:100%;border-left:none;}
 }
+
+/* single course row: fixed 1K-equivalent size on 2K/3K — no growth with viewport */
+@media (min-width: 2000px) {
+  .enrolled.single{max-width:1500px;margin-left:0;}
+  .enrolled.single .enr-card{min-height:420px;}
+  .enrolled.single .enr-hero{width:380px;min-height:420px;}
+  .enrolled.single .enr-body h3{font-size:26px;}
+  .enrolled.single .enr-foot{width:320px;}
+}

@@ -983,7 +983,7 @@ function dayCommunityCards(){
 function renderDay() {
   const d = STATE.day;
   const cardData = dayCard(d);
-  const course = courseById(d <= 2 ? 'ba-foundation' : d <= 4 ? 'software-engineering' : d <= 6 ? 'prompt-engineering' : 'job-readiness');
+  const course = courseById(d <= 2 ? 'ba-foundation' : 'requirements-engineering');
   const claimed = claimedToday();
   const readPct = (function () { const h = dayReadingHref(d); const [, , b, i] = h.split('/'); return !!(STATE.done[b] && STATE.done[b][Number(i)]); })();
   const vidVids = VIDEOS.filter((v) => v.day === d);
