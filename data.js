@@ -71,6 +71,24 @@ const COURSES = [
     strength: 0,
     color: 'var(--green)',
   },
+  {
+    id: 'benefits-management',
+    title: 'Benefits Management & Acceptance',
+    short: 'Benefits Mgmt',
+    category: 'Core / Classic Business Analysis',
+    cover: A + 'books/benefits_mangement_and_bussiness_acceptance.png',
+    cohort: 'Cohort 001',
+    days: [7],
+    week: 4,
+    weekName: 'Benefits Realisation',
+    progress: 0,
+    estimatedHours: 16,
+    completedHours: 0,
+    daysLeft: 5,
+    readiness: 0,
+    strength: 0,
+    color: 'var(--teal)',
+  },
 ];
 
 const TRACKING = COURSES[0];
