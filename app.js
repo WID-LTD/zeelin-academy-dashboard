@@ -452,9 +452,6 @@ function renderSidebar() {
       ${navA('board','#/board','feed','General Message Board','4')}
       ${navA('community','#/community','users','General Community')}
       ${navA('monday','#/monday','heart','Monday Motivations')}
-      ${lbl('EVENTS')}
-      ${navA('calendar','#/calendar','calendar','Calendar','3',true)}
-      ${navA('recordings','#/recordings','rec','Recordings')}
       ${lbl('CORE / CLASSIC BUSINESS ANALYSIS')}
       <div style="display:flex;flex-direction:column;">
         <div style="display:flex;align-items:center;justify-content:space-between;padding:10px 12px;color:#ffffff;border-radius:6px;cursor:pointer;">
