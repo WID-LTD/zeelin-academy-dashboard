@@ -173,9 +173,8 @@ function renderSidebar(activeRoute){
   }
 
   return ''
-  + '<div style="padding:20px 16px;border-bottom:2px solid #3a3a3a;display:flex;align-items:center;gap:10px;">'
-  + '<div style="width:32px;height:32px;background-color:#d97706;border-radius:6px;display:flex;align-items:center;justify-content:center;font-weight:800;color:#fff;font-size:15px;">W</div>'
-  + '<img src="assets/logo.png" alt="Zeelin logo" style="height:32px;width:32px;border-radius:6px;object-fit:contain;flex-shrink:0;"/><span style="font-size:15px;font-weight:800;color:#ffffff;letter-spacing:-0.2px;line-height:1.2;">Job Acquisition Dashboard</span>'
+  + '<div style="padding:18px 16px;border-bottom:2px solid #3a3a3a;display:flex;align-items:center;gap:12px;">'
+  + '<img src="assets/logo.png" alt="Zeelin logo" style="height:46px;width:auto;max-width:150px;object-fit:contain;flex-shrink:0;"/><span style="font-size:15px;font-weight:800;color:#ffffff;letter-spacing:-0.2px;line-height:1.3;">Job Acquisition<br/>Dashboard</span>'
   + '</div>'
   + '<div style="padding:14px 10px;display:flex;flex-direction:column;gap:6px;font-size:14px;font-weight:700;overflow-y:auto;flex:1;">'
   + portalLink(isPortal)
