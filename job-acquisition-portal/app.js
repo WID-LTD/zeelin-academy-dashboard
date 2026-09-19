@@ -173,10 +173,8 @@ function renderSidebar(activeRoute){
   }
 
   return ''
-  + '<div style="padding:18px 16px;border-bottom:2px solid #3a3a3a;display:flex;align-items:center;gap:12px;">'
-  + '<img src="assets/logo.png" alt="Zeelin logo" style="height:46px;width:auto;max-width:150px;object-fit:contain;flex-shrink:0;"/><span style="font-size:11px;font-weight:800;color:#ffffff;letter-spacing:0.8px;line-height:1.3;">ZEELIN JOB<br/>READINESS SYSTEM</span>'
-  + '</div>'
   + '<div style="padding:14px 10px;display:flex;flex-direction:column;gap:6px;font-size:14px;font-weight:700;overflow-y:auto;flex:1;">'
+  + '<div style="display:flex;flex-direction:column;align-items:center;gap:10px;padding:16px 8px 14px;border-bottom:2px solid #3a3a3a;margin:-14px -10px 8px;text-align:center;"><img src="assets/logo.png" alt="Zeelin logo" style="height:46px;width:auto;object-fit:contain;flex-shrink:0;"><span style="font-size:11px;font-weight:800;color:#ffffff;letter-spacing:0.8px;line-height:1.3;text-align:center;">ZEELIN JOB<br/>READINESS SYSTEM</span></div>'
   + portalLink(isPortal)
   + topLink(isOverview)
   + '<div style="padding:18px 12px 6px 12px;font-size:12px;font-weight:800;color:#f59e0b;letter-spacing:0.8px;">STAGE 3: CAREER GATE</div>'
