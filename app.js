@@ -333,20 +333,15 @@ window._navDay = function(n){ STATE.day = n; save(); if((parseHash()[0]||'home')
 function dayGroupsHTML(r){
   const grp = (label, links) => `<div class="dg-label">${label}</div>` + links.map((l) => `<a class="dg-link${r===l.route?' active':''}" href="${l.href}">${ic(l.icon,13,13)}<span>${l.text}</span></a>`).join('');
   return `<div class="day-groups">`
-    + grp('General Community', [
-      { route:'monday', href:'#/monday', icon:'sun', text:'Monday Motivation' },
-      { route:'community', href:'#/community', icon:'chat', text:'General Community' },
-
+    + grp('Learning', [
+      { route:'book', href:'#'+dayReadingHref(STATE.day), icon:'book', text:'Daily Reading' },
+      { route:'videos', href:'#/videos', icon:'video', text:'Video Tutorials' },
+      { route:'visual', href:'#/visual/'+deckIdForDay(STATE.day), icon:'layers', text:'Visual Deck' },
     ])
     + grp('Main', [
       { route:'checkin', href:'#/checkin', icon:'user-check', text:'Check-In' },
       { route:'roadmap', href:'#/roadmap', icon:'compass', text:'Reading Roadmap' },
       { route:'accountability', href:'#/accountability', icon:'chart', text:'Accountability' },
-    ])
-    + grp('Learning', [
-      { route:'book', href:'#'+dayReadingHref(STATE.day), icon:'book', text:'Daily Reading' },
-      { route:'videos', href:'#/videos', icon:'video', text:'Video Tutorials' },
-      { route:'visual', href:'#/visual/'+deckIdForDay(STATE.day), icon:'layers', text:'Visual Deck' },
     ])
     + `</div>`;
 }
@@ -984,7 +979,6 @@ function wirePrevQA(page) {
 function dayCommunityCards(){
   const defs = [
     { k:'calendar', icon:'calendar', tile:'green', title:'Calendar', sub:CALENDAR_EVENTS.length + ' live events scheduled', pct:100, cls:'green', href:'/calendar', btn:'View Calendar' },
-    { k:'recordings', icon:'video', tile:'purple', title:'Recordings', sub:RECORDINGS.length + ' replays in the archive', pct:100, cls:'green', href:'/recordings', btn:'Browse Replays' },
   ];
   return defs.map(dashCard);
 }
