@@ -42,6 +42,20 @@ function migrateState(p){
   if(p.activeView) d.activeView = p.activeView;
   if(p.uploads) d.uploads = p.uploads;
   if(p.interviewBookings) d.interviewBookings = p.interviewBookings;
+  if(Array.isArray(d.interviewBookings)){
+    d.interviewBookings = d.interviewBookings.map(b=>({
+      id: b.id || 'bk_'+Date.now()+Math.random().toString(36).slice(2,6),
+      mentor: b.mentor || 'Dr. O. Emeka',
+      date: b.date || new Date().toISOString(),
+      anon: !!b.anon,
+      type: b.type || 'live-mock',
+      evidenceName: b.evidenceName || '',
+      evidenceLink: b.evidenceLink || '',
+      evidenceNotes: b.evidenceNotes || '',
+      status: b.status || (b.evidenceName ? 'pending' : 'pending'),
+      createdAt: b.createdAt || b.date || new Date().toISOString()
+    }));
+  }
   if(Array.isArray(p.boostApplications)){
     // ensure each has status, datePosted, dateApplied
     d.boostApplications = p.boostApplications.map(a=>({
@@ -703,6 +717,109 @@ function viewEventsHub(){
     + '<div style="flex:1;display:flex;overflow:hidden;min-height:0;">'+main+right+'</div>';
 }
 
+function bookingHistoryHtml(){
+  const bookings = (state.interviewBookings||[]).slice().sort((a,b)=> new Date(b.date)-new Date(a.date));
+  if(!bookings.length) return '<div style="background:#161616;border:2px dashed #3a3a3a;border-radius:10px;padding:16px;text-align:center;margin-top:4px;"><div style="font-size:11px;font-weight:800;color:#737373;letter-spacing:0.6px;margin-bottom:6px;">INTERVIEW BOOKING HISTORY</div><div style="font-size:12px;font-weight:700;color:#52525b;">No bookings yet — confirm a live mock above to create your first record.</div></div>';
+  const now = new Date(); now.setHours(0,0,0,0);
+  const upcoming = bookings.filter(b=> new Date(b.date) >= now);
+  const past = bookings.filter(b=> new Date(b.date) < now);
+  function statusBadge(b){
+    const s = (b.status||'pending').toLowerCase();
+    if(s==='accepted') return '<span style="font-size:10px;font-weight:900;color:#4ade80;background:#064e3b;border:1px solid #10b981;padding:3px 8px;border-radius:999px;">● ACCEPTED</span>';
+    if(s==='denied') return '<span style="font-size:10px;font-weight:900;color:#f87171;background:#450a0a;border:1px solid #ef4444;padding:3px 8px;border-radius:999px;">● DENIED</span>';
+    if(s==='evidence_invalid' || s==='invalid') return '<span style="font-size:10px;font-weight:900;color:#fbbf24;background:#422006;border:1px solid #d97706;padding:3px 8px;border-radius:999px;">● EVIDENCE INVALID</span>';
+    return '<span style="font-size:10px;font-weight:900;color:#f59e0b;background:#422006;border:1px solid #d97706;padding:3px 8px;border-radius:999px;">● PENDING</span>';
+  }
+  function row(b){
+    const d = new Date(b.date);
+    const dateStr = isNaN(d) ? esc(b.date) : d.toLocaleDateString('en-GB',{day:'2-digit',month:'short',year:'numeric'}) + ' • ' + String(b.date).split('T')[1]?.slice(0,5) + ' WAT';
+    const anon = b.anon ? '<span style="font-size:10px;color:#f59e0b;">• Anonymous</span>' : '';
+    const ev = b.evidenceName ? '<div style="font-size:11px;color:#a3a3a3;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">📎 '+esc(b.evidenceName)+ (b.evidenceLink ? ' • <a href="'+esc(b.evidenceLink)+'" target="_blank" style="color:#38bdf8;text-decoration:underline;">view</a>' : '') +'</div>' : '<div style="font-size:11px;color:#52525b;">No evidence file</div>';
+    const isPast = new Date(b.date) < now;
+    return '<div style="background:#1f1f1f;border:1px solid #2a2a2a;border-radius:8px;padding:10px;display:flex;flex-direction:column;gap:6px;">'
+      + '<div style="display:flex;justify-content:space-between;align-items:center;gap:8px;">'+statusBadge(b)+'<span style="font-size:10px;font-weight:700;color:#737373;">'+(isPast?'PAST':'UPCOMING')+'</span></div>'
+      + '<div style="font-size:12px;font-weight:800;color:#fff;">'+esc(b.mentor||'Dr. O. Emeka')+' • '+dateStr+' '+anon+'</div>'
+      + ev
+      + '<div style="display:flex;gap:6px;"><button onclick="window._updateBookingStatus(\''+b.id+'\',\'accepted\')" style="flex:1;background:#064e3b;color:#4ade80;border:1px solid #10b981;padding:6px;border-radius:6px;font-size:10px;font-weight:800;cursor:pointer;">Accept</button><button onclick="window._updateBookingStatus(\''+b.id+'\',\'denied\')" style="flex:1;background:#450a0a;color:#f87171;border:1px solid #ef4444;padding:6px;border-radius:6px;font-size:10px;font-weight:800;cursor:pointer;">Deny</button><button onclick="window._updateBookingStatus(\''+b.id+'\',\'evidence_invalid\')" style="flex:1;background:#422006;color:#fbbf24;border:1px solid #d97706;padding:6px;border-radius:6px;font-size:10px;font-weight:800;cursor:pointer;">Invalid</button></div>'
+      + '</div>';
+  }
+  const upcomingHtml = upcoming.length ? upcoming.map(row).join('') : '<div style="font-size:11px;color:#52525b;padding:8px;text-align:center;">No upcoming bookings</div>';
+  const pastHtml = past.length ? past.map(row).join('') : '<div style="font-size:11px;color:#52525b;padding:8px;text-align:center;">No past bookings</div>';
+  return '<div style="background:#161616;border:2px solid #3a3a3a;border-radius:10px;padding:16px;display:flex;flex-direction:column;gap:12px;margin-top:4px;">'
+    + '<div style="display:flex;justify-content:space-between;align-items:center;"><span style="font-size:11px;font-weight:800;color:#f59e0b;letter-spacing:0.6px;">INTERVIEW BOOKING HISTORY</span><span style="font-size:10px;color:#737373;">'+bookings.length+' total</span></div>'
+    + '<div style="display:flex;flex-direction:column;gap:8px;"><div style="font-size:11px;font-weight:800;color:#38bdf8;">UPCOMING ('+upcoming.length+')</div>'+upcomingHtml+'</div>'
+    + '<div style="display:flex;flex-direction:column;gap:8px;"><div style="font-size:11px;font-weight:800;color:#a3a3a3;">PAST ('+past.length+')</div>'+pastHtml+'</div>'
+    + '</div>';
+}
+let _pendingBooking = null;
+function openEvidenceDialog(date,time,anon){
+  _pendingBooking = {date,time,anon};
+  const ex = document.getElementById('evidence-dialog');
+  if(ex) ex.remove();
+  const overlay = document.createElement('div');
+  overlay.id='evidence-dialog';
+  overlay.style.cssText='position:fixed;inset:0;background:rgba(0,0,0,0.7);display:flex;align-items:center;justify-content:center;z-index:9999;padding:16px;';
+  overlay.innerHTML = '<div style="background:#181818;border:2px solid #3a3a3a;border-radius:12px;width:100%;max-width:520px;overflow:hidden;box-shadow:0 12px 40px rgba(0,0,0,0.6);">'
+    + '<div style="padding:18px 20px;border-bottom:2px solid #3a3a3a;"><h3 style="font-size:16px;font-weight:900;color:#fff;margin:0;">Upload Interview Evidence</h3><p style="font-size:12px;color:#a3a3a3;margin:6px 0 0 0;">Live mock booking: <b style="color:#fff;">'+esc(date)+' '+esc(time)+' WAT</b>'+(anon?' • Anonymous':'')+'</p></div>'
+    + '<div style="padding:18px 20px;display:flex;flex-direction:column;gap:12px;">'
+    + '<label style="font-size:11px;font-weight:800;color:#d4d4d4;">Evidence File (PDF, DOCX, PNG, MP4)</label><input id="ev-file" type="file" accept=".pdf,.doc,.docx,.png,.jpg,.jpeg,.mp4,.mov" style="background:#0a0a0a;border:2px solid #3a3a3a;border-radius:6px;padding:8px;color:#fff;font-size:12px;width:100%;">'
+    + '<label style="font-size:11px;font-weight:800;color:#d4d4d4;">Or Evidence Link (Drive, Loom, etc.)</label><input id="ev-link" type="url" placeholder="https://..." style="background:#0a0a0a;border:2px solid #3a3a3a;border-radius:6px;padding:8px;color:#fff;font-size:12px;width:100%;">'
+    + '<label style="font-size:11px;font-weight:800;color:#d4d4d4;">Notes (optional)</label><textarea id="ev-notes" rows="2" placeholder="Interview summary, STAR notes..." style="background:#0a0a0a;border:2px solid #3a3a3a;border-radius:6px;padding:8px;color:#fff;font-size:12px;width:100%;resize:vertical;"></textarea>'
+    + '<div id="ev-error" style="display:none;background:#450a0a;border:1px solid #ef4444;border-radius:6px;padding:8px;font-size:11px;font-weight:700;color:#fca5a5;"></div>'
+    + '</div>'
+    + '<div style="padding:14px 20px;background:#161616;border-top:2px solid #3a3a3a;display:flex;gap:10px;justify-content:flex-end;">'
+    + '<button onclick="document.getElementById(\'evidence-dialog\').remove();_pendingBooking=null;" style="background:#262626;color:#a3a3a3;border:1px solid #404040;padding:10px 16px;border-radius:6px;font-size:12px;font-weight:800;cursor:pointer;">Cancel</button>'
+    + '<button onclick="window._submitEvidence()" style="background:linear-gradient(135deg,#16a34a 0%,#15803d 100%);color:#fff;border:1px solid #16a34a;padding:10px 18px;border-radius:6px;font-size:12px;font-weight:900;cursor:pointer;">Submit Evidence & Confirm Booking</button>'
+    + '</div></div>';
+  overlay.addEventListener('click',e=>{ if(e.target===overlay){ overlay.remove(); _pendingBooking=null; } });
+  document.body.appendChild(overlay);
+}
+window._submitEvidence = function(){
+  const fileEl=document.getElementById('ev-file');
+  const linkEl=document.getElementById('ev-link');
+  const notesEl=document.getElementById('ev-notes');
+  const errEl=document.getElementById('ev-error');
+  const file = fileEl && fileEl.files && fileEl.files[0];
+  const link = linkEl ? linkEl.value.trim() : '';
+  const notes = notesEl ? notesEl.value.trim() : '';
+  if(!file && !link){
+    errEl.style.display='block'; errEl.textContent='Upload a file or paste a link as evidence of interview.';
+    return;
+  }
+  const allowed = ['pdf','doc','docx','png','jpg','jpeg','mp4','mov'];
+  let evidenceName = file ? file.name : (link ? link.split('/').pop().slice(0,40) || 'link-evidence' : '');
+  let ext = evidenceName.split('.').pop().toLowerCase();
+  let status = 'pending';
+  if(file && allowed.indexOf(ext)===-1) status='evidence_invalid';
+  if(link && !/^https?:\/\//.test(link)) status='evidence_invalid';
+  if(!file && link && link.length<8) status='evidence_invalid';
+  const booking = {
+    id: 'bk_'+Date.now()+Math.random().toString(36).slice(2,6),
+    mentor:'Dr. O. Emeka',
+    date: (_pendingBooking ? _pendingBooking.date+'T'+_pendingBooking.time : new Date().toISOString()),
+    anon: _pendingBooking ? _pendingBooking.anon : false,
+    type:'live-mock',
+    evidenceName: evidenceName,
+    evidenceLink: link,
+    evidenceNotes: notes,
+    status: status,
+    createdAt: new Date().toISOString()
+  };
+  state.interviewBookings.push(booking);
+  saveState();
+  const dlg=document.getElementById('evidence-dialog'); if(dlg) dlg.remove(); _pendingBooking=null;
+  if(status==='evidence_invalid') showToast('Booking saved — evidence marked INVALID. Please re-upload a valid PDF/DOCX or link.');
+  else showToast('Live mock booked & evidence submitted — '+esc(booking.evidenceName)+' — status: '+status.toUpperCase());
+  render(state.activeView);
+};
+window._updateBookingStatus = function(id, newStatus){
+  const b = (state.interviewBookings||[]).find(x=>x.id===id);
+  if(!b) return;
+  b.status = newStatus;
+  saveState();
+  showToast('Booking '+esc(b.evidenceName||b.date)+' → '+newStatus.toUpperCase());
+  render(state.activeView);
+};
 function viewCalendar(){
   const d = CALENDAR_DATA;
   const daysHead = d.days.map(x=>'<span>'+x+'</span>').join('');
@@ -780,6 +897,7 @@ function viewCalendar(){
     + '<button onclick="window._bookSlotAdvanced()" style="width:100%;background:linear-gradient(135deg, #f59e0b 0%, #d97706 100%);color:#fff;border:1px solid #f59e0b;padding:12px;border-radius:8px;font-size:13px;font-weight:900;cursor:pointer;box-shadow:0 4px 12px rgba(217,119,6,0.3);">Confirm Live Mock Booking</button>'
     + '<p style="font-size:11px;font-weight:700;color:#737373;margin:8px 0 0 0;text-align:center;">Only for live mock • Calendar invite sent</p>'
     + '</div>'
+    + bookingHistoryHtml()
     + '</div>'
     + '<div style="padding:24px;background:#161616;border-top:2px solid #3a3a3a;">'
     + '<button onclick="window._nav(\'resources\')" style="width:100%;background:#262626;color:#d4d4d4;border:1px solid #404040;padding:12px;border-radius:8px;font-size:13px;font-weight:800;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px;"><span>\uD83D\uDCCB</span> Go to Mock Resources <svg style="width:14px;height:14px;fill:currentColor;" viewBox="0 0 24 24"><path d="M5 13h11.86l-5.43 5.43 1.42 1.42L21.14 12l-8.29-8.29-1.42 1.42L16.86 11H5v2z"/></svg></button>'
@@ -1083,7 +1201,7 @@ window._reviewMock = function(id){
 window._joinLive = function(){ window._nav('live-sessions'); };
 window._reserveSeat = function(){ showToast('Seat reserved for Behavioral Mock Interview Masterclass — check email (demo)'); };
 window._watchRecording = function(id){ showToast('Opening recording '+(id||'')+' — 1080p HD (demo playback)'); if(id) window._nav('recordings'); };
-window._bookSlot = function(name){ state.interviewBookings.push({mentor:name, date:new Date().toISOString(), anon:false}); saveState(); showToast('Booked live mock session with '+name+' — check Calendar tab. Interview exercise added to timetable.'); render(state.activeView); };
+window._bookSlot = function(name){ state.interviewBookings.push({id:'bk_'+Date.now()+Math.random().toString(36).slice(2,6), mentor:name, date:new Date().toISOString(), anon:false, type:'live-mock', evidenceName:'', evidenceLink:'', status:'pending', createdAt:new Date().toISOString()}); saveState(); showToast('Booked live mock session with '+name+' — check Calendar tab. Interview exercise added to timetable.'); render(state.activeView); };
 window._bookSlotAdvanced = function(){
   const dEl=document.getElementById('cal-date');
   const tEl=document.getElementById('cal-time');
@@ -1092,10 +1210,7 @@ window._bookSlotAdvanced = function(){
   const time=tEl?tEl.value:'14:00';
   const anon=aEl?aEl.checked:false;
   if(!date){ showToast('Select date for live mock'); return; }
-  state.interviewBookings.push({mentor:'Dr. O. Emeka', date:date+'T'+time, anon:anon, type:'live-mock'});
-  saveState();
-  showToast('Live mock booked: Dr. O. Emeka — '+date+' '+time+' WAT'+(anon?' • Anonymous':'' )+' — calendar invite sent');
-  render(state.activeView);
+  openEvidenceDialog(date,time,anon);
 };
 window._sendLiveChat = function(){
   const inp=document.getElementById('live-chat-input');

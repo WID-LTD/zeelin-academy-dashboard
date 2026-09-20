@@ -633,7 +633,27 @@ try {
             log.info(`Global phase: ${globalSources.join(', ')} × ${keywordsList.length} role(s) — single fetch per role, tabs attributed by content location`);
             for(const kw of keywordsList){
               try{
-                const res=await scraper.run({sources: globalSources, query:kw, location:'', limit: Math.min(totalCap, 200), log:{info:()=>{}, warn:()=>{}}, onSource:(r)=> onSource({...r, q:kw, c:'global'})});
+                // AI employer discovery (cached forever): extra ATS boards per role.
+                let extraBoards=null;
+                try{
+                  const disc=require('./course-builder/scraper/discover');
+                  const found=await disc.discover(countriesList.slice(0,8).join(', '), kw, 15);
+                  if(found.length){
+                    extraBoards={greenhouse:[],lever:[],ashby:[]};
+                    for(const e of found){
+                      const slugs=disc.slugCandidates(e.company, e.slug);
+                      const put=(k)=>{ extraBoards[k].push(...slugs); };
+                      if(e.ats==='greenhouse') put('greenhouse');
+                      else if(e.ats==='lever') put('lever');
+                      else if(e.ats==='ashby') put('ashby');
+                      else { put('greenhouse'); put('lever'); put('ashby'); }
+                    }
+                    Object.keys(extraBoards).forEach(k=>{ extraBoards[k]=[...new Set(extraBoards[k])].slice(0,10); });
+                    const nB=extraBoards.greenhouse.length+extraBoards.lever.length+extraBoards.ashby.length;
+                    log.info(`AI discovery "${kw}": ${found.length} employers → +${nB} board queries`);
+                  }
+                }catch(_){}
+                const res=await scraper.run({sources: globalSources, query:kw, location:'', limit: Math.min(totalCap, 200), boards: extraBoards, log:{info:()=>{}, warn:()=>{}}, onSource:(r)=> onSource({...r, q:kw, c:'global'})});
                 const beforeFilter=(res.jobs||[]).length;
                 const kept=(res.jobs||[]).filter(j=> titleMatchesRole(j.title, kw));
                 run.filteredOut=(run.filteredOut||0)+(beforeFilter-kept.length);
@@ -871,7 +891,10 @@ try {
             }catch(e){ log.warn(`Replacement fetch failed: ${e.message}`); }
           }
         }
-        // bucket handling: per-country cap — EVERY tab (incl. Remote/Other) holds at most perCountryCap
+        // bucket handling: per-country cap — EVERY tab (incl. Remote/Other) holds at most perCountryCap.
+        // Remote jobs carry no country signal (anyone can apply): deal them to
+        // the neediest country tabs first (one tab each — never duplicated),
+        // leftovers keep the Remote tab. Location_Label always keeps truth.
         let jobsToFilter;
         if (countriesList.length > 1) {
           const perCountryTarget = perCountryCap;
@@ -879,23 +902,33 @@ try {
           validJobs.forEach(j=>{ const c=j.country||'Unknown'; (byCountry[c]=byCountry[c]||[]).push(j); });
           let balancedMulti=[];
           const taken={};
-          // Round-robin 1 per tab until totalCap, respecting the per-tab cap
-          let added=true;
-          const tabOrder=[...countriesList, ...Object.keys(byCountry).filter(k=>!countriesList.includes(k))];
-          while(balancedMulti.length < totalCap && added){
-            added=false;
-            for(const c of tabOrder){
-              if((taken[c]||0) >= perCountryCap) continue;
-              const bucket=byCountry[c];
-              if(bucket && bucket.length){
-                balancedMulti.push(bucket.shift());
-                taken[c]=(taken[c]||0)+1;
-                added=true;
-                if(balancedMulti.length >= totalCap) break;
-              }
+          const take=(c)=>{ const b=byCountry[c]; if(b && b.length && (taken[c]||0)<perCountryCap){ balancedMulti.push(b.shift()); taken[c]=(taken[c]||0)+1; return true; } return false; };
+          // Round 1: native country jobs into their own tabs.
+          for(const c of countriesList){ while(take(c) && balancedMulti.length<totalCap){} }
+          // Round 2: Remote pool deals one card each to the neediest tabs.
+          const remotePool=[...(byCountry['Remote']||[])];
+          byCountry['Remote']=[];
+          let dealt=true;
+          while(dealt && remotePool.length && balancedMulti.length<totalCap){
+            dealt=false;
+            const neediest=[...countriesList].sort((a,b)=>(taken[a]||0)-(taken[b]||0)).filter(c=>(taken[c]||0)<perCountryCap);
+            for(const c of neediest){
+              if(!remotePool.length || balancedMulti.length>=totalCap) break;
+              const j=remotePool.shift();
+              j.country=c; // tab assignment only; Location_Label untouched
+              (byCountry[c]=byCountry[c]||[]).unshift(j);
+              if(take(c)) dealt=true;
             }
           }
-          const dropped=Object.values(byCountry).reduce((n,b)=>n+b.length,0);
+          // Leftovers (Other/Unknown + undealt Remote) keep their own tabs.
+          const leftovers=[...remotePool, ...Object.entries(byCountry).filter(([k])=>!countriesList.includes(k)).flatMap(([,v])=>v)];
+          for(const j of leftovers){
+            if(balancedMulti.length>=totalCap) break;
+            if((taken[j.country]||0)>=perCountryCap) continue;
+            balancedMulti.push(j); taken[j.country]=(taken[j.country]||0)+1;
+          }
+          const dropped=validJobs.length-balancedMulti.length;
+          const tabOrder=[...countriesList, ...Object.keys(byCountry).filter(k=>!countriesList.includes(k))];
           jobsToFilter = balancedMulti.slice(0, totalCap);
           // Authoritative per-tab counts for progress + UI (incremental counters drift)
           run.countryProgress={}; jobsToFilter.forEach(j=>{ run.countryProgress[j.country]=(run.countryProgress[j.country]||0)+1; });
@@ -955,9 +988,36 @@ try {
               setStage(run,'ai-enriching'); log.info('AI enrichment pass (model structures raw ads) …');
               enrichMod.saveRaw(run.id, jobs);
               const AI_CONCURRENCY=Math.min(8,Math.max(1,Number(process.env.ZEELIN_AI_CONCURRENCY||6)));
-              const er=await enrichMod.enrichJobs(jobs,{concurrency:AI_CONCURRENCY,onProgress:(d,t)=>{ run.aiProgress={done:d,total:t}; }});
-              jobs=er.jobs; run.aiStats=er.stats;
-              log.info(`AI enrichment: ${er.stats.ai} ai / ${er.stats.fallback} deterministic / ${er.stats.cached} cached`);
+              // Cost guard: cap AI-structured jobs (default 150/run). Over-cap
+              // jobs keep deterministic structuring. fCapUsd tightens it.
+              let aiCap=Math.max(1, Number(input.maxAiJobs)||150);
+              const capUsd=Number(input.fCapUsd||input.maxTotalChargeUsd||0);
+              if(capUsd>0){
+                const fromCap=Math.floor((capUsd-2-jobs.length*0.25-(run.sources||[]).length*0.1)/1.5);
+                if(fromCap>=0 && fromCap<aiCap) aiCap=fromCap;
+              }
+              run.aiCap=aiCap;
+              const aiSlice=jobs.slice(0,aiCap);
+              // Checkpoint AI output progressively: a dead worker keeps
+              // finished jobs in the DB record instead of losing everything.
+              const aiSnap=new Array(aiSlice.length).fill(null);
+              let aiSaved=0;
+              const er=await enrichMod.enrichJobs(aiSlice,{concurrency:AI_CONCURRENCY,onProgress:(d,t)=>{ run.aiProgress={done:d,total:aiSlice.length}; },onJob:(job,k)=>{
+                aiSnap[k]=job;
+                if((++aiSaved%5)===0){
+                  try{
+                    const merged=aiSlice.map((o,idx)=>aiSnap[idx]||o);
+                    run.jobs=[...merged, ...jobs.slice(aiCap)];
+                    run.items=run.jobs.length;
+                    run.stage='ai-enriching';
+                    if(db) db.saveRun(run);
+                  }catch(_){}
+                }
+              }});
+              const rest=jobs.slice(aiCap).map(j=>enrichMod.deterministic(j));
+              er.stats.fallback+=rest.length;
+              jobs=[...er.jobs, ...rest]; run.aiStats=er.stats;
+              log.info(`AI enrichment: ${er.stats.ai} ai / ${er.stats.fallback} deterministic / ${er.stats.cached} cached (cap ${aiCap})`);
             } else log.warn('AI requested but OPENCODE_API_KEY not set — deterministic output kept');
           }catch(e){ log.warn('AI pass failed, keeping deterministic: '+String((e&&e.message)||e).slice(0,120)); }
         }
