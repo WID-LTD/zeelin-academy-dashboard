@@ -31,6 +31,7 @@ function defaultState(){
     },
     uploads:[],
     interviewBookings:[],
+    linkedInProfile: null,
     proofDayOverride:null
   };
 }
@@ -42,6 +43,7 @@ function migrateState(p){
   if(p.activeView) d.activeView = p.activeView;
   if(p.uploads) d.uploads = p.uploads;
   if(p.interviewBookings) d.interviewBookings = p.interviewBookings;
+  if(p.linkedInProfile) d.linkedInProfile = p.linkedInProfile;
   if(Array.isArray(d.interviewBookings)){
     d.interviewBookings = d.interviewBookings.map(b=>({
       id: b.id || 'bk_'+Date.now()+Math.random().toString(36).slice(2,6),
@@ -531,6 +533,80 @@ function viewBoost(){
     + '<div style="flex:1;display:flex;overflow:hidden;min-height:0;">'+main+right+'</div>';
 }
 
+function linkedInPreviewHtml(){
+  const p = state.linkedInProfile;
+  if(!p || !p.url) return '<div style="flex:1;text-align:center;padding:12px;"><div style="font-size:12px;font-weight:800;color:#737373;">No LinkedIn profile saved yet</div><div style="font-size:11px;color:#52525b;margin-top:4px;">Paste your link above and click Save or Fetch Demo</div></div>';
+  const name = esc(p.name||'LinkedIn User');
+  const headline = esc(p.headline||'Business Analysis • Supply Chain • Zeelin Cohort 001');
+  const loc = esc(p.location||'London, UK');
+  const about = esc(p.about||'Results-driven BA with verified Work Experience. Demo preview generated from your LinkedIn link.');
+  const initials = name.split(' ').map(s=>s[0]).slice(0,2).join('').toUpperCase();
+  const url = esc(p.url);
+  const fetched = p.fetchedAt ? 'Fetched '+ fmtDate(p.fetchedAt) : 'Saved';
+  return '<div style="width:48px;height:48px;border-radius:50%;background:#0077b5;display:flex;align-items:center;justify-content:center;font-weight:900;color:#fff;font-size:16px;flex-shrink:0;">'+initials+'</div>'
+    + '<div style="flex:1;min-width:0;"><div style="font-size:14px;font-weight:900;color:#fff;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">'+name+' <span style="font-size:10px;font-weight:800;color:#38bdf8;background:#1e293b;border:1px solid #3b82f6;padding:2px 6px;border-radius:4px;margin-left:6px;vertical-align:middle;">in</span></div>'
+    + '<div style="font-size:12px;font-weight:700;color:#38bdf8;margin:2px 0;">'+headline+'</div>'
+    + '<div style="font-size:11px;color:#a3a3a3;">'+loc+' • <a href="'+url+'" target="_blank" style="color:#38bdf8;text-decoration:underline;">'+url+'</a> • '+fetched+'</div>'
+    + '<p style="font-size:11px;color:#d4d4d4;line-height:1.5;margin:8px 0 0 0;background:#0a0a0a;border:1px solid #2a2a2a;border-radius:6px;padding:8px;">'+about+'</p></div>';
+}
+window._saveLinkedIn = function(){
+  const el=document.getElementById('input-linkedin');
+  const url = el ? el.value.trim() : '';
+  if(!url){ showToast('Paste your LinkedIn profile link first'); return; }
+  if(!/linkedin\.com\/in\//i.test(url)){ showToast('Invalid LinkedIn link — should look like https://linkedin.com/in/your-profile'); return; }
+  const slug = (url.split('/in/')[1]||'').split('/')[0].split('?')[0].replace(/-/g,' ');
+  const mockName = slug ? slug.split(' ').map(s=>s.charAt(0).toUpperCase()+s.slice(1)).join(' ') : state.cvDraft.name;
+  state.linkedInProfile = {
+    url: url,
+    name: mockName || state.cvDraft.name,
+    headline: state.cvDraft.title || 'Business Analyst • Supply Chain',
+    location: state.cvDraft.location || 'London, UK',
+    about: state.cvDraft.summary ? state.cvDraft.summary.slice(0,160) + '...' : 'Demo LinkedIn about — helps build your LinkedIn presence and auto-fills CV.',
+    fetchedAt: new Date().toISOString()
+  };
+  saveState();
+  const prev=document.getElementById('linkedin-preview');
+  if(prev) prev.innerHTML = linkedInPreviewHtml();
+  showToast('LinkedIn profile saved — demo preview updated');
+  render(state.activeView);
+};
+window._fetchLinkedIn = function(){
+  const el=document.getElementById('input-linkedin');
+  const url = el ? el.value.trim() : (state.linkedInProfile?state.linkedInProfile.url:'');
+  if(!url){ showToast('Paste a LinkedIn link first'); return; }
+  showToast('Fetching LinkedIn demo data for '+url+'…');
+  // Try Workers OG fetch as demo, fallback to mock
+  fetch('/api/og?url='+encodeURIComponent(url)).then(r=>r.json()).then(j=>{
+    const slug = (url.split('/in/')[1]||'').split('/')[0].split('?')[0].replace(/-/g,' ');
+    const mockName = j.title && j.title.length>3 && !j.title.includes('LinkedIn') ? j.title.split(' | ')[0] : (slug ? slug.split(' ').map(s=>s.charAt(0).toUpperCase()+s.slice(1)).join(' ') : state.cvDraft.name);
+    state.linkedInProfile = {
+      url: url,
+      name: mockName,
+      headline: (j.description||'').slice(0,80) || state.cvDraft.title,
+      location: state.cvDraft.location,
+      about: (j.description|| state.cvDraft.summary || '').slice(0,180),
+      fetchedAt: new Date().toISOString()
+    };
+    saveState();
+    const prev=document.getElementById('linkedin-preview');
+    if(prev) prev.innerHTML = linkedInPreviewHtml();
+    showToast('LinkedIn demo fetch complete — preview updated');
+    render(state.activeView);
+  }).catch(()=>{
+    window._saveLinkedIn();
+  });
+};
+window._applyLinkedInToCV = function(){
+  const p = state.linkedInProfile;
+  if(!p || !p.url){ showToast('Save a LinkedIn profile first'); return; }
+  if(p.headline) state.cvDraft.title = p.headline.slice(0,80);
+  if(p.about) state.cvDraft.summary = p.about.slice(0,400);
+  if(p.name) state.cvDraft.name = p.name;
+  saveState();
+  showToast('Applied LinkedIn headline & about to your CV draft');
+  render(state.activeView);
+  setTimeout(()=>{ const el=document.getElementById('input-summary'); if(el) el.scrollIntoView({behavior:'smooth',block:'center'}); }, 300);
+};
 function viewCVMaker(){
   const d = state.cvDraft;
   // CV canvas theme styles
@@ -559,7 +635,12 @@ function viewCVMaker(){
   const mainLeft = ''
     + '<div style="flex:1;padding:36px 40px;overflow-y:auto;background-color:#121212;">'
     + '<div style="max-width:800px;margin:0 auto;display:flex;flex-direction:column;gap:28px;">'
-    + '<div style="background:linear-gradient(rgba(24,24,24,0.9), rgba(24,24,24,0.9)), url(\'https://images.unsplash.com/photo-1586281380349-632531db7ed4?auto=format&fit=crop&w=1200&q=80\') center/cover no-repeat;border:2px solid #3a3a3a;border-radius:12px;padding:28px;box-sizing:border-box;">'
+    + '<div style="background:linear-gradient(rgba(24,24,24,0.85), rgba(24,24,24,0.85)), url(\'https://images.unsplash.com/photo-1454165804606-c3d57bc86b40?auto=format&fit=crop&w=1400&q=80\') center/cover no-repeat;border:2px solid #3a3a3a;border-radius:16px;padding:40px 48px;box-sizing:border-box;"><span style="font-size:12px;font-weight:900;color:#f59e0b;text-transform:uppercase;letter-spacing:1px;">CV Maker & Portfolio Hub</span><h1 style="font-size:32px;font-weight:900;color:#fff;margin:8px 0 12px 0;letter-spacing:-0.5px;">Build Your Career Portfolio</h1><p style="font-size:14px;font-weight:700;color:#d4d4d4;margin:0;line-height:1.6;max-width:700px;">Just like Events & Sessions Hub — pick CV Maker to craft your ATS CV or Portfolio to connect your LinkedIn. Demo LinkedIn fetch populates your CV and boosts visibility.</p></div>'
+    + '<div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;">'
+    + '<div id="hub-cv-card" onclick="document.getElementById(\'cv-detail-start\').scrollIntoView({behavior:\'smooth\'})" style="background:linear-gradient(135deg,#1e1a0e 0%, #181818 100%);border:2px solid #d97706;border-radius:12px;padding:20px;cursor:pointer;box-shadow:0 8px 20px rgba(217,119,6,0.15);"><div style="display:flex;align-items:center;gap:12px;margin-bottom:10px;"><div style="width:44px;height:44px;background:#26170b;border:2px solid #d97706;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:18px;">📄</div><div><div style="font-size:14px;font-weight:900;color:#fff;">CV Maker</div><div style="font-size:11px;font-weight:700;color:#f59e0b;">ATS Resume Creator</div></div></div><p style="font-size:12px;font-weight:700;color:#a3a3a3;margin:0;line-height:1.5;">Live ATS preview, 5 themes, AI enhance, PDF download. Your verified Work Experience automatically appears.</p><div style="margin-top:12px;background:#2c1a0e;border:1px solid #d97706;border-radius:6px;padding:8px;text-align:center;font-size:11px;font-weight:800;color:#f59e0b;">Click to open CV Maker ↓</div></div>'
+    + '<div id="hub-portfolio-card" onclick="document.getElementById(\'portfolio-linkedin\').scrollIntoView({behavior:\'smooth\'})" style="background:linear-gradient(135deg,#0a192f 0%, #181818 100%);border:2px solid #0077b5;border-radius:12px;padding:20px;cursor:pointer;box-shadow:0 8px 20px rgba(56,189,248,0.15);"><div style="display:flex;align-items:center;gap:12px;margin-bottom:10px;"><div style="width:44px;height:44px;background:#0077b5;border-radius:10px;display:flex;align-items:center;justify-content:center;font-weight:900;color:#fff;font-size:16px;">in</div><div><div style="font-size:14px;font-weight:900;color:#fff;">Portfolio — LinkedIn</div><div style="font-size:11px;font-weight:700;color:#38bdf8;">Profile Connector (Demo)</div></div></div><p style="font-size:12px;font-weight:700;color:#a3a3a3;margin:0;line-height:1.5;">Paste your LinkedIn link, save profile, fetch demo data to auto-fill CV and boost visibility.</p><div style="margin-top:12px;background:#1e293b;border:1px solid #3b82f6;border-radius:6px;padding:8px;text-align:center;font-size:11px;font-weight:800;color:#38bdf8;">Click to open LinkedIn Connector ↓</div></div>'
+    + '</div>'
+    + '<div id="cv-detail-start" style="background:linear-gradient(rgba(24,24,24,0.9), rgba(24,24,24,0.9)), url(\'https://images.unsplash.com/photo-1586281380349-632531db7ed4?auto=format&fit=crop&w=1200&q=80\') center/cover no-repeat;border:2px solid #3a3a3a;border-radius:12px;padding:28px;box-sizing:border-box;">'
     + '<span style="font-size:11px;font-weight:900;color:#f59e0b;text-transform:uppercase;letter-spacing:0.8px;">ATS Optimization Engine</span>'
     + '<h1 style="font-size:24px;font-weight:900;color:#ffffff;margin:6px 0 8px 0;">Targeted Resume Builder</h1>'
     + '<p style="font-size:13px;font-weight:700;color:#c0c0c0;margin:0;line-height:1.5;">Input your details, experience level, background information, certifications, and target job description below. Switch themes instantly using the cards below the live preview.</p>'
@@ -592,6 +673,13 @@ function viewCVMaker(){
     + '<h2 style="font-size:18px;font-weight:900;color:#ffffff;margin:0;">3. Target Job Description & Requirements</h2>'
     + '<textarea id="input-job" oninput="window._updateCV()" style="width:100%;height:90px;background-color:#161616;border:2px solid #3a3a3a;border-radius:6px;padding:10px;color:#ffffff;font-size:13px;font-weight:700;resize:vertical;box-sizing:border-box;outline:none;">'+esc(d.jobDesc)+'</textarea>'
     + '<div style="display:flex;gap:10px;flex-wrap:wrap;"><button onclick="window._aiEnhance()" style="background:#262626;color:#f59e0b;border:2px solid #d97706;padding:8px 16px;border-radius:6px;font-size:12px;font-weight:900;cursor:pointer;">✨ Enhance with AI API</button><span style="font-size:11px;color:#737373;align-self:center;">Calls AI API to rephrase summary for ATS</span></div>'
+    + '</div>'
+    + '<div id="portfolio-linkedin" style="background-color:#181818;border:2px solid #0077b5;border-radius:12px;padding:28px;display:flex;flex-direction:column;gap:16px;">'
+    + '<h2 style="font-size:18px;font-weight:900;color:#ffffff;margin:0;display:flex;align-items:center;gap:8px;"><span style="background:#0077b5;color:#fff;padding:4px 8px;border-radius:6px;font-size:11px;min-width:28px;text-align:center;">in</span> 4. Portfolio — LinkedIn Page Connector (Demo)</h2>'
+    + '<p style="font-size:13px;font-weight:700;color:#c0c0c0;margin:0;line-height:1.5;">Paste your LinkedIn profile link, save it, and fetch a demo preview. We use the link to mock-fetch your headline, location and about section to help build your LinkedIn presence — no real LinkedIn API, fully demo.</p>'
+    + '<div style="display:flex;gap:10px;flex-wrap:wrap;align-items:flex-end;"><div style="flex:1;min-width:260px;"><label style="font-size:12px;font-weight:800;color:#d4d4d4;display:block;margin-bottom:4px;">LinkedIn Profile URL</label><input id="input-linkedin" type="url" placeholder="https://linkedin.com/in/your-profile" value="'+esc((state.linkedInProfile&&state.linkedInProfile.url)||'')+'" style="width:100%;background:#161616;border:2px solid #3a3a3a;border-radius:6px;padding:10px;color:#fff;font-size:13px;font-weight:700;box-sizing:border-box;outline:none;"></div><button onclick="window._saveLinkedIn()" style="background:#0077b5;color:#fff;border:1px solid #3b82f6;padding:10px 18px;border-radius:6px;font-size:12px;font-weight:900;cursor:pointer;white-space:nowrap;height:42px;align-self:flex-end;">Save Profile</button><button onclick="window._fetchLinkedIn()" style="background:#1e293b;color:#38bdf8;border:1px solid #3b82f6;padding:10px 18px;border-radius:6px;font-size:12px;font-weight:800;cursor:pointer;white-space:nowrap;height:42px;align-self:flex-end;">Fetch Demo</button></div>'
+    + '<div id="linkedin-preview" style="background:#161616;border:1px solid #2a2a2a;border-radius:8px;padding:16px;display:flex;gap:16px;align-items:flex-start;min-height:72px;">'+linkedInPreviewHtml()+'</div>'
+    + '<div style="display:flex;gap:10px;flex-wrap:wrap;align-items:center;"><button onclick="window._applyLinkedInToCV()" style="background:#16a34a;color:#fff;border:1px solid #16a34a;padding:8px 16px;border-radius:6px;font-size:12px;font-weight:900;cursor:pointer;">Apply to CV →</button><span style="font-size:11px;color:#737373;">Copies LinkedIn headline & about into your CV draft</span></div>'
     + '</div>'
     + '</div></div>';
 
