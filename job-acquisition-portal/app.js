@@ -206,13 +206,12 @@ function renderSidebar(activeRoute){
   + subLink('CV Maker & Portfolio','cv-maker',isCv)
   + subLink('Interview Prep & Mock','interview-prep',isInterview)
   + '</div></div></div>'
-  // extra quick links for events hub etc when active
-  + (isEvents||isCal||isRec ? '<div style="margin-top:12px;padding:12px 12px 6px 12px;font-size:11px;font-weight:800;color:#737373;letter-spacing:0.6px;">TRAINING HUB</div>'
+  + '<div style="margin-top:12px;padding:12px 12px 6px 12px;font-size:11px;font-weight:800;color:#737373;letter-spacing:0.6px;">TRAINING HUB</div>'
     + '<div style="padding-left:16px;display:flex;flex-direction:column;gap:4px;font-size:13px;padding-left:16px;">'
     + subLink('Events & Sessions Hub','events-hub',isEvents)
     + subLink('Calendar & Live','calendar',isCal)
     + subLink('Recordings','recordings',isRec)
-    + '</div>' : '')
+    + '</div>'
   + '</div>'
   + '<div style="height:140px;background:linear-gradient(rgba(24,24,24,0.3), rgba(24,24,24,0.9)), url(\'https://images.unsplash.com/photo-1521737604893-d14cc237f11d?auto=format&fit=crop&w=400&q=80\') center/cover no-repeat;border-top:2px solid #3a3a3a;flex-shrink:0;display:flex;align-items:flex-end;padding:12px;box-sizing:border-box;">'
   + '<span style="font-size:10px;font-weight:900;color:#f59e0b;text-transform:uppercase;letter-spacing:0.5px;background-color:rgba(0,0,0,0.8);padding:3px 8px;border-radius:4px;border:1px solid #d97706;">Career Gate Ready</span>'
