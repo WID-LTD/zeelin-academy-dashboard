@@ -1104,8 +1104,9 @@ try {
     const salObserved=(sal.min||sal.max)?`${sal.min||''}–${sal.max||''} ${sal.currency||''}`.trim():(sal.raw||'');
     const salDisplay=salObserved||((est.min||est.max)?`~${est.min||''}–${est.max||''} ${est.currency||''} (est.)`.trim():NL);
     const postedRaw=j.postedAt||'';
-    const postedDate=(j.Posted_Date||(postedRaw?String(postedRaw).slice(0,10):'')||'').trim();
     const scraped=j.scraped_at||new Date().toISOString();
+    const postedDate=(j.Posted_Date||(postedRaw?String(postedRaw).slice(0,10):'')||'').trim();
+    const postedTime=j.Posted_Time||(postedRaw&&String(postedRaw).length>10?String(postedRaw).slice(11,19):scraped.slice(11,19))||'';
     return [
       j.Company_Name||j.company||'',
       j.Industry||j.industry||NL,
@@ -1124,7 +1125,7 @@ try {
       est.currency||NL,
       est.period||NL,
       postedDate||scraped.slice(0,10),
-      j.Posted_Time||'',
+      postedTime,
       j.Source_Platform||j.source||j.platform||'',
       j.platform||j.source||'',
       j.URL||j.url||j.job_url||'',

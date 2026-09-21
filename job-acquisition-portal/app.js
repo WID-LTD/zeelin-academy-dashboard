@@ -32,6 +32,7 @@ function defaultState(){
     uploads:[],
     interviewBookings:[],
     linkedInProfile: null,
+    linkedInExtras: { experiences: [], skills: [], visibility: {customUrl:false, creatorMode:false, featuredSection:false, openToWork:false}, activityLog: [] },
     proofDayOverride:null
   };
 }
@@ -44,6 +45,7 @@ function migrateState(p){
   if(p.uploads) d.uploads = p.uploads;
   if(p.interviewBookings) d.interviewBookings = p.interviewBookings;
   if(p.linkedInProfile) d.linkedInProfile = p.linkedInProfile;
+  if(p.linkedInExtras) d.linkedInExtras = { experiences: Array.isArray(p.linkedInExtras.experiences)?p.linkedInExtras.experiences:[], skills: Array.isArray(p.linkedInExtras.skills)?p.linkedInExtras.skills:[], visibility: Object.assign({customUrl:false,creatorMode:false,featuredSection:false,openToWork:false}, p.linkedInExtras.visibility||{}), activityLog: Array.isArray(p.linkedInExtras.activityLog)?p.linkedInExtras.activityLog:[] };
   if(Array.isArray(d.interviewBookings)){
     d.interviewBookings = d.interviewBookings.map(b=>({
       id: b.id || 'bk_'+Date.now()+Math.random().toString(36).slice(2,6),
@@ -97,7 +99,7 @@ function calcProof(){
 function navigate(hash){
   // quota enforcement for progression
   const q = state.boostApplications.length;
-  const blocked = ['cv-maker','interview-prep'];
+  const blocked = ['cv-maker','cv-maker/cv','cv-maker/portfolio','interview-prep'];
   if(blocked.includes(hash) && q < 5){
     // redirect to boost or regional
     if(q < 1) { window.location.hash = 'regional-boards'; showToast('Complete at least 5 logged applications to unlock '+hash+' — redirected to Regional Job Boards'); return; }
@@ -132,9 +134,11 @@ function route(){
     else { window.location.href='course-builder/'; return; }
   }
   if(h==='portal' && window.__HAS_SCRAPER===false) h='overview';
-  const allowed = ['portal','overview','regional-boards','boost','cv-maker','interview-prep','events-hub','calendar','recordings','live-sessions','resources'];
+  const allowed = ['portal','overview','regional-boards','boost','cv-maker','cv-maker/cv','cv-maker/portfolio','interview-prep','events-hub','calendar','recordings','live-sessions','resources'];
   let view = h, param = null;
   if(h.startsWith('regional-boards/')){ view='regional-boards'; param=h.split('/')[1]||null; }
+  else if(h==='cv-maker/cv'){ view='cv-maker/cv'; param=null; }
+  else if(h==='cv-maker/portfolio'){ view='cv-maker/portfolio'; param=null; }
   else if(!allowed.includes(h)) view='portal';
   else param=null;
   state.activeView=view;
@@ -156,7 +160,7 @@ function renderSidebar(activeRoute){
   const isOverview = activeRoute==='overview';
   const isRegional = activeRoute==='regional-boards';
   const isBoost = activeRoute==='boost';
-  const isCv = activeRoute==='cv-maker';
+  const isCv = activeRoute==='cv-maker' || activeRoute==='cv-maker/cv' || activeRoute==='cv-maker/portfolio';
   const isInterview = activeRoute==='interview-prep';
   const isEvents = activeRoute==='events-hub';
   const isCal = activeRoute==='calendar' || activeRoute==='live-sessions' || activeRoute==='resources';
@@ -607,7 +611,79 @@ window._applyLinkedInToCV = function(){
   render(state.activeView);
   setTimeout(()=>{ const el=document.getElementById('input-summary'); if(el) el.scrollIntoView({behavior:'smooth',block:'center'}); }, 300);
 };
+window._generateHeadline = function(){
+  const base = state.cvDraft.title || 'Business Analyst';
+  const ind = state.cvDraft.industry || 'Supply Chain';
+  const sugg = base + ' | ' + ind + ' | Open to Work • Zeelin Verified';
+  const el=document.getElementById('input-linkedin-headline');
+  if(el) el.value = sugg;
+  if(state.linkedInProfile){ state.linkedInProfile.headline = sugg; saveState(); const prev=document.getElementById('linkedin-preview'); if(prev) prev.innerHTML = linkedInPreviewHtml(); }
+  showToast('Headline generated — edit and Save');
+};
+window._addExperience = function(){
+  const t=document.getElementById('exp-title'), c=document.getElementById('exp-company'), d=document.getElementById('exp-duration');
+  if(!t||!c||!t.value.trim()||!c.value.trim()){ showToast('Enter title and company'); return; }
+  if(!state.linkedInExtras) state.linkedInExtras={experiences:[],skills:[],visibility:{customUrl:false,creatorMode:false,featuredSection:false,openToWork:false},activityLog:[]};
+  state.linkedInExtras.experiences.push({id:'ex_'+Date.now(), title:t.value.trim(), company:c.value.trim(), duration:d.value.trim()||'1 yr'});
+  state.linkedInExtras.activityLog.unshift({at:new Date().toISOString(), action:'Added experience: '+t.value.trim()+' @ '+c.value.trim()});
+  t.value=''; c.value=''; if(d) d.value='';
+  saveState(); render(state.activeView);
+};
+window._removeExperience = function(id){ if(!state.linkedInExtras) return; state.linkedInExtras.experiences = state.linkedInExtras.experiences.filter(x=>x.id!==id); state.linkedInExtras.activityLog.unshift({at:new Date().toISOString(), action:'Removed experience'}); saveState(); render(state.activeView); };
+window._addSkill = function(){
+  const el=document.getElementById('skill-input');
+  const v=el?el.value.trim():'';
+  if(!v){ showToast('Enter a skill'); return; }
+  if(!state.linkedInExtras) state.linkedInExtras={experiences:[],skills:[],visibility:{customUrl:false,creatorMode:false,featuredSection:false,openToWork:false},activityLog:[]};
+  if(!state.linkedInExtras.skills.includes(v)) state.linkedInExtras.skills.push(v);
+  state.linkedInExtras.activityLog.unshift({at:new Date().toISOString(), action:'Added skill: '+v});
+  if(el) el.value='';
+  saveState(); render(state.activeView);
+};
+window._removeSkill = function(s){ if(!state.linkedInExtras) return; state.linkedInExtras.skills = state.linkedInExtras.skills.filter(x=>x!==s); state.linkedInExtras.activityLog.unshift({at:new Date().toISOString(), action:'Removed skill: '+s}); saveState(); render(state.activeView); };
+window._toggleVisibility = function(k){ if(!state.linkedInExtras) state.linkedInExtras={experiences:[],skills:[],visibility:{customUrl:false,creatorMode:false,featuredSection:false,openToWork:false},activityLog:[]}; state.linkedInExtras.visibility[k]=!state.linkedInExtras.visibility[k]; state.linkedInExtras.activityLog.unshift({at:new Date().toISOString(), action:'Toggled visibility: '+k}); saveState(); render(state.activeView); };
+window._copyLinkedInLink = function(){ const p=state.linkedInProfile; if(!p||!p.url){ showToast('No LinkedIn link saved'); return; } try{ navigator.clipboard.writeText(p.url); }catch(e){} showToast('Copied LinkedIn link'); if(!state.linkedInExtras) state.linkedInExtras={experiences:[],skills:[],visibility:{customUrl:false,creatorMode:false,featuredSection:false,openToWork:false},activityLog:[]}; state.linkedInExtras.activityLog.unshift({at:new Date().toISOString(), action:'Copied link'}); saveState(); };
+function linkedInStrength(){
+  const p=state.linkedInProfile;
+  let score=0, total=6;
+  if(p&&p.url) score++;
+  if(p&&p.name) score++;
+  if(p&&p.headline) score++;
+  if(p&&p.about) score++;
+  if((state.linkedInExtras&&state.linkedInExtras.experiences||[]).length) score++;
+  if((state.linkedInExtras&&state.linkedInExtras.skills||[]).length>=3) score++;
+  return Math.round(score/total*100);
+}
+function linkedInStatsHtml(){
+  const p=state.linkedInProfile||{};
+  const con = p.connections||512;
+  const views = p.profileViews||1240;
+  const search = p.searchAppearances||86;
+  return '<div style="display:grid;grid-template-columns:repeat(3,1fr);gap:10px;">'
+    + '<div style="background:#1e293b;border:1px solid #3b82f6;border-radius:8px;padding:12px;text-align:center;"><div style="font-size:18px;font-weight:900;color:#38bdf8;">'+con+'+</div><div style="font-size:10px;font-weight:800;color:#a3a3a3;">Connections</div><div style="font-size:10px;color:#4ade80;">↑ 12% demo</div></div>'
+    + '<div style="background:#1e293b;border:1px solid #3b82f6;border-radius:8px;padding:12px;text-align:center;"><div style="font-size:18px;font-weight:900;color:#38bdf8;">'+views+'</div><div style="font-size:10px;font-weight:800;color:#a3a3a3;">Profile views</div><div style="font-size:10px;color:#4ade80;">↑ 8% demo</div></div>'
+    + '<div style="background:#1e293b;border:1px solid #3b82f6;border-radius:8px;padding:12px;text-align:center;"><div style="font-size:18px;font-weight:900;color:#38bdf8;">'+search+'</div><div style="font-size:10px;font-weight:800;color:#a3a3a3;">Search appearances</div><div style="font-size:10px;color:#4ade80;">↑ 5% demo</div></div>'
+    + '</div>';
+}
+
 function viewCVMaker(){
+  const hubMain = ''
+    + '<div style="flex:1;padding:36px 40px;overflow-y:auto;background-color:#121212;">'
+    + '<div style="max-width:900px;margin:0 auto;display:flex;flex-direction:column;gap:28px;">'
+    + '<div style="background:linear-gradient(rgba(24,24,24,0.85), rgba(24,24,24,0.85)), url(\'https://images.unsplash.com/photo-1454165804606-c3d57bc86b40?auto=format&fit=crop&w=1400&q=80\') center/cover no-repeat;border:2px solid #3a3a3a;border-radius:16px;padding:40px 48px;box-sizing:border-box;"><span style="font-size:12px;font-weight:900;color:#f59e0b;text-transform:uppercase;letter-spacing:1px;">CV Maker & Portfolio Hub</span><h1 style="font-size:32px;font-weight:900;color:#fff;margin:8px 0 12px 0;letter-spacing:-0.5px;">Build Your Career Portfolio</h1><p style="font-size:14px;font-weight:700;color:#d4d4d4;margin:0;line-height:1.6;max-width:700px;">Pick CV Maker to craft your ATS CV or Portfolio to connect your LinkedIn. Each has its own standalone dashboard.</p></div>'
+    + '<div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;">'
+    + '<div onclick="window._nav(\'cv-maker/cv\')" style="background:linear-gradient(135deg,#1e1a0e 0%, #181818 100%);border:2px solid #d97706;border-radius:12px;padding:20px;cursor:pointer;box-shadow:0 8px 20px rgba(217,119,6,0.15);"><div style="display:flex;align-items:center;gap:12px;margin-bottom:10px;"><div style="width:44px;height:44px;background:#26170b;border:2px solid #d97706;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:18px;">📄</div><div><div style="font-size:14px;font-weight:900;color:#fff;">CV Maker</div><div style="font-size:11px;font-weight:700;color:#f59e0b;">ATS Resume Creator</div></div></div><p style="font-size:12px;font-weight:700;color:#a3a3a3;margin:0;line-height:1.5;">Live ATS preview, 5 themes, AI enhance, PDF download. Your verified Work Experience automatically appears.</p><div style="margin-top:12px;background:#2c1a0e;border:1px solid #d97706;border-radius:6px;padding:8px;text-align:center;font-size:11px;font-weight:800;color:#f59e0b;">Open CV Maker Hub →</div></div>'
+    + '<div onclick="window._nav(\'cv-maker/portfolio\')" style="background:linear-gradient(135deg,#0a192f 0%, #181818 100%);border:2px solid #0077b5;border-radius:12px;padding:20px;cursor:pointer;box-shadow:0 8px 20px rgba(56,189,248,0.15);"><div style="display:flex;align-items:center;gap:12px;margin-bottom:10px;"><div style="width:44px;height:44px;background:#0077b5;border-radius:10px;display:flex;align-items:center;justify-content:center;font-weight:900;color:#fff;font-size:16px;">in</div><div><div style="font-size:14px;font-weight:900;color:#fff;">Portfolio — LinkedIn</div><div style="font-size:11px;font-weight:700;color:#38bdf8;">Profile Connector (Demo)</div></div></div><p style="font-size:12px;font-weight:700;color:#a3a3a3;margin:0;line-height:1.5;">Paste your LinkedIn link, save profile, fetch demo data to auto-fill CV and boost visibility.</p><div style="margin-top:12px;background:#1e293b;border:1px solid #3b82f6;border-radius:6px;padding:8px;text-align:center;font-size:11px;font-weight:800;color:#38bdf8;">Open Portfolio Hub →</div></div>'
+    + '</div>'
+    + '</div></div>';
+  const hubRight = ''
+    + '<div style="width:360px;background:#181818;border-left:2px solid #3a3a3a;display:flex;flex-direction:column;overflow-y:auto;flex-shrink:0;">'
+    + '<div style="padding:28px;display:flex;flex-direction:column;gap:16px;"><div style="font-size:11px;font-weight:800;color:#737373;letter-spacing:0.6px;margin-bottom:6px;">QUICK NAV</div><div style="display:flex;flex-direction:column;gap:8px;"><button onclick="window._nav(\'cv-maker/cv\')" style="background:#26170b;color:#f59e0b;border:1px solid #d97706;padding:10px;border-radius:6px;font-size:12px;font-weight:800;cursor:pointer;">Go to CV Maker Hub</button><button onclick="window._nav(\'cv-maker/portfolio\')" style="background:#1e293b;color:#38bdf8;border:1px solid #3b82f6;padding:10px;border-radius:6px;font-size:11px;font-weight:800;cursor:pointer;">Go to Portfolio Hub</button></div></div><div style="padding:24px;background:#161616;border-top:2px solid #3a3a3a;"><div style="font-size:11px;color:#737373;text-align:center;">Select a card to open its standalone dashboard</div></div></div>';
+  return topbarHtml('CV Maker & Portfolio Hub', '<span style="color:#f59e0b;font-weight:800;">Hub</span> <span style="color:#a3a3a3;">• Choose workspace</span>', 20)
+    + '<div style="flex:1;display:flex;overflow:hidden;min-height:0;">'+hubMain+hubRight+'</div>';
+}
+
+function viewCVMakerDetail(){
   const d = state.cvDraft;
   // CV canvas theme styles
   const themes = {
@@ -635,12 +711,8 @@ function viewCVMaker(){
   const mainLeft = ''
     + '<div style="flex:1;padding:36px 40px;overflow-y:auto;background-color:#121212;">'
     + '<div style="max-width:800px;margin:0 auto;display:flex;flex-direction:column;gap:28px;">'
-    + '<div style="background:linear-gradient(rgba(24,24,24,0.85), rgba(24,24,24,0.85)), url(\'https://images.unsplash.com/photo-1454165804606-c3d57bc86b40?auto=format&fit=crop&w=1400&q=80\') center/cover no-repeat;border:2px solid #3a3a3a;border-radius:16px;padding:40px 48px;box-sizing:border-box;"><span style="font-size:12px;font-weight:900;color:#f59e0b;text-transform:uppercase;letter-spacing:1px;">CV Maker & Portfolio Hub</span><h1 style="font-size:32px;font-weight:900;color:#fff;margin:8px 0 12px 0;letter-spacing:-0.5px;">Build Your Career Portfolio</h1><p style="font-size:14px;font-weight:700;color:#d4d4d4;margin:0;line-height:1.6;max-width:700px;">Just like Events & Sessions Hub — pick CV Maker to craft your ATS CV or Portfolio to connect your LinkedIn. Demo LinkedIn fetch populates your CV and boosts visibility.</p></div>'
-    + '<div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;">'
-    + '<div id="hub-cv-card" onclick="document.getElementById(\'cv-detail-start\').scrollIntoView({behavior:\'smooth\'})" style="background:linear-gradient(135deg,#1e1a0e 0%, #181818 100%);border:2px solid #d97706;border-radius:12px;padding:20px;cursor:pointer;box-shadow:0 8px 20px rgba(217,119,6,0.15);"><div style="display:flex;align-items:center;gap:12px;margin-bottom:10px;"><div style="width:44px;height:44px;background:#26170b;border:2px solid #d97706;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:18px;">📄</div><div><div style="font-size:14px;font-weight:900;color:#fff;">CV Maker</div><div style="font-size:11px;font-weight:700;color:#f59e0b;">ATS Resume Creator</div></div></div><p style="font-size:12px;font-weight:700;color:#a3a3a3;margin:0;line-height:1.5;">Live ATS preview, 5 themes, AI enhance, PDF download. Your verified Work Experience automatically appears.</p><div style="margin-top:12px;background:#2c1a0e;border:1px solid #d97706;border-radius:6px;padding:8px;text-align:center;font-size:11px;font-weight:800;color:#f59e0b;">Click to open CV Maker ↓</div></div>'
-    + '<div id="hub-portfolio-card" onclick="document.getElementById(\'portfolio-linkedin\').scrollIntoView({behavior:\'smooth\'})" style="background:linear-gradient(135deg,#0a192f 0%, #181818 100%);border:2px solid #0077b5;border-radius:12px;padding:20px;cursor:pointer;box-shadow:0 8px 20px rgba(56,189,248,0.15);"><div style="display:flex;align-items:center;gap:12px;margin-bottom:10px;"><div style="width:44px;height:44px;background:#0077b5;border-radius:10px;display:flex;align-items:center;justify-content:center;font-weight:900;color:#fff;font-size:16px;">in</div><div><div style="font-size:14px;font-weight:900;color:#fff;">Portfolio — LinkedIn</div><div style="font-size:11px;font-weight:700;color:#38bdf8;">Profile Connector (Demo)</div></div></div><p style="font-size:12px;font-weight:700;color:#a3a3a3;margin:0;line-height:1.5;">Paste your LinkedIn link, save profile, fetch demo data to auto-fill CV and boost visibility.</p><div style="margin-top:12px;background:#1e293b;border:1px solid #3b82f6;border-radius:6px;padding:8px;text-align:center;font-size:11px;font-weight:800;color:#38bdf8;">Click to open LinkedIn Connector ↓</div></div>'
-    + '</div>'
-    + '<div id="cv-detail-start" style="background:linear-gradient(rgba(24,24,24,0.9), rgba(24,24,24,0.9)), url(\'https://images.unsplash.com/photo-1586281380349-632531db7ed4?auto=format&fit=crop&w=1200&q=80\') center/cover no-repeat;border:2px solid #3a3a3a;border-radius:12px;padding:28px;box-sizing:border-box;">'
+    + '<div style="display:flex;align-items:center;gap:8px;font-size:12px;color:#a3a3a3;"><a onclick="window._nav(\'cv-maker\')" style="color:#f59e0b;cursor:pointer;text-decoration:none;font-weight:800;">← CV Maker & Portfolio Hub</a><span>•</span><span style="color:#fff;font-weight:800;">CV Maker Hub</span></div>'
++ '<div id="cv-detail-start" style="background:linear-gradient(rgba(24,24,24,0.9), rgba(24,24,24,0.9)), url(\'https://images.unsplash.com/photo-1586281380349-632531db7ed4?auto=format&fit=crop&w=1200&q=80\') center/cover no-repeat;border:2px solid #3a3a3a;border-radius:12px;padding:28px;box-sizing:border-box;">'
     + '<span style="font-size:11px;font-weight:900;color:#f59e0b;text-transform:uppercase;letter-spacing:0.8px;">ATS Optimization Engine</span>'
     + '<h1 style="font-size:24px;font-weight:900;color:#ffffff;margin:6px 0 8px 0;">Targeted Resume Builder</h1>'
     + '<p style="font-size:13px;font-weight:700;color:#c0c0c0;margin:0;line-height:1.5;">Input your details, experience level, background information, certifications, and target job description below. Switch themes instantly using the cards below the live preview.</p>'
@@ -674,40 +746,68 @@ function viewCVMaker(){
     + '<textarea id="input-job" oninput="window._updateCV()" style="width:100%;height:90px;background-color:#161616;border:2px solid #3a3a3a;border-radius:6px;padding:10px;color:#ffffff;font-size:13px;font-weight:700;resize:vertical;box-sizing:border-box;outline:none;">'+esc(d.jobDesc)+'</textarea>'
     + '<div style="display:flex;gap:10px;flex-wrap:wrap;"><button onclick="window._aiEnhance()" style="background:#262626;color:#f59e0b;border:2px solid #d97706;padding:8px 16px;border-radius:6px;font-size:12px;font-weight:900;cursor:pointer;">✨ Enhance with AI API</button><span style="font-size:11px;color:#737373;align-self:center;">Calls AI API to rephrase summary for ATS</span></div>'
     + '</div>'
-    + '<div id="portfolio-linkedin" style="background-color:#181818;border:2px solid #0077b5;border-radius:12px;padding:28px;display:flex;flex-direction:column;gap:16px;">'
-    + '<h2 style="font-size:18px;font-weight:900;color:#ffffff;margin:0;display:flex;align-items:center;gap:8px;"><span style="background:#0077b5;color:#fff;padding:4px 8px;border-radius:6px;font-size:11px;min-width:28px;text-align:center;">in</span> 4. Portfolio — LinkedIn Page Connector (Demo)</h2>'
-    + '<p style="font-size:13px;font-weight:700;color:#c0c0c0;margin:0;line-height:1.5;">Paste your LinkedIn profile link, save it, and fetch a demo preview. We use the link to mock-fetch your headline, location and about section to help build your LinkedIn presence — no real LinkedIn API, fully demo.</p>'
-    + '<div style="display:flex;gap:10px;flex-wrap:wrap;align-items:flex-end;"><div style="flex:1;min-width:260px;"><label style="font-size:12px;font-weight:800;color:#d4d4d4;display:block;margin-bottom:4px;">LinkedIn Profile URL</label><input id="input-linkedin" type="url" placeholder="https://linkedin.com/in/your-profile" value="'+esc((state.linkedInProfile&&state.linkedInProfile.url)||'')+'" style="width:100%;background:#161616;border:2px solid #3a3a3a;border-radius:6px;padding:10px;color:#fff;font-size:13px;font-weight:700;box-sizing:border-box;outline:none;"></div><button onclick="window._saveLinkedIn()" style="background:#0077b5;color:#fff;border:1px solid #3b82f6;padding:10px 18px;border-radius:6px;font-size:12px;font-weight:900;cursor:pointer;white-space:nowrap;height:42px;align-self:flex-end;">Save Profile</button><button onclick="window._fetchLinkedIn()" style="background:#1e293b;color:#38bdf8;border:1px solid #3b82f6;padding:10px 18px;border-radius:6px;font-size:12px;font-weight:800;cursor:pointer;white-space:nowrap;height:42px;align-self:flex-end;">Fetch Demo</button></div>'
-    + '<div id="linkedin-preview" style="background:#161616;border:1px solid #2a2a2a;border-radius:8px;padding:16px;display:flex;gap:16px;align-items:flex-start;min-height:72px;">'+linkedInPreviewHtml()+'</div>'
-    + '<div style="display:flex;gap:10px;flex-wrap:wrap;align-items:center;"><button onclick="window._applyLinkedInToCV()" style="background:#16a34a;color:#fff;border:1px solid #16a34a;padding:8px 16px;border-radius:6px;font-size:12px;font-weight:900;cursor:pointer;">Apply to CV →</button><span style="font-size:11px;color:#737373;">Copies LinkedIn headline & about into your CV draft</span></div>'
-    + '</div>'
     + '</div></div>';
-
   const mainRight = ''
-    + '<div style="flex:1.2;background-color:#181818;border-left:2px solid #3a3a3a;display:flex;flex-direction:column;overflow-y:auto;flex-shrink:0;">'
-    + '<div style="padding:32px;display:flex;flex-direction:column;gap:28px;">'
-    + '<div style="display:flex;justify-content:space-between;align-items:center;border-bottom:2px solid #3a3a3a;padding-bottom:16px;gap:12px;flex-wrap:wrap;">'
-    + '<div><span style="font-size:11px;font-weight:900;color:#f59e0b;text-transform:uppercase;letter-spacing:0.8px;">Dynamic Live Canvas</span><h3 style="font-size:18px;font-weight:900;color:#ffffff;margin:2px 0 0 0;">ATS-Compliant Professional CV</h3></div>'
-    + '<button onclick="window._downloadCV()" style="background:linear-gradient(135deg, #f59e0b 0%, #d97706 100%);color:#ffffff;border:1px solid #f59e0b;padding:10px 20px;border-radius:6px;font-size:13px;font-weight:900;cursor:pointer;box-shadow:0 4px 12px rgba(217,119,6,0.3);">Download PDF</button>'
-    + '</div>'
-    + '<div id="cv-canvas" style="background-color:'+t.bg+';color:'+t.color+';border-radius:8px;padding:32px;font-family:\'Times New Roman\', serif;box-sizing:border-box;box-shadow:0 10px 30px rgba(0,0,0,0.5);transition:all 0.3s ease;">'
-    + '<div id="cv-header" style="text-align:center;border-bottom:'+t.border+';padding-bottom:12px;margin-bottom:16px;">'
-    + '<h2 id="cv-name" style="font-size:22px;font-weight:900;margin:0 0 2px 0;color:'+t.color+';letter-spacing:0.5px;">'+esc(d.name.toUpperCase())+'</h2>'
-    + '<p id="cv-title" style="font-size:13px;margin:0;font-weight:700;color:'+t.titleColor+';">'+esc(d.title)+'</p>'
-    + '<p id="cv-contact" style="font-size:11px;margin:3px 0 0 0;font-weight:600;color:#555555;">'+esc(d.location)+' \u2022 '+esc(d.email)+' \u2022 Experience Level: '+esc(d.level)+' \u2022 Focus: '+esc(d.industry)+'</p></div>'
-    + '<div style="margin-bottom:16px;"><h4 style="font-size:13px;font-weight:900;border-bottom:1px solid '+t.color+';padding-bottom:2px;margin:0 0 6px 0;text-transform:uppercase;">Professional Background & Summary</h4><p id="cv-summary-text" style="font-size:11px;line-height:1.5;margin:0;font-weight:600;text-align:justify;">'+esc(d.summary)+'</p></div>'
-    + '<div style="margin-bottom:16px;"><h4 style="font-size:13px;font-weight:900;border-bottom:1px solid '+t.color+';padding-bottom:2px;margin:0 0 6px 0;text-transform:uppercase;">Certifications & Core Competencies</h4><p id="cv-certs" style="font-size:11px;line-height:1.4;margin:0;font-weight:600;"><strong>Certifications:</strong> '+esc(d.certs)+'.<br><strong>Focus:</strong> '+esc(d.industry)+' ('+esc(d.level)+').</p></div>'
-    + '<div style="margin-bottom:12px;"><h4 style="font-size:13px;font-weight:900;border-bottom:1px solid '+t.color+';padding-bottom:2px;margin:0 0 6px 0;text-transform:uppercase;">Verified Work Experience Deliverables</h4>'
-    + '<div style="margin-bottom:8px;"><div style="display:flex;justify-content:space-between;font-weight:900;font-size:11px;"><span>Retail Supply Chain Optimization Model</span><span>Grade: 92/100</span></div><p style="font-size:10px;line-height:1.4;margin:2px 0 0 0;font-weight:600;text-align:justify;">Engineered robust spreadsheet financial models mapping annual carrying cost multipliers and inventory turnover metrics. Verified by Lead Mentor Dr. O. Emeka under enterprise standards (#WID-VERIFIED-9210).</p></div>'
-    + '<div><div style="display:flex;justify-content:space-between;font-weight:900;font-size:11px;"><span>Business Requirements Specification (BRS)</span><span>Grade: 93/100</span></div><p style="font-size:10px;line-height:1.4;margin:2px 0 0 0;font-weight:600;text-align:justify;">Conducted thorough stakeholder interviews, documented functional specifications, and created precise MoSCoW prioritization matrices.</p></div></div>'
-    + '<div style="margin-top:12px;border:1px dashed #a3a3a3;border-radius:6px;padding:8px;text-align:center;font-size:9px;color:#737373;">AI Disclaimer: This CV was enhanced via AI API — verify all facts before submission. Stage 3</div>'
-    + '</div>'
-    + '<div style="display:flex;flex-direction:column;gap:14px;margin-top:10px;"><h4 style="font-size:14px;font-weight:900;color:#ffffff;margin:0;">Select Professional Template Theme</h4>'
-    + '<div style="display:grid;grid-template-columns:repeat(5, 1fr);gap:10px;">'+cardsHtml+'</div></div>'
-    + '</div></div>';
-
-  return topbarHtml('ZEELIN JOB ACQUISITION PORTAL \u2022 ATS Resume Generator', '<span>ATS Match Score: <strong style="color:#34d399;">98% Optimized</strong></span><span style="color:#f59e0b;font-weight:800;">Dynamic Live Preview</span>', 90)
+      + '<div style="flex:1.2;background-color:#181818;border-left:2px solid #3a3a3a;display:flex;flex-direction:column;overflow-y:auto;flex-shrink:0;">'
+      + '<div style="padding:32px;display:flex;flex-direction:column;gap:28px;">'
+      + '<div style="display:flex;justify-content:space-between;align-items:center;border-bottom:2px solid #3a3a3a;padding-bottom:16px;gap:12px;flex-wrap:wrap;">'
+      + '<div><span style="font-size:11px;font-weight:900;color:#f59e0b;text-transform:uppercase;letter-spacing:0.8px;">Dynamic Live Canvas</span><h3 style="font-size:18px;font-weight:900;color:#ffffff;margin:2px 0 0 0;">ATS-Compliant Professional CV</h3></div>'
+      + '<button onclick="window._downloadCV()" style="background:linear-gradient(135deg, #f59e0b 0%, #d97706 100%);color:#ffffff;border:1px solid #f59e0b;padding:10px 20px;border-radius:6px;font-size:13px;font-weight:900;cursor:pointer;box-shadow:0 4px 12px rgba(217,119,6,0.3);">Download PDF</button>'
+      + '</div>'
+      + '<div id="cv-canvas" style="background-color:'+t.bg+';color:'+t.color+';border-radius:8px;padding:32px;font-family:\'Times New Roman\', serif;box-sizing:border-box;box-shadow:0 10px 30px rgba(0,0,0,0.5);transition:all 0.3s ease;">'
+      + '<div id="cv-header" style="text-align:center;border-bottom:'+t.border+';padding-bottom:12px;margin-bottom:16px;">'
+      + '<h2 id="cv-name" style="font-size:22px;font-weight:900;margin:0 0 2px 0;color:'+t.color+';letter-spacing:0.5px;">'+esc(d.name.toUpperCase())+'</h2>'
+      + '<p id="cv-title" style="font-size:13px;margin:0;font-weight:700;color:'+t.titleColor+';">'+esc(d.title)+'</p>'
+      + '<p id="cv-contact" style="font-size:11px;margin:3px 0 0 0;font-weight:600;color:#555555;">'+esc(d.location)+' \u2022 '+esc(d.email)+' \u2022 Experience Level: '+esc(d.level)+' \u2022 Focus: '+esc(d.industry)+'</p></div>'
+      + '<div style="margin-bottom:16px;"><h4 style="font-size:13px;font-weight:900;border-bottom:1px solid '+t.color+';padding-bottom:2px;margin:0 0 6px 0;text-transform:uppercase;">Professional Background & Summary</h4><p id="cv-summary-text" style="font-size:11px;line-height:1.5;margin:0;font-weight:600;text-align:justify;">'+esc(d.summary)+'</p></div>'
+      + '<div style="margin-bottom:16px;"><h4 style="font-size:13px;font-weight:900;border-bottom:1px solid '+t.color+';padding-bottom:2px;margin:0 0 6px 0;text-transform:uppercase;">Certifications & Core Competencies</h4><p id="cv-certs" style="font-size:11px;line-height:1.4;margin:0;font-weight:600;"><strong>Certifications:</strong> '+esc(d.certs)+'.<br><strong>Focus:</strong> '+esc(d.industry)+' ('+esc(d.level)+').</p></div>'
+      + '<div style="margin-bottom:12px;"><h4 style="font-size:13px;font-weight:900;border-bottom:1px solid '+t.color+';padding-bottom:2px;margin:0 0 6px 0;text-transform:uppercase;">Verified Work Experience Deliverables</h4>'
+      + '<div style="margin-bottom:8px;"><div style="display:flex;justify-content:space-between;font-weight:900;font-size:11px;"><span>Retail Supply Chain Optimization Model</span><span>Grade: 92/100</span></div><p style="font-size:10px;line-height:1.4;margin:2px 0 0 0;font-weight:600;text-align:justify;">Engineered robust spreadsheet financial models mapping annual carrying cost multipliers and inventory turnover metrics. Verified by Lead Mentor Dr. O. Emeka under enterprise standards (#WID-VERIFIED-9210).</p></div>'
+      + '<div><div style="display:flex;justify-content:space-between;font-weight:900;font-size:11px;"><span>Business Requirements Specification (BRS)</span><span>Grade: 93/100</span></div><p style="font-size:10px;line-height:1.4;margin:2px 0 0 0;font-weight:600;text-align:justify;">Conducted thorough stakeholder interviews, documented functional specifications, and created precise MoSCoW prioritization matrices.</p></div></div>'
+      + '<div style="margin-top:12px;border:1px dashed #a3a3a3;border-radius:6px;padding:8px;text-align:center;font-size:9px;color:#737373;">AI Disclaimer: This CV was enhanced via AI API — verify all facts before submission. Stage 3</div>'
+      + '</div>'
+      + '<div style="display:flex;flex-direction:column;gap:14px;margin-top:10px;"><h4 style="font-size:14px;font-weight:900;color:#ffffff;margin:0;">Select Professional Template Theme</h4>'
+      + '<div style="display:grid;grid-template-columns:repeat(5, 1fr);gap:10px;">'+cardsHtml+'</div></div>'
+      + '</div></div>';
+  return topbarHtml('CV Maker Hub', '<span style="color:#f59e0b;font-weight:800;">ATS Resume</span> <span style="color:#a3a3a3;">• Live Preview</span>', 90)
     + '<div style="flex:1;display:flex;overflow:hidden;min-height:0;">'+mainLeft+mainRight+'</div>';
+}
+
+function viewPortfolio(){
+  const p = state.linkedInProfile;
+  const st = linkedInStrength();
+  const ex = state.linkedInExtras || {experiences:[],skills:[],visibility:{customUrl:false,creatorMode:false,featuredSection:false,openToWork:false},activityLog:[]};
+  const vis = ex.visibility || {};
+  const visPct = Math.round(((vis.customUrl?1:0)+(vis.creatorMode?1:0)+(vis.featuredSection?1:0)+(vis.openToWork?1:0))/4*100);
+  const exList = (ex.experiences||[]).map(x=> '<div style="background:#161616;border:1px solid #2a2a2a;border-radius:6px;padding:10px 12px;display:flex;justify-content:space-between;align-items:center;gap:8px;"><div><div style="font-size:12px;font-weight:800;color:#fff;">'+esc(x.title)+'</div><div style="font-size:11px;color:#a3a3a3;">'+esc(x.company)+' • '+esc(x.duration)+'</div></div><button onclick="window._removeExperience(\''+x.id+'\')" style="background:#450a0a;color:#f87171;border:1px solid #ef4444;padding:4px 8px;border-radius:4px;font-size:10px;font-weight:800;cursor:pointer;">Remove</button></div>').join('') || '<div style="font-size:11px;color:#52525b;text-align:center;padding:8px;">No experiences yet — add one below</div>';
+  const skillList = (ex.skills||[]).map(s=> '<span style="background:#1e293b;color:#38bdf8;border:1px solid #3b82f6;padding:4px 8px;border-radius:999px;font-size:11px;font-weight:700;display:inline-flex;align-items:center;gap:6px;">'+esc(s)+' <button onclick="window._removeSkill(\''+esc(s)+'\')" style="background:transparent;border:none;color:#f87171;cursor:pointer;font-weight:900;">×</button></span>').join('') || '<span style="font-size:11px;color:#52525b;">No skills yet</span>';
+  const logList = (ex.activityLog||[]).slice(0,8).map(l=> '<div style="display:flex;gap:8px;font-size:11px;color:#a3a3a3;border-bottom:1px solid #1f1f1f;padding:6px 0;"><span style="color:#737373;">'+fmtDate(l.at)+'</span><span style="color:#d4d4d4;">'+esc(l.action)+'</span></div>').join('') || '<div style="font-size:11px;color:#52525b;text-align:center;padding:8px;">No activity yet</div>';
+  const main = ''
+    + '<div style="flex:1;padding:36px 40px;overflow-y:auto;background-color:#121212;">'
+    + '<div style="max-width:800px;margin:0 auto;display:flex;flex-direction:column;gap:28px;">'
+    + '<div style="display:flex;align-items:center;gap:8px;font-size:12px;color:#a3a3a3;"><a onclick="window._nav(\'cv-maker\')" style="color:#38bdf8;cursor:pointer;text-decoration:none;font-weight:800;">← CV Maker & Portfolio Hub</a><span>•</span><span style="color:#fff;font-weight:800;">Portfolio Hub</span></div>'
+    + '<div style="background:linear-gradient(rgba(24,24,24,0.85), rgba(24,24,24,0.85)), url(\'https://images.unsplash.com/photo-1521737604893-d14cc237f11d?auto=format&fit=crop&w=1400&q=80\') center/cover no-repeat;border:2px solid #3a3a3a;border-radius:16px;padding:40px 48px;box-sizing:border-box;"><span style="font-size:12px;font-weight:900;color:#38bdf8;text-transform:uppercase;letter-spacing:1px;">Portfolio Hub</span><h1 style="font-size:32px;font-weight:900;color:#fff;margin:8px 0 12px 0;letter-spacing:-0.5px;">LinkedIn Profile Connector</h1><p style="font-size:14px;font-weight:700;color:#d4d4d4;margin:0;line-height:1.6;max-width:700px;">Paste your LinkedIn link, save & fetch demo data, manage experiences & skills, check strength and visibility — all demo, persisted locally.</p></div>'
+    + '<div style="background:#161616;border:1px solid #2a2a2a;border-radius:10px;padding:16px;display:flex;gap:12px;align-items:center;"><div style="flex:1;"><div style="font-size:12px;font-weight:800;color:#38bdf8;">Profile Strength</div><div style="height:8px;background:#1f1f1f;border-radius:999px;overflow:hidden;margin-top:6px;"><div style="width:'+st+'%;height:100%;background:linear-gradient(90deg,#38bdf8,#16a34a);"></div></div></div><div style="font-size:18px;font-weight:900;color:#38bdf8;">'+st+'%</div></div>'
+    + linkedInStatsHtml()
+    + '<div id="portfolio-linkedin" style="background-color:#181818;border:2px solid #0077b5;border-radius:12px;padding:28px;display:flex;flex-direction:column;gap:16px;">'
+        + '<h2 style="font-size:18px;font-weight:900;color:#ffffff;margin:0;display:flex;align-items:center;gap:8px;"><span style="background:#0077b5;color:#fff;padding:4px 8px;border-radius:6px;font-size:11px;min-width:28px;text-align:center;">in</span> 4. Portfolio — LinkedIn Page Connector (Demo)</h2>'
+        + '<p style="font-size:13px;font-weight:700;color:#c0c0c0;margin:0;line-height:1.5;">Paste your LinkedIn profile link, save it, and fetch a demo preview. We use the link to mock-fetch your headline, location and about section to help build your LinkedIn presence — no real LinkedIn API, fully demo.</p>'
+        + '<div style="display:flex;gap:10px;flex-wrap:wrap;align-items:flex-end;"><div style="flex:1;min-width:260px;"><label style="font-size:12px;font-weight:800;color:#d4d4d4;display:block;margin-bottom:4px;">LinkedIn Profile URL</label><input id="input-linkedin" type="url" placeholder="https://linkedin.com/in/your-profile" value="'+esc((state.linkedInProfile&&state.linkedInProfile.url)||'')+'" style="width:100%;background:#161616;border:2px solid #3a3a3a;border-radius:6px;padding:10px;color:#fff;font-size:13px;font-weight:700;box-sizing:border-box;outline:none;"></div><button onclick="window._saveLinkedIn()" style="background:#0077b5;color:#fff;border:1px solid #3b82f6;padding:10px 18px;border-radius:6px;font-size:12px;font-weight:900;cursor:pointer;white-space:nowrap;height:42px;align-self:flex-end;">Save Profile</button><button onclick="window._fetchLinkedIn()" style="background:#1e293b;color:#38bdf8;border:1px solid #3b82f6;padding:10px 18px;border-radius:6px;font-size:12px;font-weight:800;cursor:pointer;white-space:nowrap;height:42px;align-self:flex-end;">Fetch Demo</button></div>'
+        + '<div id="linkedin-preview" style="background:#161616;border:1px solid #2a2a2a;border-radius:8px;padding:16px;display:flex;gap:16px;align-items:flex-start;min-height:72px;">'+linkedInPreviewHtml()+'</div>'
+        + '<div style="display:flex;gap:10px;flex-wrap:wrap;align-items:center;"><button onclick="window._applyLinkedInToCV()" style="background:#16a34a;color:#fff;border:1px solid #16a34a;padding:8px 16px;border-radius:6px;font-size:12px;font-weight:900;cursor:pointer;">Apply to CV →</button><span style="font-size:11px;color:#737373;">Copies LinkedIn headline & about into your CV draft</span></div>'
+        + '</div>'
+    + '<div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-top:-8px;"><input id="input-linkedin-headline" type="text" placeholder="Generated headline will appear here — edit then Save" value="'+esc((state.linkedInProfile&&state.linkedInProfile.headline)||'')+'" style="flex:1;min-width:200px;background:#0a0a0a;border:1px solid #2a2a2a;border-radius:6px;padding:8px;color:#fff;font-size:12px;box-sizing:border-box;"><button onclick="window._generateHeadline()" style="background:#262626;color:#f59e0b;border:1px solid #d97706;padding:8px 12px;border-radius:6px;font-size:11px;font-weight:800;cursor:pointer;">Generate Headline</button><button onclick="window._copyLinkedInLink()" style="background:#1e293b;color:#38bdf8;border:1px solid #3b82f6;padding:8px 12px;border-radius:6px;font-size:11px;font-weight:800;cursor:pointer;">Copy Link</button></div>'
+    + '<div style="background:#181818;border:2px solid #3a3a3a;border-radius:12px;padding:20px;"><h3 style="font-size:14px;font-weight:900;color:#fff;margin:0 0 12px 0;">Experiences</h3><div style="display:flex;flex-direction:column;gap:8px;">'+exList+'</div><div style="display:grid;grid-template-columns:1fr 1fr 100px;gap:8px;margin-top:12px;"><input id="exp-title" placeholder="Title e.g. Business Analyst" style="background:#0a0a0a;border:1px solid #2a2a2a;border-radius:6px;padding:8px;color:#fff;font-size:12px;"><input id="exp-company" placeholder="Company" style="background:#0a0a0a;border:1px solid #2a2a2a;border-radius:6px;padding:8px;color:#fff;font-size:12px;"><input id="exp-duration" placeholder="Duration" style="background:#0a0a0a;border:1px solid #2a2a2a;border-radius:6px;padding:8px;color:#fff;font-size:12px;"><button onclick="window._addExperience()" style="grid-column:1/-1;background:#262626;color:#38bdf8;border:1px solid #3b82f6;padding:8px;border-radius:6px;font-size:11px;font-weight:800;cursor:pointer;">Add Experience</button></div></div>'
+    + '<div style="background:#181818;border:2px solid #3a3a3a;border-radius:12px;padding:20px;"><h3 style="font-size:14px;font-weight:900;color:#fff;margin:0 0 12px 0;">Skills</h3><div style="display:flex;flex-wrap:wrap;gap:8px;">'+skillList+'</div><div style="display:flex;gap:8px;margin-top:12px;"><input id="skill-input" placeholder="Add a skill e.g. Stakeholder Mapping" style="flex:1;background:#0a0a0a;border:1px solid #2a2a2a;border-radius:6px;padding:8px;color:#fff;font-size:12px;"><button onclick="window._addSkill()" style="background:#1e293b;color:#38bdf8;border:1px solid #3b82f6;padding:8px 12px;border-radius:6px;font-size:11px;font-weight:800;cursor:pointer;">Add Skill</button></div></div>'
+    + '<div style="background:#181818;border:2px solid #3a3a3a;border-radius:12px;padding:20px;"><h3 style="font-size:14px;font-weight:900;color:#fff;margin:0 0 12px 0;">Visibility Checklist</h3><div style="display:flex;flex-direction:column;gap:8px;"><label style="display:flex;align-items:center;gap:8px;font-size:12px;font-weight:700;color:#d4d4d4;"><input type="checkbox" '+(vis.customUrl?'checked':'')+' onclick="window._toggleVisibility(\'customUrl\')" style="accent-color:#38bdf8;"> Custom URL set</label><label style="display:flex;align-items:center;gap:8px;font-size:12px;font-weight:700;color:#d4d4d4;"><input type="checkbox" '+(vis.creatorMode?'checked':'')+' onclick="window._toggleVisibility(\'creatorMode\')" style="accent-color:#38bdf8;"> Creator mode on</label><label style="display:flex;align-items:center;gap:8px;font-size:12px;font-weight:700;color:#d4d4d4;"><input type="checkbox" '+(vis.featuredSection?'checked':'')+' onclick="window._toggleVisibility(\'featuredSection\')" style="accent-color:#38bdf8;"> Featured section added</label><label style="display:flex;align-items:center;gap:8px;font-size:12px;font-weight:700;color:#d4d4d4;"><input type="checkbox" '+(vis.openToWork?'checked':'')+' onclick="window._toggleVisibility(\'openToWork\')" style="accent-color:#38bdf8;"> Open to work badge</label></div><div style="height:6px;background:#1f1f1f;border-radius:999px;overflow:hidden;margin-top:12px;"><div style="width:'+visPct+'%;height:100%;background:linear-gradient(90deg,#38bdf8,#16a34a);"></div></div><div style="font-size:11px;color:#a3a3a3;margin-top:4px;">'+visPct+'% complete</div></div>'
+    + '<div style="background:#181818;border:2px solid #3a3a3a;border-radius:12px;padding:20px;"><h3 style="font-size:14px;font-weight:900;color:#fff;margin:0 0 12px 0;">Share & QR</h3><div style="display:flex;gap:12px;align-items:center;"><div style="width:96px;height:96px;background:#fff;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:800;color:#111;text-align:center;padding:8px;">QR<br/>demo</div><div style="flex:1;"><div style="font-size:12px;color:#a3a3a3;word-break:break-all;">'+esc((p&&p.url)||'No link saved')+'</div><button onclick="window._copyLinkedInLink()" style="margin-top:8px;background:#262626;color:#38bdf8;border:1px solid #3b82f6;padding:6px 12px;border-radius:6px;font-size:11px;font-weight:800;cursor:pointer;">Copy Link</button></div></div></div>'
+    + '<div style="background:#181818;border:2px solid #3a3a3a;border-radius:12px;padding:20px;"><h3 style="font-size:14px;font-weight:900;color:#fff;margin:0 0 12px 0;">Activity Log</h3><div style="display:flex;flex-direction:column;">'+logList+'</div></div>'
+    + '</div></div>';
+  const mainRight = ''
+    + '<div style="width:360px;background:#181818;border-left:2px solid #3a3a3a;display:flex;flex-direction:column;overflow-y:auto;flex-shrink:0;">'
+    + '<div style="padding:28px;display:flex;flex-direction:column;gap:16px;"><div style="font-size:11px;font-weight:800;color:#38bdf8;letter-spacing:0.8px;">PORTFOLIO TIPS</div><h3 style="font-size:16px;font-weight:900;color:#fff;margin:0;">Boost Visibility</h3><p style="font-size:12px;color:#a3a3a3;line-height:1.5;">Complete all visibility items and keep strength above 80% for best demo results. Use Copy Link to share your profile.</p><div style="background:#1e293b;border:1px solid #3b82f6;border-radius:8px;padding:10px;"><div style="font-size:11px;font-weight:800;color:#38bdf8;">STRENGTH '+st+'%</div><div style="font-size:11px;color:#a3a3a3;margin-top:4px;">Add headline, about, 1 experience and 3 skills to reach 100%</div></div></div><div style="padding:24px;background:#161616;border-top:2px solid #3a3a3a;"><button onclick="window._nav(\'cv-maker\')" style="width:100%;background:#262626;color:#38bdf8;border:1px solid #3b82f6;padding:12px;border-radius:8px;font-size:13px;font-weight:800;cursor:pointer;">← Back to Hub</button></div></div>';
+  return topbarHtml('Portfolio Hub', '<span style="color:#38bdf8;font-weight:800;">LinkedIn Demo</span> <span style="color:#a3a3a3;">• '+st+'% strength</span>', st)
+    + '<div style="flex:1;display:flex;overflow:hidden;min-height:0;">'+main+mainRight+'</div>';
 }
 
 function viewInterviewPrep(){
@@ -1355,6 +1455,8 @@ function render(view, param){
     case 'regional-boards': html = viewRegionalBoards(param); if(typeof bindRegionalBoards==='function') setTimeout(bindRegionalBoards, 0); break;
     case 'boost': html = viewBoost(); break;
     case 'cv-maker': html = viewCVMaker(); break;
+    case 'cv-maker/cv': html = viewCVMakerDetail(); break;
+    case 'cv-maker/portfolio': html = viewPortfolio(); break;
     case 'interview-prep': html = viewInterviewPrep(); break;
     case 'events-hub': html = viewEventsHub(); break;
     case 'calendar': html = viewCalendar(); break;
