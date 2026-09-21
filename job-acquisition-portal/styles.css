@@ -1,128 +1,82 @@
 *{margin:0;padding:0;box-sizing:border-box}
 :root{
-  --bg:#f3f7fc;
-  --surface:#ffffff;
-  --border:#e8edf4;
-  --border-strong:#dbe4ee;
-  --amber:#d99a0a;
-  --amber-light:#edb640;
-  --gold:#f3cf68;
-  --text:#07143a;
-  --text2:#344266;
-  --text3:#64708a;
-  --blue:#0758cf;
+  --bg:#121212;
+  --surface:#181818;
+  --border:#3a3a3a;
+  --amber:#d97706;
+  --amber-light:#f59e0b;
+  --green:#16a34a;
+  --text:#e0e0e0;
+  --text3:#a3a3a3;
 }
 html,body{height:100%;overflow:hidden}
 body{
-  background:#f3f7fc;
-  color:#07143a;
-  font-family:Inter,"Segoe UI",Arial,sans-serif;
+  background:#121212;
+  color:#ffffff;
+  font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;
   font-size:15px;
   line-height:1.6;
   -webkit-font-smoothing:antialiased;
   font-weight:500;
 }
 a{color:inherit;text-decoration:none}
-button{cursor:pointer;font-family:inherit;font-weight:800}
+button{cursor:pointer;font-family:inherit; font-weight:800}
 button:focus-visible,a:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-visible{
-  outline:3px solid #d99a0a; outline-offset:2px;
+  outline:3px solid #d97706; outline-offset:2px;
 }
 ::-webkit-scrollbar{width:10px;height:10px}
-::-webkit-scrollbar-track{background:#f1f4f8; border-left:1px solid #e8edf4}
-::-webkit-scrollbar-thumb{background:linear-gradient(180deg,#ffe8a0 0%,#edb640 100%);border-radius:999px;border:2px solid #f1f4f8}
-::-webkit-scrollbar-thumb:hover{background:linear-gradient(180deg,#edb640 0%,#d99a0a 100%); border-color:#e8edf4}
-::-webkit-scrollbar-corner{background:#f3f7fc}
-*{scrollbar-width:thin; scrollbar-color:#d99a0a #f1f4f8}
+::-webkit-scrollbar-track{background:#1a1a1a; border-left:2px solid var(--border)}
+::-webkit-scrollbar-thumb{background:linear-gradient(180deg,#d97706 0%,#f59e0b 100%);border-radius:999px;border:2px solid #1a1a1a}
+::-webkit-scrollbar-thumb:hover{background:linear-gradient(180deg,#f59e0b 0%,#d97706 100%); border-color:#3a3a3a}
+::-webkit-scrollbar-corner{background:#121212}
+*{scrollbar-width:thin; scrollbar-color:#d97706 #1a1a1a}
 html{scroll-behavior:smooth}
-#scrollProgress{position:fixed;top:0;left:0;height:3px;background:linear-gradient(90deg,#d99a0a,#edb640);z-index:9999;width:0%;transition:width .1s linear}
-#scrollTopBtn{position:fixed;bottom:24px;right:24px;width:44px;height:44px;border-radius:50%;background:#d99a0a;color:#fff;border:2px solid #edb640;display:none;align-items:center;justify-content:center;cursor:pointer;box-shadow:0 4px 12px rgba(0,0,0,.15);z-index:80;transition:all .2s}
+#scrollProgress{position:fixed;top:0;left:0;height:3px;background:linear-gradient(90deg,#d97706,#f59e0b);z-index:9999;width:0%;transition:width .1s linear}
+#scrollTopBtn{position:fixed;bottom:24px;right:24px;width:44px;height:44px;border-radius:50%;background:#d97706;color:#fff;border:2px solid #f59e0b;display:none;align-items:center;justify-content:center;cursor:pointer;box-shadow:0 4px 12px rgba(0,0,0,.4);z-index:80;transition:all .2s}
 #scrollTopBtn.show{display:flex}
-#scrollTopBtn:hover{background:#edb640;transform:translateY(-2px)}
+#scrollTopBtn:hover{background:#f59e0b;transform:translateY(-2px)}
 
-/* ─── Layout — pixel-perfect reference, fixed no-outer-scroll ─── */
-.layout{
-  display:grid;
-  grid-template-columns:307px minmax(860px,1fr);
-  height:100vh;
-  min-height:945px;
-  background:linear-gradient(135deg,#f5f8fc 0%,#edf4fb 100%);
-  overflow:hidden;
-}
+/* Layout for inline-styled portal — minimal helpers for new revamp */
+.layout{display:flex;height:100vh;background:#121212}
 .sidebar{
-  height:100vh;
-  min-height:945px;
-  background:radial-gradient(circle at 110% 21%,rgba(200,147,35,.25),transparent 24%),linear-gradient(145deg,#102d4a 0%,#071b33 62%,#0a2746 100%);
-  color:#f7fbff;
-  padding:24px 15px 20px;
-  position:relative;
-  box-shadow:8px 0 22px rgba(15,40,68,.16);
-  overflow:hidden;
+  width:300px;
+  background:#181818;
+  border-right:3px solid var(--border);
   display:flex;
   flex-direction:column;
   flex-shrink:0;
+  overflow:hidden;
+  position:relative;
   z-index:40;
+  box-shadow:4px 0 20px rgba(0,0,0,.4);
 }
-.main{flex:1;display:flex;flex-direction:column;overflow:hidden;background:#f3f7fc;min-width:0}
-#main-content{flex:1;display:flex;flex-direction:column;overflow:hidden;min-height:0;background:#f3f7fc}
+.main{flex:1;display:flex;flex-direction:column;overflow:hidden;background:#121212;min-width:0}
+#main-content{flex:1;display:flex;flex-direction:column;overflow:hidden;min-height:0;background:#121212}
 
-/* ─── Reference sidebar primitives — exactly as <reference>.html:10 ─── */
-.ico{width:23px;height:23px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;display:inline-block;vertical-align:middle}
-.ico.fill{fill:currentColor;stroke:none}
-.brand{height:104px;display:flex;align-items:flex-start;justify-content:center;border-bottom:1px solid rgba(255,255,255,.28);padding:0 0 23px;flex-shrink:0}
-.brand-mark{display:flex;align-items:center;gap:10px}
-.logo-round{width:56px;height:56px;border:3px solid #f3cf68;border-radius:50%;color:#f3cf68;display:grid;place-items:center;font-size:28px;font-style:italic;font-weight:900;letter-spacing:-6px;padding-right:5px;box-shadow:0 0 0 2px rgba(255,255,255,.08) inset;background:#fff}
-.brand-name{font-size:27px;letter-spacing:3px;line-height:1;font-weight:500;color:#fff}
-.brand-sub{font-size:8px;letter-spacing:5px;text-align:center;margin-top:7px;color:#fff}
-.brand-tag{font-size:8px;text-align:center;margin-top:4px;color:#fff}
-.system-title{font-size:15px;letter-spacing:1px;font-weight:800;margin:16px 7px 18px;color:#f7fbff;flex-shrink:0}
-.nav-main,.subnav{list-style:none;margin:0;padding:0}
-.nav-item{height:50px;display:flex;align-items:center;gap:18px;padding:0 18px;border-radius:11px;font-size:15px;margin:2px 0;color:#f5f7fb;cursor:pointer;text-decoration:none;user-select:none}
-.nav-item.active{background:linear-gradient(100deg,#ffe8a0,#edb640);color:#102341;font-weight:800;box-shadow:0 4px 16px rgba(242,193,72,.32)}
-.stage{color:#ffc43e;font-weight:800;font-size:14px;letter-spacing:.3px;margin:19px 15px 12px;flex-shrink:0}
-.nav-item.parent{font-weight:700}
-.chev{margin-left:auto}
-.subnav .nav-item{height:46px;padding-left:44px;font-size:14px;gap:20px}
-.divider{height:1px;background:rgba(255,255,255,.22);margin:10px 7px 12px;flex-shrink:0}
-.journey{height:160px;border:1px solid rgba(255,255,255,.15);border-radius:14px;margin-top:17px;padding:26px 24px;background:linear-gradient(90deg,rgba(6,20,38,.58),rgba(5,24,43,.2)),url('assets/overview/journey.jpg') center/cover;color:white;position:relative;overflow:hidden;flex-shrink:0}
-.journey p{margin:0;font-size:20px;line-height:1.28;font-weight:500;width:150px}
-.gold-stroke{width:77px;height:4px;background:#ffc544;border-radius:99px;transform:rotate(-7deg);margin-top:18px}
-
-/* ─── Topbar — reference light 73px ─── */
-.topbar{height:73px;background:rgba(255,255,255,.92);display:flex;align-items:center;padding:0 31px;gap:34px;border-bottom:1px solid #e8edf4;flex-shrink:0}
-.search{width:445px;height:42px;border-radius:24px;background:#f1f4f8;display:flex;align-items:center;gap:16px;padding:0 18px;color:#4c5772;font-size:14px}
-
-/* ─── Hamburger visible on mobile only — inline styles handle most ─── */
+/* Hamburger visible on mobile only — inline styles handle most */
 .topbar-hamburger{
   display:none;
   width:42px;height:42px;
   align-items:center;justify-content:center;
-  background:#fff;border:1px solid #e8edf4;
-  border-radius:10px;color:#07143a;
+  background:#252525;border:2px solid #3a3a3a;
+  border-radius:10px;color:#d4d4d4;
   font-weight:900;
-  box-shadow:0 2px 8px rgba(27,50,85,.06);
 }
 .sidebar-overlay{
   display:none;position:fixed;inset:0;
-  background:rgba(7,20,58,.45);backdrop-filter:blur(3px);
+  background:rgba(0,0,0,.6);backdrop-filter:blur(3px);
   z-index:30;
 }
 .sidebar-overlay.show{display:block}
 @media(max-width:900px){
-  .layout{grid-template-columns:1fr; display:flex;}
   .sidebar{
     position:fixed;left:0;top:0;bottom:0;
-    width:307px;
     transform:translateX(-100%);
     transition:transform .24s cubic-bezier(.16,1,.3,1);
-    box-shadow:18px 0 40px rgba(15,40,68,.28);
-    height:100vh;
+    box-shadow:18px 0 40px rgba(0,0,0,.6);
   }
   .sidebar.open{transform:translateX(0)}
   .topbar-hamburger{display:inline-flex}
-}
-@media(max-width:1450px){
-  .layout{grid-template-columns:280px minmax(820px,1fr)}
-  .sidebar{padding-left:12px;padding-right:12px}
 }
 @media print{
   .sidebar, .sidebar-overlay{display:none !important}
@@ -132,7 +86,8 @@ html{scroll-behavior:smooth}
 
 /* Big/Bold visible borders for inline cards */
 .selector-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:20px;margin:8px 0 12px}
-.selector-divider{height:3px;background:#e8edf4;margin:8px 0; border-radius:999px}
+.selector-divider{height:3px;background:var(--border);margin:8px 0; border-radius:999px}
 @media(max-width:768px){ .selector-grid{grid-template-columns:1fr} }
 
 /* ============ ULTRA-WIDE (min 2000px): big, bold, full-screen ============ */
+/* Job portal renders mostly inline styles, so scale the whole canvas proportionally */
