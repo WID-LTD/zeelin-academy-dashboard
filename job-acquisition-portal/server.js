@@ -376,13 +376,15 @@ try {
     return out;
   }
   async function enrichJobs(jobs){
+    const MAX_SEARCH=Math.max(1, Number(process.env.ZEELIN_COMPANY_SEARCH||15));
+    const MAX_ENRICH=Math.max(1, Number(process.env.ZEELIN_COMPANY_ENRICH||20));
     const seen=new Map(); const websiteCache=new Map();
     const needsWebsite=[];
     for(const j of jobs){
       const key=String(j.company||'').toLowerCase();
       if(seen.has(key)||!j.company||j.company==='Unknown company') continue;
       if(j.company_url){ websiteCache.set(key,j.company_url); continue;}
-      if(needsWebsite.length<6 && !needsWebsite.some(w=>w.key===key)) needsWebsite.push({key,name:j.company});
+      if(needsWebsite.length<MAX_SEARCH && !needsWebsite.some(w=>w.key===key)) needsWebsite.push({key,name:j.company});
     }
     await Promise.all(needsWebsite.map(async({key,name})=>{
       try{
@@ -396,21 +398,33 @@ try {
         }
       }catch(_){}
     }));
+    // Enrich top companies in parallel (4-way); normalize both contact shapes.
+    const targets=[];
     for(const j of jobs){
       const key=String(j.company||'').toLowerCase();
-      if(seen.has(key)||seen.size>=8) continue;
-      seen.set(key,null);
+      if(seen.has(key)||targets.length>=MAX_ENRICH) continue;
       const website=j.company_url||websiteCache.get(key);
-      if(website){
-        try{ const c=await contacts.enrichCompany({name:j.company,website}); seen.set(key,c);}catch(_){}
-      }
+      if(!website) continue;
+      seen.set(key,null);
+      targets.push([key,j.company,website]);
     }
+    await Promise.all(targets.map(async([key,name,website])=>{
+      try{ const c=await contacts.enrichCompany({name,website}); seen.set(key,c||null); }catch(_){}
+    }));
     return jobs.map(j=>{
       const key=String(j.company||'').toLowerCase();
       const c=seen.get(key);
       const website=j.company_url||websiteCache.get(key)||null;
-      if(c) j.companyDetails={contacts:c.contacts||[],decisionMakers:c.decisionMakers||[],website};
-      else j.companyDetails={contacts:[],decisionMakers:[],website};
+      if(!j.company_url && website) j.company_url=website;
+      const emails=(c&&(c.emails||[]))||[];
+      const email=emails.find(e=>{ try{ return website && e.endsWith('@'+new URL(website).hostname.replace(/^www\./,'')); }catch(_){ return false; } })||emails[0]||'';
+      j.companyDetails={
+        website:website||'',
+        contactPage:website?website.replace(/\/$/,'')+'/contact':'',
+        email, emails, phone:(c&&(c.phone||''))||'',
+        linkedin:(c&&(c.linkedin||''))||'',
+        confidence: email&&website?'high':website?'medium':'low',
+      };
       return j;
     });
   }
@@ -1066,31 +1080,50 @@ try {
     return {job, curriculum};
   }
   // ---- 13-col row + XLSX helpers ----
-  const EXPORT_HEADERS=["Company_Name","Industry","Experience_Level","Core_Functional_Skills","TOOLS","AI_Emerging_Capabilities","Key_Responsibility","Salary","Salary_Min","Salary_Max","Salary_Currency","Salary_Period","Salary_Est_Min","Salary_Est_Max","Salary_Est_Currency","Salary_Est_Period","Posted_Date","Posted_Time","Source_Platform","Platform","URL","Job_URL","Job_URL_Direct","Source_URL","Scraped_At","Location_Country","Location_Region","Location_Label","Is_Remote","Is_Hybrid","Job_Type","Seniority_Level","Easy_Apply","Company_Rating","Company_Reviews_Count","Company_Size","Company_Industry","Employment_Type","Workplace_Type","Description","Skills","Query_Keyword","Company_URL","Apply_URL","Posted_Date_Raw"];
+  const EXPORT_HEADERS=["Company_Name","Industry","Experience_Level","Core_Functional_Skills","TOOLS","AI_Emerging_Capabilities","Key_Responsibility","Salary","Salary_Min","Salary_Max","Salary_Currency","Salary_Period","Salary_Est_Min","Salary_Est_Max","Salary_Est_Currency","Salary_Est_Period","Posted_Date","Posted_Time","Source_Platform","Platform","URL","Job_URL","Job_URL_Direct","Source_URL","Scraped_At","Location_Country","Location_Region","Location_Label","Is_Remote","Is_Hybrid","Job_Type","Seniority_Level","Easy_Apply","Company_Rating","Company_Reviews_Count","Company_Size","Company_Industry","Employment_Type","Workplace_Type","Description","Skills","Query_Keyword","Company_URL","Apply_URL","Posted_Date_Raw","Company_Website","Company_Contact_Page_URL","Company_Contact_Email","Company_Contact_Phone","Company_LinkedIn_URL","Company_Contact_Source_URL","Company_Contact_Confidence"];
+  // Region resolver: sub-country (state/province) from the world DB.
+  const _regionIdx=(()=>{ try{
+    const wc=require('./course-builder/data/world-cities.json');
+    const idx=[];
+    for(const iso of Object.keys(wc)) for(const sub of (wc[iso].subs||[])) idx.push([sub, iso]);
+    idx.sort((a,b)=>b[0].length-a[0].length);
+    return idx;
+  }catch(_){ return []; } })();
+  function regionFor(label){
+    const t=` ${String(label||'').toLowerCase().replace(/[^a-z\s]/g,' ').replace(/\s+/g,' ').trim()} `;
+    if(!t.trim()) return '';
+    for(const [sub] of _regionIdx){ if(sub.length>2 && t.includes(` ${sub.toLowerCase()} `)) return sub; }
+    return '';
+  }
+  const NL='NOT LISTED';
+  const joinOr=(arr,sep)=>{ const s=(Array.isArray(arr)?arr:[]).map(String).filter(x=>x.trim()).join(sep); return s||NL; };
   function jobToExportRow(j){
      const loc=j.location||{};
     const sal=j.salary||{};
     const est=j.salary_est||{};
     const salObserved=(sal.min||sal.max)?`${sal.min||''}–${sal.max||''} ${sal.currency||''}`.trim():(sal.raw||'');
-    const salDisplay=salObserved||((est.min||est.max)?`~${est.min||''}–${est.max||''} ${est.currency||''} (est.)`.trim():'NOT LISTED');
+    const salDisplay=salObserved||((est.min||est.max)?`~${est.min||''}–${est.max||''} ${est.currency||''} (est.)`.trim():NL);
+    const postedRaw=j.postedAt||'';
+    const postedDate=(j.Posted_Date||(postedRaw?String(postedRaw).slice(0,10):'')||'').trim();
+    const scraped=j.scraped_at||new Date().toISOString();
     return [
       j.Company_Name||j.company||'',
-      j.Industry||j.industry||'',
-      j.Experience_Level||j.experienceLevel||j.seniority_level||'',
-      (j.Core_Functional_Skills||j.requirements?.core||[]).join('; '),
-      (j.TOOLS||j.requirements?.tools||[]).join('; '),
-      (j.AI_Emerging_Capabilities||j.requirements?.ai||[]).join('; '),
-      (j.Key_Responsibility||j.requirements?.responsibilities||[]).join(' | '),
-      j.salary ? (sal.raw || ((sal.min||'') + (sal.max? '–'+sal.max:''))) : salDisplay,
-      sal.min||'',
-      sal.max||'',
-      sal.currency||'',
-      sal.period||'',
-      est.min||'',
-      est.max||'',
-      est.currency||'',
-      est.period||'',
-      j.Posted_Date||'',
+      j.Industry||j.industry||NL,
+      j.Experience_Level||j.experienceLevel||j.seniority_level||NL,
+      joinOr(j.Core_Functional_Skills||(j.requirements&&j.requirements.core)||[],'; '),
+      joinOr(j.TOOLS||(j.requirements&&j.requirements.tools)||[],'; '),
+      joinOr(j.AI_Emerging_Capabilities||(j.requirements&&j.requirements.ai)||[],'; '),
+      joinOr(j.Key_Responsibility||(j.requirements&&j.requirements.responsibilities)||[],' | '),
+      salDisplay,
+      sal.min||est.min||NL,
+      sal.max||est.max||NL,
+      sal.currency||est.currency||NL,
+      sal.period||est.period||NL,
+      est.min||NL,
+      est.max||NL,
+      est.currency||NL,
+      est.period||NL,
+      postedDate||scraped.slice(0,10),
       j.Posted_Time||'',
       j.Source_Platform||j.source||j.platform||'',
       j.platform||j.source||'',
@@ -1098,27 +1131,34 @@ try {
       j.job_url||j.url||'',
       j.job_url_direct||j.url||'',
       j.source_url||j.url||'',
-      j.scraped_at||new Date().toISOString(),
+      scraped,
       loc.country||j.country|| (loc.label||'').split(',').pop()?.trim()||'',
-      loc.region||'',
+      loc.region||regionFor(loc.label)||NL,
       loc.label||'',
       j.is_remote||j.isRemote ? 'TRUE':'FALSE',
       j.isHybrid ? 'TRUE':'FALSE',
-      j.employmentType||j.job_type||'',
-      j.seniority_level||j.seniority||'',
+      j.employmentType||j.job_type||NL,
+      j.seniority_level||j.seniority||j.experienceLevel||j.Experience_Level||NL,
       j.easy_apply ? 'TRUE':'FALSE',
-      j.company_rating||'',
-      j.company_reviews_count||'',
-      j.company_size||'',
-      j.company_industry||j.Industry||'',
-      j.employmentType||'',
-      j.workplaceType|| (j.is_remote?'remote': j.isHybrid?'hybrid':'on-site'),
+      j.company_rating||NL,
+      j.company_reviews_count||NL,
+      j.company_size||NL,
+      j.company_industry||j.Industry||j.industry||NL,
+      j.employmentType||j.job_type||NL,
+      j.workplaceType|| (j.is_remote||j.isRemote?'remote': j.isHybrid?'hybrid':'on-site'),
       (j.description||'').slice(0,12000),
-      (j.requirements?.skills||[]).join('; '),
+      joinOr(j.requirements&&j.requirements.skills, '; '),
       j.queryKeyword||j.Query_Keyword||j.title||'',
-      j.company_url||'',
+      j.company_url||(j.companyDetails&&j.companyDetails.website)||NL,
       j.url||j.job_url||'',
-      j.postedAt||j.Posted_Date||''
+      postedRaw||'unlisted',
+      (j.companyDetails&&j.companyDetails.website)||NL,
+      (j.companyDetails&&j.companyDetails.contactPage)||NL,
+      (j.companyDetails&&j.companyDetails.email)||NL,
+      (j.companyDetails&&j.companyDetails.phone)||NL,
+      (j.companyDetails&&j.companyDetails.linkedin)||NL,
+      (j.companyDetails&&j.companyDetails.website)||NL,
+      (j.companyDetails&&j.companyDetails.confidence)||'low'
     ];
   }
   async function buildExportWorkbook(jobs, input, analysisMode){

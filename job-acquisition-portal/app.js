@@ -267,7 +267,7 @@ function viewPortal(){
     + '<h3 style="font-size:19px;font-weight:900;color:#ffffff;margin:0 0 6px 0;">Job Acquisition Portal</h3>'
     + '<p style="font-size:12px;font-weight:800;color:#16a34a;margin:0 0 6px 0;letter-spacing:0.4px;text-transform:uppercase;">Cohort-Based • Multi-Job Training</p>'
     + '<p style="font-size:13px;font-weight:700;color:#d4d4d4;line-height:1.6;margin:0 0 14px 0;flex:1;">AI-matched Regional Job Boards, Boost accountability (5-job quota), CV Maker with AI API, and Interview Prep & Mock with timetable. Routes to <span style="color:#34d399;">portal/job-acquisition/overview</span>.</p>'
-    + '<div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:6px;"><span style="font-size:11px;background:#064e3b;color:#4ade80;padding:4px 8px;border-radius:999px;border:1px solid #14532d;font-weight:800;">AI Matcher 95%</span><span style="font-size:11px;background:#26170b;color:#d97706;padding:4px 8px;border-radius:999px;border:1px solid #3d2411;font-weight:800;">Cohort 001</span><span style="font-size:11px;background:#1e293b;color:#38bdf8;padding:4px 8px;border-radius:999px;border:1px solid #1e3a5f;font-weight:800;">ATS Ready</span></div>'
+    + '<div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:6px;"><span style="font-size:11px;background:#064e3b;color:#4ade80;padding:4px 8px;border-radius:999px;border:1px solid #14532d;font-weight:800;">AI Matcher 95%</span><span style="font-size:11px;background:#1e293b;color:#38bdf8;padding:4px 8px;border-radius:999px;border:1px solid #1e3a5f;font-weight:800;">ATS Ready</span></div>'
     + '</div>'
     + '<div style="padding:14px 16px;background:#161616;border-top:2px solid #3a3a3a;display:flex;gap:10px;">'
     + '<button onclick="window._nav(\'overview\')" style="flex:1;background:#16a34a;color:#fff;border:1px solid #22c55e;padding:12px;border-radius:8px;font-size:13px;font-weight:900;cursor:pointer;">Enter Job Portal →</button>'
@@ -336,7 +336,7 @@ function viewOverview(){
     + '<button onclick="window._nav(\'regional-boards\')" style="width:100%;background:linear-gradient(135deg, #f59e0b 0%, #d97706 100%);color:#ffffff;border:1px solid #f59e0b;padding:14px;border-radius:8px;font-size:14px;font-weight:900;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px;box-shadow:0 4px 16px rgba(217, 119, 6, 0.4);">'
     + '<span>Go to Regional Job Boards</span><svg style="width:16px;height:16px;fill:currentColor;" viewBox="0 0 24 24"><path d="M5 13h11.86l-5.43 5.43 1.42 1.42L21.14 12l-8.29-8.29-1.42 1.42L16.86 11H5v2z"/></svg></button></div></div>';
 
-  return topbarHtml('ZEELIN JOB ACQUISITION PORTAL \u2022 Career Mission Control', '<span>Readiness Index: <strong style="color:#34d399;">95%</strong></span><span style="color:#f59e0b;font-weight:800;">Cohort 001</span>', 25)
+  return topbarHtml('ZEELIN JOB ACQUISITION PORTAL \u2022 Career Mission Control', '<span>Readiness Index: <strong style="color:#34d399;">95%</strong></span>', 25)
     + '<div style="flex:1;display:flex;overflow:hidden;min-height:0;">'+main+right+'</div>';
 }
 
@@ -537,7 +537,7 @@ function linkedInPreviewHtml(){
   const p = state.linkedInProfile;
   if(!p || !p.url) return '<div style="flex:1;text-align:center;padding:12px;"><div style="font-size:12px;font-weight:800;color:#737373;">No LinkedIn profile saved yet</div><div style="font-size:11px;color:#52525b;margin-top:4px;">Paste your link above and click Save or Fetch Demo</div></div>';
   const name = esc(p.name||'LinkedIn User');
-  const headline = esc(p.headline||'Business Analysis • Supply Chain • Zeelin Cohort 001');
+  const headline = esc(p.headline||'Business Analysis • Supply Chain');
   const loc = esc(p.location||'London, UK');
   const about = esc(p.about||'Results-driven BA with verified Work Experience. Demo preview generated from your LinkedIn link.');
   const initials = name.split(' ').map(s=>s[0]).slice(0,2).join('').toUpperCase();
@@ -700,7 +700,7 @@ function viewCVMaker(){
     + '<div style="margin-bottom:12px;"><h4 style="font-size:13px;font-weight:900;border-bottom:1px solid '+t.color+';padding-bottom:2px;margin:0 0 6px 0;text-transform:uppercase;">Verified Work Experience Deliverables</h4>'
     + '<div style="margin-bottom:8px;"><div style="display:flex;justify-content:space-between;font-weight:900;font-size:11px;"><span>Retail Supply Chain Optimization Model</span><span>Grade: 92/100</span></div><p style="font-size:10px;line-height:1.4;margin:2px 0 0 0;font-weight:600;text-align:justify;">Engineered robust spreadsheet financial models mapping annual carrying cost multipliers and inventory turnover metrics. Verified by Lead Mentor Dr. O. Emeka under enterprise standards (#WID-VERIFIED-9210).</p></div>'
     + '<div><div style="display:flex;justify-content:space-between;font-weight:900;font-size:11px;"><span>Business Requirements Specification (BRS)</span><span>Grade: 93/100</span></div><p style="font-size:10px;line-height:1.4;margin:2px 0 0 0;font-weight:600;text-align:justify;">Conducted thorough stakeholder interviews, documented functional specifications, and created precise MoSCoW prioritization matrices.</p></div></div>'
-    + '<div style="margin-top:12px;border:1px dashed #a3a3a3;border-radius:6px;padding:8px;text-align:center;font-size:9px;color:#737373;">AI Disclaimer: This CV was enhanced via AI API — verify all facts before submission. Cohort 001 — Stage 3</div>'
+    + '<div style="margin-top:12px;border:1px dashed #a3a3a3;border-radius:6px;padding:8px;text-align:center;font-size:9px;color:#737373;">AI Disclaimer: This CV was enhanced via AI API — verify all facts before submission. Stage 3</div>'
     + '</div>'
     + '<div style="display:flex;flex-direction:column;gap:14px;margin-top:10px;"><h4 style="font-size:14px;font-weight:900;color:#ffffff;margin:0;">Select Professional Template Theme</h4>'
     + '<div style="display:grid;grid-template-columns:repeat(5, 1fr);gap:10px;">'+cardsHtml+'</div></div>'
@@ -800,7 +800,7 @@ function viewEventsHub(){
     + '<div style="padding:24px;background-color:#161616;border-top:2px solid #3a3a3a;">'
     + '<button onclick="window._nav(\'calendar\')" style="width:100%;background:linear-gradient(135deg, #f59e0b 0%, #d97706 100%);color:#ffffff;border:1px solid #f59e0b;padding:14px;border-radius:8px;font-size:14px;font-weight:900;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px;box-shadow:0 4px 16px rgba(217, 119, 6, 0.4);"><span>View Full Calendar & Bookings</span><svg style="width:16px;height:16px;fill:currentColor;" viewBox="0 0 24 24"><path d="M5 13h11.86l-5.43 5.43 1.42 1.42L21.14 12l-8.29-8.29-1.42 1.42L16.86 11H5v2z"/></svg></button></div></div>';
 
-  return topbarHtml('Work Experience Portal \u2022 Events & Sessions Hub', '<span style="color:#f59e0b;font-weight:800;">Cohort 001 Active</span>', 60)
+  return topbarHtml('Work Experience Portal \u2022 Events & Sessions Hub', '', 60)
     + '<div style="flex:1;display:flex;overflow:hidden;min-height:0;">'+main+right+'</div>';
 }
 
@@ -990,7 +990,7 @@ function viewCalendar(){
     + '<button onclick="window._nav(\'resources\')" style="width:100%;background:#262626;color:#d4d4d4;border:1px solid #404040;padding:12px;border-radius:8px;font-size:13px;font-weight:800;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px;"><span>\uD83D\uDCCB</span> Go to Mock Resources <svg style="width:14px;height:14px;fill:currentColor;" viewBox="0 0 24 24"><path d="M5 13h11.86l-5.43 5.43 1.42 1.42L21.14 12l-8.29-8.29-1.42 1.42L16.86 11H5v2z"/></svg></button>'
     + '</div></div>';
 
-  return topbarHtml('Work Experience Portal \u2022 Calendar & Live Sessions Hub', '<span style="color:#f59e0b;font-weight:800;">Cohort 001 Active</span> <span style="color:#a3a3a3;">• Interactive Demo</span>', 55)
+  return topbarHtml('Work Experience Portal \u2022 Calendar & Live Sessions Hub', '<span style="color:#a3a3a3;">Interactive Demo</span>', 55)
     + '<div style="flex:1;display:flex;overflow:hidden;min-height:0;">'+main+right+'</div>';
 }
 
@@ -1074,7 +1074,7 @@ function viewRecordings(){
     + '</div>'
     + '<div style="padding:24px;background:#161616;border-top:2px solid #3a3a3a;"><button onclick="window._nav(\'calendar\')" style="width:100%;background:linear-gradient(135deg, #f59e0b 0%, #d97706 100%);color:#fff;border:1px solid #f59e0b;padding:14px;border-radius:8px;font-size:13px;font-weight:900;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px;"><span>Go to Calendar & Live</span><svg style="width:14px;height:14px;fill:currentColor;" viewBox="0 0 24 24"><path d="M5 13h11.86l-5.43 5.43 1.42 1.42L21.14 12l-8.29-8.29-1.42 1.42L16.86 11H5v2z"/></svg></button></div></div>';
 
-  return topbarHtml('Work Experience Portal \u2022 Recordings Library & Archive Hub', '<span style="color:#f59e0b;font-weight:800;">Cohort 001 Archive</span> <span style="color:#a3a3a3;">• On-Demand</span>', 70)
+  return topbarHtml('Work Experience Portal \u2022 Recordings Library & Archive Hub', '<span style="color:#a3a3a3;">On-Demand</span>', 70)
     + '<div style="flex:1;display:flex;overflow:hidden;min-height:0;">'+main+right+'</div>';
 }
 
@@ -1251,7 +1251,7 @@ window._downloadCV = function(){
   window.print && window.print();
 };
 window._downloadPrompt = function(){
-  const blob = new Blob(['ZEELIN JOB ACQUISITION PORTAL — BA_SupplyChain_Interview_Prompt.docx (demo)\n\n1. Describe your stakeholder conflict resolution approach.\n2. Defend your carrying cost multiplier model.\n3. Explain MoSCoW prioritization under scope creep.\n\nCohort 001 — Submit via drag & drop.'], {type:'application/vnd.openxmlformats-officedocument.wordprocessingml.document'});
+  const blob = new Blob(['ZEELIN JOB ACQUISITION PORTAL — BA_SupplyChain_Interview_Prompt.docx (demo)\n\n1. Describe your stakeholder conflict resolution approach.\n2. Defend your carrying cost multiplier model.\n3. Explain MoSCoW prioritization under scope creep.\n\nSubmit via drag & drop.'], {type:'application/vnd.openxmlformats-officedocument.wordprocessingml.document'});
   const url=URL.createObjectURL(blob);
   const a=document.createElement('a'); a.href=url; a.download='BA_SupplyChain_Interview_Prompt.docx'; a.click(); URL.revokeObjectURL(url);
   showToast('Downloaded BA_SupplyChain_Interview_Prompt.docx');
@@ -1317,7 +1317,7 @@ window._sendLiveChat = function(){
 };
 window._raiseHand = function(){ showToast('\u270B Hand raised — Dr. O. Emeka will invite you to speak'); };
 window._showParticipants = function(){ showToast('Participants: 18 in call \u2014 Dr. O. Emeka (Host), Sarah Jenkins (Co-host), You, Amara K., David O. +13 more'); };
-window._contactSupport = function(){ showToast('Contact Support: support@zeelin.academy — Cohort 001 (demo)'); };
+window._contactSupport = function(){ showToast('Contact Support: support@zeelin.academy (demo)'); };
 
 /* ─── Sidebar update ─── */
 function updateSidebar(activeRoute){
