@@ -294,6 +294,8 @@ function viewOverview(){
   const pct = proofPct;
   const hasCV = q>0;
   const hasQuota = q>=5;
+  const latestBoards = (typeof JOB_BOARDS!=='undefined'?JOB_BOARDS.slice(0,3):[]);
+  const boardsHtml = latestBoards.map(b=>{ const c=(typeof JOB_COUNTRIES!=='undefined'?JOB_COUNTRIES.find(x=>x.id===b.countryId):null); const loc=c?c.name:b.countryId; const host=(function(){try{return new URL(b.url).hostname.replace('www.','')}catch{return b.url}})(); const tag=b.category==='remote'?'Remote':'Verified'; const tagCls=b.category==='remote'?'tag blue':'tag'; const logoInner=b.boardImg?'':esc(b.name.slice(0,3).toUpperCase()); const logoStyle=b.boardImg?"background:url('"+esc(b.boardImg)+"') center/cover no-repeat":""; return '<article class="job" onclick="window.open(\''+esc(b.url)+'\',\'_blank\')"><div class="company-logo" style="'+logoStyle+'">'+logoInner+'</div><div><strong>'+esc(b.name)+'</strong><div class="company">'+esc(host)+'</div><div class="job-meta"><svg class="ico" style="width:13px"><use href="#pin"/></svg>'+esc(loc)+' <span class="'+tagCls+'">'+esc(tag)+'</span></div></div><svg class="ico" style="width:17px"><use href="#bookmark"/></svg></article>'; }).join('');
   // pixel-perfect replica of Zeelin_Job_Acquisition_Dashboard (1).html — assets local
   const overviewHtml = ''
     + '<style>'
@@ -355,12 +357,8 @@ function viewOverview(){
     + '<article class="feature purple" onclick="window._nav(\'cv-maker\')"><div class="feature-icon"><svg class="ico" style="width:31px;height:31px"><use href="#doc"/></svg></div><h3>CV Maker &amp; Portfolio</h3><p>Create a professional CV and showcase your skills</p><span class="circle-arrow">→</span></article>'
     + '<article class="feature gold" onclick="window._nav(\'resources\')"><div class="feature-icon"><svg class="ico" style="width:31px;height:31px"><use href="#cap"/></svg></div><h3>Training &amp; Learning</h3><p>Build in-demand skills with expert courses</p><span class="circle-arrow">→</span></article>'
     + '</section>'
-    + '<div class="opps-head"><div><h2>Latest Opportunities</h2><p>Curated job opportunities from trusted partners</p></div><div class="view-all" onclick="window._nav(\'regional-boards\')">View All Jobs&nbsp; →</div></div>'
-    + '<section class="jobs">'
-    + '<article class="job" onclick="window._nav(\'regional-boards\')"><div class="company-logo">NHS</div><div><strong>Social Worker</strong><div class="company">NHS Trust</div><div class="job-meta"><svg class="ico" style="width:13px"><use href="#pin"/></svg>London, UK <span class="tag">Full-time</span></div></div><svg class="ico" style="width:17px"><use href="#bookmark"/></svg></article>'
-    + '<article class="job" onclick="window._nav(\'regional-boards\')"><div class="company-logo" style="font-size:0;background:conic-gradient(#7fba00 0 25%,#ffb900 0 50%,#00a4ef 0 75%,#f25022 0)"></div><div><strong>Business Analyst</strong><div class="company">Microsoft</div><div class="job-meta"><svg class="ico" style="width:13px"><use href="#pin"/></svg>Remote <span class="tag blue">Hybrid</span></div></div><svg class="ico" style="width:17px"><use href="#bookmark"/></svg></article>'
-    + '<article class="job" onclick="window._nav(\'regional-boards\')"><div class="company-logo" style="color:#07143a;font-size:15px">amey</div><div><strong>Project Coordinator</strong><div class="company">Amey</div><div class="job-meta"><svg class="ico" style="width:13px"><use href="#pin"/></svg>Birmingham, UK <span class="tag">Full-time</span></div></div><svg class="ico" style="width:17px"><use href="#bookmark"/></svg></article>'
-    + '</section>'
+    + '<div class="opps-head"><div><h2>Latest Job Boards</h2><p>Curated job boards from trusted partners</p></div><div class="view-all" onclick="window._nav(\'regional-boards\')">View All Job Boards&nbsp; →</div></div>'
+    + '<section class="jobs">'+boardsHtml+'</section>'
     + '<section class="support"><div class="support-icon"><svg class="ico"><use href="#users"/></svg></div><div><strong>Need Support?</strong><p>Access resources, guides and our community for help at every step.</p></div><button class="btn" onclick="window._nav(\'resources\')">Get Support&nbsp; →</button></section>'
     + '</main>'
     + '</section>'
