@@ -1454,8 +1454,8 @@ window._contactSupport = function(){ showToast('Contact Support: support@zeelin.
 function updateSidebar(activeRoute){
   const sb = document.getElementById('sidebar');
   if(sb) sb.innerHTML = renderSidebar(activeRoute);
-  // keep left sidebar for all hubs except immersive Teams meeting (still show left bar for demo consistency as requested)
-  const fullWidth = [].includes(activeRoute);
+  // overview is pixel-perfect full replica — hide outer chrome
+  const fullWidth = ['overview'].includes(activeRoute);
   const layout = document.querySelector('.layout');
   const sidebarEl = document.getElementById('sidebar');
   const overlayEl = document.getElementById('sidebarOverlay');
@@ -1476,8 +1476,8 @@ function render(view, param){
   updateSidebar(view);
   const main = document.getElementById('main-content');
   if(!main) return;
-  // Ensure main-content wrapper styles
-  main.style.cssText = isFull ? 'display:block;overflow:auto;background:#121212;height:100vh;' : 'display:flex;flex-direction:column;overflow:hidden;background:#121212;height:100%;min-height:0;';
+  // Ensure main-content wrapper styles — overview uses light canvas like reference html
+  main.style.cssText = isFull ? 'display:block;overflow:auto;background:#f3f7fc;height:100vh;' : 'display:flex;flex-direction:column;overflow:hidden;background:#121212;height:100%;min-height:0;';
 
   let html='';
   switch(view){
