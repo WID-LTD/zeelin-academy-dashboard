@@ -183,7 +183,7 @@ function renderSidebar(activeRoute){
     const iStyle='color:#d4d4d4;border:2px solid transparent;';
     return '<a href="#portal" style="'+base+(active?aStyle:iStyle)+'">'
       + '<svg style="width:18px;height:18px;fill:'+(active?'#f59e0b':'currentColor')+';" viewBox="0 0 24 24"><path d="M3 3h18v18H3V3zm2 2v14h14V5H5zm2 2h10v2H7V7zm0 4h10v2H7v-2zm0 4h10v2H7v-2z"/></svg>'
-      + '<span>Select Dashboard</span></a>';
+      + '<span>Select Portal</span></a>';
   }
 
   return ''
@@ -230,7 +230,7 @@ function topbarHtml(title, rightHtml, progressPct){
     + '<span style="font-size:26px;font-weight:900;letter-spacing:1.2px;color:#ffffff;white-space:nowrap;text-align:center;width:100%;">'+esc(title.split(" •")[0])+'</span>'
     + '<div style="flex:1;max-width:280px;height:12px;background-color:#161616;border:2px solid #3a3a3a;border-radius:6px;overflow:hidden;display:flex;flex-shrink:0;"><div style="width:'+pct+'%;height:100%;background:linear-gradient(90deg, #d97706 0%, #16a34a 100%);"></div></div>'
     + '</div>'
-    + '<div style="display:flex;align-items:center;gap:16px;font-size:13px;font-weight:700;color:#d4d4d4;flex-shrink:0;"><a href="/portal.html" style="display:inline-flex;align-items:center;gap:6px;padding:6px 10px;border-radius:999px;background:#1e1e1e;border:1px solid #3a3a3a;color:#f59e0b;font-size:11px;font-weight:800;text-decoration:none">⟡ Dashboards</a>'+(rightHtml||'')+'</div>'
+    + '<div style="display:flex;align-items:center;gap:16px;font-size:13px;font-weight:700;color:#d4d4d4;flex-shrink:0;"><a href="/portal.html" style="display:inline-flex;align-items:center;gap:6px;padding:6px 10px;border-radius:999px;background:#1e1e1e;border:1px solid #3a3a3a;color:#f59e0b;font-size:11px;font-weight:800;text-decoration:none">⟡ Portals</a>'+(rightHtml||'')+'</div>'
     + '</div>';
 }
 
@@ -241,7 +241,7 @@ function viewPortal(){
     + '<div style="flex:1;padding:48px 52px;overflow-y:auto;background:#121212;">'
     + '<div style="max-width:1000px;margin:0 auto;display:flex;flex-direction:column;gap:28px;">'
     + '<div style="text-align:center;padding:8px 0 4px;">'
-    + '<h1 style="font-size:32px;font-weight:900;color:#ffffff;margin:0 0 8px;letter-spacing:-0.5px;">Select Dashboard</h1>'
+    + '<h1 style="font-size:32px;font-weight:900;color:#ffffff;margin:0 0 8px;letter-spacing:-0.5px;">Select Portal</h1>'
     + '<p style="font-size:14px;font-weight:700;color:#a3a3a3;margin:0;line-height:1.6;max-width:720px;margin-left:auto;margin-right:auto;">Choose your workspace. Each selection routes to <code style="background:#1f1f1f;border:1px solid #3a3a3a;padding:2px 6px;border-radius:4px;color:#f59e0b;font-weight:800;">portal/&lt;name&gt;/overview</code>. Course Builder (Job Scraper) lives at <code style="background:#1f1f1f;border:1px solid #3a3a3a;padding:2px 6px;border-radius:4px;color:#38bdf8;">course-builder/</code>.</p>'
     + '</div>'
     + '<div style="display:grid;grid-template-columns:repeat(auto-fit, minmax(320px, 1fr));gap:24px;">'
@@ -263,13 +263,13 @@ function viewPortal(){
     + '<div style="background:#181818;border:2px solid #d97706;border-radius:12px;overflow:hidden;display:flex;flex-direction:column;box-shadow:0 12px 24px rgba(217,119,6,0.18);">'
     + '<div style="padding:22px 22px 16px;flex:1;display:flex;flex-direction:column;">'
     + '<div style="width:56px;height:56px;background:#26170b;border:2px solid rgba(217,119,6,.25);border-radius:12px;display:flex;align-items:center;justify-content:center;margin-bottom:14px;"><svg viewBox="0 0 24 24" width="28" height="28" fill="#d97706"><path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-2 10h-4v4h-2v-4H7v-2h4V7h2v4h4v2z"/></svg></div>'
-    + '<h3 style="font-size:19px;font-weight:900;color:#ffffff;margin:0 0 6px 0;">Job Acquisition Dashboard</h3>'
+    + '<h3 style="font-size:19px;font-weight:900;color:#ffffff;margin:0 0 6px 0;">Job Acquisition Portal</h3>'
     + '<p style="font-size:12px;font-weight:800;color:#16a34a;margin:0 0 6px 0;letter-spacing:0.4px;text-transform:uppercase;">Cohort-Based • Multi-Job Training</p>'
     + '<p style="font-size:13px;font-weight:700;color:#d4d4d4;line-height:1.6;margin:0 0 14px 0;flex:1;">AI-matched Regional Job Boards, Boost accountability (5-job quota), CV Maker with AI API, and Interview Prep & Mock with timetable. Routes to <span style="color:#34d399;">portal/job-acquisition/overview</span>.</p>'
     + '<div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:6px;"><span style="font-size:11px;background:#064e3b;color:#4ade80;padding:4px 8px;border-radius:999px;border:1px solid #14532d;font-weight:800;">AI Matcher 95%</span><span style="font-size:11px;background:#26170b;color:#d97706;padding:4px 8px;border-radius:999px;border:1px solid #3d2411;font-weight:800;">Cohort 001</span><span style="font-size:11px;background:#1e293b;color:#38bdf8;padding:4px 8px;border-radius:999px;border:1px solid #1e3a5f;font-weight:800;">ATS Ready</span></div>'
     + '</div>'
     + '<div style="padding:14px 16px;background:#161616;border-top:2px solid #3a3a3a;display:flex;gap:10px;">'
-    + '<button onclick="window._nav(\'overview\')" style="flex:1;background:#16a34a;color:#fff;border:1px solid #22c55e;padding:12px;border-radius:8px;font-size:13px;font-weight:900;cursor:pointer;">Enter Job Dashboard →</button>'
+    + '<button onclick="window._nav(\'overview\')" style="flex:1;background:#16a34a;color:#fff;border:1px solid #22c55e;padding:12px;border-radius:8px;font-size:13px;font-weight:900;cursor:pointer;">Enter Job Portal →</button>'
     + '<button onclick="window._nav(\'portal/job-acquisition/overview\')" style="background:#262626;color:#34d399;border:2px solid #16a34a;padding:12px 14px;border-radius:8px;font-size:12px;font-weight:800;cursor:pointer;">Route Demo</button>'
     + '</div>'
     + '</div>'
@@ -303,7 +303,7 @@ function viewOverview(){
     + '<div style="background:linear-gradient(rgba(24,24,24,0.9), rgba(24,24,24,0.9)), url(\'https://images.unsplash.com/photo-1521737604893-d14cc237f11d?auto=format&fit=crop&w=1200&q=80\') center/cover no-repeat;border:2px solid #3a3a3a;border-radius:12px;padding:36px;box-sizing:border-box;">'
     + '<div style="display:inline-flex;align-items:center;gap:6px;background-color:#2c1a0e;border:1px solid #d97706;padding:4px 10px;border-radius:4px;font-size:11px;font-weight:900;color:#f59e0b;text-transform:uppercase;margin-bottom:12px;">'
     + '<svg style="width:12px;height:12px;fill:currentColor;" viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-6h2v6zm0-8h-2V7h2v2z"/></svg> Verified Stage 2 Credentials Loaded</div>'
-    + '<h1 style="font-size:32px;font-weight:900;color:#ffffff;margin:0 0 10px 0;letter-spacing:-0.5px;">Welcome to Your Job Acquisition Dashboard</h1>'
+    + '<h1 style="font-size:32px;font-weight:900;color:#ffffff;margin:0 0 10px 0;letter-spacing:-0.5px;">Welcome to Your Job Acquisition Portal</h1>'
     + '<p style="font-size:14px;font-weight:700;color:#d4d4d4;margin:0 0 24px 0;line-height:1.6;max-width:700px;">You have successfully completed Stage 1 and Stage 2 with a verified score of 92/100. Access verified regional job boards, meet your daily application quotas, and transition into the active employment market. <strong style="color:#f59e0b;">Multiple job training enabled — log up to 5 concurrent applications.</strong></p>'
     + '<div style="display:flex;gap:14px;flex-wrap:wrap;">'
     + '<button onclick="window._nav(\'regional-boards\')" style="background:linear-gradient(135deg, #f59e0b 0%, #d97706 100%);color:#ffffff;border:1px solid #f59e0b;padding:12px 24px;border-radius:8px;font-size:14px;font-weight:900;cursor:pointer;box-shadow:0 4px 16px rgba(217,119,6,0.4);">Explore Regional Job Boards</button>'
@@ -713,7 +713,7 @@ function viewEventsHub(){
     + '<div style="padding:24px;background-color:#161616;border-top:2px solid #3a3a3a;">'
     + '<button onclick="window._nav(\'calendar\')" style="width:100%;background:linear-gradient(135deg, #f59e0b 0%, #d97706 100%);color:#ffffff;border:1px solid #f59e0b;padding:14px;border-radius:8px;font-size:14px;font-weight:900;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px;box-shadow:0 4px 16px rgba(217, 119, 6, 0.4);"><span>View Full Calendar & Bookings</span><svg style="width:16px;height:16px;fill:currentColor;" viewBox="0 0 24 24"><path d="M5 13h11.86l-5.43 5.43 1.42 1.42L21.14 12l-8.29-8.29-1.42 1.42L16.86 11H5v2z"/></svg></button></div></div>';
 
-  return topbarHtml('Work Experience Dashboard \u2022 Events & Sessions Hub', '<span style="color:#f59e0b;font-weight:800;">Cohort 001 Active</span>', 60)
+  return topbarHtml('Work Experience Portal \u2022 Events & Sessions Hub', '<span style="color:#f59e0b;font-weight:800;">Cohort 001 Active</span>', 60)
     + '<div style="flex:1;display:flex;overflow:hidden;min-height:0;">'+main+right+'</div>';
 }
 
@@ -903,7 +903,7 @@ function viewCalendar(){
     + '<button onclick="window._nav(\'resources\')" style="width:100%;background:#262626;color:#d4d4d4;border:1px solid #404040;padding:12px;border-radius:8px;font-size:13px;font-weight:800;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px;"><span>\uD83D\uDCCB</span> Go to Mock Resources <svg style="width:14px;height:14px;fill:currentColor;" viewBox="0 0 24 24"><path d="M5 13h11.86l-5.43 5.43 1.42 1.42L21.14 12l-8.29-8.29-1.42 1.42L16.86 11H5v2z"/></svg></button>'
     + '</div></div>';
 
-  return topbarHtml('Work Experience Dashboard \u2022 Calendar & Live Sessions Hub', '<span style="color:#f59e0b;font-weight:800;">Cohort 001 Active</span> <span style="color:#a3a3a3;">• Interactive Demo</span>', 55)
+  return topbarHtml('Work Experience Portal \u2022 Calendar & Live Sessions Hub', '<span style="color:#f59e0b;font-weight:800;">Cohort 001 Active</span> <span style="color:#a3a3a3;">• Interactive Demo</span>', 55)
     + '<div style="flex:1;display:flex;overflow:hidden;min-height:0;">'+main+right+'</div>';
 }
 
@@ -952,7 +952,7 @@ function viewResources(){
     + '</div>'
     + '<div style="padding:24px;background:#161616;border-top:2px solid #3a3a3a;"><button onclick="window._nav(\'calendar\')" style="width:100%;background:#262626;color:#d4d4d4;border:1px solid #404040;padding:12px;border-radius:8px;font-size:13px;font-weight:800;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px;"><span>\u2190 Back to Calendar</span></button></div></div>';
 
-  return topbarHtml('Work Experience Dashboard \u2022 Mock Interview Resources Library', '<span style="color:#f59e0b;font-weight:800;">Resources</span> <span style="color:#a3a3a3;">• Interactive</span>', 80)
+  return topbarHtml('Work Experience Portal \u2022 Mock Interview Resources Library', '<span style="color:#f59e0b;font-weight:800;">Resources</span> <span style="color:#a3a3a3;">• Interactive</span>', 80)
     + '<div style="flex:1;display:flex;overflow:hidden;min-height:0;">'+main+right+'</div>';
 }
 
@@ -987,7 +987,7 @@ function viewRecordings(){
     + '</div>'
     + '<div style="padding:24px;background:#161616;border-top:2px solid #3a3a3a;"><button onclick="window._nav(\'calendar\')" style="width:100%;background:linear-gradient(135deg, #f59e0b 0%, #d97706 100%);color:#fff;border:1px solid #f59e0b;padding:14px;border-radius:8px;font-size:13px;font-weight:900;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px;"><span>Go to Calendar & Live</span><svg style="width:14px;height:14px;fill:currentColor;" viewBox="0 0 24 24"><path d="M5 13h11.86l-5.43 5.43 1.42 1.42L21.14 12l-8.29-8.29-1.42 1.42L16.86 11H5v2z"/></svg></button></div></div>';
 
-  return topbarHtml('Work Experience Dashboard \u2022 Recordings Library & Archive Hub', '<span style="color:#f59e0b;font-weight:800;">Cohort 001 Archive</span> <span style="color:#a3a3a3;">• On-Demand</span>', 70)
+  return topbarHtml('Work Experience Portal \u2022 Recordings Library & Archive Hub', '<span style="color:#f59e0b;font-weight:800;">Cohort 001 Archive</span> <span style="color:#a3a3a3;">• On-Demand</span>', 70)
     + '<div style="flex:1;display:flex;overflow:hidden;min-height:0;">'+main+right+'</div>';
 }
 
