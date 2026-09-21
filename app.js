@@ -347,7 +347,7 @@ function socialState(){ try { return Object.assign({ likes:{}, posts:[] }, JSON.
 function socialSave(s){ try { localStorage.setItem('zdash_social', JSON.stringify(s)); } catch {} }
 const POST_META = {
   p1: { title:'Looking for partners to review Business Analysis Foundation Day 1 & 2', role:'Cohort 001 Student', time:'4 hours ago', color:'#059669', tag:'Study Group', tagBg:'#064e3b', tagColor:'#34d399' },
-  p2: { title:'Exam readiness checklist tips that saved my preparation', role:'Exam Candidate', time:'1 day ago', color:'#7c3aed', tag:'General', tagBg:'#2e1065', tagColor:'#c084fc' },
+  p2: { title:'Job readiness system checklist tips that saved my preparation', role:'Exam Candidate', time:'1 day ago', color:'#7c3aed', tag:'General', tagBg:'#2e1065', tagColor:'#c084fc' },
 };
 function postNums(p){
   const m = String(p.reacts||'').match(/(\d+)\s*likes?\s*[^\d]*(\d+)\s*repl/i);
@@ -1690,9 +1690,9 @@ function renderGuide() {
         <span>User Guide</span><span>/</span><span style="color:#ffffff;">Day 1 Overview</span>
       </div>
       <div style="background:linear-gradient(135deg, #2c1a0e 0%, #1a1a1a 100%);border:1px solid #3d2411;border-radius:12px;padding:40px 20px;text-align:center;margin-bottom:24px;position:relative;overflow:hidden;">
-        <h1 style="font-size:28px;font-weight:700;color:#ffffff;margin:0 0 12px 0;letter-spacing:-0.5px;">Zeelin Academy Exam Readiness</h1>
+        <h1 style="font-size:28px;font-weight:700;color:#ffffff;margin:0 0 12px 0;letter-spacing:-0.5px;">Zeelin Academy Job Readiness System</h1>
         <div style="display:inline-block;background-color:#b45309;color:#ffffff;font-size:13px;font-weight:600;padding:8px 16px;border-radius:6px;margin-bottom:16px;">Start here. Five minutes now saves hours later.</div>
-        <p style="font-size:13px;color:#d4d4d4;max-width:500px;margin:0 auto;line-height:1.5;">A quick tour of your Exam Readiness Hub so you know exactly where everything lives, and how to get the most out of the next weeks.</p>
+        <p style="font-size:13px;color:#d4d4d4;max-width:500px;margin:0 auto;line-height:1.5;">A quick tour of your Job Readiness System so you know exactly where everything lives, and how to get the most out of the next weeks.</p>
       </div>
       <div style="background-color:#181818;border:1px solid #2a2a2a;border-radius:10px;overflow:hidden;margin-bottom:24px;">
         <div style="padding:20px;border-bottom:1px solid #2a2a2a;display:flex;align-items:center;justify-content:space-between;">
@@ -1906,7 +1906,7 @@ function renderMonday() {
     <div style="padding:24px;max-width:900px;margin:0 auto;width:100%;box-sizing:border-box;">
       <div style="background:linear-gradient(135deg, #2c1a0e 0%, #1a1a1a 100%);border:1px solid #3d2411;border-radius:12px;padding:40px 20px;text-align:center;margin-bottom:24px;position:relative;overflow:hidden;">
         <h1 style="font-size:28px;font-weight:700;color:#ffffff;margin:0 0 12px 0;letter-spacing:-0.5px;">Monday Motivations</h1>
-        <div style="display:inline-block;background-color:#b45309;color:#ffffff;font-size:13px;font-weight:600;padding:8px 16px;border-radius:6px;margin-bottom:16px;">Start your week with purpose and peak exam readiness mindset.</div>
+        <div style="display:inline-block;background-color:#b45309;color:#ffffff;font-size:13px;font-weight:600;padding:8px 16px;border-radius:6px;margin-bottom:16px;">Start your week with purpose and peak job readiness system mindset.</div>
         <p style="font-size:13px;color:#d4d4d4;max-width:500px;margin:0 auto;line-height:1.5;">Weekly inspirational insights, focus directives, and success strategies tailored for Zeelin Academy candidates.</p>
       </div>
       <div style="background-color:#181818;border:1px solid #2a2a2a;border-radius:10px;overflow:hidden;margin-bottom:24px;">

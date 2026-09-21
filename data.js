@@ -281,7 +281,7 @@ const CHAPTER_QUIZZES = {
 
 /* ---------- Videos ---------- */
 const VIDEOS = [
-  { id: 'v1', title: 'Welcome to Zeelin Academy — Exam Readiness', thumb: S + 'IMG-20260605-WA0031.jpg', dur: '02:45', watched: true, day: 1, takeaway: 'The exam tests your routine, not your sprint. Schedule a daily 20-minute slot.', chapter: 'Welcome' },
+  { id: 'v1', title: 'Welcome to Zeelin Academy — Job Readiness System', thumb: S + 'IMG-20260605-WA0031.jpg', dur: '02:45', watched: true, day: 1, takeaway: 'The exam tests your routine, not your sprint. Schedule a daily 20-minute slot.', chapter: 'Welcome' },
   { id: 'v2', title: 'The Role of the Business Analyst', thumb: S + 'IMG-20260605-WA0032.jpg', dur: '06:20', watched: true, day: 1, takeaway: 'Name the technique, then the outcome. Examiners reward a named, applied method.', chapter: 'The Role of the BA' },
   { id: 'v3', title: 'The BA Process Framework', thumb: S + 'IMG-20260605-WA0035.jpg', dur: '07:05', watched: false, day: 2, takeaway: 'Investigate → define requirements → evaluate options → recommend. Keep the steps traceable.', chapter: 'BA Process Framework' },
   { id: 'v4', title: 'Requirements Documentation & MoSCoW', thumb: S + 'IMG-20260605-WA0036.jpg', dur: '18:00', watched: false, day: 2, takeaway: 'MoSCoW = Must / Should / Could / Wont. It forces honest prioritisation under constraints.', chapter: 'Requirements & MoSCoW' },
@@ -670,7 +670,7 @@ const CHECKIN = {
 
 /* ---------- Accountability ---------- */
 const ACCOUNTABILITY = {
-  top: { label: 'Exam Ready Soon', progress: 78, suffix: '78%' },
+  top: { label: 'Job Ready Soon', progress: 78, suffix: '78%' },
   pie: {
     segments: [
       ['var(--amber)', '0 200deg'],
@@ -755,7 +755,7 @@ const COMMUNITY = {
       avatar: S + 'IMG-20260605-WA0035.jpg',
       color: 'var(--purple)',
       ring: 'purple',
-      body: 'Exam readiness checklist tip: read the first paragraph of every chapter out loud — retention jumps when you hear your own voice.',
+      body: 'Job readiness system checklist tip: read the first paragraph of every chapter out loud — retention jumps when you hear your own voice.',
       tag: 'General',
       tagCls: 'pill-purple',
       reacts: '28 likes · 11 replies',
