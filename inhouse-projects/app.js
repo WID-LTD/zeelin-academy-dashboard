@@ -67,7 +67,7 @@ function toast(msg){ let el = document.getElementById('app-toast'); if(!el){ el=
 }
 window._toast = toast;
 window._state = function(){ return state; }; /* ─── Router ─── */
-function navigate(hash){ window.location.hash = hash;
+function navigate(hash){ var t = String(hash||''); if(t.charAt(0)!=='#') t = '#'+t; if(window.location.hash === t){ route(); } else { window.location.hash = t; }
 }
 const PROJECT_PAGES = ['brief','workspace','collaboration','docs-vault','home','mode'];
 /* helpers for enrolled / wishlist */
