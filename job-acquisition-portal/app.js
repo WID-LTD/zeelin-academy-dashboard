@@ -1487,7 +1487,7 @@ function render(view, param){
   const isFull = fullWidthViews.includes(view);
   // update sidebar even for full width (for state)
   updateSidebar(view);
-  // re-evaluate stage zoom on every navigation (overview opts out; stale zoom from other views must not stick)
+  // re-evaluate stage zoom on every navigation so no stale scale sticks
   try{ fitStage(); }catch(e){}
   const main = document.getElementById('main-content');
   if(!main) return;
@@ -1527,8 +1527,8 @@ function closeSidebar(){
 }
 
 /* ─── Init ─── */
-/* continuous stage scale — skipped on overview (overview handles its own 80% scale) */
-function fitStage(){ try{ var h=String(location.hash||''); if(h.indexOf('overview')!==-1){ document.body.style.zoom=''; return; } var w = window.innerWidth || 1600; document.body.style.zoom = (w < 1024) ? '' : Math.min(2.4, Math.max(1, (w / 1600) * 1)); }catch(e){} }
+/* continuous stage scale — identical layout at every desktop width (base 1), all views including overview */
+function fitStage(){ try{ var w = window.innerWidth || 1600; document.body.style.zoom = (w < 1024) ? '' : Math.min(2.4, Math.max(1, (w / 1600) * 1)); }catch(e){} }
 window.addEventListener('resize', fitStage);
 fitStage();
 window.addEventListener('hashchange', function(){
