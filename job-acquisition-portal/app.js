@@ -1487,6 +1487,8 @@ function render(view, param){
   const isFull = fullWidthViews.includes(view);
   // update sidebar even for full width (for state)
   updateSidebar(view);
+  // re-evaluate stage zoom on every navigation (overview opts out; stale zoom from other views must not stick)
+  try{ fitStage(); }catch(e){}
   const main = document.getElementById('main-content');
   if(!main) return;
   // Ensure main-content wrapper styles — overview white, free, 80% scale handled inside
