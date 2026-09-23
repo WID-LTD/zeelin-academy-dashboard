@@ -227,9 +227,9 @@ function renderSidebar(activeRoute){
 /* ─── Topbar helper ─── */
 function topbarHtml(title, rightHtml, progressPct){
   const pct = (progressPct!=null? progressPct : 25);
-  return '<div style="height:78px;background-color:#181818;border-top:2px solid #3f3f3f;border-bottom:2px solid #3f3f3f;display:flex;align-items:center;justify-content:space-between;padding:0 32px;gap:16px;flex-shrink:0;">'
+  return '<div class="jb-topbar" style="height:78px;background-color:#181818;border-top:2px solid #3f3f3f;border-bottom:2px solid #3f3f3f;display:flex;align-items:center;justify-content:space-between;padding:0 32px;gap:16px;flex-shrink:0;">'
     + '<div style="display:flex;align-items:center;gap:12px;flex-shrink:0;">'
-    + '<button onclick="document.getElementById(\'sidebar\').classList.add(\'open\');document.getElementById(\'sidebarOverlay\').classList.add(\'show\')" style="display:none;" class="topbar-hamburger">☰</button>'
+    + '<button onclick="document.getElementById(\'sidebar\').classList.add(\'open\');document.getElementById(\'sidebarOverlay\').classList.add(\'show\')" class="topbar-hamburger jb-burger" aria-label="Open navigation">☰</button>'
     + '</div>'
     + '<div style="flex:1;display:flex;align-items:center;justify-content:center;gap:12px;min-width:280px;">'
     + '<span style="font-size:26px;font-weight:900;letter-spacing:1.2px;color:#ffffff;white-space:nowrap;text-align:center;width:100%;">'+esc(title.split(" •")[0])+'</span>'
@@ -242,7 +242,7 @@ function topbarHtml(title, rightHtml, progressPct){
 /* ─── Views ─── */
 function viewPortal(){
   return topbarHtml('ZEELIN JOB ACQUISITION PORTAL \u2022 Select Workspace', '<span style="color:#f59e0b;font-weight:800;">Portal</span><span style="color:#a3a3a3;">zeelin.widltd.com.ng/job-acquisition-portal/#portal</span>', 100)
-    + '<div style="flex:1;display:flex;overflow:hidden;min-height:0;">'
+    + '<div class="jb-split" style="flex:1;display:flex;overflow:hidden;min-height:0;">'
     + '<div style="flex:1;padding:48px 52px;overflow-y:auto;background:#121212;">'
     + '<div style="max-width:1000px;margin:0 auto;display:flex;flex-direction:column;gap:28px;">'
     + '<div style="text-align:center;padding:8px 0 4px;">'
@@ -453,7 +453,7 @@ function viewRegionalBoards(countryParam){
         + '<div style="background:#1a1a1a;border:1px solid #2a2a2a;border-radius:10px;padding:12px;"><div style="font-size:11px;font-weight:800;color:#f59e0b;margin-bottom:6px;">Recommended</div><p style="font-size:11px;color:#a3a3a3;line-height:1.5;">Boards for '+esc(country.name)+' are direct country-specific domains (e.g., LinkedIn '+esc(country.name)+' differs from UK). Open + log to satisfy 5-job quota.</p></div>'
         + '</div>'
         + '<div style="padding:16px;background:#161616;border-top:2px solid #3a3a3a;"><a href="#regional-boards" style="display:block;width:100%;text-align:center;padding:12px;background:transparent;border:2px solid #3a3a3a;color:#a3a3a3;border-radius:8px;font-weight:800;text-decoration:none;">← Back to Countries</a></div></div>';
-      return topbarHtml('Job Boards • '+country.name, '<span>'+esc(country.flag)+' '+esc(country.region)+'</span><span style="color:#34d399;font-weight:800;">'+list.length+' Boards</span>', 55) + '<div style="flex:1;display:flex;overflow:hidden;min-height:0;">'+main+right+'</div>';
+      return topbarHtml('Job Boards • '+country.name, '<span>'+esc(country.flag)+' '+esc(country.region)+'</span><span style="color:#34d399;font-weight:800;">'+list.length+' Boards</span>', 55) + '<div class="jb-split" style="flex:1;display:flex;overflow:hidden;min-height:0;">'+main+right+'</div>';
     }
   }
   // Country marketplace grid (first category: job boards country based)
@@ -500,7 +500,7 @@ function viewRegionalBoards(countryParam){
     + '<div style="padding:16px;background:#161616;border-top:2px solid #3a3a3a;"><button onclick="window._nav(\'boost\')" style="width:100%;padding:12px;background:#d97706;color:#fff;border-radius:8px;font-weight:800;border:none;cursor:pointer;">Go to Boost Log</button></div></div>';
 
   return topbarHtml('Job Boards • Country Based', '<span>25 Countries</span><span style="color:#34d399;font-weight:800;">'+JOB_COUNTRIES.length+' Verified</span>', 40)
-    + '<div style="flex:1;display:flex;overflow:hidden;min-height:0;">'+main+right+'</div>';
+    + '<div class="jb-split" style="flex:1;display:flex;overflow:hidden;min-height:0;">'+main+right+'</div>';
 }
 function bindRegionalBoards(){
   const s=document.getElementById('jbCountrySearch'); if(s) s.addEventListener('input', e=>{ window._jbFilter.q=e.target.value; const m=document.getElementById('main-content'); const h=location.hash; if(h.startsWith('#regional-boards/')){ m.innerHTML=viewRegionalBoards(window._jbCountryParam); bindRegionalBoards(); const inp=document.getElementById('jbSearch'); if(inp) inp.focus(); } else { m.innerHTML=viewRegionalBoards(); bindRegionalBoards(); const inp2=document.getElementById('jbCountrySearch'); if(inp2){ inp2.focus(); const v=inp2.value; inp2.value=''; inp2.value=v; } } });
@@ -594,7 +594,7 @@ function viewBoost(){
     + '<span>Proceed to CV Maker & Portfolio</span><svg style="width:16px;height:16px;fill:currentColor;" viewBox="0 0 24 24"><path d="M5 13h11.86l-5.43 5.43 1.42 1.42L21.14 12l-8.29-8.29-1.42 1.42L16.86 11H5v2z"/></svg></button></div></div>';
 
   return topbarHtml('ZEELIN JOB ACQUISITION PORTAL \u2022 Boost & Accountability', '<span>Quota Status: <strong style="color:#f59e0b;">'+q+' / 5 Logged</strong></span><span style="color:#34d399;font-weight:800;">Active Enforcement</span>', Math.round(q/5*100))
-    + '<div style="flex:1;display:flex;overflow:hidden;min-height:0;">'+main+right+'</div>';
+    + '<div class="jb-split" style="flex:1;display:flex;overflow:hidden;min-height:0;">'+main+right+'</div>';
 }
 
 function linkedInPreviewHtml(){
@@ -740,7 +740,7 @@ function viewCVMaker(){
     + '<div style="width:360px;background:#181818;border-left:2px solid #3a3a3a;display:flex;flex-direction:column;overflow-y:auto;flex-shrink:0;">'
     + '<div style="padding:28px;display:flex;flex-direction:column;gap:16px;"><div style="font-size:11px;font-weight:800;color:#737373;letter-spacing:0.6px;margin-bottom:6px;">QUICK NAV</div><div style="display:flex;flex-direction:column;gap:8px;"><button onclick="window._nav(\'cv-maker/cv\')" style="background:#26170b;color:#f59e0b;border:1px solid #d97706;padding:10px;border-radius:6px;font-size:12px;font-weight:800;cursor:pointer;">Go to CV Maker Hub</button><button onclick="window._nav(\'cv-maker/portfolio\')" style="background:#1e293b;color:#38bdf8;border:1px solid #3b82f6;padding:10px;border-radius:6px;font-size:11px;font-weight:800;cursor:pointer;">Go to Portfolio Hub</button></div></div><div style="padding:24px;background:#161616;border-top:2px solid #3a3a3a;"><div style="font-size:11px;color:#737373;text-align:center;">Select a card to open its standalone dashboard</div></div></div>';
   return topbarHtml('CV Maker & Portfolio Hub', '<span style="color:#f59e0b;font-weight:800;">Hub</span> <span style="color:#a3a3a3;">• Choose workspace</span>', 20)
-    + '<div style="flex:1;display:flex;overflow:hidden;min-height:0;">'+hubMain+hubRight+'</div>';
+    + '<div class="jb-split" style="flex:1;display:flex;overflow:hidden;min-height:0;">'+hubMain+hubRight+'</div>';
 }
 
 function viewCVMakerDetail(){
@@ -830,7 +830,7 @@ function viewCVMakerDetail(){
       + '<div style="display:grid;grid-template-columns:repeat(5, 1fr);gap:10px;">'+cardsHtml+'</div></div>'
       + '</div></div>';
   return topbarHtml('CV Maker Hub', '<span style="color:#f59e0b;font-weight:800;">ATS Resume</span> <span style="color:#a3a3a3;">• Live Preview</span>', 90)
-    + '<div style="flex:1;display:flex;overflow:hidden;min-height:0;">'+mainLeft+mainRight+'</div>';
+    + '<div class="jb-split" style="flex:1;display:flex;overflow:hidden;min-height:0;">'+mainLeft+mainRight+'</div>';
 }
 
 function viewPortfolio(){
@@ -867,7 +867,7 @@ function viewPortfolio(){
     + '<div style="width:360px;background:#181818;border-left:2px solid #3a3a3a;display:flex;flex-direction:column;overflow-y:auto;flex-shrink:0;">'
     + '<div style="padding:28px;display:flex;flex-direction:column;gap:16px;"><div style="font-size:11px;font-weight:800;color:#38bdf8;letter-spacing:0.8px;">PORTFOLIO TIPS</div><h3 style="font-size:16px;font-weight:900;color:#fff;margin:0;">Boost Visibility</h3><p style="font-size:12px;color:#a3a3a3;line-height:1.5;">Complete all visibility items and keep strength above 80% for best demo results. Use Copy Link to share your profile.</p><div style="background:#1e293b;border:1px solid #3b82f6;border-radius:8px;padding:10px;"><div style="font-size:11px;font-weight:800;color:#38bdf8;">STRENGTH '+st+'%</div><div style="font-size:11px;color:#a3a3a3;margin-top:4px;">Add headline, about, 1 experience and 3 skills to reach 100%</div></div></div><div style="padding:24px;background:#161616;border-top:2px solid #3a3a3a;"><button onclick="window._nav(\'cv-maker\')" style="width:100%;background:#262626;color:#38bdf8;border:1px solid #3b82f6;padding:12px;border-radius:8px;font-size:13px;font-weight:800;cursor:pointer;">← Back to Hub</button></div></div>';
   return topbarHtml('Portfolio Hub', '<span style="color:#38bdf8;font-weight:800;">LinkedIn Demo</span> <span style="color:#a3a3a3;">• '+st+'% strength</span>', st)
-    + '<div style="flex:1;display:flex;overflow:hidden;min-height:0;">'+main+mainRight+'</div>';
+    + '<div class="jb-split" style="flex:1;display:flex;overflow:hidden;min-height:0;">'+main+mainRight+'</div>';
 }
 
 function viewInterviewPrep(){
@@ -924,7 +924,7 @@ function viewInterviewPrep(){
     + '<span>Return to Mission Control</span><svg style="width:16px;height:16px;fill:currentColor;" viewBox="0 0 24 24"><path d="M5 13h11.86l-5.43 5.43 1.42 1.42L21.14 12l-8.29-8.29-1.42 1.42L16.86 11H5v2z"/></svg></button></div></div>';
 
   return topbarHtml('ZEELIN JOB ACQUISITION PORTAL \u2022 Interview Prep & Mock Center', '<span>Live Timetable: <strong style="color:#34d399;">Booking Open</strong></span><span style="color:#f59e0b;font-weight:800;">Mock & Assignments</span>', 75)
-    + '<div style="flex:1;display:flex;overflow:hidden;min-height:0;">'+main+right+'</div>';
+    + '<div class="jb-split" style="flex:1;display:flex;overflow:hidden;min-height:0;">'+main+right+'</div>';
 }
 
 function viewEventsHub(){
@@ -961,7 +961,7 @@ function viewEventsHub(){
     + '<button onclick="window._nav(\'calendar\')" style="width:100%;background:linear-gradient(135deg, #f59e0b 0%, #d97706 100%);color:#ffffff;border:1px solid #f59e0b;padding:14px;border-radius:8px;font-size:14px;font-weight:900;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px;box-shadow:0 4px 16px rgba(217, 119, 6, 0.4);"><span>View Full Calendar & Bookings</span><svg style="width:16px;height:16px;fill:currentColor;" viewBox="0 0 24 24"><path d="M5 13h11.86l-5.43 5.43 1.42 1.42L21.14 12l-8.29-8.29-1.42 1.42L16.86 11H5v2z"/></svg></button></div></div>';
 
   return topbarHtml('Work Experience Portal \u2022 Events & Sessions Hub', '', 60)
-    + '<div style="flex:1;display:flex;overflow:hidden;min-height:0;">'+main+right+'</div>';
+    + '<div class="jb-split" style="flex:1;display:flex;overflow:hidden;min-height:0;">'+main+right+'</div>';
 }
 
 function bookingHistoryHtml(){
@@ -1151,7 +1151,7 @@ function viewCalendar(){
     + '</div></div>';
 
   return topbarHtml('Work Experience Portal \u2022 Calendar & Live Sessions Hub', '<span style="color:#a3a3a3;">Interactive Demo</span>', 55)
-    + '<div style="flex:1;display:flex;overflow:hidden;min-height:0;">'+main+right+'</div>';
+    + '<div class="jb-split" style="flex:1;display:flex;overflow:hidden;min-height:0;">'+main+right+'</div>';
 }
 
 function viewResources(){
@@ -1200,7 +1200,7 @@ function viewResources(){
     + '<div style="padding:24px;background:#161616;border-top:2px solid #3a3a3a;"><button onclick="window._nav(\'calendar\')" style="width:100%;background:#262626;color:#d4d4d4;border:1px solid #404040;padding:12px;border-radius:8px;font-size:13px;font-weight:800;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px;"><span>\u2190 Back to Calendar</span></button></div></div>';
 
   return topbarHtml('Work Experience Portal \u2022 Mock Interview Resources Library', '<span style="color:#f59e0b;font-weight:800;">Resources</span> <span style="color:#a3a3a3;">• Interactive</span>', 80)
-    + '<div style="flex:1;display:flex;overflow:hidden;min-height:0;">'+main+right+'</div>';
+    + '<div class="jb-split" style="flex:1;display:flex;overflow:hidden;min-height:0;">'+main+right+'</div>';
 }
 
 function viewRecordings(){
@@ -1235,7 +1235,7 @@ function viewRecordings(){
     + '<div style="padding:24px;background:#161616;border-top:2px solid #3a3a3a;"><button onclick="window._nav(\'calendar\')" style="width:100%;background:linear-gradient(135deg, #f59e0b 0%, #d97706 100%);color:#fff;border:1px solid #f59e0b;padding:14px;border-radius:8px;font-size:13px;font-weight:900;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px;"><span>Go to Calendar & Live</span><svg style="width:14px;height:14px;fill:currentColor;" viewBox="0 0 24 24"><path d="M5 13h11.86l-5.43 5.43 1.42 1.42L21.14 12l-8.29-8.29-1.42 1.42L16.86 11H5v2z"/></svg></button></div></div>';
 
   return topbarHtml('Work Experience Portal \u2022 Recordings Library & Archive Hub', '<span style="color:#a3a3a3;">On-Demand</span>', 70)
-    + '<div style="flex:1;display:flex;overflow:hidden;min-height:0;">'+main+right+'</div>';
+    + '<div class="jb-split" style="flex:1;display:flex;overflow:hidden;min-height:0;">'+main+right+'</div>';
 }
 
 function viewLiveSessions(){
@@ -1502,12 +1502,29 @@ function updateSidebar(activeRoute){
   }
 }
 
+function renderJBNav(view){
+  var el = document.getElementById('jbBottomNav'); if(!el) return;
+  if(view==='overview'){ el.innerHTML=''; el.style.display='none'; return; }
+  el.style.display='';
+  var map = {'portal':'home','overview':'home','regional-boards':'boards','boost':'boost','cv-maker':'cv','cv-maker/cv':'cv','cv-maker/portfolio':'cv','interview-prep':'prep','events-hub':'hub','calendar':'hub','recordings':'hub','live-sessions':'hub','resources':'hub'};
+  var on = map[view] || '';
+  function link(route, key, label, path){
+    return '<a href="#'+route+'" class="'+(on===key?'active':'')+'"><svg viewBox="0 0 24 24" width="22" height="22" fill="currentColor"><path d="'+path+'"/></svg><span>'+label+'</span></a>';
+  }
+  el.innerHTML = link('overview','home','Home','M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-6h2v6zm0-8h-2V7h2v2z')
+    + link('regional-boards','boards','Boards','M3 3h8v8H3V3zm10 0h8v8h-8V3zM3 13h8v8H3v-8zm10 0h8v8h-8v-8z')
+    + link('boost','boost','Boost','M4 20V10M10 20V5M16 20v-8M22 20V2')
+    + link('cv-maker','cv','CV Maker','M6 2h9l4 4v16H6zM15 2v5h5M9 12h7M9 16h7')
+    + link('events-hub','hub','Hub','M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-2 10h-4v4h-2v-4H7v-2h4V7h2v4h4v2z');
+}
+
 /* ─── Main render ─── */
 function render(view, param){
   const fullWidthViews = ['overview'];
   const isFull = fullWidthViews.includes(view);
   // update sidebar even for full width (for state)
   updateSidebar(view);
+  renderJBNav(view);
   // re-evaluate stage zoom on every navigation so no stale scale sticks
   try{ fitStage(); }catch(e){}
   const main = document.getElementById('main-content');

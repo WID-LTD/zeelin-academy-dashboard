@@ -91,3 +91,34 @@ html{scroll-behavior:smooth}
 
 /* ============ ULTRA-WIDE (min 2000px): big, bold, full-screen ============ */
 /* Job portal renders mostly inline styles, so scale the whole canvas proportionally */
+
+/* ===== Mobile bottom nav + skip (layout only) ===== */
+#jbBottomNav{display:none}
+.jb-skip{position:absolute;left:-9999px;top:0;background:#d97706;color:#fff;padding:10px 16px;z-index:200;border-radius:0 0 8px 0;font-weight:800;font-size:13px}
+.jb-skip:focus{left:0}
+@media(max-width:767px){
+  #main-content{padding-bottom:72px}
+  #jbBottomNav{display:flex;position:fixed;bottom:0;left:0;right:0;z-index:95;background:rgba(24,24,24,.97);border-top:1px solid #3a3a3a;padding:8px 6px calc(8px + env(safe-area-inset-bottom))}
+  #jbBottomNav a{flex:1;display:flex;flex-direction:column;align-items:center;gap:3px;font-size:10px;font-weight:800;color:#a3a3a3;text-decoration:none;padding:6px 2px;border-radius:10px}
+  #jbBottomNav a.active{color:#f59e0b}
+  #jbBottomNav svg{width:22px;height:22px}
+}
+@media(min-width:2000px){
+  .layout{max-width:2400px;margin:0 auto}
+}
+
+/* ===== Outer-view stacking (layout only, theme untouched) ===== */
+@media(max-width:1023px){
+  .jb-split{flex-direction:column!important;overflow-y:auto!important}
+  .jb-sidepanel{width:100%!important;border-left:none!important;border-top:2px solid #3a3a3a!important;flex-shrink:0}
+}
+@media(max-width:767px){
+  .jb-topbar{height:auto!important;min-height:64px;flex-wrap:wrap;padding:10px 14px!important;row-gap:10px}
+  .jb-topbar > div:nth-child(2){order:3;flex-basis:100%;min-width:0!important}
+  .jb-topbar > div:nth-child(2) > span{font-size:19px!important;white-space:normal!important;text-align:left!important;line-height:1.25}
+}
+@media(max-width:767px){
+  .jb-topbar > div:last-child{flex-wrap:wrap;row-gap:8px}
+  .jb-split div{min-width:0!important}
+  .jb-split a{overflow-wrap:anywhere}
+}
