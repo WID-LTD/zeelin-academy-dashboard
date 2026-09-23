@@ -494,7 +494,7 @@ function renderTopbar() {
   $('#topbar').innerHTML = `
     <button class="burger" id="burger" aria-label="Open navigation" aria-expanded="false">${ic('burger', 20, 20)}</button>
     <div style="display:flex;align-items:center;gap:12px;flex-shrink:0;">
-      <img src="${A}logo.png" alt="Zeelin Academy Logo" style="height:42px;width:auto;object-fit:contain;">
+      <img decoding="async" fetchpriority="high" src="${A}logo.png" alt="Zeelin Academy Logo" style="height:42px;width:auto;object-fit:contain;">
     </div>
     <div style="flex:1;display:flex;align-items:center;justify-content:center;min-width:280px;">
       <span style="font-size:26px;font-weight:900;letter-spacing:1.2px;color:#ffffff;white-space:nowrap;text-align:center;width:100%;">ZEELIN JOB TRAINING PORTAL</span>
@@ -504,7 +504,7 @@ function renderTopbar() {
       <span class="top-chip top-xp">${ic('zap', 15, 15)} ${STATE.xp.toLocaleString()} XP</span>
       <span class="top-chip top-streak">${ic('fire', 15, 15)} ${STATE.streak}</span>
       <button class="top-icon" data-go="checkin" title="Check-In">${ic('user-check', 17, 17)}</button>
-      <button class="profile-btn" data-go="profile"><img class="profile-avatar" src="${USER.avatar}" alt=""/><span class="profile-name">${esc(USER.name)}</span>${ic('caret', 14, 14)}</button>
+      <button class="profile-btn" data-go="profile"><img decoding="async" class="profile-avatar" src="${USER.avatar}" alt=""/><span class="profile-name">${esc(USER.name)}</span>${ic('caret', 14, 14)}</button>
     </div>`;
   $$('[data-go]', $('#topbar')).forEach((b) => b.addEventListener('click', () => go('/' + b.dataset.go)));
   $('#burger').addEventListener('click', () => { const o = $('#sidebar').classList.toggle('open'); $('#backdrop').classList.toggle('show', o); $('#burger').setAttribute('aria-expanded', o ? 'true' : 'false'); });
@@ -815,7 +815,7 @@ function renderCourses() {
     const hours = c.completedHours + ' of ' + c.estimatedHours + 'h';
     return `
           <div class="enr-card" role="button" tabindex="0" data-continue="${c.id}" aria-label="${esc(c.title)} — ${c.progress > 0 ? 'Continue course' : 'Start course'}">
-            <div class="enr-hero"><img class="cover" src="${c.cover}?v=2" alt=""/><div class="enr-hero-overlay"></div><div class="enr-badges"><span class="enr-badge">${esc(c.weekName)}</span><span class="enr-badge dim">${esc(c.short)}</span></div><div class="enr-hero-meta">${c.readiness}% readiness &bull; ${hours}</div></div>
+            <div class="enr-hero"><img loading="lazy" decoding="async" class="cover" src="${c.cover}?v=2" alt=""/><div class="enr-hero-overlay"></div><div class="enr-badges"><span class="enr-badge">${esc(c.weekName)}</span><span class="enr-badge dim">${esc(c.short)}</span></div><div class="enr-hero-meta">${c.readiness}% readiness &bull; ${hours}</div></div>
             <div class="enr-body">
               <h3>${esc(c.title)}</h3>
               <div class="enr-sub">${esc(c.weekName)} - ${esc(c.cohort)}</div>
@@ -933,7 +933,7 @@ function dashCard(c) {
     pct = Math.round(seen / Math.max(1, vids.length) * 100); sub = seen + ' of ' + vids.length + ' videos watched'; cls = seen === vids.length ? 'green' : c.cls;
   }
   if (c.k === 'visual') { const done = !!STATE.doneDeck[deckIdForDay(STATE.day)]; pct = done ? 100 : c.pct; sub = done ? 'Pitch deck cleared - quiz passed' : c.sub; cls = done ? 'green' : c.cls; }
-  const iconHtml = c.img ? `<div class="imgbox lg"><img src="${c.img}" alt=""/></div>` : `<div class="icobox ${c.tile} lg">${ic(c.icon, 30, 30)}</div>`;
+  const iconHtml = c.img ? `<div class="imgbox lg"><img loading="lazy" decoding="async" src="${c.img}" alt=""/></div>` : `<div class="icobox ${c.tile} lg">${ic(c.icon, 30, 30)}</div>`;
   return `
     <div class="p-card">
       <div class="p-top">${iconHtml}<div class="p-txt"><div class="pt-title">${esc(c.title)}</div><div class="pt-sub">${esc(sub)}</div></div><span class="pt-pct ${cls}">${pct}%</span></div>
@@ -1351,7 +1351,7 @@ function renderVideos() {
     const mins = v.dur.includes(':') ? v.dur : v.dur;
     return `<div class="video-row">
         <div class="thumb-wrap">
-          <img src="${v.thumb}" alt="" />
+          <img loading="lazy" decoding="async" src="${v.thumb}" alt="" />
           <div style="position:absolute;inset:0;background:${done ? 'rgba(0,0,0,0.3)' : 'rgba(0,0,0,0.4)'};display:flex;align-items:center;justify-content:center;">
             <div style="width:32px;height:32px;background-color:${done ? '#16a34a' : '#d97706'};border-radius:50%;display:flex;align-items:center;justify-content:center;">
               <svg style="width:14px;height:14px;fill:white;margin-left:1px;" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
@@ -1423,7 +1423,7 @@ function renderWatch(id) {
       <div style="flex:1;min-width:0;">
         <div style="background-color:#181818;border:1px solid #2a2a2a;border-radius:12px;overflow:hidden;">
           <div style="width:100%;height:400px;background-color:#000000;position:relative;overflow:hidden;">
-            <img src="${v.thumb}" alt="" style="width:100%;height:100%;object-fit:cover;opacity:0.85;"/>
+            <img loading="lazy" decoding="async" src="${v.thumb}" alt="" style="width:100%;height:100%;object-fit:cover;opacity:0.85;"/>
             <div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;">
               <button id="vPlay" style="width:70px;height:70px;background-color:#d97706;border-radius:50%;display:flex;align-items:center;justify-content:center;box-shadow:0 4px 20px rgba(0,0,0,0.6);cursor:pointer;border:none;">
                 <svg style="width:28px;height:28px;fill:white;margin-left:3px;" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
@@ -1638,7 +1638,7 @@ function renderProfile() {
     ${backBtn()}
     <div class="page-header"><div class="eyebrow">Account</div><h1>Profile &amp; Insights</h1><div class="sub">Your metrics, pie breakdown, weekly rhythm and skill readiness at a glance.</div></div>
     <div class="profile-hero">
-      <img class="big-av" src="${USER.avatar}" alt=""/>
+      <img loading="lazy" decoding="async" class="big-av" src="${USER.avatar}" alt=""/>
       <div><h1>${esc(USER.name)}</h1><div class="role">${esc(USER.role)} - Level ${USER.level}</div><div class="pt-sub">${esc(USER.cohort)} - since ${esc(USER.memberSince)}</div></div>
       <div class="profile-actions">
         <div class="hero-mini">${ic('zap', 16, 16)}<b>${STATE.xp.toLocaleString()}</b> XP</div>
@@ -1725,7 +1725,7 @@ function renderGuide() {
         <div style="padding:20px;">
           <h2 style="font-size:18px;font-weight:600;color:#ffffff;margin:0 0 16px 0;">MUST WATCH FIRST! Welcome to Zeelin Academy</h2>
           <div style="width:100%;height:320px;border-radius:8px;overflow:hidden;background-color:#262626;position:relative;">
-            <img src="assets/stock/classroom.jpg" alt="Learning platform preview" style="width:100%;height:100%;object-fit:cover;">
+            <img loading="lazy" decoding="async" src="assets/stock/classroom.jpg" alt="Learning platform preview" style="width:100%;height:100%;object-fit:cover;">
             <div style="position:absolute;inset:0;background:rgba(0,0,0,0.3);display:flex;align-items:center;justify-content:center;">
               <div onclick="window._playWelcome()" style="width:60px;height:60px;background-color:#d97706;border-radius:50%;display:flex;align-items:center;justify-content:center;box-shadow:0 4px 12px rgba(0,0,0,0.5);cursor:pointer;">
                 <svg style="width:24px;height:24px;fill:white;margin-left:3px;" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
@@ -1867,7 +1867,7 @@ function renderRecordings() {
       + `<div style="padding:20px;">`
       + `<h2 style="font-size:18px;font-weight:600;color:#ffffff;margin:0 0 16px 0;">${esc(x.title)}</h2>`
       + `<div style="width:100%;height:320px;border-radius:8px;overflow:hidden;background-color:#262626;position:relative;">`
-      + `<img src="${x.cover}" alt="Recording video thumbnail" style="width:100%;height:100%;object-fit:cover;">`
+      + `<img loading="lazy" decoding="async" src="${x.cover}" alt="Recording video thumbnail" style="width:100%;height:100%;object-fit:cover;">`
       + `<div style="position:absolute;inset:0;background:rgba(0,0,0,0.3);display:flex;align-items:center;justify-content:center;">`
       + `<div onclick="window._playRec('${x.id}')" style="width:60px;height:60px;background-color:#d97706;border-radius:50%;display:flex;align-items:center;justify-content:center;box-shadow:0 4px 12px rgba(0,0,0,0.5);cursor:pointer;">`
       + `<svg style="width:24px;height:24px;fill:white;margin-left:3px;" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>`
@@ -1895,8 +1895,8 @@ function renderRecordings() {
 function renderSupport() {
   $('#page').innerHTML = `
     ${backBtn()}
-    <div class="hero alt"><div><span class="hbadge">Help centre</span><div class="htitle">Get Support</div><div class="hsub">${esc(SUPPORT.hero.body)}</div></div><img src="${SUPPORT.hero.image}" alt="" style="width:220px;height:130px;object-fit:cover;border-radius:10px"/></div>
-    <div class="sup-grid">${SUPPORT.cards.map((c) => `<div class="sup-card"><img class="himg" src="${c.image}" alt=""/><div class="body"><span class="sup-tag ${c.tagCls}">${esc(c.tag)}</span><div class="feed-title">${esc(c.title)}</div><div class="pt-sub mt8">${esc(c.body)}</div></div><div class="foot">${ic('users', 13, 13)} ${esc(c.foot.who)}<button class="btn btn-sm btn-outline">Open</button></div></div>`).join('')}</div>
+    <div class="hero alt"><div><span class="hbadge">Help centre</span><div class="htitle">Get Support</div><div class="hsub">${esc(SUPPORT.hero.body)}</div></div><img loading="lazy" decoding="async" src="${SUPPORT.hero.image}" alt="" style="width:220px;height:130px;object-fit:cover;border-radius:10px"/></div>
+    <div class="sup-grid">${SUPPORT.cards.map((c) => `<div class="sup-card"><img loading="lazy" decoding="async" class="himg" src="${c.image}" alt=""/><div class="body"><span class="sup-tag ${c.tagCls}">${esc(c.tag)}</span><div class="feed-title">${esc(c.title)}</div><div class="pt-sub mt8">${esc(c.body)}</div></div><div class="foot">${ic('users', 13, 13)} ${esc(c.foot.who)}<button class="btn btn-sm btn-outline">Open</button></div></div>`).join('')}</div>
     <div class="section-head mt24"><h2>Frequently asked questions</h2></div>
     ${SUPPORT.faqs.map((f) => `<div class="faq-row"><div class="faq-q">${esc(f.q)}</div><div class="faq-a">${esc(f.a)}</div></div>`).join('')}`;
   $('#page').addEventListener('click', backLink);
@@ -1905,7 +1905,7 @@ function renderAluminal() {
   $('#page').innerHTML = `
     ${backBtn()}
     <div class="hero"><div><span class="hbadge">Exclusive membership</span><div class="htitle">Become an Aluminal</div><div class="hsub">${esc(ALUMINAL.hero.body)}</div></div></div>
-    <div class="alum-grid">${ALUMINAL.features.map((f) => `<div class="alum-card"><img class="himg" src="${f.img}" alt=""/><div class="body"><span class="feat">${esc(f.tag)}</span><div class="feed-title">${esc(f.title)}</div><div class="pt-sub mt8">${esc(f.body)}</div></div></div>`).join('')}</div>
+    <div class="alum-grid">${ALUMINAL.features.map((f) => `<div class="alum-card"><img loading="lazy" decoding="async" class="himg" src="${f.img}" alt=""/><div class="body"><span class="feat">${esc(f.tag)}</span><div class="feed-title">${esc(f.title)}</div><div class="pt-sub mt8">${esc(f.body)}</div></div></div>`).join('')}</div>
     <div class="cta"><div><span class="redbadge">Special Offer</span><div class="price">Join Aluminal — £20 <span class="price-old">${esc(ALUMINAL.cta.old)}</span></div><div class="save">✓ Included Lifetime</div></div><button class="btn btn-grad-green" style="margin-left:auto">Join Aluminal — £20</button></div>`;
   $('#page').addEventListener('click', backLink);
 }
@@ -1939,7 +1939,7 @@ function renderMonday() {
         <div style="padding:20px;">
           <h2 style="font-size:18px;font-weight:600;color:#ffffff;margin:0 0 16px 0;">${esc(MONDAY_FEATURED.title)}</h2>
           <div style="width:100%;height:320px;border-radius:8px;overflow:hidden;background-color:#262626;position:relative;margin-bottom:16px;">
-            <img src="${MONDAY_FEATURED.image}" alt="Team motivation study" style="width:100%;height:100%;object-fit:cover;">
+            <img loading="lazy" decoding="async" src="${MONDAY_FEATURED.image}" alt="Team motivation study" style="width:100%;height:100%;object-fit:cover;">
           </div>
           <p style="font-size:13px;color:#d4d4d4;line-height:1.6;margin:0 0 12px 0;">${esc(MONDAY_FEATURED.body)}</p>
           <p style="font-size:13px;color:#d4d4d4;line-height:1.6;margin:0;">Take 5 minutes today to map out your calendar events, review the recording backlog if needed, and engage with your peers in the community. You have got this!</p>

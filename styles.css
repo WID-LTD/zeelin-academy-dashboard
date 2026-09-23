@@ -1141,3 +1141,11 @@ a:focus-visible,button:focus-visible{outline:2px solid #f59e0b;outline-offset:2p
 @media(min-width:2000px){
   .shell-row{max-width:2400px;margin:0 auto}
 }
+
+/* Zoom-proof: stack the single row-card when its own container narrows (covers zoomed TV widths) */
+@container (max-width: 900px) {
+  .enrolled.single .enr-card { flex-direction: column; }
+  .enrolled.single .enr-hero { width: 100%; height: 220px; min-height: 0; border-right: none; border-bottom: 1px solid var(--border); }
+  .enrolled.single .enr-hero img.cover { position: static; }
+  .enrolled.single .enr-foot { width: 100%; border-left: none; padding: 0 22px 22px; }
+}
