@@ -368,7 +368,7 @@ function initScrollFeatures(){ if(document.getElementById('scrollProgress')) ret
 window._initScrollFeatures = initScrollFeatures; /* ─── Init ─── */
 window.route = route;
 /* continuous stage scale — identical layout at every desktop width (base 0.8) */
-function fitStage(){ try{ var w = window.innerWidth || 1600; document.body.style.zoom = (w < 1024) ? '' : Math.min(2.4, Math.max(1, (w / 1600) * 0.8)); }catch(e){} }
+function fitStage(){ try{ document.body.style.zoom = ''; }catch(e){} }
 window.addEventListener('resize', fitStage);
 fitStage();
 window.addEventListener('hashchange', route);
