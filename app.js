@@ -267,11 +267,20 @@ function bootSpawnCheckin() {
   if (!claimedToday() && !STATE.completedDays.includes(STATE.day)) openCheckinOverlay();
 }
 
+function renderCBottomNav(routeName) {
+  const el = document.getElementById('cBottomNav');
+  if (!el) return;
+  const r = routeName || 'home';
+  const item = (hash, label, icon) => `<a href="#${hash}" class="${r === hash ? 'active' : ''}">${ic(icon, 22, 22)}<span>${label}</span></a>`;
+  el.innerHTML = item('/', 'Home', 'compass') + item('/guide', 'Guide', 'info') + item('/community', 'Community', 'users') + item('/calendar', 'Calendar', 'calendar') + item('/profile', 'Profile', 'user');
+}
+
 function route() {
   clearTimers();
   closeGate();
   renderSidebar();
   renderTopbar();
+  renderCBottomNav((parseHash()[0] || 'home'));
   const parts = parseHash();
   const page = $('#page');
   page.innerHTML = '';
@@ -483,7 +492,7 @@ function renderTopbar() {
   const routeName = parseHash()[0] || 'home';
   const crumb = routeName === 'home' ? 'Your Courses' : `${esc(dayCard(STATE.day).title)} - Day ${STATE.day} of 7`;
   $('#topbar').innerHTML = `
-    <button class="burger" id="burger">${ic('burger', 20, 20)}</button>
+    <button class="burger" id="burger" aria-label="Open navigation" aria-expanded="false">${ic('burger', 20, 20)}</button>
     <div style="display:flex;align-items:center;gap:12px;flex-shrink:0;">
       <img src="${A}logo.png" alt="Zeelin Academy Logo" style="height:42px;width:auto;object-fit:contain;">
     </div>
@@ -498,8 +507,13 @@ function renderTopbar() {
       <button class="profile-btn" data-go="profile"><img class="profile-avatar" src="${USER.avatar}" alt=""/><span class="profile-name">${esc(USER.name)}</span>${ic('caret', 14, 14)}</button>
     </div>`;
   $$('[data-go]', $('#topbar')).forEach((b) => b.addEventListener('click', () => go('/' + b.dataset.go)));
-  $('#burger').addEventListener('click', () => { $('#sidebar').classList.toggle('open'); $('#backdrop').classList.toggle('show'); });
-  $('#backdrop').addEventListener('click', () => { $('#sidebar').classList.remove('open'); $('#backdrop').classList.remove('show'); });
+  $('#burger').addEventListener('click', () => { const o = $('#sidebar').classList.toggle('open'); $('#backdrop').classList.toggle('show', o); $('#burger').setAttribute('aria-expanded', o ? 'true' : 'false'); });
+  $('#backdrop').addEventListener('click', () => { $('#sidebar').classList.remove('open'); $('#backdrop').classList.remove('show'); $('#burger').setAttribute('aria-expanded', 'false'); });
+  if (!window._cNavBound) {
+    window._cNavBound = true;
+    document.addEventListener('click', (e) => { if (e.target.closest && e.target.closest('#sidebar.open a')) { $('#sidebar').classList.remove('open'); $('#backdrop').classList.remove('show'); const b = $('#burger'); if (b) b.setAttribute('aria-expanded', 'false'); } });
+    document.addEventListener('keydown', (e) => { if (e.key === 'Escape') { $('#sidebar').classList.remove('open'); $('#backdrop').classList.remove('show'); const b = $('#burger'); if (b) b.setAttribute('aria-expanded', 'false'); } });
+  }
 }
 
 /* ============ STAR RATING + FEEDBACK ============ */

@@ -1120,3 +1120,24 @@ svg { display: block; flex-shrink: 0; overflow: hidden; }
   .enrolled.single .enr-hero img.cover,.enrolled.dual .enr-hero img.cover{position:absolute;inset:0;}
   .enrolled.single .enr-foot,.enrolled.dual .enr-foot{width:100%;border-left:none;}
 }
+
+/* ===== Mobile-ground-up: topbar wrap, bottom nav, a11y (layout only) ===== */
+#cBottomNav{display:none}
+.c-skip{position:absolute;left:-9999px;top:0;background:#d97706;color:#fff;padding:10px 16px;z-index:200;border-radius:0 0 8px 0;font-weight:800;font-size:13px}
+.c-skip:focus{left:0}
+a:focus-visible,button:focus-visible{outline:2px solid #f59e0b;outline-offset:2px}
+@media(max-width:900px){
+  #topbar{flex-wrap:wrap;height:auto;min-height:var(--topbar-h);row-gap:10px;padding:10px 14px}
+}
+@media(max-width:767px){
+  #topbar > div:nth-child(3){order:3;flex-basis:100%;min-width:0!important}
+  #topbar > div:nth-child(3) > span{font-size:19px!important;white-space:normal!important;text-align:left!important;line-height:1.25}
+  #page{padding-bottom:88px}
+  #cBottomNav{display:flex;position:fixed;bottom:0;left:0;right:0;z-index:95;background:rgba(20,20,22,.97);border-top:1px solid #3a3a3a;padding:8px 6px calc(8px + env(safe-area-inset-bottom))}
+  #cBottomNav a{flex:1;display:flex;flex-direction:column;align-items:center;gap:3px;font-size:10px;font-weight:800;color:#a3a3a3;text-decoration:none;padding:6px 2px;border-radius:10px}
+  #cBottomNav a.active{color:#f59e0b}
+  #cBottomNav svg{width:22px;height:22px}
+}
+@media(min-width:2000px){
+  .shell-row{max-width:2400px;margin:0 auto}
+}
