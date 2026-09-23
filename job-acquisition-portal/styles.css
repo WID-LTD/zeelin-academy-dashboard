@@ -104,7 +104,7 @@ html{scroll-behavior:smooth}
   #jbBottomNav svg{width:22px;height:22px}
 }
 @media(min-width:2000px){
-  .layout{max-width:2400px;margin:0 auto}
+  .layout{max-width:3000px;margin:0 auto}
 }
 
 /* ===== Outer-view stacking (layout only, theme untouched) ===== */

@@ -9,3 +9,9 @@
   Cache-Control: no-cache, no-store, must-revalidate
 /portal.html
   Cache-Control: no-cache, no-store, must-revalidate
+/
+  Cache-Control: no-cache, no-store, must-revalidate
+/job-acquisition-portal/
+  Cache-Control: no-cache, no-store, must-revalidate
+/inhouse-projects/
+  Cache-Control: no-cache, no-store, must-revalidate
