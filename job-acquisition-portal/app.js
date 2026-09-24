@@ -203,23 +203,39 @@ function overviewSidebarCopy(activeRoute){
     + '<div class="journey"><p>“Your Global Career Journey Starts Here.”</p><div class="gold-stroke"></div></div>';
 }
 
+function overviewChromeSpriteCopy(){
+  return '<svg width="0" height="0" style="position:absolute"><defs>'
+    + '<symbol id="menu" viewBox="0 0 24 24"><path d="M4 6h16M4 12h16M4 18h16"/></symbol>'
+    + '<symbol id="search" viewBox="0 0 24 24"><circle cx="10" cy="10" r="7"/><path d="m15 15 6 6"/></symbol>'
+    + '<symbol id="bell" viewBox="0 0 24 24"><path d="M18 8a6 6 0 0 0-12 0c0 7-3 7-3 9h18c0-2-3-2-3-9M10 21h4"/></symbol>'
+    + '<symbol id="chat" viewBox="0 0 24 24"><path d="M4 4h16v13H8l-4 4z"/></symbol>'
+    + '</defs></svg>';
+}
+function overviewTopIconsCopy(){
+  return '<div class="top-icons job-copied-top-icons"><div class="notification" tabindex="0" role="button" aria-label="Notifications, 3 unread" onclick="showToast(\'3 notifications\')" style="cursor:pointer"><svg class="ico"><use href="#bell"></use></svg><span class="badge">3</span></div><svg class="ico" tabindex="0" role="button" aria-label="Messages" onclick="showToast(\'Messages (demo)\')" style="cursor:pointer"><use href="#chat"></use></svg><div class="user" tabindex="0" role="button" aria-label="Open profile menu" aria-expanded="false" onclick="event.stopPropagation();var m=this.querySelector(\'.profile-menu\');var o=m.classList.toggle(\'open\');this.setAttribute(\'aria-expanded\',o?\'true\':\'false\')"><img decoding="async" class="avatar" src="assets/overview/avatar.jpg" alt="Wisdom Automa"><div><strong>Wisdom Automa</strong><span>Learner</span></div><span style="font-size:22px;color:#07143a">⌄</span><div class="profile-menu" role="menu" onclick="event.stopPropagation()"><button role="menuitem" onclick="showToast(\'Profile settings\')">Profile settings</button><button role="menuitem" onclick="showToast(\'Account settings\')">Account settings</button><button role="menuitem" onclick="window._nav(\'resources\')">Help &amp; Support</button></div></div></div>';
+}
+function overviewTopbarCopy(options){
+  const o=options||{};
+  const includeBrand=o.includeBrand!==false;
+  const burger=o.regional
+    ? '<label class="ov-burger job-copied-burger" for="rbNavToggle" aria-label="Open navigation" aria-expanded="false"><svg class="ico" viewBox="0 0 24 24"><use href="#menu"></use></svg></label>'
+    : '<button class="ov-burger job-copied-burger" onclick="document.getElementById(\'sidebar\')&&document.getElementById(\'sidebar\').classList.add(\'open\');document.getElementById(\'sidebarOverlay\')&&document.getElementById(\'sidebarOverlay\').classList.add(\'show\')" aria-label="Open navigation" aria-expanded="false"><svg class="ico" viewBox="0 0 24 24"><use href="#menu"></use></svg></button>';
+  return '<header class="topbar job-copied-topbar">'
+    + burger
+    + '<svg class="ico" onclick="window._nav(\'portal\')" style="cursor:pointer"><use href="#menu"></use></svg>'
+    + (includeBrand?'<div class="ov-brand"><img decoding="async" src="assets/logo.png" alt="Zeelin Academy Logo"></div>':'')
+    + '<div class="search"><svg class="ico" style="width:19px;flex-shrink:0;" aria-hidden="true"><use href="#search"></use></svg><input type="search" placeholder="Search for jobs, courses, resources..." aria-label="Search for jobs, courses, resources" onkeydown="if(event.key===\'Enter\'){window._nav(\'regional-boards\')}" style="flex:1;min-width:0;background:transparent;border:none;outline:none;color:#4c5772;font-size:14px;font-family:inherit;"></div>'
+    + '</header><div class="job-copied-topbar-space" aria-hidden="true"></div>';
+}
+
+
 function renderSidebar(activeRoute){
   return overviewSidebarCopy(activeRoute);
 }
 
 /* ─── Topbar helper ─── */
 function topbarHtml(title, rightHtml, progressPct){
-  const pct = (progressPct!=null? progressPct : 25);
-  return '<div class="jb-topbar" style="height:78px;background-color:#181818;border-top:2px solid #3f3f3f;border-bottom:2px solid #3f3f3f;display:flex;align-items:center;justify-content:space-between;padding:0 32px;gap:16px;flex-shrink:0;">'
-    + '<div style="display:flex;align-items:center;gap:12px;flex-shrink:0;">'
-    + '<button onclick="document.getElementById(\'sidebar\').classList.add(\'open\');document.getElementById(\'sidebarOverlay\').classList.add(\'show\')" class="topbar-hamburger jb-burger" aria-label="Open navigation">☰</button>'
-    + '</div>'
-    + '<div style="flex:1;display:flex;align-items:center;justify-content:center;gap:12px;min-width:280px;">'
-    + '<span style="font-size:26px;font-weight:900;letter-spacing:1.2px;color:#ffffff;white-space:nowrap;text-align:center;width:100%;">'+esc(title.split(" •")[0])+'</span>'
-    + '<div style="flex:1;max-width:280px;height:12px;background-color:#161616;border:2px solid #3a3a3a;border-radius:6px;overflow:hidden;display:flex;flex-shrink:0;"><div style="width:'+pct+'%;height:100%;background:linear-gradient(90deg, #d97706 0%, #16a34a 100%);"></div></div>'
-    + '</div>'
-    + '<div style="display:flex;align-items:center;gap:16px;font-size:13px;font-weight:700;color:#d4d4d4;flex-shrink:0;"><a href="/portal.html" style="display:inline-flex;align-items:center;gap:6px;padding:6px 10px;border-radius:999px;background:#1e1e1e;border:1px solid #3a3a3a;color:#f59e0b;font-size:11px;font-weight:800;text-decoration:none">⟡ Portals</a>'+(rightHtml||'')+'</div>'
-    + '</div>';
+  return overviewChromeSpriteCopy()+overviewTopIconsCopy()+overviewTopbarCopy({includeBrand:true,regional:false});
 }
 
 /* ─── Views ─── */
@@ -324,6 +340,7 @@ function viewOverview(){
     + '<style>/* Overview stability audit */.overview-root .app>*{min-width:0}.overview-root .topbar{min-width:0}.overview-root .search input{width:100%;min-width:0}.overview-root .top-icons{max-width:calc(100% - 70px)}.overview-root .opps-head{gap:16px;min-width:0}.overview-root .opps-head>div:first-child{min-width:0}.overview-root .view-all{flex-shrink:0}.overview-root .support>div:nth-child(2){min-width:0;flex:1}.overview-root .support p{overflow-wrap:anywhere}.overview-root .motivation{height:auto;min-height:226px}.overview-root .motivation h3,.overview-root .motivation p{max-width:100%;overflow-wrap:anywhere}.overview-root .quote{height:auto;min-height:106px}.overview-root .profile-menu{cursor:default}.overview-root .profile-menu button{display:block}@media(min-width:1280px){.overview-root .sidebar{position:sticky;top:0;align-self:start;max-height:100dvh}.overview-root .right{height:auto;min-height:100dvh}.overview-root .feature-grid,.overview-root .jobs{align-items:stretch}.overview-root .feature,.overview-root .job{align-self:stretch}}@media(max-width:1279px){.overview-root .right{position:relative;top:auto;max-height:none;overflow:visible}.overview-root .opps-head{flex-wrap:wrap}.overview-root .support{flex-wrap:wrap;row-gap:10px}.overview-root .support .btn{margin-left:auto}}@media(max-width:767px){.overview-root .top-icons{max-width:none}.overview-root .opps-head{align-items:flex-start}.overview-root .view-all{font-size:12px}.overview-root .support .btn{width:100%;margin-left:0}.overview-root .profile-menu{display:none!important}.overview-root .profile-menu.open{display:block!important}.overview-root .user>.profile-menu{position:fixed!important;right:12px!important;top:68px!important;width:min(190px,calc(100vw - 24px))!important}.overview-root .user>.profile-menu button{display:block!important}.overview-root .user>.profile-menu{visibility:visible}}@media(max-width:479px){.overview-root .opps-head{display:block}.overview-root .view-all{margin-top:8px;display:inline-block}}</style>'
     + '<style>/* Guardrails: approved grid designs (must stay last) */@media(min-width:1280px){.overview-root .jobs{grid-template-columns:repeat(3,1fr)}.overview-root .feature-grid{grid-template-columns:repeat(4,1fr)}.overview-root .job{height:90px;min-height:0}.overview-root .feature{height:auto;min-height:177px;padding:15px 20px 46px}}@media(max-width:767px){.overview-root .hero-actions{flex-direction:row}.overview-root .hero-actions .btn{flex:1 1 0;min-width:0;width:auto}.overview-root .jobs{grid-template-columns:repeat(2,minmax(0,1fr))}.overview-root .feature-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.overview-root .job{aspect-ratio:1/1;min-height:0}.overview-root .feature{min-height:148px}}</style>' + '<style>/* Header icons viewport-anchored + visible scrollbars */@media(min-width:1280px){.overview-root .top-icons{position:fixed;right:38px;top:0;z-index:80;margin:0;background:#ffffff;border:none;border-radius:0;box-shadow:none;padding:0 14px}}@media(min-width:1280px){.overview-root .sidebar{position:sticky;top:0;align-self:start;max-height:100dvh;overflow-y:auto;overflow-x:hidden;height:auto}}#main-content{scrollbar-color:#c9d3e0 #ffffff}#main-content::-webkit-scrollbar-thumb{background:#c9d3e0;border:1px solid #e8edf4}.overview-root .sidebar,.overview-root .main,.overview-root .right{scrollbar-color:#c9d3e0 #ffffff}.overview-root .sidebar::-webkit-scrollbar-thumb,.overview-root .main::-webkit-scrollbar-thumb,.overview-root .right::-webkit-scrollbar-thumb{background:#c9d3e0;border:1px solid #e8edf4}@media(min-width:1280px){.overview-root .main{height:auto;max-height:none;overflow:visible}.overview-root .right{height:auto;max-height:none;overflow:visible;position:static}.overview-root .sidebar{height:auto;max-height:none;position:static}}</style>' + '<style>/* Hero motto in-flow with flanking dashes; columns fill viewport */.overview-root .hero-motto{display:flex;position:static;left:auto;bottom:auto;align-items:center;gap:12px;width:100%;margin:16px 0 0;color:#697183;font-size:9px;letter-spacing:4px;white-space:nowrap}.overview-root .hero-motto:before,.overview-root .hero-motto:after{content:"";height:2px;background:#b77a05;flex:1;min-width:22px}@media(min-width:1280px){.overview-root .sidebar{position:sticky;top:0;align-self:start;height:auto;min-height:100dvh;max-height:100dvh;overflow-y:auto;overflow-x:hidden}.overview-root .right{display:flex;flex-direction:column;min-height:100dvh}.overview-root .right>.quote{margin-top:auto}}@media(max-width:767px){.overview-root .hero-motto{margin-top:12px;letter-spacing:2.5px;font-size:8px}}</style>' + '<style>/* Smart header + topbar brand + sticky sidebar brand */.overview-root .topbar{position:fixed;top:0;z-index:75;transition:transform .28s ease;box-shadow:0 1px 0 #e8edf4,0 8px 22px rgba(27,50,85,.06)}.overview-root .topbar.ov-hidden{transform:translateY(-110%)}.overview-root .top-icons{transition:transform .28s ease,opacity .28s ease}.overview-root.ov-headhidden .top-icons{transform:translateY(-110%);opacity:0}.overview-root .ov-brand{display:flex;align-items:center;flex-shrink:0}.overview-root .ov-brand img{height:34px;width:auto;object-fit:contain;background:transparent}.overview-root .sidebar .brand{position:sticky;top:-24px;z-index:6;margin:-24px -15px 0;padding:24px 15px 23px;background:#0e2a47}@media(max-width:1279px){.overview-root>.top-icons{justify-content:flex-end;padding:10px 16px 0}}@media(max-width:767px){.overview-root .ov-brand img{height:28px}}.overview-root .workspace{padding-top:var(--ov-bar-h,73px)}@media(min-width:1280px){.overview-root .workspace{grid-column:2}.overview-root .right{grid-column:3}.overview-root .sidebar{position:fixed;top:0;left:0;width:var(--ov-side-w,307px);height:100dvh;min-height:0;max-height:100dvh;overflow-y:auto;overflow-x:hidden;z-index:70;align-self:auto}}</style>'
     + '</style>'
+    + '<style>/* Overview right rail requested sticky */@media(min-width:1280px){.overview-root .right{position:sticky!important;top:0!important;align-self:start!important;height:100dvh!important;min-height:100dvh!important;max-height:100dvh!important;overflow-y:auto!important;overflow-x:hidden!important}}</style>'
     + '<svg width="0" height="0" style="position:absolute"><defs>'
     + '<symbol id="menu" viewBox="0 0 24 24"><path d="M4 6h16M4 12h16M4 18h16"/></symbol><symbol id="home" viewBox="0 0 24 24"><path d="m3 11 9-8 9 8"/><path d="M5 10v10h14V10M9 20v-6h6v6"/></symbol><symbol id="target" viewBox="0 0 24 24"><circle cx="12" cy="12" r="8"/><circle cx="12" cy="12" r="3"/><path d="m15 9 6-6m-4 0h4v4"/></symbol><symbol id="bag" viewBox="0 0 24 24"><rect x="3" y="7" width="18" height="13" rx="2"/><path d="M8 7V5h8v2M3 12h18M10 12v2h4v-2"/></symbol><symbol id="chart" viewBox="0 0 24 24"><path d="M4 20V10M10 20V5M16 20v-8M22 20V2"/><path d="m3 9 6-4 6 5 7-8"/></symbol><symbol id="doc" viewBox="0 0 24 24"><path d="M6 2h9l4 4v16H6z"/><path d="M15 2v5h5M9 12h7M9 16h7"/></symbol><symbol id="book" viewBox="0 0 24 24"><path d="M3 5c4-2 7-1 9 1v15c-2-2-5-3-9-1zM21 5c-4-2-7-1-9 1v15c2-2 5-3 9-1z"/></symbol><symbol id="search" viewBox="0 0 24 24"><circle cx="10" cy="10" r="7"/><path d="m15 15 6 6"/></symbol><symbol id="image" viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="15" rx="2"/><path d="m4 16 5-5 4 4 3-3 5 5M16 9h.01"/></symbol><symbol id="users" viewBox="0 0 24 24"><circle cx="8" cy="8" r="3"/><circle cx="17" cy="8" r="3"/><path d="M2 20v-2c0-3 2-5 6-5s6 2 6 5v2M14 14c4-1 8 1 8 5v1"/></symbol><symbol id="help" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M9.5 9a2.7 2.7 0 1 1 4.5 2c-1.5 1-2 1.5-2 3M12 18h.01"/></symbol><symbol id="bell" viewBox="0 0 24 24"><path d="M18 8a6 6 0 0 0-12 0c0 7-3 7-3 9h18c0-2-3-2-3-9M10 21h4"/></symbol><symbol id="chat" viewBox="0 0 24 24"><path d="M4 4h16v13H8l-4 4z"/></symbol><symbol id="pin" viewBox="0 0 24 24"><path d="M20 10c0 5-8 12-8 12S4 15 4 10a8 8 0 1 1 16 0z"/><circle cx="12" cy="10" r="2"/></symbol><symbol id="bookmark" viewBox="0 0 24 24"><path d="M6 3h12v18l-6-4-6 4z"/></symbol><symbol id="cap" viewBox="0 0 24 24"><path d="m2 9 10-5 10 5-10 5zM6 11v5c3 3 9 3 12 0v-5M22 9v7"/></symbol>'
     + '</defs></svg>'
@@ -555,18 +572,11 @@ function viewRegionalBoards(countryParam){
   }
 
   function topbar(){
-    return '<header class="rb-topbar">'
-      + '<label class="rb-hamburger" for="rbNavToggle" aria-label="Open navigation"><svg class="rb-ico"><use href="#menu"/></svg></label>'
-      + '<svg class="rb-ico rb-portal-icon" onclick="window._nav(\'portal\')" aria-label="Portal"><use href="#menu"/></svg>'
-      + '<label class="rb-search"><svg class="rb-ico rb-search-small" aria-hidden="true"><use href="#search"/></svg><input type="search" placeholder="Search countries, regions, or job boards..."></label>'
-      + '<div class="rb-top-spacer"></div>'
-      + '<div class="rb-top-icons"><button class="rb-icon-button" type="button" aria-label="Notifications, 3 unread" onclick="showToast(&quot;3 notifications&quot;)"><svg class="rb-ico"><use href="#bell"/></svg><span class="rb-badge">3</span></button><button class="rb-icon-button" type="button" aria-label="Messages" onclick="showToast(&quot;Messages (demo)&quot;)"><svg class="rb-ico"><use href="#chat"/></svg></button>'
-      + '<details class="rb-profile"><summary class="rb-profile-trigger"><img decoding="async" class="rb-avatar" src="assets/overview/avatar.jpg" alt="Wisdom Automa"><div class="rb-profile-text"><strong>Wisdom Automa</strong><span>Learner</span></div><span class="rb-profile-chevron">⌄</span></summary><div class="rb-dropdown"><a href="#" onclick="showToast(&quot;Profile settings&quot;);return false">Profile settings</a><a href="#" onclick="showToast(&quot;Account settings&quot;);return false">Account settings</a><a href="#resources">Help &amp; Support</a></div></details>'
-      + '</div></header>';
+    return overviewTopIconsCopy()+overviewTopbarCopy({includeBrand:false,regional:true});
   }
 
   function shell(mainHtml,rightHtml){
-    return css + chrome + icons + '<div class="rb-root"><input class="rb-nav-toggle" type="checkbox" id="rbNavToggle"><div class="rb-app">'+sidebar()+'<label class="rb-overlay" for="rbNavToggle"></label><section class="rb-workspace">'+topbar()+mainHtml+'</section>'+rightHtml+'</div></div>';
+    return css + chrome + icons + overviewChromeSpriteCopy() + '<div class="rb-root"><input class="rb-nav-toggle" type="checkbox" id="rbNavToggle"><div class="rb-app">'+sidebar()+'<label class="rb-overlay" for="rbNavToggle"></label><section class="rb-workspace">'+topbar()+mainHtml+'</section>'+rightHtml+'</div></div>';
   }
 
   if(countryParam){
@@ -1691,10 +1701,53 @@ function render(view, param){
   main.innerHTML = html;
   bindOvSmartHeader();
   ovSyncHeader();
+  bindCopiedOverviewChrome();
+  syncCopiedOverviewChrome();
   // re-attach file input listener if needed is inline; ensure drag zone exists
   // scroll to top
   const scrollEl = main.querySelector('[style*="overflow-y:auto"]') || main;
   if(scrollEl) scrollEl.scrollTop = 0;
+}
+
+
+/* ─── Copied Overview chrome for Regional + every other Job Acquisition route ─── */
+function syncCopiedOverviewChrome(){
+  try{
+    const main=document.getElementById('main-content');
+    if(!main) return;
+    const bar=main.querySelector('.job-copied-topbar');
+    if(!bar) return;
+    const regional=main.querySelector('.rb-root');
+    const host=regional ? main.querySelector('.rb-workspace') : document.querySelector('.layout > .main');
+    if(host && window.innerWidth>=1280){
+      const r=host.getBoundingClientRect();
+      bar.style.left=r.left+'px';
+      bar.style.width=r.width+'px';
+    }else{
+      bar.style.left='0px';
+      bar.style.width='100%';
+    }
+    const space=main.querySelector('.job-copied-topbar-space');
+    if(space) space.style.height=bar.offsetHeight+'px';
+  }catch(e){}
+}
+function bindCopiedOverviewChrome(){
+  const main=document.getElementById('main-content');
+  if(!main || main.dataset.copiedOverviewChromeBound) return;
+  main.dataset.copiedOverviewChromeBound='1';
+  window.addEventListener('resize',syncCopiedOverviewChrome);
+  document.addEventListener('scroll',function(e){
+    const bar=main.querySelector('.job-copied-topbar');
+    const icons=main.querySelector('.job-copied-top-icons');
+    if(!bar || !icons) return;
+    const t=e.target===document ? document.scrollingElement : e.target;
+    if(!t || typeof t.scrollTop!=='number') return;
+    const st=t.scrollTop;
+    const last=Number(t.dataset && t.dataset.jobChromeLast || 0);
+    if(st>140 && st>last+4){bar.classList.add('ov-hidden');icons.classList.add('ov-hidden');}
+    else if(st<last-4){bar.classList.remove('ov-hidden');icons.classList.remove('ov-hidden');}
+    if(t.dataset) t.dataset.jobChromeLast=String(st);
+  },true);
 }
 
 /* ─── Overview smart header: hide on scroll down, reveal on scroll up ─── */
