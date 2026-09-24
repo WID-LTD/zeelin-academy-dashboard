@@ -9,7 +9,7 @@ const USER = {
   avatar: A + 'avatar_1.png',
   initials: 'JD',
   memberSince: 'Jan 2026',
-  cohort: 'Cohort 001 - Parenting',
+  cohort: 'Cohort 001',
   streak: 5,
   xp: 2950,
   role: 'Software Engineering Learner',
@@ -21,8 +21,9 @@ const COURSES = [
     id: 'ba-foundation',
     title: 'Business Analysis Foundation',
     short: 'BA Foundation',
+    category: 'Core / Classic Business Analysis',
     cover: A + 'books/foundation_in_bussiness_analysis_pratice.png',
-    cohort: 'Cohort 001 - Parenting',
+    cohort: 'Cohort 001',
     days: [1, 2],
     week: 1,
     weekName: 'Foundations',
@@ -33,54 +34,6 @@ const COURSES = [
     readiness: 18,
     strength: 88,
     color: 'var(--amber)',
-  },
-  {
-    id: 'software-engineering',
-    title: 'Software Engineering',
-    short: 'Software Eng',
-    cover: A + 'books/system_modelling_techniques.png',
-    cohort: 'Cohort 001 - Parenting',
-    days: [3, 4],
-    week: 2,
-    weekName: 'Analysis & Design',
-    progress: 8,
-    estimatedHours: 30,
-    completedHours: 2,
-    readiness: 8,
-    strength: 42,
-    color: 'var(--blue)',
-  },
-  {
-    id: 'prompt-engineering',
-    title: 'Prompt Engineering',
-    short: 'Prompt Eng',
-    cover: A + 'books/project_management.png',
-    cohort: 'Cohort 001 - Parenting',
-    days: [5, 6],
-    week: 3,
-    weekName: 'Modelling & Delivery',
-    progress: 0,
-    estimatedHours: 26,
-    completedHours: 0,
-    readiness: 0,
-    strength: 0,
-    color: 'var(--green)',
-  },
-  {
-    id: 'job-readiness',
-    title: 'Job Readiness Sprint',
-    short: 'Job Sprint',
-    cover: A + 'books/bussiness_change.png',
-    cohort: 'Cohort 001 - Parenting',
-    days: [7],
-    week: 4,
-    weekName: 'Career Launch',
-    progress: 0,
-    estimatedHours: 16,
-    completedHours: 0,
-    readiness: 0,
-    strength: 0,
-    color: 'var(--teal)',
   },
 ];
 
@@ -328,7 +281,7 @@ const CHAPTER_QUIZZES = {
 
 /* ---------- Videos ---------- */
 const VIDEOS = [
-  { id: 'v1', title: 'Welcome to Zeelin Academy — Exam Readiness', thumb: S + 'IMG-20260605-WA0031.jpg', dur: '02:45', watched: true, day: 1, takeaway: 'The exam tests your routine, not your sprint. Schedule a daily 20-minute slot.', chapter: 'Welcome' },
+  { id: 'v1', title: 'Welcome to Zeelin Academy — Job Readiness System', thumb: S + 'IMG-20260605-WA0031.jpg', dur: '02:45', watched: true, day: 1, takeaway: 'The exam tests your routine, not your sprint. Schedule a daily 20-minute slot.', chapter: 'Welcome' },
   { id: 'v2', title: 'The Role of the Business Analyst', thumb: S + 'IMG-20260605-WA0032.jpg', dur: '06:20', watched: true, day: 1, takeaway: 'Name the technique, then the outcome. Examiners reward a named, applied method.', chapter: 'The Role of the BA' },
   { id: 'v3', title: 'The BA Process Framework', thumb: S + 'IMG-20260605-WA0035.jpg', dur: '07:05', watched: false, day: 2, takeaway: 'Investigate → define requirements → evaluate options → recommend. Keep the steps traceable.', chapter: 'BA Process Framework' },
   { id: 'v4', title: 'Requirements Documentation & MoSCoW', thumb: S + 'IMG-20260605-WA0036.jpg', dur: '18:00', watched: false, day: 2, takeaway: 'MoSCoW = Must / Should / Could / Wont. It forces honest prioritisation under constraints.', chapter: 'Requirements & MoSCoW' },
@@ -717,7 +670,7 @@ const CHECKIN = {
 
 /* ---------- Accountability ---------- */
 const ACCOUNTABILITY = {
-  top: { label: 'Exam Ready Soon', progress: 78, suffix: '78%' },
+  top: { label: 'Job Ready Soon', progress: 78, suffix: '78%' },
   pie: {
     segments: [
       ['var(--amber)', '0 200deg'],
@@ -757,10 +710,10 @@ const VISUAL = {
 
 /* ---------- Community / feed / calendar / recordings / support / aluminal ---------- */
 const FEED = [
-  { id: 'f1', who: 'Cohort 001 · Parenting', title: 'New session uploaded', body: 'Day 1 recap: watch the latest tutorial before your mock quiz.', time: '2h ago', color: 'var(--green)' },
+  { id: 'f1', who: 'Cohort 001', title: 'New session uploaded', body: 'Day 1 recap: watch the latest tutorial before your mock quiz.', time: '2h ago', color: 'var(--green)' },
   { id: 'f2', who: 'Mentor · Amina', title: 'Your accountability check is due', body: 'Submit your daily check-in to keep your 5-day streak alive.', time: '5h ago', color: 'var(--amber)' },
   { id: 'f3', who: 'Zeelin Academy', title: 'Monday Motivation delivered', body: 'A fresh motivational brief landed in your Monday Motivations feed.', time: '1d ago', color: 'var(--blue)' },
-  { id: 'f4', who: 'Cohort 001 · Parenting', title: 'Calendar updated', body: 'The live workshop has been added for August 4 / Q&A on August 8.', time: '1d ago', color: 'var(--green)' },
+  { id: 'f4', who: 'Cohort 001', title: 'Calendar updated', body: 'The live workshop has been added for August 4 / Q&A on August 8.', time: '1d ago', color: 'var(--green)' },
 ];
 
 const MONDAY = [
@@ -802,7 +755,7 @@ const COMMUNITY = {
       avatar: S + 'IMG-20260605-WA0035.jpg',
       color: 'var(--purple)',
       ring: 'purple',
-      body: 'Exam readiness checklist tip: read the first paragraph of every chapter out loud — retention jumps when you hear your own voice.',
+      body: 'Job readiness system checklist tip: read the first paragraph of every chapter out loud — retention jumps when you hear your own voice.',
       tag: 'General',
       tagCls: 'pill-purple',
       reacts: '28 likes · 11 replies',
@@ -814,7 +767,7 @@ const COMMUNITY = {
 const CALENDAR_EVENTS = [
   {
     id: 'c1', date: 4, month: 8, year: 2026, dow: 'Tue', offset: 0, color: 'amber', dcol: '',
-    title: 'Live Workshop: Effective Communication in Parenting & Study Balance',
+    title: 'Live Workshop: Effective Communication & Study Balance',
     pills: [{ text: 'Live Session', cls: 'pill-amber' }],
     meta: '4:00 PM — 5:00 PM · Live on Zoom',
   },
@@ -828,7 +781,7 @@ const CALENDAR_EVENTS = [
 
 const RECORDINGS = [
   { id: 'r1', title: 'Orientation & Business Analysis Foundation Overview', meta: '28 Jul 2026 · 48 min', cover: S + 'IMG-20260605-WA0031.jpg', badge: { text: 'Current Event', cls: 'pill-amber' }, host: { name: 'Zeelin Academy', avatar: S + 'IMG-20260605-WA0031.jpg', cls: '' } },
-  { id: 'r2', title: 'Parenting Strategies & Time Management Masterclass', meta: '19 Jul 2026 · 55 min', cover: S + 'IMG-20260605-WA0036.jpg', badge: { text: 'Previous Event', cls: 'pill-blue' }, host: { name: 'Olaniyi Emeka · OE', avatar: S + 'IMG-20260605-WA0032.jpg', cls: '' } },
+  { id: 'r2', title: 'Time Management Masterclass', meta: '19 Jul 2026 · 55 min', cover: S + 'IMG-20260605-WA0036.jpg', badge: { text: 'Previous Event', cls: 'pill-blue' }, host: { name: 'Olaniyi Emeka · OE', avatar: S + 'IMG-20260605-WA0032.jpg', cls: '' } },
 ];
 
 const SUPPORT = {

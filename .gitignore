@@ -1,5 +1,9 @@
 node_modules/
 *.log
+*.xlsx
+*.xlsm
+exports/
+out/
 .DS_Store
 # Enterprise auth - local only scraper/console - never push
 job-acquisition-portal/course-builder/
@@ -13,3 +17,8 @@ storage/
 aidesigner-agent-skills-*.tgz
 # OS
 Thumbs.db
+
+# opencode - global Go key is not in project, but if you ever add apiKey to opencode.json, keep ignored
+.opencode.auth.json
+opencode.json.bak
+

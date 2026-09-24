@@ -9,9 +9,9 @@ const ROOT = __dirname;
 const PORT = Number(process.env.PORT || 8080);
 
 const MIME = {
-  '.html': 'text/html',
-  '.js': 'text/javascript',
-  '.css': 'text/css',
+  '.html': 'text/html; charset=utf-8',
+  '.js': 'text/javascript; charset=utf-8',
+  '.css': 'text/css; charset=utf-8',
   '.png': 'image/png',
   '.jpg': 'image/jpeg',
   '.jpeg': 'image/jpeg',
@@ -38,6 +38,31 @@ const PAGE_EXT = new Set(['.html','', '.htm']);
 
 function isBlocked(p) {
   return BLOCKED_PREFIXES.some(b => p === b || p.startsWith(b + '/') || p.startsWith(b));
+}
+
+// --- Local-only scraper console (same port, loopback only) ---
+// Public/remote traffic still gets the 404 above + git never sees the
+// scraper (course-builder/ is gitignored). Local browser (127.0.0.1)
+// bypasses the block and reaches the console + backend proxy below.
+const SCRAPER_BACKEND = { host: '127.0.0.1', port: Number(process.env.SCRAPER_PORT || 8092) };
+const SCRAPER_API = ['/api/health', '/api/scrape', '/api/runs', '/api/industries', '/api/cities', '/api/curriculum', '/api/course-builder', '/api/pathway-match', '/api/pathway-result'];
+function isLoopback(req) {
+  const ip = String((req.socket && req.socket.remoteAddress) || '');
+  return ip === '127.0.0.1' || ip === '::1' || ip === '::ffff:127.0.0.1';
+}
+function isScraperApi(p) {
+  return SCRAPER_API.some(a => p === a || p.startsWith(a + '/'));
+}
+function proxyScraper(req, res, targetPath) {
+  const proxy = http.request(
+    { host: SCRAPER_BACKEND.host, port: SCRAPER_BACKEND.port, path: targetPath, method: req.method, headers: { ...req.headers, host: `${SCRAPER_BACKEND.host}:${SCRAPER_BACKEND.port}` } },
+    (up) => { res.writeHead(up.statusCode || 502, up.headers); up.pipe(res); }
+  );
+  proxy.on('error', () => {
+    res.writeHead(502, { 'Content-Type': 'application/json' });
+    res.end(JSON.stringify({ error: 'scraper backend offline — start it: node job-acquisition-portal/server.js' }));
+  });
+  req.pipe(proxy);
 }
 
 function parseCookies(req) {
@@ -84,7 +109,7 @@ function securityHeaders() {
     'Referrer-Policy': 'strict-origin-when-cross-origin',
     'X-XSS-Protection': '0',
     'Permissions-Policy': 'camera=(), microphone=(), geolocation=()',
-    'Content-Security-Policy': "default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://cdn.tailwindcss.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data: https: blob:; media-src 'self' blob:; connect-src 'self'; frame-ancestors 'none'; base-uri 'self'; form-action 'self'",
+    'Content-Security-Policy': "default-src 'self'; script-src 'self' 'unsafe-inline' https://static.cloudflareinsights.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://cdn.tailwindcss.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data: https: blob:; media-src 'self' blob:; connect-src 'self' https://cloudflareinsights.com; frame-ancestors 'none'; base-uri 'self'; form-action 'self'",
     'Cross-Origin-Opener-Policy': 'same-origin',
     'Cross-Origin-Resource-Policy': 'same-origin',
   };
@@ -127,6 +152,8 @@ function clearTokenCookie(res, isSecure) {
 function shouldAuthPage(urlPath) {
   // Page navigations require token. Asset exts do not.
   if (urlPath.startsWith('/api/')) return false;
+  // Demo marketplace: allow browsing job boards + in-house projects without auth for catalog view (enterprise gate still for API writes)
+  if (urlPath.startsWith('/job-acquisition-portal/') || urlPath.startsWith('/inhouse-projects/')) return false;
   const ext = path.extname(urlPath).toLowerCase();
   if (PUBLIC_ASSET_EXT.has(ext)) return false;
   // allow auth.html and its assets without auth, plus portal.html itself is gated
@@ -163,7 +190,7 @@ function sendJson(res, code, obj, extraHeaders) {
 function serveFile(filePath, res, req, extraHeaders) {
   const ext = path.extname(filePath).toLowerCase();
   const mime = MIME[ext] || 'application/octet-stream';
-  const headers = { 'Content-Type': mime, 'Cache-Control': ext === '.html' ? 'no-cache, no-store, must-revalidate' : 'public, max-age=3600', ...securityHeaders(), ...(extraHeaders||{}) };
+  const headers = { 'Content-Type': mime, 'Cache-Control': (ext === '.html' || ext === '.js' || ext === '.css') ? 'no-cache, no-store, must-revalidate' : 'public, max-age=3600', ...securityHeaders(), ...(extraHeaders||{}) };
   // prevent mime sniff
   headers['X-Content-Type-Options'] = 'nosniff';
   fs.stat(filePath, (err, stat) => {
@@ -216,12 +243,31 @@ const server = http.createServer(async (req, res) => {
     }
   }
 
-  // --- Block scraper/console ---
-  if (isBlocked(urlPath)) {
+  // --- Block scraper/console (remote traffic only; loopback uses /scraper below) ---
+  if (isBlocked(urlPath) && !isLoopback(req)) {
     serve404(req, res);
     return;
   }
   if (urlPath.includes('..')) { res.writeHead(400, securityHeaders()); res.end('Bad request'); return; }
+
+  // --- Local scraper console on the same port (loopback + login only) ---
+  if (urlPath === '/scraper' || urlPath === '/scraper/') {
+    if (!isLoopback(req)) { serve404(req, res); return; }
+    const t = tokenFromReq(req);
+    if (!verifyToken(t)) { return redirect(res, '/'); }
+    const consolePath = path.join(ROOT, 'job-acquisition-portal', 'course-builder', 'index.html');
+    if (!fs.existsSync(consolePath)) {
+      res.writeHead(503, { 'Content-Type': 'text/plain' });
+      res.end('Scraper console not installed locally.');
+      return;
+    }
+    return serveFile(consolePath, res, req);
+  }
+  // --- Local scraper API proxy to the portal backend (loopback only) ---
+  if (isScraperApi(urlPath)) {
+    if (!isLoopback(req)) { serve404(req, res); return; }
+    return proxyScraper(req, res, rawUrl);
+  }
 
   // --- API routes ---
   if (urlPath === '/api/auth/login' && req.method === 'POST') {
@@ -269,6 +315,24 @@ const server = http.createServer(async (req, res) => {
   if (urlPath === '/api/auth/logout' && req.method==='POST') {
     clearTokenCookie(res, isSecure);
     sendJson(res, 200, { ok:true });
+    return;
+  }
+
+  if (urlPath.startsWith('/api/og') && req.method==='GET') {
+    const u = new URL(req.url, `http://${req.headers.host}`);
+    const target = u.searchParams.get('url');
+    if(!target){ sendJson(res,400,{error:'Missing url'}); return; }
+    let parsed; try{ parsed=new URL(target); }catch{ sendJson(res,400,{error:'Invalid url'}); return; }
+    try{
+      const ctrl = new AbortController(); const t=setTimeout(()=>ctrl.abort(), 4500);
+      const r = await fetch(target, {headers:{'User-Agent':'ZeelinAcademyBot/1.0'}, signal: ctrl.signal});
+      clearTimeout(t);
+      const html = await r.text();
+      const m=(re)=>{ const x=html.match(re); return x?x[1].trim():''; };
+      const og={url:target, domain:parsed.hostname, title: m(/<meta[^>]+property=["']og:title["'][^>]*content=["']([^"']+)["']/i) || m(/<title[^>]*>([^<]+)<\/title>/i) || parsed.hostname, description: m(/<meta[^>]+property=["']og:description["'][^>]*content=["']([^"']+)["']/i) || m(/<meta[^>]+name=["']description["'][^>]*content=["']([^"']+)["']/i) || '', image: m(/<meta[^>]+property=["']og:image["'][^>]*content=["']([^"']+)["']/i) || ''};
+      if(og.image && og.image.startsWith('/')) og.image = parsed.origin + og.image;
+      sendJson(res,200, og, {'Cache-Control':'public, max-age=86400','Access-Control-Allow-Origin':'*'});
+    }catch(e){ sendJson(res,200,{url:target, domain: parsed.hostname, title: parsed.hostname, description:'', image:''});}
     return;
   }
 
@@ -323,8 +387,8 @@ const server = http.createServer(async (req, res) => {
 
   // --- For any page navigation that requires token, enforce ---
   const needsAuth = shouldAuthPage(urlPath) || isHtmlNavigation(req, urlPath);
-  // Special: allow /auth.html assets
-  const allowWithoutAuth = urlPath === '/auth.html' || urlPath === '/404.html' || urlPath.startsWith('/api/');
+  // Special: allow /auth.html assets + demo marketplaces without auth (catalog browsing)
+  const allowWithoutAuth = urlPath === '/auth.html' || urlPath === '/404.html' || urlPath.startsWith('/api/') || urlPath.startsWith('/job-acquisition-portal/') || urlPath.startsWith('/inhouse-projects/') || urlPath.startsWith('/portal.html') || urlPath === '/index.html' || urlPath === '/';
   if (needsAuth && !allowWithoutAuth) {
     // check if it's actually a page (html or no ext). Asset exts already excluded
     const t = tokenFromReq(req);
@@ -383,11 +447,12 @@ const server = http.createServer(async (req, res) => {
     }
     const ext = path.extname(filePath).toLowerCase();
     const mime = MIME[ext] || 'application/octet-stream';
-    // security + cache
+    // security + cache - bust JS cache for marketplace updates
     const isHtml = ext === '.html' || ext === '.htm';
+    const isJs = ext === '.js';
     const headers = {
       'Content-Type': mime,
-      'Cache-Control': isHtml ? 'no-cache, no-store, must-revalidate' : 'public, max-age=3600',
+      'Cache-Control': (isHtml || isJs || ext === '.css') ? 'no-cache, no-store, must-revalidate' : 'public, max-age=3600',
       ...securityHeaders(),
     };
     // if token exists and page, renew cookie already set above, need to keep it
@@ -399,5 +464,5 @@ const server = http.createServer(async (req, res) => {
 
 server.listen(PORT, () => {
   console.log(`Zeelin Academy secure server on http://localhost:${PORT}`);
-  console.log(`Auth gate hard-coded password: ZEELIN (30m sliding session)`);
+  console.log(`Auth gate enabled (30m sliding session)`);
 });
