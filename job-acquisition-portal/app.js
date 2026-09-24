@@ -409,7 +409,7 @@ function viewOverview(){
   return '<div style="flex:1;display:flex;flex-direction:column;overflow:hidden;background:#ffffff;min-height:0"><div style="flex:1;overflow:auto;background:#ffffff">' + overviewHtml + '</div></div>';
 }
 
-function viewRegionalBoards(countryParam){
+function viewRegionalBoardsLegacy(countryParam){
   const q = state.boostApplications.length;
   const pct = Math.min(100, Math.round(q/5*100));
   window._jbFilter = window._jbFilter || {q:'', region:'all', category:'all', sort:'name', arrange:'grid'};
@@ -507,6 +507,129 @@ function viewRegionalBoards(countryParam){
   return topbarHtml('Job Boards • Country Based', '<span>25 Countries</span><span style="color:#34d399;font-weight:800;">'+JOB_COUNTRIES.length+' Verified</span>', 40)
     + '<div class="jb-split" style="flex:1;display:flex;overflow:hidden;min-height:0;">'+main+right+'</div>';
 }
+
+function viewRegionalBoards(countryParam){
+  const q = state.boostApplications.length;
+  const pct = Math.min(100, Math.round(q/5*100));
+  window._jbFilter = window._jbFilter || {q:'',region:'all',category:'all',sort:'name',arrange:'grid'};
+  const F = window._jbFilter;
+  const countries = (typeof JOB_COUNTRIES!=='undefined' ? JOB_COUNTRIES : []);
+  const boards = (typeof JOB_BOARDS!=='undefined' ? JOB_BOARDS : []);
+  const countryBoards = (cid)=>boards.filter(b=>b.countryId===cid);
+  const regionOpts = ['all','Africa','Europe','Oceania','North America','Asia','Caribbean','Remote'];
+
+  const css = '<style>'
+    + '.rb-root,.rb-root *{box-sizing:border-box}.rb-root{--navy:#071b33;--navy2:#0d2f52;--gold:#d99a0a;--gold2:#f0c456;--text:#07143a;--muted:#697590;--border:#e3e9f0;--soft:#f6f8fb;--blue:#0758cf;--green:#0b9b72;width:100%;min-width:0;min-height:100dvh;background:#fff;color:var(--text);font-family:Inter,"Segoe UI",Arial,sans-serif}.rb-root a{text-decoration:none;color:inherit}.rb-root button,.rb-root input,.rb-root select{font:inherit}.rb-nav-toggle{position:fixed;left:-9999px}.rb-app{width:100%;min-height:100dvh;display:grid;grid-template-columns:clamp(220px,13.8vw,275px) minmax(0,1fr) clamp(285px,19vw,360px);background:#fff}'
+    + '.rb-sidebar{position:sticky;top:0;height:100dvh;overflow:auto;padding:22px 12px 20px;color:#fff;background:radial-gradient(circle at 115% 20%,rgba(229,176,55,.24),transparent 26%),linear-gradient(145deg,#103251 0%,#071b33 64%,#0a2746 100%);box-shadow:8px 0 24px rgba(15,40,68,.15);z-index:70}.rb-brand{height:92px;display:flex;justify-content:center;align-items:flex-start;border-bottom:1px solid rgba(255,255,255,.22)}.rb-brand img{height:44px;width:auto;max-width:175px;object-fit:contain;display:block}.rb-system{margin:16px 8px 14px;color:#f7fbff;font-size:clamp(11px,.75vw,14px);font-weight:900;letter-spacing:.85px}.rb-stage{margin:18px 13px 9px;color:#ffc43e;font-size:clamp(11px,.72vw,13px);font-weight:900;letter-spacing:.35px}.rb-nav{list-style:none;margin:0;padding:0}.rb-nav-item{min-height:46px;display:flex;align-items:center;gap:12px;padding:0 13px;margin:3px 0;border-radius:11px;color:#f5f7fb;font-size:clamp(12px,.76vw,14px);font-weight:700;transition:.18s ease}.rb-nav-item:hover{background:rgba(255,255,255,.10);transform:translateX(3px)}.rb-nav-item.active{background:linear-gradient(100deg,#ffe8a0,#edb640);color:#102341;box-shadow:0 5px 15px rgba(242,193,72,.28)}.rb-nav-icon{width:20px;flex:0 0 20px;text-align:center}.rb-nav.sub .rb-nav-item{padding-left:31px;font-size:12px}.rb-divider{height:1px;background:rgba(255,255,255,.18);margin:12px 7px}.rb-journey{margin-top:16px;min-height:142px;border-radius:14px;padding:21px 18px;border:1px solid rgba(255,255,255,.14);background:linear-gradient(90deg,rgba(6,20,38,.72),rgba(5,24,43,.34)),url("assets/overview/journey.jpg") center/cover no-repeat;overflow:hidden}.rb-journey p{max-width:150px;font-size:clamp(16px,1vw,20px);line-height:1.3;font-weight:700;margin:0}.rb-gold-stroke{width:72px;height:4px;background:#ffc544;border-radius:99px;transform:rotate(-6deg);margin-top:17px}'
+    + '.rb-workspace{min-width:0;background:#fff}.rb-topbar{position:sticky;top:0;z-index:60;min-height:73px;display:flex;align-items:center;gap:clamp(12px,1.4vw,26px);padding:10px clamp(16px,1.6vw,30px);background:rgba(255,255,255,.98);border-bottom:1px solid #e7edf4;box-shadow:0 6px 20px rgba(27,50,85,.05);backdrop-filter:blur(14px)}.rb-hamburger{display:none;width:40px;height:40px;border-radius:11px;border:1px solid #e3e9f0;background:#fff;color:var(--navy);align-items:center;justify-content:center;font-size:19px;cursor:pointer}.rb-search{width:clamp(250px,31vw,470px);height:42px;border-radius:24px;background:#f2f5f9;display:flex;align-items:center;gap:11px;padding:0 16px;color:#65728b;border:1px solid transparent;transition:.18s ease}.rb-search:focus-within{background:#fff;border-color:#ccd8e6;box-shadow:0 0 0 4px rgba(7,88,207,.06)}.rb-search input{width:100%;min-width:0;border:0;outline:0;background:transparent;color:#344266;font-size:13px}.rb-top-spacer{flex:1}.rb-top-icons{display:flex;align-items:center;gap:15px;color:#0a1a39}.rb-icon-button{width:38px;height:38px;border-radius:10px;border:0;background:transparent;display:grid;place-items:center;position:relative;color:#0a1a39;font-size:17px;cursor:pointer}.rb-icon-button:hover{background:#f5f7fa}.rb-badge{position:absolute;right:0;top:1px;width:17px;height:17px;border-radius:50%;background:#e21b2d;color:#fff;font-size:9px;display:grid;place-items:center;border:2px solid #fff}.rb-profile{position:relative}.rb-profile summary{list-style:none}.rb-profile summary::-webkit-details-marker{display:none}.rb-profile-trigger{display:flex;align-items:center;gap:10px;padding:5px 8px 5px 12px;border-left:1px solid #e4eaf1;border-radius:11px;cursor:pointer;transition:.18s ease}.rb-profile-trigger:hover{background:#f8fafc;box-shadow:0 7px 18px rgba(25,53,88,.08);transform:translateY(-1px)}.rb-avatar{width:42px;height:42px;border-radius:50%;object-fit:cover;display:block;border:2px solid #fff;box-shadow:0 0 0 1px #dbe3ec;filter:grayscale(1)}.rb-profile-text strong{display:block;font-size:12px}.rb-profile-text span{display:block;font-size:10px;color:#7b879b;margin-top:3px}.rb-dropdown{position:absolute;right:0;top:58px;width:195px;padding:7px;border-radius:12px;background:#fff;border:1px solid #e0e6ee;box-shadow:0 16px 36px rgba(23,47,78,.16);z-index:100}.rb-dropdown a{display:block;padding:10px 11px;border-radius:8px;font-size:12px;font-weight:700}.rb-dropdown a:hover{background:#f2f5f8}'
+    + '.rb-content{padding:clamp(16px,1.35vw,26px) clamp(16px,1.7vw,32px) 40px}.rb-hero{min-height:252px;border-radius:19px;overflow:hidden;position:relative;padding:clamp(28px,2.3vw,42px);background:linear-gradient(90deg,rgba(7,27,51,.97),rgba(7,27,51,.76)),url("assets/overview/hero.jpg") center/cover no-repeat;box-shadow:0 14px 34px rgba(18,51,85,.13);color:#fff}.rb-hero.country{background:linear-gradient(90deg,rgba(7,27,51,.97),rgba(7,27,51,.76)),var(--rb-country-hero) center/cover no-repeat}.rb-hero:before{content:"";position:absolute;right:-80px;top:-100px;width:330px;height:330px;border-radius:50%;background:radial-gradient(circle,rgba(240,196,86,.29),transparent 68%)}.rb-hero-copy{position:relative;z-index:2;max-width:780px}.rb-eyebrow{display:inline-flex;align-items:center;gap:8px;padding:7px 11px;border-radius:9px;background:linear-gradient(90deg,#ffecb1,#f3c76d);color:#805100;font-size:11px;font-weight:900;letter-spacing:.5px}.rb-hero h1{margin:18px 0 11px;font-size:clamp(30px,2.5vw,46px);line-height:1.03;letter-spacing:-1.4px;color:#fff}.rb-hero h1 span{color:#f2c862}.rb-hero p{max-width:720px;color:rgba(255,255,255,.84);font-size:14px;line-height:1.65;margin:0}'
+    + '.rb-filterbar{margin-top:17px;padding:12px;background:#fff;border:1px solid #e1e8f0;border-radius:16px;box-shadow:0 10px 30px rgba(23,50,84,.08);display:grid;grid-template-columns:minmax(240px,1fr) auto auto auto;gap:9px}.rb-input-wrap{min-width:0;height:44px;border-radius:11px;background:#f4f7fa;display:flex;align-items:center;gap:10px;padding:0 14px;border:1px solid transparent}.rb-input-wrap:focus-within{background:#fff;border-color:#c9d6e4;box-shadow:0 0 0 3px rgba(7,88,207,.06)}.rb-input-wrap input{width:100%;min-width:0;border:0;outline:0;background:transparent;color:#25324c;font-size:12px}.rb-control{height:44px;padding:0 12px;border-radius:10px;background:#fff;border:1px solid #dfe6ee;color:#25324c;font-size:12px;font-weight:700;outline:0;cursor:pointer}.rb-control:hover{border-color:#c9d4e0}.rb-section-head{margin:27px 3px 14px;display:flex;justify-content:space-between;align-items:flex-end;gap:14px}.rb-section-head h2{font-size:clamp(20px,1.4vw,26px);margin:0}.rb-section-head p{font-size:12px;color:var(--muted);margin:4px 0 0}.rb-count-pill{padding:8px 11px;border-radius:999px;background:#fff6dd;border:1px solid #f0dda6;color:#946000;font-size:11px;font-weight:900;white-space:nowrap}'
+    + '.rb-country-grid,.rb-board-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(235px,100%),1fr));gap:14px}.rb-country-grid.list,.rb-board-grid.list{grid-template-columns:1fr}.rb-country-card,.rb-board-card{min-width:0;background:#fff;border:1px solid #dfe7f0;border-radius:16px;overflow:hidden;box-shadow:0 5px 16px rgba(30,60,95,.055);transition:.22s ease}.rb-country-card{display:flex;flex-direction:column}.rb-country-card:hover,.rb-board-card:hover{transform:translateY(-5px);border-color:#d4aa48;box-shadow:0 18px 45px rgba(22,48,82,.14)}.rb-country-image,.rb-board-image{height:150px;position:relative;background-size:cover;background-position:center;background-color:#eef2f6}.rb-country-image:after,.rb-board-image:after{content:"";position:absolute;inset:0;background:linear-gradient(to top,rgba(7,27,51,.72),rgba(7,27,51,.06))}.rb-region-chip,.rb-domain{position:absolute;z-index:2;left:12px;padding:6px 9px;border-radius:999px;background:rgba(255,255,255,.94);color:#8b5900;font-size:10px;font-weight:900;box-shadow:0 3px 12px rgba(0,0,0,.07)}.rb-region-chip{top:12px}.rb-domain{bottom:12px;max-width:calc(100% - 24px);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.rb-country-name{position:absolute;z-index:2;left:13px;right:13px;bottom:13px;display:flex;align-items:center;gap:9px;color:#fff;font-size:16px;font-weight:900}.rb-flag{width:28px;height:19px;border-radius:4px;display:block;object-fit:cover;background:rgba(255,255,255,.92);border:1px solid rgba(255,255,255,.48)}.rb-country-body,.rb-board-body{padding:15px 16px 16px}.rb-country-body p,.rb-board-body p{color:var(--muted);font-size:12px;line-height:1.55;margin:0}.rb-country-footer{margin-top:15px;display:flex;align-items:center;justify-content:space-between;gap:12px}.rb-open-label{font-size:12px;font-weight:900;color:var(--blue)}.rb-arrow{width:32px;height:32px;border-radius:50%;display:grid;place-items:center;background:#f7f9fc;border:1px solid #dfe7ef;color:var(--blue);font-size:18px;transition:.2s ease}.rb-country-card:hover .rb-arrow{transform:translateX(3px);background:var(--blue);color:#fff;border-color:var(--blue)}.rb-board-card{display:flex;flex-direction:column}.rb-board-image{height:155px}.rb-board-body{display:flex;flex-direction:column;flex:1}.rb-board-body h3{margin:0 0 7px;color:var(--text);font-size:15px}.rb-board-body p{flex:1;overflow-wrap:anywhere}.rb-board-actions{margin-top:16px;display:grid;grid-template-columns:1fr auto;gap:8px}.rb-primary-link,.rb-secondary-link{min-height:42px;border-radius:10px;display:flex;justify-content:center;align-items:center;padding:9px 13px;text-decoration:none;font-size:12px;font-weight:900;transition:.18s ease}.rb-primary-link{background:linear-gradient(100deg,#d59608,#e9bb38);color:#fff!important;box-shadow:0 5px 12px rgba(192,132,0,.18)}.rb-secondary-link{background:#fff;border:1px solid #d8e0e9;color:var(--navy)!important}.rb-primary-link:hover,.rb-secondary-link:hover{transform:translateY(-2px)}'
+    + '.rb-right{min-width:0;border-left:1px solid #e6ecf2;background:#fbfcfe;padding:24px 17px}.rb-right-inner{position:sticky;top:96px;display:flex;flex-direction:column;gap:14px}.rb-side-card{background:#fff;border:1px solid #e0e7ef;border-radius:15px;padding:18px;box-shadow:0 5px 16px rgba(31,58,91,.045)}.rb-side-label{color:#9a6400;font-size:11px;font-weight:900;letter-spacing:.55px;text-transform:uppercase}.rb-side-card h3{margin:7px 0 6px;font-size:17px;color:var(--text)}.rb-side-card p{color:var(--muted);font-size:12px;line-height:1.56;margin:0}.rb-region-buttons{display:flex;flex-wrap:wrap;gap:7px;margin-top:12px}.rb-chip{border:1px solid #dde5ee;border-radius:999px;background:#fff;color:#64708a;padding:7px 10px;font-size:11px;font-weight:800;cursor:pointer}.rb-chip.active{background:#fff3cd;border-color:#e3b646;color:#835500}.rb-chip:hover{border-color:#d6a128;color:#8f5b00}.rb-progress-title{display:flex;align-items:center;justify-content:space-between;gap:10px;margin:10px 0;font-size:13px;font-weight:900}.rb-progress{height:10px;overflow:hidden;border-radius:99px;background:#e4ebf2}.rb-progress span{display:block;height:100%;border-radius:inherit;background:linear-gradient(90deg,#d99a0a,#10a477)}.rb-side-btn{display:flex;align-items:center;justify-content:center;width:100%;min-height:44px;margin-top:14px;border:0;border-radius:11px;background:var(--navy);color:#fff!important;font-size:12px;font-weight:900;transition:.18s ease}.rb-side-btn:hover{transform:translateY(-2px);box-shadow:0 8px 18px rgba(7,27,51,.18)}.rb-mini-stats{display:grid;grid-template-columns:1fr 1fr;gap:9px;margin-top:12px}.rb-mini-stat{padding:12px;border-radius:12px;background:#f7f9fc;border:1px solid #e5ebf2}.rb-mini-stat b{display:block;font-size:17px}.rb-mini-stat span{font-size:10px;color:#7a8598;margin-top:3px;display:block}.rb-empty{grid-column:1/-1;padding:40px;text-align:center;color:#798399;border:1px dashed #d8e1eb;border-radius:15px;background:#fafcff}.rb-overlay{display:none}'
+    + '@media(max-width:1279px){.rb-app{grid-template-columns:1fr}.rb-sidebar{position:fixed;left:0;top:0;bottom:0;width:300px;max-width:86vw;height:100dvh;transform:translateX(-106%);transition:transform .25s ease;border-radius:0 16px 16px 0;z-index:95}.rb-hamburger{display:flex}.rb-nav-toggle:checked~.rb-app .rb-sidebar{transform:none}.rb-nav-toggle:checked~.rb-app .rb-overlay{display:block;position:fixed;inset:0;background:rgba(7,20,58,.45);z-index:90}.rb-right{grid-column:1;border-left:0;border-top:1px solid #e6ecf2}.rb-right-inner{position:static;display:grid;grid-template-columns:repeat(3,minmax(0,1fr))}}'
+    + '@media(max-width:850px){.rb-topbar{flex-wrap:wrap;row-gap:10px}.rb-search{order:3;flex-basis:100%;width:auto}.rb-profile-text{display:none}.rb-filterbar{grid-template-columns:1fr 1fr}.rb-input-wrap{grid-column:1/-1}.rb-right-inner{grid-template-columns:1fr}}'
+    + '@media(max-width:620px){.rb-topbar{padding:10px 13px}.rb-content{padding:14px 13px 30px}.rb-hero{min-height:0;padding:24px 18px;border-radius:15px}.rb-hero h1{font-size:28px}.rb-filterbar{grid-template-columns:1fr}.rb-input-wrap{grid-column:auto}.rb-control{width:100%}.rb-section-head{align-items:flex-start;flex-direction:column}.rb-country-grid,.rb-board-grid{grid-template-columns:1fr}.rb-country-image,.rb-board-image{height:170px}.rb-top-icons{gap:8px}.rb-profile-trigger{padding-left:6px}.rb-dropdown{position:fixed;right:12px;top:68px}}'
+    + '</style>';
+
+  function sidebar(){
+    return '<aside class="rb-sidebar">'
+      + '<div class="rb-brand"><img src="assets/logo.png" alt="Zeelin Academy Logo"></div>'
+      + '<div class="rb-system">ZEELIN JOB READINESS SYSTEM</div>'
+      + '<ul class="rb-nav"><li><a class="rb-nav-item" href="#overview"><span class="rb-nav-icon">⌂</span>Dashboard</a></li><li><a class="rb-nav-item" href="/portal.html"><span class="rb-nav-icon">☰</span>Portal</a></li></ul>'
+      + '<div class="rb-stage">STAGE 3: CAREER GATE</div>'
+      + '<ul class="rb-nav"><li><a class="rb-nav-item" href="#regional-boards"><span class="rb-nav-icon">▣</span>Placement Pipeline <span style="margin-left:auto">⌄</span></a></li></ul>'
+      + '<ul class="rb-nav sub"><li><a class="rb-nav-item active" href="#regional-boards"><span class="rb-nav-icon">▦</span>Regional Job Boards</a></li><li><a class="rb-nav-item" href="#boost"><span class="rb-nav-icon">↗</span>Boost &amp; Accountability</a></li><li><a class="rb-nav-item" href="#cv-maker"><span class="rb-nav-icon">▤</span>CV Maker &amp; Portfolio</a></li></ul>'
+      + '<div class="rb-divider"></div>'
+      + '<ul class="rb-nav"><li><a class="rb-nav-item" href="#resources"><span class="rb-nav-icon">◫</span>Learning Hub</a></li><li><a class="rb-nav-item" href="#regional-boards"><span class="rb-nav-icon">⌕</span>Job Opportunities</a></li><li><a class="rb-nav-item" href="#resources"><span class="rb-nav-icon">◇</span>Resources</a></li><li><a class="rb-nav-item" href="#resources"><span class="rb-nav-icon">◎</span>Community</a></li><li><a class="rb-nav-item" href="#resources"><span class="rb-nav-icon">?</span>Help &amp; Support</a></li></ul>'
+      + '<div class="rb-journey"><p>“Your Global Career Journey Starts Here.”</p><div class="rb-gold-stroke"></div></div>'
+      + '</aside>';
+  }
+
+  function topbar(){
+    return '<header class="rb-topbar">'
+      + '<label class="rb-hamburger" for="rbNavToggle" aria-label="Open navigation">☰</label>'
+      + '<label class="rb-search"><span>⌕</span><input type="search" placeholder="Search countries, regions, or job boards..."></label>'
+      + '<div class="rb-top-spacer"></div>'
+      + '<div class="rb-top-icons"><button class="rb-icon-button" type="button" aria-label="Notifications" onclick="showToast(&quot;3 notifications&quot;)">♢<span class="rb-badge">3</span></button><button class="rb-icon-button" type="button" aria-label="Messages" onclick="showToast(&quot;Messages (demo)&quot;)">□</button>'
+      + '<details class="rb-profile"><summary class="rb-profile-trigger"><img class="rb-avatar" src="assets/overview/avatar.jpg" alt="Wisdom Automa"><div class="rb-profile-text"><strong>Wisdom Automa</strong><span>Learner</span></div><span>⌄</span></summary><div class="rb-dropdown"><a href="#" onclick="showToast(&quot;Profile settings&quot;);return false">Profile settings</a><a href="#" onclick="showToast(&quot;Account settings&quot;);return false">Account settings</a><a href="#resources">Help &amp; Support</a></div></details>'
+      + '</div></header>';
+  }
+
+  function shell(mainHtml,rightHtml){
+    return css + '<div class="rb-root"><input class="rb-nav-toggle" type="checkbox" id="rbNavToggle"><div class="rb-app">'+sidebar()+'<label class="rb-overlay" for="rbNavToggle"></label><section class="rb-workspace">'+topbar()+mainHtml+'</section>'+rightHtml+'</div></div>';
+  }
+
+  if(countryParam){
+    const country = countries.find(c=>c.id===countryParam);
+    if(country){
+      let list = countryBoards(countryParam);
+      if(F.q){ const s=F.q.toLowerCase(); list=list.filter(b=>b.name.toLowerCase().includes(s)||String(b.url||'').toLowerCase().includes(s)||String(b.desc||'').toLowerCase().includes(s)); }
+      if(F.category!=='all') list=list.filter(b=>(b.category||'general')===F.category);
+      if(F.sort==='name') list.sort((a,b)=>a.name.localeCompare(b.name));
+      else if(F.sort==='domain') list.sort((a,b)=>{ try{return new URL(a.url).hostname.localeCompare(new URL(b.url).hostname)}catch(e){return 0} });
+
+      function boardCard(b){
+        const host=(()=>{try{return new URL(b.url).hostname.replace('www.','')}catch(e){return b.url}})();
+        const img=b.boardImg||b.ogImage||country.hero||'assets/overview/hero.jpg';
+        return '<article class="rb-board-card">'
+          + '<div class="rb-board-image jb-og-img" data-url="'+esc(b.url)+'" data-fallback="'+esc(b.boardImg||'')+'" style="background-image:url(&quot;'+esc(img)+'&quot;)"><span class="rb-domain">'+esc(host)+'</span></div>'
+          + '<div class="rb-board-body"><h3>'+esc(b.name)+'</h3><p>'+esc(b.desc||('Explore current opportunities available through '+b.name+'.'))+'</p>'
+          + '<div class="rb-board-actions"><a class="rb-primary-link jb-open" data-board="'+esc(b.id)+'" href="'+esc(b.url)+'" target="_blank" rel="noopener">Open Job Board&nbsp; ↗</a><a class="rb-secondary-link" href="'+esc(b.demoUrl||b.url)+'" target="_blank" rel="noopener">Preview</a></div></div>'
+          + '</article>';
+      }
+
+      const main = '<main class="rb-content">'
+        + '<section class="rb-hero country" style="--rb-country-hero:url(&quot;'+esc(country.hero||'assets/overview/hero.jpg')+'&quot;)"><div class="rb-hero-copy"><div class="rb-eyebrow">✓ VERIFIED REGIONAL MARKETPLACE</div><h1>'+esc(country.flag||'')+' '+esc(country.name)+' <span>Job Boards</span></h1><p>Discover verified employment platforms for '+esc(country.name)+'. Search trusted local and international boards, compare opportunities, and continue building your 5-job accountability quota.</p></div></section>'
+        + '<section class="rb-filterbar"><label class="rb-input-wrap"><span>⌕</span><input id="jbSearch" value="'+esc(F.q)+'" placeholder="Search boards, companies or domains..."></label>'
+        + '<select id="jbCategory" class="rb-control"><option value="all" '+(F.category==='all'?'selected':'')+'>All Categories</option><option value="general" '+(F.category==='general'?'selected':'')+'>General</option><option value="tech" '+(F.category==='tech'?'selected':'')+'>Tech</option><option value="remote" '+(F.category==='remote'?'selected':'')+'>Remote</option></select>'
+        + '<select id="jbSort" class="rb-control"><option value="name" '+(F.sort==='name'?'selected':'')+'>Sort: Name</option><option value="domain" '+(F.sort==='domain'?'selected':'')+'>Sort: Domain</option></select>'
+        + '<button id="jbArrange" class="rb-control" type="button">'+(F.arrange==='list'?'Grid View':'List View')+'</button></section>'
+        + '<div class="rb-section-head"><div><h2>Available Job Boards</h2><p>Trusted employment platforms serving '+esc(country.name)+'.</p></div><div class="rb-count-pill">'+list.length+' Boards</div></div>'
+        + '<section id="jbGrid" class="rb-board-grid '+(F.arrange==='list'?'list':'')+'">'+(list.length?list.map(boardCard).join(''):'<div class="rb-empty">No job boards match your current filters.</div>')+'</section>'
+        + '</main>';
+
+      const right = '<aside class="rb-right"><div class="rb-right-inner">'
+        + '<section class="rb-side-card"><div class="rb-side-label">Selected Market</div><h3>'+esc(country.flag||'')+' '+esc(country.name)+'</h3><p>'+esc(country.region)+' regional employment market.</p><a class="rb-side-btn" href="#regional-boards">← Back to Countries</a></section>'
+        + '<section class="rb-side-card"><div class="rb-side-label">Application Quota</div><div class="rb-progress-title"><span>Weekly Progress</span><span>'+q+'/5</span></div><div class="rb-progress"><span style="width:'+pct+'%"></span></div><p style="margin-top:12px">Log five verified external applications to maintain active cohort standing.</p></section>'
+        + '<section class="rb-side-card"><div class="rb-side-label">Career Tip</div><h3>Apply strategically</h3><p>Prioritize positions that closely match your verified skills and portfolio experience.</p><a class="rb-side-btn" href="#boost">Open Application Log →</a></section>'
+        + '</div></aside>';
+      return shell(main,right);
+    }
+  }
+
+  let filtered=countries.slice();
+  if(F.q){ const s=F.q.toLowerCase(); filtered=filtered.filter(c=>c.name.toLowerCase().includes(s)||c.region.toLowerCase().includes(s)); }
+  if(F.region!=='all') filtered=filtered.filter(c=>c.region===F.region);
+  if(F.sort==='name') filtered.sort((a,b)=>a.name.localeCompare(b.name));
+  else if(F.sort==='region') filtered.sort((a,b)=>a.region.localeCompare(b.region));
+
+  function countryCard(country){
+    const bc=countryBoards(country.id).length;
+    return '<a href="#regional-boards/'+esc(country.id)+'" class="rb-country-card">'
+      + '<div class="rb-country-image" style="background-image:url(&quot;'+esc(country.hero||'assets/overview/hero.jpg')+'&quot;)"><span class="rb-region-chip">'+esc(country.region)+'</span><div class="rb-country-name">'+(country.flagImg?'<img class="rb-flag" loading="lazy" decoding="async" src="'+esc(country.flagImg)+'" alt="'+esc(country.name)+' flag" onerror="this.style.display=&quot;none&quot;">':'')+'<span>'+esc(country.name)+'</span></div></div>'
+      + '<div class="rb-country-body"><p>'+bc+' verified job boards • Direct links to employment platforms for '+esc(country.name)+'.</p><div class="rb-country-footer"><span class="rb-open-label">Explore opportunities</span><span class="rb-arrow">→</span></div></div>'
+      + '</a>';
+  }
+
+  const main = '<main class="rb-content">'
+    + '<section class="rb-hero"><div class="rb-hero-copy"><div class="rb-eyebrow">✓ VERIFIED GLOBAL JOB MARKETPLACE</div><h1>Explore <span>Regional Job Boards</span><br>Across Global Markets</h1><p>Discover trusted employment platforms across multiple regions. Choose a country, access verified job boards, and build your application pipeline with confidence.</p></div></section>'
+    + '<section class="rb-filterbar"><label class="rb-input-wrap"><span>⌕</span><input id="jbCountrySearch" value="'+esc(F.q)+'" placeholder="Search country or region, e.g. Nigeria, Europe..."></label>'
+    + '<select id="jbRegion" class="rb-control"><option value="all">All Regions</option>'+regionOpts.slice(1).map(r=>'<option value="'+esc(r)+'" '+(F.region===r?'selected':'')+'>'+esc(r)+'</option>').join('')+'</select>'
+    + '<select id="jbSort" class="rb-control"><option value="name" '+(F.sort==='name'?'selected':'')+'>Sort: Name</option><option value="region" '+(F.sort==='region'?'selected':'')+'>Sort: Region</option></select>'
+    + '<button id="jbArrange" class="rb-control" type="button">'+(F.arrange==='list'?'Grid View':'List View')+'</button></section>'
+    + '<div class="rb-section-head"><div><h2>Explore Regional Markets</h2><p>Select a country to access its verified employment platforms.</p></div><div class="rb-count-pill">'+filtered.length+' Countries</div></div>'
+    + '<section id="jbCountryGrid" class="rb-country-grid '+(F.arrange==='list'?'list':'')+'">'+(filtered.length?filtered.map(countryCard).join(''):'<div class="rb-empty">No countries match your search.</div>')+'</section>'
+    + '</main>';
+
+  const right = '<aside class="rb-right"><div class="rb-right-inner">'
+    + '<section class="rb-side-card"><div class="rb-side-label">Recommended</div><h3>Start with your region</h3><p>Choose your primary employment market first, then expand into remote and international opportunities.</p><div class="rb-mini-stats"><div class="rb-mini-stat"><b>'+countries.length+'</b><span>Countries</span></div><div class="rb-mini-stat"><b>'+boards.length+'</b><span>Verified Boards</span></div></div></section>'
+    + '<section class="rb-side-card"><div class="rb-side-label">Filter Markets</div><div class="rb-region-buttons">'+regionOpts.map(r=>'<button class="rb-chip '+(F.region===r?'active':'')+'" type="button" onclick="window._jbSetRegion(&quot;'+esc(r)+'&quot;)">'+(r==='all'?'All':esc(r))+'</button>').join('')+'</div></section>'
+    + '<section class="rb-side-card"><div class="rb-side-label">Weekly Accountability</div><div class="rb-progress-title"><span>Applications Logged</span><span>'+q+'/5</span></div><div class="rb-progress"><span style="width:'+pct+'%"></span></div><p style="margin-top:12px">Complete five verified external applications to stay active in the employment cohort.</p><a class="rb-side-btn" href="#boost">Go to Application Log →</a></section>'
+    + '</div></aside>';
+
+  return shell(main,right);
+}
+
 function bindRegionalBoards(){
   const s=document.getElementById('jbCountrySearch'); if(s) s.addEventListener('input', e=>{ window._jbFilter.q=e.target.value; const m=document.getElementById('main-content'); const h=location.hash; if(h.startsWith('#regional-boards/')){ m.innerHTML=viewRegionalBoards(window._jbCountryParam); bindRegionalBoards(); const inp=document.getElementById('jbSearch'); if(inp) inp.focus(); } else { m.innerHTML=viewRegionalBoards(); bindRegionalBoards(); const inp2=document.getElementById('jbCountrySearch'); if(inp2){ inp2.focus(); const v=inp2.value; inp2.value=''; inp2.value=v; } } });
   const r=document.getElementById('jbRegion'); if(r) r.addEventListener('change', e=>{ window._jbFilter.region=e.target.value; const m=document.getElementById('main-content'); m.innerHTML=viewRegionalBoards(window._jbCountryParam); bindRegionalBoards(); });
@@ -1489,7 +1612,7 @@ function updateSidebar(activeRoute){
   const sb = document.getElementById('sidebar');
   if(sb) sb.innerHTML = renderSidebar(activeRoute);
   // overview is pixel-perfect full replica — hide outer chrome, white canvas
-  const fullWidth = ['overview'].includes(activeRoute);
+  const fullWidth = ['overview','regional-boards'].includes(activeRoute);
   const layout = document.querySelector('.layout');
   const mainWrap = document.querySelector('.main');
   const sidebarEl = document.getElementById('sidebar');
@@ -1509,7 +1632,7 @@ function updateSidebar(activeRoute){
 
 function renderJBNav(view){
   var el = document.getElementById('jbBottomNav'); if(!el) return;
-  if(view==='overview'){ el.innerHTML=''; el.style.display='none'; return; }
+  if(view==='overview' || view==='regional-boards'){ el.innerHTML=''; el.style.display='none'; return; }
   el.style.display='';
   var map = {'portal':'home','overview':'home','regional-boards':'boards','boost':'boost','cv-maker':'cv','cv-maker/cv':'cv','cv-maker/portfolio':'cv','interview-prep':'prep','events-hub':'hub','calendar':'hub','recordings':'hub','live-sessions':'hub','resources':'hub'};
   var on = map[view] || '';
@@ -1525,7 +1648,7 @@ function renderJBNav(view){
 
 /* ─── Main render ─── */
 function render(view, param){
-  const fullWidthViews = ['overview'];
+  const fullWidthViews = ['overview','regional-boards'];
   const isFull = fullWidthViews.includes(view);
   // update sidebar even for full width (for state)
   updateSidebar(view);
