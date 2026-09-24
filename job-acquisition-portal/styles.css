@@ -215,3 +215,162 @@ html{scroll-behavior:smooth}
   .layout>.sidebar.overview-sidebar-copy.open{transform:none}
   .topbar-hamburger{display:inline-flex!important}
 }
+
+
+/* =========================================================
+   EXACT OVERVIEW CHROME COPY — all non-Overview Job Acquisition routes
+   Overview remains the source of truth.
+   ========================================================= */
+.job-copied-topbar .ico,
+.job-copied-top-icons .ico{
+  width:23px;height:23px;fill:none;stroke:currentColor;stroke-width:2;
+  stroke-linecap:round;stroke-linejoin:round;display:inline-block;vertical-align:middle;
+}
+.job-copied-topbar{
+  position:fixed!important;top:0;z-index:75;height:73px;min-height:73px;
+  background:#ffffff;display:flex;align-items:center;padding:0 31px;gap:34px;
+  border-bottom:1px solid #e8edf4;flex-shrink:0;
+  box-shadow:0 1px 0 #e8edf4,0 8px 22px rgba(27,50,85,.06);
+  transition:transform .28s ease;
+}
+.job-copied-topbar.ov-hidden{transform:translateY(-110%)}
+.job-copied-topbar .ov-burger{display:none}
+.job-copied-topbar .ov-brand{display:flex;align-items:center;flex-shrink:0}
+.job-copied-topbar .ov-brand img{height:34px;width:auto;object-fit:contain;background:transparent}
+.job-copied-topbar .search{
+  width:445px;height:42px;border-radius:24px;background:#f1f4f8;
+  display:flex;align-items:center;gap:16px;padding:0 18px;color:#4c5772;font-size:14px;
+}
+.job-copied-topbar .search input::placeholder{color:#8a94a8}
+
+.job-copied-top-icons{
+  position:fixed;right:38px;top:0;z-index:80;height:73px;
+  display:flex;align-items:center;gap:27px;color:#07143a;
+  margin:0;background:#ffffff;border:none;border-radius:0;padding:0 14px;box-shadow:none;
+  transition:transform .28s ease,opacity .28s ease;
+}
+.job-copied-top-icons.ov-hidden{transform:translateY(-110%);opacity:0}
+.job-copied-top-icons .notification{position:relative}
+.job-copied-top-icons .badge{
+  position:absolute;right:-10px;top:-9px;width:18px;height:18px;border-radius:50%;
+  background:#e21b2d;color:#fff;font-size:10px;display:grid;place-items:center;border:2px solid white;
+}
+.job-copied-top-icons .user{
+  position:relative;display:flex;align-items:center;gap:10px;border-left:1px solid #e6ebf2;
+  padding-left:19px;margin-left:3px;border-radius:12px;padding-top:7px;padding-bottom:7px;padding-right:9px;
+  cursor:pointer;transition:transform .18s ease,background .18s ease,box-shadow .18s ease;
+}
+.job-copied-top-icons .user:hover,
+.job-copied-top-icons .user:focus-within{
+  transform:translateY(-2px);background:#f7f9fc;box-shadow:0 6px 18px rgba(27,50,85,.10);
+}
+.job-copied-top-icons .avatar{
+  width:47px;height:47px;border-radius:50%;object-fit:cover;filter:grayscale(1);
+  transition:transform .2s ease,box-shadow .2s ease;
+}
+.job-copied-top-icons .user:hover .avatar{
+  transform:scale(1.06);box-shadow:0 0 0 3px #f2c65d;
+}
+.job-copied-top-icons .user strong{display:block;font-size:13px;color:#07143a}
+.job-copied-top-icons .user span{display:block;font-size:11px;color:#697590;margin-top:4px}
+.job-copied-top-icons .profile-menu{
+  display:none;position:absolute;right:0;top:62px;width:190px;background:#fff;
+  border:1px solid #e1e7ef;border-radius:12px;padding:7px;
+  box-shadow:0 14px 34px rgba(20,40,70,.18);z-index:130;
+}
+.job-copied-top-icons .profile-menu.open{display:block}
+.job-copied-top-icons .profile-menu button{
+  width:100%;border:0;background:transparent;text-align:left;padding:10px 12px;
+  border-radius:8px;color:#07143a;font:600 13px Inter,"Segoe UI",Arial,sans-serif;cursor:pointer;
+  display:block;
+}
+.job-copied-top-icons .profile-menu button:hover{background:#f1f4f8}
+.job-copied-topbar-space{height:73px;flex:0 0 73px}
+
+/* Sidebar clone uses the same final desktop sizing, spacing, scrollbar and brand behavior as Overview. */
+@media(min-width:1280px){
+  .rb-app{
+    grid-template-columns:clamp(210px,13.5vw,270px) minmax(0,1fr) clamp(280px,19vw,360px)!important;
+  }
+  .rb-sidebar.overview-sidebar-copy,
+  .layout>.sidebar.overview-sidebar-copy{
+    width:100%!important;min-width:0!important;
+    padding:24px 15px 20px!important;
+    background:
+      radial-gradient(circle at 110% 21%,rgba(200,147,35,.25),transparent 24%),
+      linear-gradient(145deg,#102d4a 0%,#071b33 62%,#0a2746 100%)!important;
+    color:#f7fbff!important;
+    box-shadow:8px 0 22px rgba(15,40,68,.16)!important;
+    overflow-y:auto!important;overflow-x:hidden!important;
+    scrollbar-width:thin!important;scrollbar-color:#c9d3e0 #ffffff!important;
+  }
+  .layout>.sidebar.overview-sidebar-copy{
+    width:clamp(210px,13.5vw,270px)!important;
+    min-width:clamp(210px,13.5vw,270px)!important;
+    height:100vh!important;position:sticky!important;top:0!important;align-self:flex-start!important;
+  }
+  .rb-sidebar.overview-sidebar-copy{
+    position:sticky!important;top:0!important;align-self:start!important;
+    height:100dvh!important;min-height:0!important;max-height:100dvh!important;
+  }
+  .rb-sidebar.overview-sidebar-copy .brand,
+  .layout>.sidebar.overview-sidebar-copy .brand{
+    position:sticky;top:-24px;z-index:6;margin:-24px -15px 0;
+    padding:24px 15px 23px!important;background:#0e2a47;
+  }
+}
+@media(min-width:1280px) and (max-width:1450px){
+  .rb-app{grid-template-columns:220px minmax(0,1fr) 290px!important}
+  .rb-sidebar.overview-sidebar-copy,
+  .layout>.sidebar.overview-sidebar-copy{
+    width:220px!important;min-width:220px!important;padding-left:8px!important;padding-right:8px!important;
+  }
+  .rb-sidebar.overview-sidebar-copy .nav-item,
+  .layout>.sidebar.overview-sidebar-copy .nav-item{padding-left:10px;padding-right:10px;gap:10px}
+  .rb-sidebar.overview-sidebar-copy .subnav .nav-item,
+  .layout>.sidebar.overview-sidebar-copy .subnav .nav-item{padding-left:24px}
+}
+
+.rb-sidebar.overview-sidebar-copy::-webkit-scrollbar,
+.layout>.sidebar.overview-sidebar-copy::-webkit-scrollbar{width:6px!important}
+.rb-sidebar.overview-sidebar-copy::-webkit-scrollbar-track,
+.layout>.sidebar.overview-sidebar-copy::-webkit-scrollbar-track{background:#ffffff!important}
+.rb-sidebar.overview-sidebar-copy::-webkit-scrollbar-thumb,
+.layout>.sidebar.overview-sidebar-copy::-webkit-scrollbar-thumb{
+  background:#c9d3e0!important;border:1px solid #e8edf4!important;border-radius:999px!important;
+}
+
+/* Keep the Regional right rail content exactly as-is; only reserve the Overview header height. */
+@media(min-width:1280px){
+  .rb-right{padding-top:96px!important}
+}
+
+/* Overview-style responsive header behavior for copied headers. */
+@media(max-width:1279px){
+  .job-copied-topbar{
+    position:fixed!important;left:0!important;width:100%!important;
+    flex-wrap:wrap;height:auto;min-height:73px;row-gap:10px;
+  }
+  .job-copied-topbar .ov-burger{
+    display:inline-flex;width:42px;height:42px;flex-shrink:0;align-items:center;justify-content:center;
+    background:#fff;border:1px solid #e8edf4;border-radius:12px;color:#07143a;cursor:pointer;
+  }
+  .job-copied-topbar > svg.ico{display:none}
+  .job-copied-topbar .search{flex:1;min-width:200px;width:auto}
+  .job-copied-top-icons{
+    position:fixed;right:16px;top:0;height:73px;margin:0;background:transparent;padding:0;gap:14px;
+  }
+  .rb-right{padding-top:20px!important}
+}
+@media(max-width:767px){
+  .job-copied-topbar{padding:12px 14px;gap:10px}
+  .job-copied-topbar .search{order:3;flex-basis:100%}
+  .job-copied-topbar .ov-brand img{height:28px}
+  .job-copied-top-icons .user>div{display:none}
+  .job-copied-top-icons .avatar{width:36px;height:36px}
+  .job-copied-top-icons .user{border-left:none;padding-left:0}
+  .job-copied-top-icons .user>span{display:none}
+  .job-copied-top-icons .profile-menu{
+    position:fixed;right:12px;top:68px;width:min(190px,calc(100vw - 24px));
+  }
+}
