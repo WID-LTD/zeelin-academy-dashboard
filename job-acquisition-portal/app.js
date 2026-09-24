@@ -518,6 +518,38 @@ function viewRegionalBoards(countryParam){
   const countryBoards = (cid)=>boards.filter(b=>b.countryId===cid);
   const regionOpts = ['all','Africa','Europe','Oceania','North America','Asia','Caribbean','Remote'];
 
+  const pexelsImg = (id)=>'https://images.pexels.com/photos/'+id+'/pexels-photo-'+id+'.jpeg?auto=compress&cs=tinysrgb&w=1200&h=720&fit=crop';
+  const countryMedia = {
+    nz:{landmark:'Auckland Sky Tower',image:pexelsImg('18742687'),source:'https://www.pexels.com/photo/sky-tower-in-auckland-18742687/'},
+    ie:{landmark:"Ha'penny Bridge, Dublin",image:pexelsImg('35809667'),source:'https://www.pexels.com/photo/ha-penny-bridge-spanning-river-liffey-in-dublin-35809667/'},
+    au:{landmark:'Sydney Opera House',image:pexelsImg('26834715'),source:'https://www.pexels.com/photo/sydney-opera-house-26834715/'},
+    us:{landmark:'Statue of Liberty, New York',image:pexelsImg('64271'),source:'https://www.pexels.com/photo/statue-of-liberty-64271/'},
+    ca:{landmark:'CN Tower, Toronto',image:pexelsImg('27844750'),source:'https://www.pexels.com/photo/toronto-cn-tower-27844750/'},
+    gb:{landmark:'Big Ben, London',image:pexelsImg('20624142'),source:'https://www.pexels.com/photo/big-ben-in-london-20624142/'},
+    ng:{landmark:'Lagos Skyline',image:pexelsImg('37505507'),source:'https://www.pexels.com/photo/prominent-lagos-skyline-featuring-the-green-tower-37505507/'},
+    za:{landmark:'Table Mountain, Cape Town',image:pexelsImg('37759553'),source:'https://www.pexels.com/photo/majestic-table-mountain-in-cape-town-landscape-37759553/'},
+    ke:{landmark:'Nairobi Skyline',image:pexelsImg('38133494'),source:'https://www.pexels.com/photo/nairobi-skyline-at-sunset-with-urban-landmarks-38133494/'},
+    gh:{landmark:'Independence Arch, Accra',image:pexelsImg('20131678'),source:'https://www.pexels.com/photo/independence-arch-in-accra-ghana-20131678/'},
+    ug:{landmark:'Kampala Mosque',image:pexelsImg('38101744'),source:'https://www.pexels.com/photo/aerial-view-of-domes-of-kampala-mosque-38101744/'},
+    zw:{landmark:'Victoria Falls',image:pexelsImg('27878404'),source:'https://www.pexels.com/photo/an-aerial-view-of-victoria-falls-in-zimbabwe-27878404/'},
+    in:{landmark:'Taj Mahal, Agra',image:pexelsImg('13754209'),source:'https://www.pexels.com/photo/taj-mahal-in-india-13754209/'},
+    pk:{landmark:'Faisal Mosque, Islamabad',image:pexelsImg('20673923'),source:'https://www.pexels.com/photo/vertical-shot-of-the-faisal-mosque-in-islamabad-20673923/'},
+    sg:{landmark:'Marina Bay Sands',image:pexelsImg('13551306'),source:'https://www.pexels.com/photo/marina-bay-sands-in-singapore-13551306/'},
+    ph:{landmark:'El Nido, Palawan',image:pexelsImg('36521031'),source:'https://www.pexels.com/photo/serene-limestone-cliffs-in-el-nido-palawan-36521031/'},
+    jm:{landmark:'Montego Bay',image:pexelsImg('27222664'),source:'https://www.pexels.com/photo/montego-bay-27222664/'},
+    bs:{landmark:'Nassau, Bahamas',image:pexelsImg('28443536'),source:'https://www.pexels.com/photo/nassau-bahamas-28443536/'},
+    tt:{landmark:'Maracas Bay',image:pexelsImg('30871804'),source:'https://www.pexels.com/photo/serene-maracas-bay-beach-in-trinidad-and-tobago-30871804/'},
+    bz:{landmark:'Belize Caribbean Coast',image:pexelsImg('2473986'),source:'https://www.pexels.com/photo/exotic-tropical-beach-2473986/'},
+    gy:{landmark:'Kaieteur Falls',image:'https://images.unsplash.com/photo-1672860004522-5b88ffcf39ce?auto=format&fit=crop&w=1200&q=85',source:'https://unsplash.com/photos/a-large-waterfall-with-water-pouring-out-of-it-7QKewlK6Glg'},
+    fj:{landmark:'Nadi, Fiji',image:pexelsImg('26088009'),source:'https://www.pexels.com/photo/stranded-island-surrounded-by-ocean-26088009/'},
+    pg:{landmark:'Salamaua Coast, Morobe Province',image:pexelsImg('14558429'),source:'https://www.pexels.com/photo/aerial-view-of-a-tropical-beach-14558429/'},
+    ws:{landmark:'Apia, Samoa',image:pexelsImg('36137382'),source:'https://www.pexels.com/photo/tropical-beachfront-with-palm-trees-in-samoa-36137382/'},
+    remote:{landmark:'Global Remote Collaboration',image:pexelsImg('3865639'),source:'https://www.pexels.com/photo/cheerful-diverse-colleagues-of-different-ages-working-on-laptop-during-startup-project-3865639/'}
+  };
+  const mediaFor = (country)=>countryMedia[country && country.id] || {landmark:(country&&country.name)||'Regional Market',image:(country&&country.hero)||'assets/overview/hero.jpg',source:(country&&country.hero)||''};
+  const siteShot = (url)=>'https://image.thum.io/get/width/900/crop/560/noanimate/allowJPG/?url='+encodeURIComponent(url||'');
+
+
   const css = '<style>'
     + '.rb-root,.rb-root *{box-sizing:border-box}.rb-root{--navy:#071b33;--navy2:#0d2f52;--gold:#d99a0a;--gold2:#f0c456;--text:#07143a;--muted:#697590;--border:#e3e9f0;--soft:#f6f8fb;--blue:#0758cf;--green:#0b9b72;width:100%;min-width:0;min-height:100dvh;background:#fff;color:var(--text);font-family:Inter,"Segoe UI",Arial,sans-serif}.rb-root a{text-decoration:none;color:inherit}.rb-root button,.rb-root input,.rb-root select{font:inherit}.rb-nav-toggle{position:fixed;left:-9999px}.rb-app{width:100%;min-height:100dvh;display:grid;grid-template-columns:clamp(220px,13.8vw,275px) minmax(0,1fr) clamp(285px,19vw,360px);background:#fff}'
     + '.rb-sidebar{position:sticky;top:0;height:100dvh;overflow:auto;padding:22px 12px 20px;color:#fff;background:radial-gradient(circle at 115% 20%,rgba(229,176,55,.24),transparent 26%),linear-gradient(145deg,#103251 0%,#071b33 64%,#0a2746 100%);box-shadow:8px 0 24px rgba(15,40,68,.15);z-index:70}.rb-brand{height:92px;display:flex;justify-content:center;align-items:flex-start;border-bottom:1px solid rgba(255,255,255,.22)}.rb-brand img{height:44px;width:auto;max-width:175px;object-fit:contain;display:block}.rb-system{margin:16px 8px 14px;color:#f7fbff;font-size:clamp(11px,.75vw,14px);font-weight:900;letter-spacing:.85px}.rb-stage{margin:18px 13px 9px;color:#ffc43e;font-size:clamp(11px,.72vw,13px);font-weight:900;letter-spacing:.35px}.rb-nav{list-style:none;margin:0;padding:0}.rb-nav-item{min-height:46px;display:flex;align-items:center;gap:12px;padding:0 13px;margin:3px 0;border-radius:11px;color:#f5f7fb;font-size:clamp(12px,.76vw,14px);font-weight:700;transition:.18s ease}.rb-nav-item:hover{background:rgba(255,255,255,.10);transform:translateX(3px)}.rb-nav-item.active{background:linear-gradient(100deg,#ffe8a0,#edb640);color:#102341;box-shadow:0 5px 15px rgba(242,193,72,.28)}.rb-nav-icon{width:20px;flex:0 0 20px;text-align:center}.rb-nav.sub .rb-nav-item{padding-left:31px;font-size:12px}.rb-divider{height:1px;background:rgba(255,255,255,.18);margin:12px 7px}.rb-journey{margin-top:16px;min-height:142px;border-radius:14px;padding:21px 18px;border:1px solid rgba(255,255,255,.14);background:linear-gradient(90deg,rgba(6,20,38,.72),rgba(5,24,43,.34)),url("assets/overview/journey.jpg") center/cover no-repeat;overflow:hidden}.rb-journey p{max-width:150px;font-size:clamp(16px,1vw,20px);line-height:1.3;font-weight:700;margin:0}.rb-gold-stroke{width:72px;height:4px;background:#ffc544;border-radius:99px;transform:rotate(-6deg);margin-top:17px}'
@@ -590,16 +622,18 @@ function viewRegionalBoards(countryParam){
 
       function boardCard(b){
         const host=(()=>{try{return new URL(b.url).hostname.replace('www.','')}catch(e){return b.url}})();
-        const img=b.boardImg||b.ogImage||country.hero||'assets/overview/hero.jpg';
+        const preview=siteShot(b.url);
+        const fallback=b.boardImg||mediaFor(country).image||country.hero||'assets/overview/hero.jpg';
         return '<article class="rb-board-card">'
-          + '<div class="rb-board-image jb-og-img" data-url="'+esc(b.url)+'" data-fallback="'+esc(b.boardImg||'')+'" style="background-image:url(&quot;'+esc(img)+'&quot;)"><span class="rb-domain">'+esc(host)+'</span></div>'
+          + '<div class="rb-board-image" role="img" aria-label="'+esc(b.name)+' website preview" data-preview-source="'+esc(b.url)+'" style="background-image:url(&quot;'+esc(preview)+'&quot;),url(&quot;'+esc(fallback)+'&quot;)"><span class="rb-domain">'+esc(host)+'</span></div>'
           + '<div class="rb-board-body"><h3>'+esc(b.name)+'</h3><p>'+esc(b.desc||('Explore current opportunities available through '+b.name+'.'))+'</p>'
           + '<div class="rb-board-actions"><a class="rb-primary-link jb-open" data-board="'+esc(b.id)+'" href="'+esc(b.url)+'" target="_blank" rel="noopener">Open Job Board&nbsp; ↗</a><a class="rb-secondary-link" href="'+esc(b.demoUrl||b.url)+'" target="_blank" rel="noopener">Preview</a></div></div>'
           + '</article>';
       }
 
+      const selectedMedia=mediaFor(country);
       const main = '<main class="rb-content">'
-        + '<section class="rb-hero country" style="--rb-country-hero:url(&quot;'+esc(country.hero||'assets/overview/hero.jpg')+'&quot;)"><div class="rb-hero-copy"><div class="rb-eyebrow">✓ VERIFIED REGIONAL MARKETPLACE</div><h1>'+esc(country.flag||'')+' '+esc(country.name)+' <span>Job Boards</span></h1><p>Discover verified employment platforms for '+esc(country.name)+'. Search trusted local and international boards, compare opportunities, and continue building your 5-job accountability quota.</p></div></section>'
+        + '<section class="rb-hero country" data-landmark="'+esc(selectedMedia.landmark)+'" data-stock-source="'+esc(selectedMedia.source)+'" style="--rb-country-hero:url(&quot;'+esc(selectedMedia.image)+'&quot;)"><div class="rb-hero-copy"><div class="rb-eyebrow">✓ VERIFIED REGIONAL MARKETPLACE</div><h1>'+esc(country.flag||'')+' '+esc(country.name)+' <span>Job Boards</span></h1><p>Discover verified employment platforms for '+esc(country.name)+'. Search trusted local and international boards, compare opportunities, and continue building your 5-job accountability quota.</p></div></section>'
         + '<section class="rb-filterbar"><label class="rb-input-wrap"><svg class="rb-ico"><use href="#search"/></svg><input id="jbSearch" value="'+esc(F.q)+'" placeholder="Search boards, companies or domains..."></label>'
         + '<select id="jbCategory" class="rb-control"><option value="all" '+(F.category==='all'?'selected':'')+'>All Categories</option><option value="general" '+(F.category==='general'?'selected':'')+'>General</option><option value="tech" '+(F.category==='tech'?'selected':'')+'>Tech</option><option value="remote" '+(F.category==='remote'?'selected':'')+'>Remote</option></select>'
         + '<select id="jbSort" class="rb-control"><option value="name" '+(F.sort==='name'?'selected':'')+'>Sort: Name</option><option value="domain" '+(F.sort==='domain'?'selected':'')+'>Sort: Domain</option></select>'
@@ -625,8 +659,9 @@ function viewRegionalBoards(countryParam){
 
   function countryCard(country){
     const bc=countryBoards(country.id).length;
+    const media=mediaFor(country);
     return '<a href="#regional-boards/'+esc(country.id)+'" class="rb-country-card">'
-      + '<div class="rb-country-image" style="background-image:url(&quot;'+esc(country.hero||'assets/overview/hero.jpg')+'&quot;)"><span class="rb-region-chip">'+esc(country.region)+'</span><div class="rb-country-name">'+(country.flagImg?'<img class="rb-flag" loading="lazy" decoding="async" src="'+esc(country.flagImg)+'" alt="'+esc(country.name)+' flag" onerror="this.style.display=&quot;none&quot;">':'')+'<span>'+esc(country.name)+'</span></div></div>'
+      + '<div class="rb-country-image" role="img" aria-label="'+esc(media.landmark)+', '+esc(country.name)+'" title="'+esc(media.landmark)+'" data-landmark="'+esc(media.landmark)+'" data-stock-source="'+esc(media.source)+'" style="background-image:url(&quot;'+esc(media.image)+'&quot;),url(&quot;'+esc(country.hero||'assets/overview/hero.jpg')+'&quot;)"><span class="rb-region-chip">'+esc(country.region)+'</span><div class="rb-country-name">'+(country.flagImg?'<img class="rb-flag" loading="lazy" decoding="async" src="'+esc(country.flagImg)+'" alt="'+esc(country.name)+' flag" onerror="this.style.display=&quot;none&quot;">':'')+'<span>'+esc(country.name)+'</span></div></div>'
       + '<div class="rb-country-body"><p>'+bc+' verified job boards • Direct links to employment platforms for '+esc(country.name)+'.</p><div class="rb-country-footer"><span class="rb-open-label">Explore opportunities</span><span class="rb-arrow">→</span></div></div>'
       + '</a>';
   }
