@@ -156,11 +156,11 @@ function showToast(msg){
 
 /* ─── Sidebar (inline styled) ─── */
 
-/* ─── Shared Job Acquisition chrome: one sidebar + one topbar everywhere ─── */
-function jobIcon(name, cls){
-  const icons = {
-    menu:'<path d="M4 6h16M4 12h16M4 18h16"/>',
+/* ─── Exact Overview sidebar clone for every non-Overview Job Acquisition route ─── */
+function overviewSidebarIcon(name){
+  const paths={
     home:'<path d="m3 11 9-8 9 8"/><path d="M5 10v10h14V10M9 20v-6h6v6"/>',
+    menu:'<path d="M4 6h16M4 12h16M4 18h16"/>',
     bag:'<rect x="3" y="7" width="18" height="13" rx="2"/><path d="M8 7V5h8v2M3 12h18M10 12v2h4v-2"/>',
     chart:'<path d="M4 20V10M10 20V5M16 20v-8M22 20V2"/><path d="m3 9 6-4 6 5 7-8"/>',
     doc:'<path d="M6 2h9l4 4v16H6z"/><path d="M15 2v5h5M9 12h7M9 16h7"/>',
@@ -168,81 +168,58 @@ function jobIcon(name, cls){
     search:'<circle cx="10" cy="10" r="7"/><path d="m15 15 6 6"/>',
     image:'<rect x="3" y="5" width="18" height="15" rx="2"/><path d="m4 16 5-5 4 4 3-3 5 5M16 9h.01"/>',
     users:'<circle cx="8" cy="8" r="3"/><circle cx="17" cy="8" r="3"/><path d="M2 20v-2c0-3 2-5 6-5s6 2 6 5v2M14 14c4-1 8 1 8 5v1"/>',
-    help:'<circle cx="12" cy="12" r="10"/><path d="M9.5 9a2.7 2.7 0 1 1 4.5 2c-1.5 1-2 1.5-2 3M12 18h.01"/>',
-    bell:'<path d="M18 8a6 6 0 0 0-12 0c0 7-3 7-3 9h18c0-2-3-2-3-9M10 21h4"/>',
-    chat:'<path d="M4 4h16v13H8l-4 4z"/>'
+    help:'<circle cx="12" cy="12" r="10"/><path d="M9.5 9a2.7 2.7 0 1 1 4.5 2c-1.5 1-2 1.5-2 3M12 18h.01"/>'
   };
-  return '<svg class="'+(cls||'job-ico')+'" viewBox="0 0 24 24" aria-hidden="true">'+(icons[name]||icons.home)+'</svg>';
+  return '<svg class="ico" viewBox="0 0 24 24" aria-hidden="true">'+(paths[name]||paths.home)+'</svg>';
 }
-function jobSidebarContent(activeRoute){
-  const is = (route)=> activeRoute===route || (route==='cv-maker' && String(activeRoute||'').startsWith('cv-maker/'));
-  const placement = ['regional-boards','boost','cv-maker','cv-maker/cv','cv-maker/portfolio','interview-prep'].includes(activeRoute);
-  const learning = ['resources','events-hub','calendar','recordings','live-sessions'].includes(activeRoute);
-  const nav = (label,route,icon,active,parent)=>'<li class="nav-item'+(active?' active':'')+(parent?' parent':'')+'" role="button" tabindex="0" onclick="window._nav(\''+route+'\')" onkeydown="if(event.key===\'Enter\'||event.key===\' \'){event.preventDefault();window._nav(\''+route+'\')}">'+jobIcon(icon,'ico job-nav-ico')+esc(label)+(parent?'<span class="chev">⌄</span>':'')+'</li>';
+function overviewSidebarCopy(activeRoute){
+  const active=(route)=>activeRoute===route || (route==='cv-maker' && String(activeRoute||'').startsWith('cv-maker/'));
+  function item(label,route,icon,isActive,parent){
+    return '<li class="nav-item'+(isActive?' active':'')+(parent?' parent':'')+'" tabindex="0" role="button" onclick="window._nav(\''+route+'\')" onkeydown="if(event.key===\'Enter\'||event.key===\' \'){event.preventDefault();window._nav(\''+route+'\')}">'
+      +overviewSidebarIcon(icon)+esc(label)+(parent?'<span class="chev">⌄</span>':'')+'</li>';
+  }
   return ''
-    + '<div class="brand"><div class="brand-mark"><img decoding="async" fetchpriority="high" src="assets/logo.png" alt="Zeelin Academy Logo"></div></div>'
+    + '<div class="brand"><div class="brand-mark" style="justify-content:center"><img decoding="async" fetchpriority="high" src="assets/logo.png" alt="Zeelin Academy Logo" style="height:42px;width:auto;object-fit:contain;background:transparent"></div></div>'
     + '<div class="system-title">ZEELIN JOB READINESS SYSTEM</div>'
     + '<ul class="nav-main">'
-    + nav('Dashboard','overview','home',is('overview'),false)
-    + nav('Portal','portal','menu',is('portal'),false)
+    + item('Dashboard','overview','home',active('overview'),false)
+    + item('Portal','portal','menu',active('portal'),false)
     + '</ul>'
     + '<div class="stage">STAGE 3: CAREER GATE</div>'
-    + '<ul class="nav-main">'+nav('Placement Pipeline','regional-boards','bag',false,true)+'</ul>'
+    + '<ul class="nav-main">'+item('Placement Pipeline','regional-boards','bag',false,true)+'</ul>'
     + '<ul class="subnav">'
-    + nav('Regional Job Boards','regional-boards','bag',is('regional-boards'),false)
-    + nav('Boost & Accountability','boost','chart',is('boost'),false)
-    + nav('CV Maker & Portfolio','cv-maker','doc',is('cv-maker'),false)
+    + item('Regional Job Boards','regional-boards','bag',active('regional-boards'),false)
+    + item('Boost & Accountability','boost','chart',active('boost'),false)
+    + item('CV Maker & Portfolio','cv-maker','doc',active('cv-maker'),false)
     + '</ul>'
     + '<div class="divider"></div>'
     + '<ul class="nav-main">'
-    + nav('Learning Hub','resources','book',learning,false)
-    + nav('Job Opportunities','regional-boards','search',false,false)
-    + nav('Resources','resources','image',is('resources'),false)
-    + nav('Community','resources','users',false,false)
-    + nav('Help & Support','resources','help',false,false)
+    + item('Learning Hub','resources','book',active('resources'),false)
+    + item('Job Opportunities','regional-boards','search',false,false)
+    + item('Resources','resources','image',active('resources'),false)
+    + item('Community','resources','users',false,false)
+    + item('Help & Support','resources','help',false,false)
     + '</ul>'
     + '<div class="journey"><p>“Your Global Career Journey Starts Here.”</p><div class="gold-stroke"></div></div>';
 }
-function jobUnifiedTopbar(context, options){
-  const o=options||{};
-  const cls=(o.className?o.className+' ':'')+'job-unified-topbar';
-  const placeholder=o.placeholder||'Search for jobs, courses, resources...';
-  const searchId=o.searchId?(' id="'+o.searchId+'"'):'';
-  const onEnter=o.onEnter||"window._nav('regional-boards')";
-  let mobile='';
-  if(context==='overview'){
-    mobile='<button class="job-mobile-menu ov-burger" onclick="window._ovNav(true)" aria-label="Open navigation" aria-expanded="false">'+jobIcon('menu','job-ico')+'</button>';
-  }else if(context==='regional'){
-    mobile='<label class="job-mobile-menu rb-hamburger" for="rbNavToggle" aria-label="Open navigation">'+jobIcon('menu','job-ico')+'</label>';
-  }else{
-    mobile='<button class="job-mobile-menu topbar-hamburger" onclick="document.getElementById(\'sidebar\').classList.add(\'open\');document.getElementById(\'sidebarOverlay\').classList.add(\'show\')" aria-label="Open navigation">'+jobIcon('menu','job-ico')+'</button>';
-  }
-  return '<header class="'+cls+'">'
-    + mobile
-    + '<div class="job-topbar-brand"><img decoding="async" src="assets/logo.png" alt="Zeelin Academy Logo"></div>'
-    + '<label class="job-topbar-search">'+jobIcon('search','job-ico job-search-ico')+'<input'+searchId+' type="search" placeholder="'+esc(placeholder)+'" aria-label="'+esc(placeholder)+'" onkeydown="if(event.key===\'Enter\'){'+onEnter+'}"></label>'
-    + '<div class="job-topbar-spacer"></div>'
-    + '<div class="job-topbar-icons">'
-    + '<button class="job-icon-button job-notification" type="button" aria-label="Notifications, 3 unread" onclick="showToast(\'3 notifications\')">'+jobIcon('bell','job-ico')+'<span class="job-badge">3</span></button>'
-    + '<button class="job-icon-button" type="button" aria-label="Messages" onclick="showToast(\'Messages (demo)\')">'+jobIcon('chat','job-ico')+'</button>'
-    + '<div class="job-user" tabindex="0" role="button" aria-label="Open profile menu" aria-expanded="false" onclick="event.stopPropagation();var m=this.querySelector(\'.job-profile-menu\');var open=m.classList.toggle(\'open\');this.setAttribute(\'aria-expanded\',open?\'true\':\'false\')">'
-    + '<img decoding="async" class="job-avatar" src="assets/overview/avatar.jpg" alt="Wisdom Automa"><div class="job-user-copy"><strong>Wisdom Automa</strong><span>Learner</span></div><span class="job-chevron">⌄</span>'
-    + '<div class="job-profile-menu" role="menu" onclick="event.stopPropagation()"><button role="menuitem" onclick="showToast(\'Profile settings\')">Profile settings</button><button role="menuitem" onclick="showToast(\'Account settings\')">Account settings</button><button role="menuitem" onclick="window._nav(\'resources\')">Help &amp; Support</button></div>'
-    + '</div></div>'
-    + '</header>';
-}
 
 function renderSidebar(activeRoute){
-  return jobSidebarContent(activeRoute);
+  return overviewSidebarCopy(activeRoute);
 }
 
 /* ─── Topbar helper ─── */
 function topbarHtml(title, rightHtml, progressPct){
-  return jobUnifiedTopbar('global',{
-    className:'jb-topbar',
-    placeholder:'Search for jobs, courses, resources...',
-    onEnter:"window._nav('regional-boards')"
-  });
+  const pct = (progressPct!=null? progressPct : 25);
+  return '<div class="jb-topbar" style="height:78px;background-color:#181818;border-top:2px solid #3f3f3f;border-bottom:2px solid #3f3f3f;display:flex;align-items:center;justify-content:space-between;padding:0 32px;gap:16px;flex-shrink:0;">'
+    + '<div style="display:flex;align-items:center;gap:12px;flex-shrink:0;">'
+    + '<button onclick="document.getElementById(\'sidebar\').classList.add(\'open\');document.getElementById(\'sidebarOverlay\').classList.add(\'show\')" class="topbar-hamburger jb-burger" aria-label="Open navigation">☰</button>'
+    + '</div>'
+    + '<div style="flex:1;display:flex;align-items:center;justify-content:center;gap:12px;min-width:280px;">'
+    + '<span style="font-size:26px;font-weight:900;letter-spacing:1.2px;color:#ffffff;white-space:nowrap;text-align:center;width:100%;">'+esc(title.split(" •")[0])+'</span>'
+    + '<div style="flex:1;max-width:280px;height:12px;background-color:#161616;border:2px solid #3a3a3a;border-radius:6px;overflow:hidden;display:flex;flex-shrink:0;"><div style="width:'+pct+'%;height:100%;background:linear-gradient(90deg, #d97706 0%, #16a34a 100%);"></div></div>'
+    + '</div>'
+    + '<div style="display:flex;align-items:center;gap:16px;font-size:13px;font-weight:700;color:#d4d4d4;flex-shrink:0;"><a href="/portal.html" style="display:inline-flex;align-items:center;gap:6px;padding:6px 10px;border-radius:999px;background:#1e1e1e;border:1px solid #3a3a3a;color:#f59e0b;font-size:11px;font-weight:800;text-decoration:none">⟡ Portals</a>'+(rightHtml||'')+'</div>'
+    + '</div>';
 }
 
 /* ─── Views ─── */
@@ -347,20 +324,37 @@ function viewOverview(){
     + '<style>/* Overview stability audit */.overview-root .app>*{min-width:0}.overview-root .topbar{min-width:0}.overview-root .search input{width:100%;min-width:0}.overview-root .top-icons{max-width:calc(100% - 70px)}.overview-root .opps-head{gap:16px;min-width:0}.overview-root .opps-head>div:first-child{min-width:0}.overview-root .view-all{flex-shrink:0}.overview-root .support>div:nth-child(2){min-width:0;flex:1}.overview-root .support p{overflow-wrap:anywhere}.overview-root .motivation{height:auto;min-height:226px}.overview-root .motivation h3,.overview-root .motivation p{max-width:100%;overflow-wrap:anywhere}.overview-root .quote{height:auto;min-height:106px}.overview-root .profile-menu{cursor:default}.overview-root .profile-menu button{display:block}@media(min-width:1280px){.overview-root .sidebar{position:sticky;top:0;align-self:start;max-height:100dvh}.overview-root .right{height:auto;min-height:100dvh}.overview-root .feature-grid,.overview-root .jobs{align-items:stretch}.overview-root .feature,.overview-root .job{align-self:stretch}}@media(max-width:1279px){.overview-root .right{position:relative;top:auto;max-height:none;overflow:visible}.overview-root .opps-head{flex-wrap:wrap}.overview-root .support{flex-wrap:wrap;row-gap:10px}.overview-root .support .btn{margin-left:auto}}@media(max-width:767px){.overview-root .top-icons{max-width:none}.overview-root .opps-head{align-items:flex-start}.overview-root .view-all{font-size:12px}.overview-root .support .btn{width:100%;margin-left:0}.overview-root .profile-menu{display:none!important}.overview-root .profile-menu.open{display:block!important}.overview-root .user>.profile-menu{position:fixed!important;right:12px!important;top:68px!important;width:min(190px,calc(100vw - 24px))!important}.overview-root .user>.profile-menu button{display:block!important}.overview-root .user>.profile-menu{visibility:visible}}@media(max-width:479px){.overview-root .opps-head{display:block}.overview-root .view-all{margin-top:8px;display:inline-block}}</style>'
     + '<style>/* Guardrails: approved grid designs (must stay last) */@media(min-width:1280px){.overview-root .jobs{grid-template-columns:repeat(3,1fr)}.overview-root .feature-grid{grid-template-columns:repeat(4,1fr)}.overview-root .job{height:90px;min-height:0}.overview-root .feature{height:auto;min-height:177px;padding:15px 20px 46px}}@media(max-width:767px){.overview-root .hero-actions{flex-direction:row}.overview-root .hero-actions .btn{flex:1 1 0;min-width:0;width:auto}.overview-root .jobs{grid-template-columns:repeat(2,minmax(0,1fr))}.overview-root .feature-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.overview-root .job{aspect-ratio:1/1;min-height:0}.overview-root .feature{min-height:148px}}</style>' + '<style>/* Header icons viewport-anchored + visible scrollbars */@media(min-width:1280px){.overview-root .top-icons{position:fixed;right:38px;top:0;z-index:80;margin:0;background:#ffffff;border:none;border-radius:0;box-shadow:none;padding:0 14px}}@media(min-width:1280px){.overview-root .sidebar{position:sticky;top:0;align-self:start;max-height:100dvh;overflow-y:auto;overflow-x:hidden;height:auto}}#main-content{scrollbar-color:#c9d3e0 #ffffff}#main-content::-webkit-scrollbar-thumb{background:#c9d3e0;border:1px solid #e8edf4}.overview-root .sidebar,.overview-root .main,.overview-root .right{scrollbar-color:#c9d3e0 #ffffff}.overview-root .sidebar::-webkit-scrollbar-thumb,.overview-root .main::-webkit-scrollbar-thumb,.overview-root .right::-webkit-scrollbar-thumb{background:#c9d3e0;border:1px solid #e8edf4}@media(min-width:1280px){.overview-root .main{height:auto;max-height:none;overflow:visible}.overview-root .right{height:auto;max-height:none;overflow:visible;position:static}.overview-root .sidebar{height:auto;max-height:none;position:static}}</style>' + '<style>/* Hero motto in-flow with flanking dashes; columns fill viewport */.overview-root .hero-motto{display:flex;position:static;left:auto;bottom:auto;align-items:center;gap:12px;width:100%;margin:16px 0 0;color:#697183;font-size:9px;letter-spacing:4px;white-space:nowrap}.overview-root .hero-motto:before,.overview-root .hero-motto:after{content:"";height:2px;background:#b77a05;flex:1;min-width:22px}@media(min-width:1280px){.overview-root .sidebar{position:sticky;top:0;align-self:start;height:auto;min-height:100dvh;max-height:100dvh;overflow-y:auto;overflow-x:hidden}.overview-root .right{display:flex;flex-direction:column;min-height:100dvh}.overview-root .right>.quote{margin-top:auto}}@media(max-width:767px){.overview-root .hero-motto{margin-top:12px;letter-spacing:2.5px;font-size:8px}}</style>' + '<style>/* Smart header + topbar brand + sticky sidebar brand */.overview-root .topbar{position:fixed;top:0;z-index:75;transition:transform .28s ease;box-shadow:0 1px 0 #e8edf4,0 8px 22px rgba(27,50,85,.06)}.overview-root .topbar.ov-hidden{transform:translateY(-110%)}.overview-root .top-icons{transition:transform .28s ease,opacity .28s ease}.overview-root.ov-headhidden .top-icons{transform:translateY(-110%);opacity:0}.overview-root .ov-brand{display:flex;align-items:center;flex-shrink:0}.overview-root .ov-brand img{height:34px;width:auto;object-fit:contain;background:transparent}.overview-root .sidebar .brand{position:sticky;top:-24px;z-index:6;margin:-24px -15px 0;padding:24px 15px 23px;background:#0e2a47}@media(max-width:1279px){.overview-root>.top-icons{justify-content:flex-end;padding:10px 16px 0}}@media(max-width:767px){.overview-root .ov-brand img{height:28px}}.overview-root .workspace{padding-top:var(--ov-bar-h,73px)}@media(min-width:1280px){.overview-root .workspace{grid-column:2}.overview-root .right{grid-column:3}.overview-root .sidebar{position:fixed;top:0;left:0;width:var(--ov-side-w,307px);height:100dvh;min-height:0;max-height:100dvh;overflow-y:auto;overflow-x:hidden;z-index:70;align-self:auto}}</style>'
     + '</style>'
-    + '<style>/* Unified Job Acquisition chrome — keep last */'
-    + '.overview-root .sidebar.job-unified-sidebar{scrollbar-width:none!important}.overview-root .sidebar.job-unified-sidebar::-webkit-scrollbar{display:none!important}'
-    + '.overview-root .job-unified-topbar{position:sticky!important;top:0!important;left:auto!important;width:100%!important;transform:none!important}.overview-root .workspace{padding-top:0!important}'
-    + '@media(min-width:1280px){.overview-root .app{grid-template-columns:307px minmax(0,1fr) 400px!important}.overview-root .sidebar.job-unified-sidebar{position:static!important;left:auto!important;width:307px!important;height:auto!important;min-height:100%!important;max-height:none!important;overflow:visible!important;align-self:stretch!important}.overview-root .sidebar.job-unified-sidebar .brand{position:static!important;top:auto!important;margin:0!important;padding:0 0 23px!important;background:transparent!important}.overview-root .job-mobile-menu{display:none!important}}'
-    + '@media(max-width:1279px){.overview-root .sidebar.job-unified-sidebar{position:fixed!important;left:0!important;top:0!important;bottom:0!important;width:300px!important;max-width:86vw!important;height:100dvh!important;min-height:0!important;overflow-y:auto!important;scrollbar-width:none!important}.overview-root .job-mobile-menu{display:inline-flex!important}}'
-    + '</style>'
     + '<svg width="0" height="0" style="position:absolute"><defs>'
     + '<symbol id="menu" viewBox="0 0 24 24"><path d="M4 6h16M4 12h16M4 18h16"/></symbol><symbol id="home" viewBox="0 0 24 24"><path d="m3 11 9-8 9 8"/><path d="M5 10v10h14V10M9 20v-6h6v6"/></symbol><symbol id="target" viewBox="0 0 24 24"><circle cx="12" cy="12" r="8"/><circle cx="12" cy="12" r="3"/><path d="m15 9 6-6m-4 0h4v4"/></symbol><symbol id="bag" viewBox="0 0 24 24"><rect x="3" y="7" width="18" height="13" rx="2"/><path d="M8 7V5h8v2M3 12h18M10 12v2h4v-2"/></symbol><symbol id="chart" viewBox="0 0 24 24"><path d="M4 20V10M10 20V5M16 20v-8M22 20V2"/><path d="m3 9 6-4 6 5 7-8"/></symbol><symbol id="doc" viewBox="0 0 24 24"><path d="M6 2h9l4 4v16H6z"/><path d="M15 2v5h5M9 12h7M9 16h7"/></symbol><symbol id="book" viewBox="0 0 24 24"><path d="M3 5c4-2 7-1 9 1v15c-2-2-5-3-9-1zM21 5c-4-2-7-1-9 1v15c2-2 5-3 9-1z"/></symbol><symbol id="search" viewBox="0 0 24 24"><circle cx="10" cy="10" r="7"/><path d="m15 15 6 6"/></symbol><symbol id="image" viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="15" rx="2"/><path d="m4 16 5-5 4 4 3-3 5 5M16 9h.01"/></symbol><symbol id="users" viewBox="0 0 24 24"><circle cx="8" cy="8" r="3"/><circle cx="17" cy="8" r="3"/><path d="M2 20v-2c0-3 2-5 6-5s6 2 6 5v2M14 14c4-1 8 1 8 5v1"/></symbol><symbol id="help" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M9.5 9a2.7 2.7 0 1 1 4.5 2c-1.5 1-2 1.5-2 3M12 18h.01"/></symbol><symbol id="bell" viewBox="0 0 24 24"><path d="M18 8a6 6 0 0 0-12 0c0 7-3 7-3 9h18c0-2-3-2-3-9M10 21h4"/></symbol><symbol id="chat" viewBox="0 0 24 24"><path d="M4 4h16v13H8l-4 4z"/></symbol><symbol id="pin" viewBox="0 0 24 24"><path d="M20 10c0 5-8 12-8 12S4 15 4 10a8 8 0 1 1 16 0z"/><circle cx="12" cy="10" r="2"/></symbol><symbol id="bookmark" viewBox="0 0 24 24"><path d="M6 3h12v18l-6-4-6 4z"/></symbol><symbol id="cap" viewBox="0 0 24 24"><path d="m2 9 10-5 10 5-10 5zM6 11v5c3 3 9 3 12 0v-5M22 9v7"/></symbol>'
     + '</defs></svg>'
-    + '<div class="overview-root"><a class="ov-skip" href="#ov-main">Skip to main content</a>' + '<div class="app">'
-    + '<aside class="sidebar job-unified-sidebar" id="ovSidebar" role="navigation" aria-label="Primary">' + jobSidebarContent('overview') + '</aside>'
+    + '<div class="overview-root"><a class="ov-skip" href="#ov-main">Skip to main content</a>' + '<div class="top-icons"><div class="notification" tabindex="0" role="button" aria-label="Notifications, 3 unread" onclick="showToast(\'3 notifications\')" style="cursor:pointer"><svg class="ico"><use href="#bell"/></svg><span class="badge">3</span></div><svg class="ico" tabindex="0" role="button" aria-label="Messages" onclick="showToast(\'Messages (demo)\')" style="cursor:pointer"><use href="#chat"/></svg><div class="user" tabindex="0" role="button" aria-label="Open profile menu" aria-expanded="false" onclick="event.stopPropagation();var m=this.querySelector(\'.profile-menu\');var o=m.classList.toggle(\'open\');this.setAttribute(\'aria-expanded\',o?\'true\':\'false\')"><img decoding="async" class="avatar" src="assets/overview/avatar.jpg" alt="Wisdom Automa"><div><strong>Wisdom Automa</strong><span>Learner</span></div><span style="font-size:22px;color:#07143a">⌄</span><div class="profile-menu" role="menu" onclick="event.stopPropagation()"><button role="menuitem" onclick="showToast(\'Profile settings\')">Profile settings</button><button role="menuitem" onclick="showToast(\'Account settings\')">Account settings</button><button role="menuitem" onclick="window._nav(\'resources\')">Help &amp; Support</button></div></div></div>' + '<div class="app">'
+    + '<aside class="sidebar" id="ovSidebar" role="navigation" aria-label="Primary">'
+    + '<div class="brand"><div class="brand-mark" style="justify-content:center"><img decoding="async" fetchpriority="high" src="assets/logo.png" alt="Zeelin Academy Logo" style="height:42px;width:auto;object-fit:contain;background:transparent"></div></div>'
+    + '<div class="system-title">ZEELIN JOB READINESS SYSTEM</div>'
+    + '<ul class="nav-main">'
+    + '<li class="nav-item active" onclick="window._nav(\'overview\')"><svg class="ico"><use href="#home"/></svg>Dashboard</li>'
+    + '<li class="nav-item" onclick="location.href=\'/portal.html\'"><svg class="ico"><use href="#menu"/></svg>Portal</li>'
+    + '</ul>'
+    + '<div class="stage">STAGE 3: CAREER GATE</div>'
+    + '<ul class="nav-main"><li class="nav-item parent" onclick="window._nav(\'regional-boards\')"><svg class="ico"><use href="#bag"/></svg>Placement Pipeline <span class="chev">⌄</span></li></ul>'
+    + '<ul class="subnav">'
+    + '<li class="nav-item" onclick="window._nav(\'regional-boards\')"><svg class="ico"><use href="#bag"/></svg>Regional Job Boards</li>'
+    + '<li class="nav-item" onclick="window._nav(\'boost\')"><svg class="ico"><use href="#chart"/></svg>Boost &amp; Accountability</li>'
+    + '<li class="nav-item" onclick="window._nav(\'cv-maker\')"><svg class="ico"><use href="#doc"/></svg>CV Maker &amp; Portfolio</li>'
+    + '</ul>'
+    + '<div class="divider"></div>'
+    + '<ul class="nav-main">'
+    + '<li class="nav-item" onclick="window._nav(\'resources\')"><svg class="ico"><use href="#book"/></svg>Learning Hub</li>'
+    + '<li class="nav-item" onclick="window._nav(\'regional-boards\')"><svg class="ico"><use href="#search"/></svg>Job Opportunities</li>'
+    + '<li class="nav-item" onclick="window._nav(\'resources\')"><svg class="ico"><use href="#image"/></svg>Resources</li>'
+    + '<li class="nav-item" onclick="window._nav(\'resources\')"><svg class="ico"><use href="#users"/></svg>Community</li>'
+    + '<li class="nav-item" onclick="window._nav(\'resources\')"><svg class="ico"><use href="#help"/></svg>Help &amp; Support</li>'
+    + '</ul>'
+    + '<div class="journey"><p>“Your Global Career Journey Starts Here.”</p><div class="gold-stroke"></div></div>'
+    + '</aside>'
     + '<div class="ov-overlay" onclick="window._ovNav(false)" aria-hidden="true"></div>'
     + '<section class="workspace">'
-    + jobUnifiedTopbar('overview',{className:'topbar',searchId:'ovSearch',placeholder:'Search for jobs, courses, resources...',onEnter:"window._nav('regional-boards')"})
+    + '<header class="topbar"><button class="ov-burger" onclick="window._ovNav(true)" aria-label="Open navigation" aria-expanded="false"><svg class="ico" viewBox="0 0 24 24"><use href="#menu"/></svg></button><svg class="ico" onclick="window._nav(\'portal\')" style="cursor:pointer"><use href="#menu"/></svg><div class="ov-brand"><img decoding="async" src="assets/logo.png" alt="Zeelin Academy Logo"></div><div class="search"><svg class="ico" style="width:19px;flex-shrink:0;" aria-hidden="true"><use href="#search"/></svg><input id="ovSearch" type="search" placeholder="Search for jobs, courses, resources..." aria-label="Search for jobs, courses, resources" onkeydown="if(event.key===\'Enter\'){window._nav(\'regional-boards\')}" style="flex:1;min-width:0;background:transparent;border:none;outline:none;color:#4c5772;font-size:14px;font-family:inherit;"></div>' + '</header>'
     + '<main class="main" id="ov-main">'
     + '<section class="hero">'
     + '<img class="hero-photo" src="assets/overview/hero.jpg" alt="Smiling professional woman at her laptop">'
@@ -535,9 +529,10 @@ function viewRegionalBoards(countryParam){
     + '.rb-right{min-width:0}.rb-filterbar .rb-ico{width:18px;height:18px;color:#65728b}'
     + '@media(max-width:1279px){.rb-app{display:flex;flex-direction:column;min-height:0}.rb-workspace{width:100%;overflow:visible}.rb-sidebar{position:fixed;left:0;top:0;bottom:0;width:300px;max-width:86vw;height:100dvh;min-height:0;overflow-y:auto;z-index:95;transform:translateX(-106%);transition:transform .25s ease;border-radius:0 16px 16px 0}.rb-nav-toggle:checked~.rb-app .rb-sidebar{transform:none}.rb-hamburger{display:inline-flex;width:42px;height:42px;flex-shrink:0;align-items:center;justify-content:center;background:#fff;border:1px solid #e8edf4;border-radius:12px;color:#07143a;cursor:pointer}.rb-portal-icon{display:none}.rb-topbar{position:sticky;top:0;flex-wrap:wrap;height:auto;min-height:73px;row-gap:10px}.rb-search{flex:1;min-width:200px;width:auto}.rb-top-icons{position:static;height:auto;margin-left:auto;margin-bottom:0;background:transparent;border:0;border-radius:0;padding:0;box-shadow:none}.rb-right{width:100%;border-left:0;border-top:1px solid #e6ecf2}.rb-right-inner{position:static;display:grid;grid-template-columns:repeat(3,minmax(0,1fr))}}'
     + '@media(max-width:767px){.rb-topbar{padding:12px 14px;gap:10px}.rb-search{order:3;flex-basis:100%}.rb-profile-text{display:none}.rb-top-icons{margin-left:auto;gap:14px}.rb-avatar{width:36px;height:36px}.rb-profile-trigger{border-left:0;padding-left:0}.rb-profile-chevron{display:none}.rb-right-inner{grid-template-columns:1fr}}'
-    + '.rb-sidebar.job-unified-sidebar{scrollbar-width:none!important}.rb-sidebar.job-unified-sidebar::-webkit-scrollbar{display:none!important}.rb-topbar.job-unified-topbar{position:sticky!important;top:0!important;transform:none!important}'
-    + '@media(min-width:1280px){.rb-app{grid-template-columns:307px minmax(0,1fr) 400px!important}.rb-sidebar.job-unified-sidebar{position:static!important;left:auto!important;width:307px!important;height:auto!important;min-height:100%!important;max-height:none!important;overflow:visible!important;align-self:stretch!important;padding:24px 15px 20px!important}.rb-sidebar.job-unified-sidebar .brand{height:104px;display:flex;align-items:flex-start;justify-content:center;border-bottom:1px solid rgba(255,255,255,.28);padding:0 0 23px!important;margin:0!important;background:transparent!important}.rb-sidebar.job-unified-sidebar .brand img{height:42px;width:auto}.rb-sidebar.job-unified-sidebar .system-title{font-size:15px;letter-spacing:1px;font-weight:800;margin:16px 7px 18px}.rb-sidebar.job-unified-sidebar .nav-item{height:50px;min-height:50px;display:flex;align-items:center;gap:18px;padding:0 18px;border-radius:11px;font-size:15px;font-weight:400;margin:2px 0}.rb-sidebar.job-unified-sidebar .subnav .nav-item{height:46px;min-height:46px;padding-left:44px;font-size:14px;gap:20px}.rb-sidebar.job-unified-sidebar .stage{font-size:14px;margin:19px 15px 12px}.rb-sidebar.job-unified-sidebar .journey{height:160px;min-height:160px;padding:26px 24px}.rb-sidebar.job-unified-sidebar .journey p{font-size:20px;line-height:1.28;font-weight:500;width:150px}.rb-sidebar.job-unified-sidebar .gold-stroke{width:77px}.rb-sidebar.job-unified-sidebar .job-nav-ico{width:23px;height:23px}.rb-sidebar.job-unified-sidebar .chev{margin-left:auto}.rb-sidebar.job-unified-sidebar .divider{height:1px;background:rgba(255,255,255,.22);margin:10px 7px 12px}.rb-sidebar.job-unified-sidebar .nav-main,.rb-sidebar.job-unified-sidebar .subnav{list-style:none;margin:0;padding:0}.rb-sidebar.job-unified-sidebar .nav-item.active{background:linear-gradient(100deg,#ffe8a0,#edb640);color:#102341;font-weight:800;box-shadow:0 4px 16px rgba(242,193,72,.32)}.rb-sidebar.job-unified-sidebar .job-mobile-menu{display:none!important}}'
-    + '@media(max-width:1279px){.rb-sidebar.job-unified-sidebar{position:fixed!important;left:0!important;top:0!important;bottom:0!important;width:300px!important;max-width:86vw!important;height:100dvh!important;min-height:0!important;overflow-y:auto!important;scrollbar-width:none!important}.rb-topbar .job-mobile-menu{display:inline-flex!important}}'
+    + '.rb-sidebar.overview-sidebar-copy{background:radial-gradient(circle at 110% 21%,rgba(200,147,35,.25),transparent 24%),linear-gradient(145deg,#102d4a 0%,#071b33 62%,#0a2746 100%)!important;color:#f7fbff!important;padding:24px 15px 20px!important;box-shadow:8px 0 22px rgba(15,40,68,.16)!important;scrollbar-width:thin!important;scrollbar-color:#c9d3e0 #ffffff!important}.rb-sidebar.overview-sidebar-copy::-webkit-scrollbar{width:6px!important}.rb-sidebar.overview-sidebar-copy::-webkit-scrollbar-track{background:#ffffff!important}.rb-sidebar.overview-sidebar-copy::-webkit-scrollbar-thumb{background:#c9d3e0!important;border:1px solid #e8edf4!important;border-radius:999px!important}.rb-sidebar.overview-sidebar-copy .ico{width:23px;height:23px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;display:inline-block;vertical-align:middle;flex:0 0 auto}.rb-sidebar.overview-sidebar-copy .brand{height:104px;display:flex;align-items:flex-start;justify-content:center;border-bottom:1px solid rgba(255,255,255,.28);padding:0 0 23px}.rb-sidebar.overview-sidebar-copy .system-title{font-size:15px;letter-spacing:1px;font-weight:800;margin:16px 7px 18px}.rb-sidebar.overview-sidebar-copy .nav-main,.rb-sidebar.overview-sidebar-copy .subnav{list-style:none;margin:0;padding:0}.rb-sidebar.overview-sidebar-copy .nav-item{height:50px;display:flex;align-items:center;gap:18px;padding:0 18px;border-radius:11px;font-size:15px;font-weight:400;margin:2px 0;color:#f5f7fb;cursor:pointer}.rb-sidebar.overview-sidebar-copy .nav-item.active{background:linear-gradient(100deg,#ffe8a0,#edb640);color:#102341;font-weight:800;box-shadow:0 4px 16px rgba(242,193,72,.32)}.rb-sidebar.overview-sidebar-copy .stage{color:#ffc43e;font-weight:800;font-size:14px;letter-spacing:.3px;margin:19px 15px 12px}.rb-sidebar.overview-sidebar-copy .nav-item.parent{font-weight:700}.rb-sidebar.overview-sidebar-copy .chev{margin-left:auto}.rb-sidebar.overview-sidebar-copy .subnav .nav-item{height:46px;padding-left:44px;font-size:14px;gap:20px}.rb-sidebar.overview-sidebar-copy .divider{height:1px;background:rgba(255,255,255,.22);margin:10px 7px 12px}.rb-sidebar.overview-sidebar-copy .journey{height:160px;border:1px solid rgba(255,255,255,.15);border-radius:14px;margin-top:17px;padding:26px 24px;background:linear-gradient(90deg,rgba(6,20,38,.58),rgba(5,24,43,.2)),url("assets/overview/journey.jpg") center/cover;color:#fff;position:relative;overflow:hidden;flex-shrink:0}.rb-sidebar.overview-sidebar-copy .journey p{margin:0;font-size:20px;line-height:1.28;font-weight:500;width:150px}.rb-sidebar.overview-sidebar-copy .gold-stroke{width:77px;height:4px;background:#ffc544;border-radius:99px;transform:rotate(-7deg);margin-top:18px}'
+    + '@media(min-width:1280px){.rb-app{grid-template-columns:clamp(210px,13.5vw,270px) minmax(0,1fr) clamp(280px,19vw,360px)!important}.rb-sidebar.overview-sidebar-copy{position:sticky!important;top:0!important;align-self:start!important;width:100%!important;height:100dvh!important;min-height:0!important;max-height:100dvh!important;overflow-y:auto!important;overflow-x:hidden!important}.rb-workspace{grid-column:auto!important}.rb-right{grid-column:auto!important}}'
+    + '@media(min-width:1280px) and (max-width:1450px){.rb-app{grid-template-columns:220px minmax(0,1fr) 290px!important}.rb-sidebar.overview-sidebar-copy{padding-left:8px!important;padding-right:8px!important}.rb-sidebar.overview-sidebar-copy .nav-item{padding-left:10px;padding-right:10px;gap:10px}.rb-sidebar.overview-sidebar-copy .subnav .nav-item{padding-left:24px}}'
+    + '@media(max-width:1279px){.rb-sidebar.overview-sidebar-copy{position:fixed!important;left:0!important;top:0!important;bottom:0!important;width:300px!important;max-width:86vw!important;height:100dvh!important;min-height:0!important;overflow-y:auto!important;transform:translateX(-106%);transition:transform .25s ease;border-radius:0 16px 16px 0;z-index:95}.rb-nav-toggle:checked~.rb-app .rb-sidebar.overview-sidebar-copy{transform:none}}'
     + '</style>';
 
   const icons = '<svg width="0" height="0" style="position:absolute"><defs>'
@@ -556,15 +551,18 @@ function viewRegionalBoards(countryParam){
     + '</defs></svg>';
 
   function sidebar(){
-    return '<aside class="rb-sidebar job-unified-sidebar" role="navigation" aria-label="Primary">'+jobSidebarContent('regional-boards')+'</aside>';
+    return '<aside class="rb-sidebar overview-sidebar-copy" role="navigation" aria-label="Primary">'+overviewSidebarCopy('regional-boards')+'</aside>';
   }
 
   function topbar(){
-    return jobUnifiedTopbar('regional',{
-      className:'rb-topbar',
-      placeholder:'Search countries, regions, or job boards...',
-      onEnter:"var s=document.getElementById('jbCountrySearch')||document.getElementById('jbSearch');if(s){s.focus()}"
-    });
+    return '<header class="rb-topbar">'
+      + '<label class="rb-hamburger" for="rbNavToggle" aria-label="Open navigation"><svg class="rb-ico"><use href="#menu"/></svg></label>'
+      + '<svg class="rb-ico rb-portal-icon" onclick="window._nav(\'portal\')" aria-label="Portal"><use href="#menu"/></svg>'
+      + '<label class="rb-search"><svg class="rb-ico rb-search-small" aria-hidden="true"><use href="#search"/></svg><input type="search" placeholder="Search countries, regions, or job boards..."></label>'
+      + '<div class="rb-top-spacer"></div>'
+      + '<div class="rb-top-icons"><button class="rb-icon-button" type="button" aria-label="Notifications, 3 unread" onclick="showToast(&quot;3 notifications&quot;)"><svg class="rb-ico"><use href="#bell"/></svg><span class="rb-badge">3</span></button><button class="rb-icon-button" type="button" aria-label="Messages" onclick="showToast(&quot;Messages (demo)&quot;)"><svg class="rb-ico"><use href="#chat"/></svg></button>'
+      + '<details class="rb-profile"><summary class="rb-profile-trigger"><img decoding="async" class="rb-avatar" src="assets/overview/avatar.jpg" alt="Wisdom Automa"><div class="rb-profile-text"><strong>Wisdom Automa</strong><span>Learner</span></div><span class="rb-profile-chevron">⌄</span></summary><div class="rb-dropdown"><a href="#" onclick="showToast(&quot;Profile settings&quot;);return false">Profile settings</a><a href="#" onclick="showToast(&quot;Account settings&quot;);return false">Account settings</a><a href="#resources">Help &amp; Support</a></div></details>'
+      + '</div></header>';
   }
 
   function shell(mainHtml,rightHtml){
@@ -1623,7 +1621,7 @@ window._contactSupport = function(){ showToast('Contact Support: support@zeelin.
 function updateSidebar(activeRoute){
   const sb=document.getElementById('sidebar');
   if(sb){
-    sb.classList.add('job-unified-sidebar');
+    sb.classList.add('overview-sidebar-copy');
     sb.innerHTML=renderSidebar(activeRoute);
   }
   const fullWidth=['overview','regional-boards'].includes(activeRoute);
@@ -1632,12 +1630,12 @@ function updateSidebar(activeRoute){
   const sidebarEl=document.getElementById('sidebar');
   if(fullWidth){
     if(sidebarEl) sidebarEl.style.display='none';
-    if(layout){ layout.style.display='block'; layout.style.background='#ffffff'; }
+    if(layout){layout.style.display='block';layout.style.background='#ffffff';}
     if(mainWrap) mainWrap.style.background='#ffffff';
     try{document.body.style.background='#ffffff';}catch(e){}
   }else{
-    if(sidebarEl){ sidebarEl.style.display='flex'; sidebarEl.style.width='307px'; }
-    if(layout){ layout.style.display='flex'; layout.style.background=''; }
+    if(sidebarEl){sidebarEl.style.display='flex';sidebarEl.style.width='';}
+    if(layout){layout.style.display='flex';layout.style.background='';}
     if(mainWrap) mainWrap.style.background='';
     try{document.body.style.background='';}catch(e){}
   }
@@ -1702,22 +1700,42 @@ function render(view, param){
 /* ─── Overview smart header: hide on scroll down, reveal on scroll up ─── */
 function ovSyncHeader(){
   try{
-    const main=document.getElementById('main-content');
+    const main = document.getElementById('main-content');
     if(!main) return;
-    const root=main.querySelector('.overview-root');
+    const root = main.querySelector('.overview-root');
     if(!root) return;
-    const bar=root.querySelector('.topbar');
-    if(bar) root.style.setProperty('--ov-bar-h',bar.offsetHeight+'px');
-    const sb=root.querySelector('.sidebar');
-    if(sb){ sb.style.left=''; sb.style.width=''; }
-    if(bar){ bar.style.left=''; bar.style.width=''; }
+    const ws = root.querySelector('.workspace');
+    const bar = root.querySelector('.topbar');
+    if(!ws || !bar) return;
+    const r = ws.getBoundingClientRect();
+    bar.style.left = r.left + 'px';
+    bar.style.width = r.width + 'px';
+    const sb = root.querySelector('.sidebar');
+    const appEl = root.querySelector('.app');
+    if(sb && appEl && window.innerWidth >= 1280){
+      const ar = appEl.getBoundingClientRect();
+      sb.style.left = ar.left + 'px';
+      sb.style.width = (r.left - ar.left) + 'px';
+    } else if(sb){ sb.style.left=''; sb.style.width=''; }
+    root.style.setProperty('--ov-bar-h', bar.offsetHeight + 'px');
   }catch(e){}
 }
 function bindOvSmartHeader(){
-  const main=document.getElementById('main-content');
+  const main = document.getElementById('main-content');
   if(!main || main.dataset.ovSmart) return;
-  main.dataset.ovSmart='1';
-  window.addEventListener('resize',ovSyncHeader);
+  main.dataset.ovSmart = '1';
+  window.addEventListener('resize', ovSyncHeader);
+  let last = 0;
+  main.addEventListener('scroll', function(){
+    const root = main.querySelector('.overview-root');
+    if(!root) return;
+    const bar = root.querySelector('.topbar');
+    if(!bar) return;
+    const st = main.scrollTop;
+    if(st > 140 && st > last + 4){ bar.classList.add('ov-hidden'); root.classList.add('ov-headhidden'); }
+    else if(st < last - 4){ bar.classList.remove('ov-hidden'); root.classList.remove('ov-headhidden'); }
+    last = st;
+  }, {passive:true});
 }
 
 /* ─── Overlay helper ─── */
@@ -1746,11 +1764,6 @@ window.addEventListener('DOMContentLoaded', function(){
   document.addEventListener('click', function(e){
     const link=e.target.closest('.sidebar a');
     if(link) closeSidebar();
-  });
-  document.addEventListener('click', function(e){
-    if(e.target.closest && e.target.closest('.job-user')) return;
-    document.querySelectorAll('.job-profile-menu.open').forEach(function(m){m.classList.remove('open');});
-    document.querySelectorAll('.job-user[aria-expanded="true"]').forEach(function(u){u.setAttribute('aria-expanded','false');});
   });
   // global drag prevention
   document.addEventListener('dragover', e=>e.preventDefault());
