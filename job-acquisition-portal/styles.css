@@ -122,3 +122,175 @@ html{scroll-behavior:smooth}
   .jb-split div{min-width:0!important}
   .jb-split a{overflow-wrap:anywhere}
 }
+
+
+/* =========================================================
+   JOB ACQUISITION — SHARED SIDEBAR + TOPBAR
+   One visual chrome for Overview, Regional Boards and every route.
+   ========================================================= */
+.job-ico,.job-nav-ico{
+  width:23px;height:23px;fill:none;stroke:currentColor;stroke-width:2;
+  stroke-linecap:round;stroke-linejoin:round;display:inline-block;
+  vertical-align:middle;flex:0 0 auto;
+}
+.sidebar.job-unified-sidebar{
+  width:307px!important;
+  background:
+    radial-gradient(circle at 110% 21%,rgba(200,147,35,.25),transparent 24%),
+    linear-gradient(145deg,#102d4a 0%,#071b33 62%,#0a2746 100%)!important;
+  color:#f7fbff!important;
+  border-right:0!important;
+  padding:24px 15px 20px!important;
+  box-shadow:8px 0 22px rgba(15,40,68,.16)!important;
+  overflow-y:auto!important;
+  overflow-x:hidden!important;
+  scrollbar-width:none!important;
+}
+.sidebar.job-unified-sidebar::-webkit-scrollbar{display:none!important;width:0!important;height:0!important}
+.job-unified-sidebar .brand{
+  height:104px;display:flex;align-items:flex-start;justify-content:center;
+  border-bottom:1px solid rgba(255,255,255,.28);padding:0 0 23px;margin:0;
+  flex-shrink:0;
+}
+.job-unified-sidebar .brand-mark{display:flex;align-items:center;justify-content:center;gap:10px}
+.job-unified-sidebar .brand img{height:42px;width:auto;object-fit:contain;background:transparent}
+.job-unified-sidebar .system-title{
+  font-size:15px;letter-spacing:1px;font-weight:800;margin:16px 7px 18px;color:#f7fbff;
+}
+.job-unified-sidebar .nav-main,.job-unified-sidebar .subnav{list-style:none;margin:0;padding:0}
+.job-unified-sidebar .nav-item{
+  height:50px;display:flex;align-items:center;gap:18px;padding:0 18px;
+  border-radius:11px;font-size:15px;font-weight:400;margin:2px 0;color:#f5f7fb;
+  cursor:pointer;transition:background .18s ease,transform .18s ease;
+  user-select:none;
+}
+.job-unified-sidebar .nav-item:hover{background:rgba(255,255,255,.14);transform:translateX(4px)}
+.job-unified-sidebar .nav-item.active{
+  background:linear-gradient(100deg,#ffe8a0,#edb640);color:#102341;font-weight:800;
+  box-shadow:0 4px 16px rgba(242,193,72,.32);
+}
+.job-unified-sidebar .nav-item.active:hover{transform:none}
+.job-unified-sidebar .stage{
+  color:#ffc43e;font-weight:800;font-size:14px;letter-spacing:.3px;margin:19px 15px 12px;
+}
+.job-unified-sidebar .nav-item.parent{font-weight:700}
+.job-unified-sidebar .chev{margin-left:auto}
+.job-unified-sidebar .subnav .nav-item{height:46px;padding-left:44px;font-size:14px;gap:20px}
+.job-unified-sidebar .divider{height:1px;background:rgba(255,255,255,.22);margin:10px 7px 12px}
+.job-unified-sidebar .journey{
+  height:160px;border:1px solid rgba(255,255,255,.15);border-radius:14px;margin-top:17px;
+  padding:26px 24px;
+  background:linear-gradient(90deg,rgba(6,20,38,.58),rgba(5,24,43,.2)),
+             url('assets/overview/journey.jpg') center/cover;
+  color:white;position:relative;overflow:hidden;flex-shrink:0;
+}
+.job-unified-sidebar .journey p{margin:0;font-size:20px;line-height:1.28;font-weight:500;width:150px}
+.job-unified-sidebar .gold-stroke{
+  width:77px;height:4px;background:#ffc544;border-radius:99px;
+  transform:rotate(-7deg);margin-top:18px;
+}
+
+/* Shared topbar. Desktop has no hamburger; mobile/tablet gets the drawer trigger. */
+.job-unified-topbar{
+  position:sticky;top:0;z-index:75;height:73px;min-height:73px;
+  background:rgba(255,255,255,.98);display:flex;align-items:center;
+  padding:0 31px;gap:24px;border:0;border-bottom:1px solid #e8edf4;
+  box-shadow:0 1px 0 #e8edf4,0 8px 22px rgba(27,50,85,.06);
+  color:#07143a;flex-shrink:0;
+}
+.job-mobile-menu{
+  display:none!important;width:42px;height:42px;flex:0 0 42px;
+  align-items:center;justify-content:center;background:#fff;border:1px solid #e8edf4;
+  border-radius:12px;color:#07143a;cursor:pointer;padding:0;
+}
+.job-mobile-menu .job-ico{width:22px;height:22px}
+.job-topbar-brand{display:flex;align-items:center;flex:0 0 auto}
+.job-topbar-brand img{height:34px;width:auto;object-fit:contain;background:transparent}
+.job-topbar-search{
+  width:445px;height:42px;border-radius:24px;background:#f1f4f8;
+  display:flex;align-items:center;gap:16px;padding:0 18px;color:#4c5772;
+  border:1px solid transparent;flex:0 1 445px;
+}
+.job-topbar-search:focus-within{background:#fff;border-color:#ccd8e6;box-shadow:0 0 0 4px rgba(7,88,207,.06)}
+.job-topbar-search .job-search-ico{width:19px;height:19px;flex-shrink:0}
+.job-topbar-search input{
+  width:100%;min-width:0;background:transparent;border:0;outline:0;
+  color:#4c5772;font:14px Inter,"Segoe UI",Arial,sans-serif;
+}
+.job-topbar-search input::placeholder{color:#8a94a8}
+.job-topbar-spacer{flex:1;min-width:20px}
+.job-topbar-icons{
+  position:fixed;right:38px;top:0;z-index:80;height:73px;
+  display:flex;align-items:center;gap:27px;color:#07143a;
+  background:#fff;padding:0 14px;
+}
+.job-icon-button{
+  width:23px;height:23px;display:grid;place-items:center;border:0;background:transparent;
+  color:#07143a;padding:0;cursor:pointer;position:relative;
+}
+.job-icon-button .job-ico{width:23px;height:23px}
+.job-notification{position:relative}
+.job-badge{
+  position:absolute;right:-10px;top:-9px;width:18px;height:18px;border-radius:50%;
+  background:#e21b2d;color:#fff;font-size:10px;display:grid;place-items:center;border:2px solid #fff;
+}
+.job-user{
+  position:relative;display:flex;align-items:center;gap:10px;border-left:1px solid #e6ebf2;
+  padding:7px 9px 7px 19px;margin-left:3px;border-radius:12px;cursor:pointer;
+  transition:transform .18s ease,background .18s ease,box-shadow .18s ease;
+}
+.job-user:hover,.job-user:focus-within{
+  transform:translateY(-2px);background:#f7f9fc;box-shadow:0 6px 18px rgba(27,50,85,.10);
+}
+.job-avatar{
+  width:47px;height:47px;border-radius:50%;object-fit:cover;filter:grayscale(1);
+  transition:transform .2s ease,box-shadow .2s ease;
+}
+.job-user:hover .job-avatar{transform:scale(1.06);box-shadow:0 0 0 3px #f2c65d}
+.job-user-copy strong{display:block;font-size:13px;color:#07143a}
+.job-user-copy span{display:block;font-size:11px;color:#697590;margin-top:4px}
+.job-chevron{font-size:22px;color:#07143a}
+.job-profile-menu{
+  display:none;position:absolute;right:0;top:62px;width:190px;background:#fff;
+  border:1px solid #e1e7ef;border-radius:12px;padding:7px;
+  box-shadow:0 14px 34px rgba(20,40,70,.18);z-index:120;
+}
+.job-profile-menu.open{display:block}
+.job-profile-menu button{
+  width:100%;border:0;background:transparent;text-align:left;padding:10px 12px;
+  border-radius:8px;color:#07143a;font:600 13px Inter,"Segoe UI",Arial,sans-serif;cursor:pointer;
+}
+.job-profile-menu button:hover{background:#f1f4f8}
+
+/* Legacy Job Acquisition views use the same exact chrome too. */
+@media(min-width:901px){
+  .layout>.sidebar.job-unified-sidebar{width:307px!important;min-width:307px!important}
+  .topbar-hamburger{display:none!important}
+}
+@media(max-width:1279px){
+  .job-unified-topbar{height:auto;min-height:73px;flex-wrap:wrap;padding:10px 16px;gap:12px}
+  .job-mobile-menu{display:inline-flex!important}
+  .job-topbar-brand img{height:30px}
+  .job-topbar-search{flex:1 1 280px;width:auto;min-width:200px}
+  .job-topbar-icons{
+    position:static;height:auto;margin-left:auto;background:transparent;padding:0;gap:14px;
+  }
+}
+@media(max-width:900px){
+  .sidebar.job-unified-sidebar{
+    width:300px!important;max-width:86vw!important;height:100dvh!important;
+    position:fixed!important;left:0;top:0;bottom:0;overflow-y:auto!important;
+    transform:translateX(-106%);transition:transform .25s ease;border-radius:0 16px 16px 0;
+    z-index:95;box-shadow:18px 0 40px rgba(7,20,58,.35)!important;
+  }
+  .sidebar.job-unified-sidebar.open{transform:none}
+}
+@media(max-width:767px){
+  .job-unified-topbar{padding:10px 13px}
+  .job-topbar-search{order:3;flex-basis:100%;width:100%}
+  .job-user-copy{display:none}
+  .job-avatar{width:36px;height:36px}
+  .job-user{border-left:0;padding-left:0}
+  .job-chevron{display:none}
+  .job-profile-menu{position:fixed;right:12px;top:68px}
+}
