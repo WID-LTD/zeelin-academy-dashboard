@@ -453,8 +453,9 @@ function renderSidebar() {
       + (isOpen ? days : '') + `</div>`;
   };
   $('#sidebar').innerHTML = `
-    <div style="padding:22px 16px;border-bottom:2px solid #3a3a3a;display:flex;align-items:center;justify-content:center;text-align:center;">
-      <span style="font-size:13px;font-weight:800;color:#ffffff;letter-spacing:1px;line-height:1.4;">ZEELIN JOB READINESS SYSTEM</span>
+    <div class="training-sidebar-brand">
+      <img decoding="async" src="${A}logo.png" alt="Zeelin Academy Logo">
+      <span>ZEELIN JOB READINESS SYSTEM</span>
     </div>
     <div style="padding:12px 8px;display:flex;flex-direction:column;gap:4px;font-size:13px;">
       ${navA('guide','#/guide','info','User Guide')}
@@ -493,11 +494,8 @@ function renderTopbar() {
   const crumb = routeName === 'home' ? 'Your Courses' : `${esc(dayCard(STATE.day).title)} - Day ${STATE.day} of 7`;
   $('#topbar').innerHTML = `
     <button class="burger" id="burger" aria-label="Open navigation" aria-expanded="false">${ic('burger', 20, 20)}</button>
-    <div style="display:flex;align-items:center;gap:12px;flex-shrink:0;">
-      <img decoding="async" fetchpriority="high" src="${A}logo.png" alt="Zeelin Academy Logo" style="height:42px;width:auto;object-fit:contain;">
-    </div>
-    <div style="flex:1;display:flex;align-items:center;justify-content:center;min-width:280px;">
-      <span style="font-size:26px;font-weight:900;letter-spacing:1.2px;color:#ffffff;white-space:nowrap;text-align:center;width:100%;">ZEELIN JOB TRAINING PORTAL</span>
+    <div class="training-topbar-title">
+      <span>ZEELIN JOB TRAINING PORTAL</span>
     </div>
     <div class="top-actions" style="flex-shrink:0;">
       <a href="/portal.html" class="top-chip" style="text-decoration:none;border-color:#3a3a3a;background:#1e1e1e;color:#f59e0b" title="Switch Portal">${ic('layers', 14, 14)} Portals</a>
