@@ -134,7 +134,7 @@ function route(){
     else { window.location.href='course-builder/'; return; }
   }
   if(h==='portal' && window.__HAS_SCRAPER===false) h='overview';
-  const allowed = ['portal','overview','regional-boards','boost','cv-maker','cv-maker/cv','cv-maker/portfolio','interview-prep','events-hub','calendar','recordings','live-sessions','resources'];
+  const allowed = ['portal','overview','regional-boards','boost','cv-maker','cv-maker/cv','cv-maker/portfolio','interview-prep','events-hub','calendar','recordings','live-sessions','resources','help-support'];
   let view = h, param = null;
   if(h.startsWith('regional-boards/')){ view='regional-boards'; param=h.split('/')[1]||null; }
   else if(h==='cv-maker/cv'){ view='cv-maker/cv'; param=null; }
