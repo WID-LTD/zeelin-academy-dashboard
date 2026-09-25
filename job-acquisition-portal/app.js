@@ -1335,53 +1335,91 @@ function viewCalendar(){
 }
 
 function viewResources(){
-  const qb = [
-    {q:'Explain how you resolved a stakeholder conflict between inventory and finance teams.', tag:'Behavioral', diff:'Medium'},
-    {q:'Walk us through your inventory carrying cost formula and $ locking strategy.', tag:'Technical', diff:'Hard'},
-    {q:'Describe a time your BRS missed a requirement — how did you recover?', tag:'BRS', diff:'Medium'},
-    {q:'Defend your MoSCoW prioritization when the sponsor adds scope mid-sprint.', tag:'Agile', diff:'Hard'},
-    {q:'How do you handle #DIV/0! and #REF! errors in a client-facing model?', tag:'Excel', diff:'Easy'}
+  const questions=[
+    {q:'Explain how you resolved a stakeholder conflict between inventory and finance teams.',tag:'Behavioral',diff:'Medium',tone:'gold'},
+    {q:'Walk us through your inventory carrying-cost formula and absolute-cell locking strategy.',tag:'Technical',diff:'Hard',tone:'green'},
+    {q:'Describe a time a Business Requirements Specification missed an important requirement. How did you recover?',tag:'BRS',diff:'Medium',tone:'purple'},
+    {q:'How would you defend your MoSCoW prioritization when a sponsor adds scope mid-sprint?',tag:'Agile',diff:'Hard',tone:'gold'},
+    {q:'How do you handle #DIV/0! and #REF! errors in a client-facing financial model?',tag:'Excel',diff:'Easy',tone:'green'},
+    {q:'Give us a 90-second “Tell me about yourself” answer that connects your verified experience to this role.',tag:'Career',diff:'Core',tone:'purple'}
   ];
-  const qbHtml = qb.map((x,i)=> '<div style="background:#161616;border:1px solid #2a2a2a;border-radius:8px;padding:14px;display:flex;justify-content:space-between;align-items:center;gap:12px;"><div><div style="font-size:12px;font-weight:900;color:#f59e0b;">Q'+(i+1)+' • '+x.tag+' • '+x.diff+'</div><div style="font-size:13px;font-weight:700;color:#d4d4d4;margin-top:4px;">'+esc(x.q)+'</div></div><button onclick="showToast(\'Answer guide opened — demo\')" style="background:#262626;color:#fff;border:1px solid #404040;padding:6px 12px;border-radius:6px;font-size:11px;font-weight:800;cursor:pointer;white-space:nowrap;">View Guide</button></div>').join('');
-  const ebooks = [
-    {title:'Interview Question Guide — Business Analyst Edition', desc:'72-page e-book covering STAR, stakeholder maps, BRS, MoSCoW, and Excel audit checklist.', pages:'72 pages', thumb:'https://images.unsplash.com/photo-1512820790803-83ca734da794?auto=format&fit=crop&w=400&q=80', color:'#d97706'},
-    {title:'Supply Chain Mock Interview Playbook', desc:'Case-based Q&A, carrying-cost model defense prompts, and video-linked walkthroughs.', pages:'48 pages', thumb:'https://images.unsplash.com/photo-1456513080510-7bf3a84b82f8?auto=format&fit=crop&w=400&q=80', color:'#2563eb'},
-    {title:'ATS & Behavioral Interview E-book', desc:'Resume-to-interview linking, STAR examples, and 30 sample answers verified by mentors.', pages:'56 pages', thumb:'https://images.unsplash.com/photo-1481627834876-b7833e8f5570?auto=format&fit=crop&w=400&q=80', color:'#16a34a'}
+  const books=[
+    {title:'Interview Question Guide — Business Analyst Edition',desc:'STAR method, stakeholder mapping, BRS walkthroughs, MoSCoW prioritization, and Excel audit checklists.',pages:'72 PAGES',meta:'PDF • 8.2 MB',img:'https://images.unsplash.com/photo-1512820790803-83ca734da794?auto=format&fit=crop&w=800&q=80'},
+    {title:'Supply Chain Mock Interview Playbook',desc:'Case-based Q&A, inventory-model defense prompts, carrying-cost calculations and mentor walkthroughs.',pages:'48 PAGES',meta:'PDF • 5.6 MB',img:'https://images.unsplash.com/photo-1456513080510-7bf3a84b82f8?auto=format&fit=crop&w=800&q=80'},
+    {title:'ATS & Behavioral Interview E-book',desc:'Resume-to-interview linking, STAR examples, recruiter expectations and 30 sample mentor-reviewed answers.',pages:'56 PAGES',meta:'PDF • 6.4 MB',img:'https://images.unsplash.com/photo-1481627834876-b7833e8f5570?auto=format&fit=crop&w=800&q=80'}
   ];
-  const ebooksHtml = ebooks.map(b=> '<div style="background:#181818;border:2px solid #3a3a3a;border-radius:10px;overflow:hidden;display:flex;flex-direction:column;"><div style="height:140px;background:url(\''+b.thumb+'\') center/cover no-repeat;border-bottom:2px solid #3a3a3a;position:relative;"><div style="position:absolute;bottom:8px;left:8px;background:rgba(0,0,0,0.85);border:1px solid '+b.color+';padding:3px 8px;border-radius:4px;font-size:11px;font-weight:900;color:#fff;">E-BOOK • '+b.pages+'</div></div><div style="padding:16px;flex:1;display:flex;flex-direction:column;gap:8px;"><h4 style="font-size:14px;font-weight:900;color:#fff;margin:0;">'+esc(b.title)+'</h4><p style="font-size:12px;font-weight:700;color:#a3a3a3;margin:0;line-height:1.5;">'+esc(b.desc)+'</p><button onclick="showToast(\'Downloading '+esc(b.title)+' — demo\')" style="margin-top:8px;background:'+b.color+';color:#fff;border:1px solid '+b.color+';padding:8px;border-radius:6px;font-size:12px;font-weight:800;cursor:pointer;">Download E-book</button></div></div>').join('');
-  const vids = [
-    {title:'STAR Method: Answer Like a Pro — Full Mock', dur:'22:14', thumb:'https://images.unsplash.com/photo-1522202176988-66273c2fd55f?auto=format&fit=crop&w=600&q=80'},
-    {title:'Live Mock Interview: Supply Chain Defense (Dr. O. Emeka)', dur:'34:20', thumb:'https://images.unsplash.com/photo-1531482615713-2afd69097998?auto=format&fit=crop&w=600&q=80'},
-    {title:'MoSCoW & Stakeholder Elicitation — Office Hours', dur:'18:45', thumb:'https://images.unsplash.com/photo-1516321318423-f06f85e504b3?auto=format&fit=crop&w=600&q=80'}
+  const videos=[
+    {title:'STAR Method: Answer Like a Pro — Full Mock',desc:'Behavioral interview structure with response breakdowns.',dur:'22:14',img:'https://images.unsplash.com/photo-1522202176988-66273c2fd55f?auto=format&fit=crop&w=900&q=80'},
+    {title:'Live Mock Interview: Supply Chain Defense',desc:'Dr. O. Emeka reviews technical reasoning and model defense.',dur:'34:20',img:'https://images.unsplash.com/photo-1531482615713-2afd69097998?auto=format&fit=crop&w=900&q=80'},
+    {title:'MoSCoW & Stakeholder Elicitation — Office Hours',desc:'Practical techniques for requirements prioritization and interview defense.',dur:'18:45',img:'https://images.unsplash.com/photo-1516321318423-f06f85e504b3?auto=format&fit=crop&w=900&q=80'}
   ];
-  const vidsHtml = vids.map(v=> '<div onclick="showToast(\'Playing '+esc(v.title)+' — demo\')" style="background:#161616;border:2px solid #2a2a2a;border-radius:10px;overflow:hidden;cursor:pointer;display:flex;flex-direction:column;"><div style="height:140px;background:linear-gradient(rgba(0,0,0,0.2),rgba(0,0,0,0.4)), url(\''+v.thumb+'\') center/cover no-repeat;position:relative;display:flex;align-items:center;justify-content:center;"><div style="width:44px;height:44px;background:rgba(217,119,6,0.9);border:2px solid #f59e0b;border-radius:50%;display:flex;align-items:center;justify-content:center;color:#fff;font-weight:900;">\u25B6</div><div style="position:absolute;bottom:8px;right:8px;background:rgba(0,0,0,0.85);padding:3px 8px;border-radius:4px;font-size:11px;font-weight:800;color:#fff;">'+v.dur+'</div></div><div style="padding:12px;"><h4 style="font-size:13px;font-weight:900;color:#fff;margin:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">'+esc(v.title)+'</h4></div></div>').join('');
 
-  const main = ''
-    + '<div style="flex:1;padding:36px 52px;overflow-y:auto;background:#121212;">'
-    + '<div style="max-width:960px;margin:0 auto;display:flex;flex-direction:column;gap:32px;">'
-    + '<div style="background:linear-gradient(rgba(24,24,24,0.85), rgba(24,24,24,0.85)), url(\'https://images.unsplash.com/photo-1512820790803-83ca734da794?auto=format&fit=crop&w=1400&q=80\') center/cover no-repeat;border:2px solid #3a3a3a;border-radius:16px;padding:40px 48px;box-sizing:border-box;"><span style="font-size:12px;font-weight:900;color:#f59e0b;text-transform:uppercase;letter-spacing:1px;">Interview Prep Vault</span><h1 style="font-size:32px;font-weight:900;color:#fff;margin:8px 0 12px 0;letter-spacing:-0.5px;">Mock Interview Resources</h1><p style="font-size:14px;font-weight:700;color:#d4d4d4;margin:0;line-height:1.6;max-width:700px;">Access Question Bank, Interview Guides & E-books, and Video Resources — fully scrollable, interactive demo with left/right sidebars.</p></div>'
-    + '<div id="qb-section" style="display:flex;flex-direction:column;gap:16px;"><h2 style="font-size:20px;font-weight:900;color:#fff;margin:0;">\uD83D\uDCCB QUESTION BANK</h2><p style="font-size:12px;font-weight:700;color:#a3a3a3;margin:0;">Curated 120+ questions — behavioral, technical, BRS, and supply-chain cases.</p><div style="display:flex;flex-direction:column;gap:12px;">'+qbHtml+'</div></div>'
-    + '<div id="guide-section" style="display:flex;flex-direction:column;gap:16px;"><h2 style="font-size:20px;font-weight:900;color:#fff;margin:0;">\uD83D\uDCD8 INTERVIEW QUESTION GUIDE — E-BOOKS</h2><div style="display:grid;grid-template-columns:repeat(3, 1fr);gap:16px;">'+ebooksHtml+'</div></div>'
-    + '<div id="video-section" style="display:flex;flex-direction:column;gap:16px;"><h2 style="font-size:20px;font-weight:900;color:#fff;margin:0;">\uD83C\uDFA5 VIDEO RESOURCES</h2><div style="display:grid;grid-template-columns:repeat(3, 1fr);gap:16px;">'+vidsHtml+'</div></div>'
-    + '</div></div>';
+  const questionHtml=questions.map((x,i)=>{
+    const cls=x.tone==='green'?' green':x.tone==='purple'?' purple':'';
+    return '<article class="rs-question rs-search-item" data-search="'+esc((x.q+' '+x.tag+' '+x.diff).toLowerCase())+'">'
+      + '<div class="rs-q-num">Q'+(i+1)+'</div><div class="rs-q-copy"><div class="rs-q-meta"><span class="rs-tag'+cls+'">'+esc(x.tag)+'</span><span class="rs-tag blue">'+esc(x.diff)+'</span></div>'
+      + '<h3>'+esc(x.q)+'</h3><div class="rs-actions" style="margin-top:12px"><button class="rs-btn" type="button" onclick="showToast(&quot;Answer guide opened — demo&quot;)">View Answer Guide</button></div></div></article>';
+  }).join('');
 
-  const right = ''
-    + '<div style="width:360px;background:#181818;border-left:2px solid #3a3a3a;display:flex;flex-direction:column;justify-content:space-between;overflow-y:auto;flex-shrink:0;">'
-    + '<div style="padding:28px;display:flex;flex-direction:column;gap:24px;">'
-    + '<div style="margin-bottom:4px;border-bottom:2px solid #3a3a3a;padding-bottom:16px;"><span style="font-size:11px;font-weight:800;color:#f59e0b;text-transform:uppercase;letter-spacing:0.8px;">Quick Nav</span><h3 style="font-size:18px;font-weight:900;color:#fff;margin:4px 0 2px 0;">Resources Menu</h3><p style="font-size:12px;font-weight:700;color:#c0c0c0;margin:0;">Jump to sections</p></div>'
-    + '<div style="display:flex;flex-direction:column;gap:8px;">'
-    + '<button onclick="document.getElementById(\'qb-section\').scrollIntoView({behavior:\'smooth\'})" style="background:#161616;color:#d4d4d4;border:1px solid #2a2a2a;padding:10px 12px;border-radius:8px;font-size:12px;font-weight:800;cursor:pointer;text-align:left;display:flex;justify-content:space-between;align-items:center;"><span>\uD83D\uDCCB QUESTION BANK</span><span style="color:#38bdf8;">120+ Q</span></button>'
-    + '<button onclick="document.getElementById(\'guide-section\').scrollIntoView({behavior:\'smooth\'})" style="background:#161616;color:#d4d4d4;border:1px solid #2a2a2a;padding:10px 12px;border-radius:8px;font-size:12px;font-weight:800;cursor:pointer;text-align:left;display:flex;justify-content:space-between;align-items:center;"><span>\uD83D\uDCD8 INTERVIEW GUIDE</span><span style="color:#f59e0b;">E-BOOKS</span></button>'
-    + '<button onclick="document.getElementById(\'video-section\').scrollIntoView({behavior:\'smooth\'})" style="background:#161616;color:#d4d4d4;border:1px solid #2a2a2a;padding:10px 12px;border-radius:8px;font-size:12px;font-weight:800;cursor:pointer;text-align:left;display:flex;justify-content:space-between;align-items:center;"><span>\uD83C\uDFA5 VIDEO RESOURCES</span><span style="color:#4ade80;">18</span></button>'
-    + '</div>'
-    + '<div style="background:#161616;border:2px solid #3a3a3a;border-radius:10px;padding:16px;"><h4 style="font-size:13px;font-weight:900;color:#fff;margin:0 0 8px 0;">Need a mock slot?</h4><p style="font-size:11px;font-weight:700;color:#a3a3a3;margin:0 0 10px 0;">Book Dr. O. Emeka for live mock — calendar picker in #calendar</p><button onclick="window._nav(\'calendar\')" style="width:100%;background:linear-gradient(135deg,#f59e0b 0%,#d97706 100%);color:#fff;border:1px solid #f59e0b;padding:10px;border-radius:6px;font-size:13px;font-weight:900;cursor:pointer;">Go to Calendar Booking</button></div>'
-    + '<div style="background:#1f1f1f;border:1px solid #2a2a2a;border-radius:8px;padding:12px;"><div style="font-size:11px;font-weight:800;color:#a3a3a3;margin-bottom:6px;">E-BOOK TIP</div><div style="font-size:12px;font-weight:700;color:#d4d4d4;line-height:1.5;">Download guides work offline — demo filters by instructor.</div></div>'
-    + '</div>'
-    + '<div style="padding:24px;background:#161616;border-top:2px solid #3a3a3a;"><button onclick="window._nav(\'calendar\')" style="width:100%;background:#262626;color:#d4d4d4;border:1px solid #404040;padding:12px;border-radius:8px;font-size:13px;font-weight:800;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px;"><span>\u2190 Back to Calendar</span></button></div></div>';
+  const bookHtml=books.map(b=>
+    '<article class="rs-resource-card rs-search-item" data-search="'+esc((b.title+' '+b.desc).toLowerCase())+'">'
+      + '<div class="rs-resource-img" style="background-image:url(&quot;'+b.img+'&quot;)"><span class="rs-resource-type">E-BOOK • '+b.pages+'</span></div>'
+      + '<div class="rs-resource-body"><h3>'+esc(b.title)+'</h3><p>'+esc(b.desc)+'</p><div class="rs-resource-foot"><span class="rs-resource-meta">'+esc(b.meta)+'</span>'
+      + '<button class="rs-btn primary" type="button" onclick="showToast(&quot;E-book download started — demo&quot;)">Download</button></div></div></article>'
+  ).join('');
 
-  return topbarHtml('Work Experience Portal \u2022 Mock Interview Resources Library', '<span style="color:#f59e0b;font-weight:800;">Resources</span> <span style="color:#a3a3a3;">• Interactive</span>', 80)
-    + '<div class="jb-split" style="flex:1;display:flex;overflow:hidden;min-height:0;">'+main+right+'</div>';
+  const videoHtml=videos.map(v=>
+    '<article class="rs-video-card rs-search-item" data-search="'+esc((v.title+' '+v.desc).toLowerCase())+'" onclick="showToast(&quot;Video playback opened — demo&quot;)">'
+      + '<div class="rs-video-thumb" style="background-image:url(&quot;'+v.img+'&quot;)"><div class="rs-play">▶</div><span class="rs-duration">'+v.dur+'</span></div>'
+      + '<div class="rs-video-body"><h3>'+esc(v.title)+'</h3><p>'+esc(v.desc)+'</p></div></article>'
+  ).join('');
+
+  const css='<style>'
+    + '.resources-premium,.resources-premium *{box-sizing:border-box}.resources-premium{--rs-ink:#07143a;--rs-muted:#697590;--rs-line:#e1e8ef;--rs-gold:#d79a0b;--rs-gold2:#f2c14e;--rs-blue:#0a66c2;--rs-green:#0a9b70;display:flex;flex:1;min-height:0;background:#fff;color:var(--rs-ink);font-family:Inter,"Segoe UI",Arial,sans-serif}.resources-premium button,.resources-premium input{font:inherit}.resources-premium a{text-decoration:none;color:inherit}'
+    + '.rs-main{flex:1;min-width:0;overflow-y:auto;background:#fff;padding:22px;scrollbar-width:thin;scrollbar-color:#d9e2ec #fff}.rs-main::-webkit-scrollbar{width:7px}.rs-main::-webkit-scrollbar-track{background:#fff}.rs-main::-webkit-scrollbar-thumb{background:#d9e2ec;border-radius:999px}.rs-inner{max-width:1180px;margin:0 auto}'
+    + '.rs-hero{min-height:260px;border-radius:18px;padding:34px 36px;color:#fff;background:linear-gradient(90deg,rgba(5,20,38,.97),rgba(5,20,38,.85) 52%,rgba(5,20,38,.24)),url("https://images.unsplash.com/photo-1512820790803-83ca734da794?auto=format&fit=crop&w=1600&q=85") center/cover;box-shadow:0 18px 40px rgba(19,47,77,.12)}.rs-eyebrow{font-size:11px;font-weight:900;letter-spacing:.8px;text-transform:uppercase;color:#ffd36a}.rs-hero h1{font-size:clamp(31px,3vw,46px);line-height:1.03;margin:10px 0 12px}.rs-hero h1 span{color:var(--rs-gold2)}.rs-hero p{max-width:760px;font-size:14px;line-height:1.68;color:#dce6ef;margin:0}.rs-actions{display:flex;gap:10px;flex-wrap:wrap;margin-top:22px}.rs-btn{min-height:42px;border:1px solid #d6dfe8;border-radius:11px;background:#fff;color:#07143a;padding:0 16px;font-size:12px;font-weight:900;display:inline-flex;align-items:center;justify-content:center;gap:8px;cursor:pointer;transition:.18s}.rs-btn:hover{transform:translateY(-1px)}.rs-btn.primary{background:linear-gradient(100deg,#d59608,#e9bb38);border-color:#d89c11;color:#fff;box-shadow:0 8px 20px rgba(201,144,7,.25)}'
+    + '.rs-search{margin-top:18px;max-width:610px;height:46px;border-radius:13px;background:rgba(255,255,255,.96);display:flex;align-items:center;gap:10px;padding:0 14px;color:#68758b}.rs-search input{flex:1;min-width:0;border:0;outline:0;background:transparent;color:#07143a;font-size:13px}.rs-search svg{width:18px;height:18px;fill:none;stroke:currentColor;stroke-width:2}'
+    + '.rs-metrics{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px;margin:16px 0 20px}.rs-metric{background:#fff;border:1px solid var(--rs-line);border-radius:15px;padding:16px;box-shadow:0 5px 16px rgba(31,58,91,.045)}.rs-metric span{font-size:10px;color:#7a8598;font-weight:900;letter-spacing:.3px}.rs-metric b{display:block;font-size:26px;margin-top:9px}.rs-metric p{font-size:11px;color:#7a8598;margin:3px 0 0}'
+    + '.rs-section{margin-top:20px}.rs-section-head{display:flex;justify-content:space-between;align-items:flex-end;gap:12px;margin-bottom:12px}.rs-section-head h2{font-size:21px;margin:0}.rs-section-head p{font-size:12px;color:#7a8598;margin:5px 0 0}.rs-section-badge{padding:7px 10px;border-radius:999px;background:#fff6d9;border:1px solid #e7c158;color:#8a5b00;font-size:10px;font-weight:900;white-space:nowrap}'
+    + '.rs-q-list{display:grid;grid-template-columns:1fr 1fr;gap:12px}.rs-question{background:#fff;border:1px solid #dfe7ef;border-radius:15px;padding:16px;box-shadow:0 5px 16px rgba(31,58,91,.04);display:flex;gap:16px;align-items:flex-start}.rs-q-copy{min-width:0}.rs-q-meta{display:flex;gap:7px;flex-wrap:wrap;margin-bottom:8px}.rs-tag{font-size:10px;font-weight:900;border-radius:999px;padding:6px 8px;background:#fff6d9;color:#8a5b00;border:1px solid #ecd288}.rs-tag.blue{background:#eef5ff;color:#0a66c2;border-color:#cfe0f6}.rs-tag.green{background:#eaf8f3;color:#0a7c5d;border-color:#b9e4d5}.rs-tag.purple{background:#f4efff;color:#6b3db4;border-color:#dccdf7}.rs-question h3{font-size:14px;line-height:1.45;margin:0;color:#17233e}.rs-q-num{width:38px;height:38px;border-radius:11px;background:#071b33;color:#fff;display:grid;place-items:center;font-size:11px;font-weight:900;flex:0 0 38px}'
+    + '.rs-resource-grid,.rs-video-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:16px}.rs-resource-card,.rs-video-card{background:#fff;border:1px solid var(--rs-line);border-radius:17px;overflow:hidden;box-shadow:0 7px 22px rgba(30,58,90,.055);transition:.2s}.rs-resource-card{display:flex;flex-direction:column;min-height:390px}.rs-resource-card:hover,.rs-video-card:hover{transform:translateY(-4px);box-shadow:0 14px 30px rgba(30,58,90,.1)}.rs-resource-img{height:190px;background-size:cover;background-position:center;position:relative}.rs-resource-img:after,.rs-video-thumb:after{content:"";position:absolute;inset:0;background:linear-gradient(180deg,rgba(7,20,58,.04),rgba(7,20,58,.45))}.rs-resource-type{position:absolute;left:13px;bottom:12px;z-index:2;padding:7px 9px;border-radius:9px;background:rgba(255,255,255,.94);font-size:10px;font-weight:900;color:#8a5b00}.rs-resource-body{padding:18px;display:flex;flex-direction:column;flex:1}.rs-resource-body h3{font-size:16px;line-height:1.3;margin:0 0 7px}.rs-resource-body p{font-size:12px;line-height:1.55;color:#697590;margin:0}.rs-resource-foot{margin-top:auto;padding-top:16px;display:flex;justify-content:space-between;align-items:center;gap:10px}.rs-resource-meta{font-size:11px;color:#8490a1;font-weight:800}'
+    + '.rs-video-card{cursor:pointer}.rs-video-thumb{height:180px;background-size:cover;background-position:center;position:relative}.rs-play{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);z-index:2;width:52px;height:52px;border-radius:50%;display:grid;place-items:center;background:linear-gradient(135deg,#d99a0a,#efbd3a);color:#fff;font-size:20px;box-shadow:0 8px 22px rgba(217,154,10,.3)}.rs-duration{position:absolute;right:10px;bottom:10px;z-index:2;padding:5px 7px;border-radius:7px;background:rgba(7,20,58,.86);color:#fff;font-size:10px;font-weight:900}.rs-video-body{padding:16px}.rs-video-body h3{font-size:14px;line-height:1.4;margin:0 0 5px}.rs-video-body p{font-size:11px;color:#7a8598;margin:0}'
+    + '.rs-right{width:360px;flex:0 0 360px;height:100%;overflow-y:auto;border-left:1px solid #e4eaf1;background:#fbfcfe;padding:18px 17px;scrollbar-width:thin;scrollbar-color:#d0d9e4 #fff}.rs-right::-webkit-scrollbar{width:6px}.rs-right::-webkit-scrollbar-track{background:#fff}.rs-right::-webkit-scrollbar-thumb{background:#d0d9e4;border-radius:999px}.rs-right-inner{display:flex;flex-direction:column;gap:14px}.rs-side-card{background:#fff;border:1px solid #e0e7ef;border-radius:15px;padding:18px;box-shadow:0 5px 16px rgba(31,58,91,.045)}.rs-side-label{color:#9a6400;font-size:11px;font-weight:900;letter-spacing:.55px;text-transform:uppercase}.rs-side-card h3{margin:7px 0 6px;font-size:17px}.rs-side-card p{font-size:12px;line-height:1.56;color:#697590;margin:0}.rs-quick-nav{display:flex;flex-direction:column;gap:8px;margin-top:14px}.rs-quick-nav button{width:100%;border:1px solid #e0e7ef;background:#f8fafc;color:#25324b;border-radius:10px;padding:11px 12px;display:flex;justify-content:space-between;align-items:center;font-size:12px;font-weight:800;text-align:left;cursor:pointer}.rs-quick-nav button:hover{background:#eef4fb}.rs-quick-nav em{font-style:normal;color:#0a66c2;font-size:10px;font-weight:900}.rs-mock{color:#fff;min-height:190px;display:flex;flex-direction:column;justify-content:flex-end;background:linear-gradient(180deg,rgba(7,27,51,.05),rgba(7,27,51,.94)),url("https://images.unsplash.com/photo-1531482615713-2afd69097998?auto=format&fit=crop&w=900&q=80") center/cover}.rs-mock p{color:#dce6ef}.rs-tip-list{display:flex;flex-direction:column;gap:9px;margin-top:12px}.rs-tip-row{font-size:11px;color:#56637a;display:flex;gap:8px;align-items:flex-start}.rs-dot{width:8px;height:8px;border-radius:50%;background:#d99a0a;flex:0 0 8px;margin-top:4px}'
+    + '@media(max-width:1279px){.resources-premium{display:block;overflow-y:auto}.rs-main{overflow:visible}.rs-right{width:100%;height:auto;overflow:visible;border-left:0;border-top:1px solid #e4eaf1;padding:20px}.rs-right-inner{display:grid;grid-template-columns:repeat(3,minmax(0,1fr))}.rs-resource-grid,.rs-video-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}'
+    + '@media(max-width:900px){.rs-q-list{grid-template-columns:1fr}.rs-right-inner{grid-template-columns:1fr}.rs-metrics{grid-template-columns:1fr 1fr}}'
+    + '@media(max-width:620px){.rs-main{padding:14px 13px}.rs-hero{padding:24px 18px;min-height:0}.rs-hero h1{font-size:30px}.rs-resource-grid,.rs-video-grid{grid-template-columns:1fr}.rs-metrics{grid-template-columns:1fr 1fr;gap:9px}}'
+    + '</style>';
+
+  const main='<main class="rs-main"><div class="rs-inner">'
+    + '<section class="rs-hero"><div class="rs-eyebrow">CAREER READINESS RESOURCE VAULT</div><h1>Interview &amp; Career <span>Resources Library</span></h1><p>Access structured interview question banks, premium e-books, walkthrough videos, and role-specific career resources designed to support your job application and interview preparation.</p>'
+    + '<div class="rs-actions"><button class="rs-btn primary" type="button" onclick="window._scrollResources(&quot;rs-questions&quot;)">Explore Question Bank</button><button class="rs-btn" type="button" onclick="window._scrollResources(&quot;rs-ebooks&quot;)">Browse E-books</button><button class="rs-btn" type="button" onclick="window._scrollResources(&quot;rs-videos&quot;)">Watch Videos</button></div>'
+    + '<label class="rs-search"><svg viewBox="0 0 24 24"><circle cx="10" cy="10" r="7"/><path d="m15 15 6 6"/></svg><input type="search" placeholder="Search guides, questions, videos..." oninput="window._filterResources(this.value)"></label>'
+    + '</section>'
+    + '<section class="rs-metrics"><article class="rs-metric"><span>QUESTION BANK</span><b>120+</b><p>Behavioral &amp; technical prompts</p></article><article class="rs-metric"><span>INTERVIEW GUIDES</span><b>12</b><p>Role-specific e-books</p></article><article class="rs-metric"><span>VIDEO RESOURCES</span><b>18</b><p>Mentor walkthroughs</p></article><article class="rs-metric"><span>PROGRESS</span><b>68%</b><p>Resources completed</p></article></section>'
+    + '<section class="rs-section" id="rs-questions"><div class="rs-section-head"><div><h2>Question Bank</h2><p>Practice the high-value questions employers are most likely to ask.</p></div><span class="rs-section-badge">120+ QUESTIONS</span></div><div class="rs-q-list">'+questionHtml+'</div></section>'
+    + '<section class="rs-section" id="rs-ebooks"><div class="rs-section-head"><div><h2>Interview Guides &amp; E-books</h2><p>Structured playbooks for applications, tests and interviews.</p></div><span class="rs-section-badge">OFFLINE READY</span></div><div class="rs-resource-grid">'+bookHtml+'</div></section>'
+    + '<section class="rs-section" id="rs-videos"><div class="rs-section-head"><div><h2>Video Resources</h2><p>Mentor-led walkthroughs and realistic mock interview examples.</p></div><span class="rs-section-badge">18 VIDEOS</span></div><div class="rs-video-grid">'+videoHtml+'</div></section>'
+    + '</div></main>';
+
+  const right='<aside class="rs-right"><div class="rs-right-inner">'
+    + '<section class="rs-side-card"><div class="rs-side-label">Quick Navigation</div><h3>Resources Menu</h3><p>Jump directly to the resource section you need.</p><div class="rs-quick-nav"><button type="button" onclick="window._scrollResources(&quot;rs-questions&quot;)"><span>Question Bank</span><em>120+</em></button><button type="button" onclick="window._scrollResources(&quot;rs-ebooks&quot;)"><span>Interview Guides</span><em>12</em></button><button type="button" onclick="window._scrollResources(&quot;rs-videos&quot;)"><span>Video Resources</span><em>18</em></button></div></section>'
+    + '<section class="rs-side-card rs-mock"><div class="rs-side-label" style="color:#ffd36a">Mock Interview</div><h3>Practice live with a mentor</h3><p>Use a guided mock session to test your interview answers before employer interviews.</p><button class="rs-btn primary" type="button" style="width:100%;margin-top:14px" onclick="window._nav(&quot;calendar&quot;)">Book Mock Session →</button></section>'
+    + '<section class="rs-side-card"><div class="rs-side-label">Resource Tip</div><h3>Build a preparation loop</h3><div class="rs-tip-list"><div class="rs-tip-row"><span class="rs-dot"></span><span>Review one question category at a time.</span></div><div class="rs-tip-row"><span class="rs-dot"></span><span>Download the matching e-book for deeper examples.</span></div><div class="rs-tip-row"><span class="rs-dot"></span><span>Watch the mentor walkthrough and compare your answer.</span></div><div class="rs-tip-row"><span class="rs-dot"></span><span>Practice aloud before booking a live mock.</span></div></div></section>'
+    + '</div></aside>';
+
+  return topbarHtml('Resources','',68)+css+'<div class="resources-premium">'+main+right+'</div>';
 }
+window._filterResources = function(value){
+  const q=String(value||'').trim().toLowerCase();
+  document.querySelectorAll('.rs-search-item').forEach(function(el){
+    el.style.display=!q || String(el.dataset.search||'').includes(q) ? '' : 'none';
+  });
+};
+window._scrollResources = function(id){
+  const el=document.getElementById(id);
+  if(el) el.scrollIntoView({behavior:'smooth',block:'start'});
+};
+
 
 function viewRecordings(){
   const listHtml = RECORDINGS_DATA.map(r=>{
@@ -1709,6 +1747,7 @@ function render(view, param){
   const isFull = fullWidthViews.includes(view);
   const isBoost = view==='boost';
   const isCareer = ['cv-maker','cv-maker/cv','cv-maker/portfolio'].includes(view);
+  const isResources = view==='resources';
   // update sidebar even for full width (for state)
   updateSidebar(view);
   renderJBNav(view);
@@ -1719,7 +1758,7 @@ function render(view, param){
   main.classList.toggle('boost-page',isBoost);
   try{ document.body.classList.toggle('boost-page-active',isBoost); }catch(e){}
   // Ensure main-content wrapper styles — overview white, free, 80% scale handled inside
-  main.style.cssText = isFull ? 'display:block;overflow:auto;background:#ffffff;height:100vh;height:100dvh;min-height:0;flex:none;' : 'display:flex;flex-direction:column;overflow:hidden;background:'+((isBoost||isCareer)?'#ffffff':'#121212')+';height:100%;min-height:0;';
+  main.style.cssText = isFull ? 'display:block;overflow:auto;background:#ffffff;height:100vh;height:100dvh;min-height:0;flex:none;' : 'display:flex;flex-direction:column;overflow:hidden;background:'+((isBoost||isCareer||isResources)?'#ffffff':'#121212')+';height:100%;min-height:0;';
 
   let html='';
   switch(view){
