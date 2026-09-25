@@ -759,10 +759,16 @@ function viewBoost(){
     + '@media(max-width:1279px){.boost-premium{display:block;overflow-y:auto}.bp-main{overflow:visible}.bp-right{width:100%;height:auto;overflow:visible;border-left:0;border-top:1px solid #e4eaf1;padding:20px}.bp-right-inner{display:grid;grid-template-columns:repeat(3,minmax(0,1fr))}.bp-metrics{grid-template-columns:repeat(2,minmax(0,1fr))}}'
     + '@media(max-width:850px){.bp-grid{grid-template-columns:1fr}.bp-right-inner{grid-template-columns:1fr}}'
     + '@media(max-width:620px){.bp-main{padding:14px 13px 36px}.bp-hero{padding:24px 18px;min-height:0}.bp-hero h1{font-size:30px}.bp-metrics{grid-template-columns:1fr 1fr;gap:9px}.bp-form-grid{grid-template-columns:1fr}.bp-full{grid-column:auto}.bp-application{grid-template-columns:1fr}.bp-app-actions{justify-content:space-between}.bp-head{align-items:flex-start;flex-direction:column}}'
-    + '.boost-topbar{position:sticky!important;top:0!important;left:auto!important;width:100%!important;transform:none!important;flex:0 0 73px!important}'
+    + '.boost-topbar{position:sticky!important;top:0!important;left:auto!important;width:100%!important;flex:0 0 73px!important;transition:transform .28s ease!important}.boost-topbar.ov-hidden{transform:translateY(-110%)!important}'
     + '@media(min-width:1280px){.sidebar.boost-sidebar-position{position:sticky!important;top:0!important;align-self:flex-start!important;height:100dvh!important;min-height:0!important;max-height:100dvh!important;overflow-y:auto!important;overflow-x:hidden!important;width:clamp(210px,13.5vw,270px)!important;min-width:clamp(210px,13.5vw,270px)!important}.layout:has(.boost-premium){background:#fff!important}.main:has(.boost-premium){background:#fff!important}}'
     + '@media(min-width:1280px) and (max-width:1450px){.sidebar.boost-sidebar-position{width:220px!important;min-width:220px!important;padding-left:8px!important;padding-right:8px!important}.sidebar.boost-sidebar-position .nav-item{padding-left:10px!important;padding-right:10px!important;gap:10px!important}.sidebar.boost-sidebar-position .subnav .nav-item{padding-left:24px!important}}'
     + '@media(max-width:1279px){.sidebar.boost-sidebar-position{position:fixed!important;left:0!important;top:0!important;bottom:0!important;width:300px!important;max-width:86vw!important;height:100dvh!important;min-height:0!important;overflow-y:auto!important}}'
+    + 'body.boost-page-active,#main-content.boost-page,#main-content.boost-page .boost-premium,#main-content.boost-page .boost-premium *{scrollbar-width:thin!important;scrollbar-color:#dfe6ee #ffffff!important}'
+    + 'body.boost-page-active::-webkit-scrollbar,#main-content.boost-page::-webkit-scrollbar,#main-content.boost-page .boost-premium::-webkit-scrollbar,#main-content.boost-page .boost-premium *::-webkit-scrollbar{width:8px!important;height:8px!important}'
+    + 'body.boost-page-active::-webkit-scrollbar-track,#main-content.boost-page::-webkit-scrollbar-track,#main-content.boost-page .boost-premium::-webkit-scrollbar-track,#main-content.boost-page .boost-premium *::-webkit-scrollbar-track{background:#ffffff!important;border:0!important}'
+    + 'body.boost-page-active::-webkit-scrollbar-thumb,#main-content.boost-page::-webkit-scrollbar-thumb,#main-content.boost-page .boost-premium::-webkit-scrollbar-thumb,#main-content.boost-page .boost-premium *::-webkit-scrollbar-thumb{background:#ffffff!important;border:1px solid #e3e9f0!important;border-radius:999px!important}'
+    + 'body.boost-page-active::-webkit-scrollbar-thumb:hover,#main-content.boost-page::-webkit-scrollbar-thumb:hover,#main-content.boost-page .boost-premium::-webkit-scrollbar-thumb:hover,#main-content.boost-page .boost-premium *::-webkit-scrollbar-thumb:hover{background:#f8fafc!important;border-color:#d7e0e9!important}'
+    + 'body.boost-page-active::-webkit-scrollbar-corner,#main-content.boost-page::-webkit-scrollbar-corner,#main-content.boost-page .boost-premium::-webkit-scrollbar-corner,#main-content.boost-page .boost-premium *::-webkit-scrollbar-corner{background:#ffffff!important}'
     + '</style>';
 
   const main='<div class="bp-main"><div class="bp-inner">'
@@ -1735,6 +1741,8 @@ function render(view, param){
   try{ fitStage(); }catch(e){}
   const main = document.getElementById('main-content');
   if(!main) return;
+  main.classList.toggle('boost-page',isBoost);
+  try{ document.body.classList.toggle('boost-page-active',isBoost); }catch(e){}
   // Ensure main-content wrapper styles — overview white, free, 80% scale handled inside
   main.style.cssText = isFull ? 'display:block;overflow:auto;background:#ffffff;height:100vh;height:100dvh;min-height:0;flex:none;' : 'display:flex;flex-direction:column;overflow:hidden;background:'+(isBoost?'#ffffff':'#121212')+';height:100%;min-height:0;';
 
