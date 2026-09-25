@@ -2783,3 +2783,35 @@ body.premium-training .btn:not(:disabled):active{
     max-width:none!important;
   }
 }
+
+
+/* V4 contrast cleanup for remaining hardcoded legacy accent text */
+body.premium-training #page [style*="color:#d97706"],
+body.premium-training #page [style*="color: #d97706"],
+body.premium-training #page [style*="color:#f59e0b"],
+body.premium-training #page [style*="color: #f59e0b"]{
+  color:#825400!important;
+}
+body.premium-training #page [style*="color:#16a34a"],
+body.premium-training #page [style*="color: #16a34a"],
+body.premium-training #page [style*="color:#4ade80"],
+body.premium-training #page [style*="color: #4ade80"]{
+  color:#087557!important;
+}
+body.premium-training #page [style*="color:#38bdf8"],
+body.premium-training #page [style*="color: #38bdf8"]{
+  color:#245b9e!important;
+}
+body.premium-training #page [style*="color:#c084fc"],
+body.premium-training #page [style*="color: #c084fc"]{
+  color:#6944a6!important;
+}
+/* Never let contrast cleanup recolor filled primary buttons */
+body.premium-training #page button[style*="background-color:#d97706"],
+body.premium-training #page button[style*="background:linear-gradient(135deg,#f59e0b"],
+body.premium-training #page .btn-gradient,
+body.premium-training #page .btn-amber,
+body.premium-training #page .btn-green,
+body.premium-training #page .btn-grad-green{
+  color:#fff!important;
+}
