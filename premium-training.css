@@ -1111,3 +1111,102 @@ body.premium-training :focus-visible{
   body.premium-training.premium-route-videos .thumb-wrap{width:100%!important;height:190px!important}
   body.premium-training.premium-route-videos .video-row>div:last-child{grid-column:auto!important}
 }
+
+
+/* V2 final token reset: old components now inherit the light system instead of dark defaults. */
+:root{
+  --bg:#f5f7fb;
+  --bg-raised:#ffffff;
+  --bg-card:#ffffff;
+  --bg-deep:#f8fafc;
+  --bg-soft:#eef3f8;
+  --bg-dark:#e8eef5;
+  --border:#cfd9e6;
+  --border-soft:#dde5ef;
+  --border-bright:#b8c6d8;
+  --text:#081735;
+  --text-dim:#5e6e86;
+  --text-faint:#7c899b;
+  --amber:#c98708;
+  --amber-light:#a96d00;
+  --amber-dark:#8c5800;
+  --amber-tint:#fff2cf;
+  --amber-tile:#fff8e8;
+  --green:#078867;
+  --green-light:#078867;
+  --green-dark:#e8f8f3;
+  --blue:#1557b7;
+  --blue-light:#1557b7;
+  --blue-dark:#dfeaff;
+  --blue-tint:#edf4ff;
+  --purple:#6842b8;
+  --purple-tint:#f3edff;
+  --purple-light:#6842b8;
+  --teal:#078867;
+  --teal-tint:#e8f8f3;
+  --teal-light:#078867;
+}
+
+/* Overlay / gate content is outside #page, so explicitly remove remaining legacy dark surfaces. */
+body.premium-training .dash-modal [style*="background-color:#181818"],
+body.premium-training .dash-modal [style*="background-color:#161616"],
+body.premium-training .dash-modal [style*="background-color:#121212"],
+body.premium-training .dash-modal [style*="background-color:#0d0d0d"],
+body.premium-training .dash-modal [style*="background-color:#262626"],
+body.premium-training .gate-card [style*="background-color:#181818"],
+body.premium-training .gate-card [style*="background-color:#161616"],
+body.premium-training .gate-card [style*="background-color:#121212"],
+body.premium-training .gate-card [style*="background-color:#0d0d0d"],
+body.premium-training .gate-card [style*="background-color:#262626"]{
+  background:#fff!important;color:var(--z-ink)!important;border-color:var(--z-line)!important
+}
+body.premium-training .dash-modal [style*="color:#ffffff"],
+body.premium-training .dash-modal [style*="color:#d4d4d4"],
+body.premium-training .dash-modal [style*="color:#a3a3a3"],
+body.premium-training .gate-card [style*="color:#ffffff"],
+body.premium-training .gate-card [style*="color:#d4d4d4"],
+body.premium-training .gate-card [style*="color:#a3a3a3"]{color:var(--z-ink-2)!important}
+body.premium-training .dash-modal .ci-wrap,
+body.premium-training .gate-card .gate-body{color:var(--z-ink)!important}
+body.premium-training .dash-modal .ci-side{background:#f8fafc!important}
+body.premium-training .dash-modal .ci-label,
+body.premium-training .dash-modal .branch-q,
+body.premium-training .gate-card .gate-big{color:var(--z-ink)!important}
+body.premium-training .dash-modal .radio-chip,
+body.premium-training .dash-modal .check-chip,
+body.premium-training .dash-modal .starb{
+  background:#fff!important;color:var(--z-ink-2)!important;border:1.5px solid var(--z-line-strong)!important
+}
+body.premium-training .dash-modal .radio-chip.sel,
+body.premium-training .dash-modal .check-chip.sel,
+body.premium-training .dash-modal .starb.on{
+  background:var(--z-gold-soft)!important;color:#815200!important;border-color:#d7a53d!important
+}
+
+/* Day dashboard stronger visual hierarchy */
+body.premium-training.premium-route-day .p-card{
+  border:1.5px solid var(--z-line)!important;
+  box-shadow:var(--z-shadow-sm)!important;
+  border-radius:16px!important;
+}
+body.premium-training.premium-route-day .pt-title{font-size:16px!important;font-weight:850!important}
+body.premium-training.premium-route-day .pt-sub{font-size:13px!important;color:var(--z-muted)!important}
+body.premium-training.premium-route-day .pt-pct{font-size:20px!important}
+body.premium-training.premium-route-day .p-bar{height:8px!important}
+body.premium-training.premium-route-day .p-foot{border-top:1.5px solid var(--z-line)!important}
+body.premium-training.premium-route-day .dash-wide-grid .xv-panel{padding:22px!important}
+
+/* Make all native selects/textareas obviously interactive */
+body.premium-training textarea,
+body.premium-training select,
+body.premium-training input[type="text"],
+body.premium-training input[type="search"]{
+  border:1.5px solid var(--z-line)!important;
+}
+body.premium-training textarea:focus,
+body.premium-training select:focus,
+body.premium-training input[type="text"]:focus,
+body.premium-training input[type="search"]:focus{
+  border-color:#3c73bd!important;
+  box-shadow:0 0 0 4px rgba(21,87,183,.10)!important;
+}
