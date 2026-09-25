@@ -5004,3 +5004,17 @@ body.premium-training #page::before{display:none!important}
     min-height:0!important;
   }
 }
+
+
+/* V5 shell continuity: keep acquisition-style sidebar on the course landing too. */
+body.premium-training #shell.app.hide-sidebar #sidebar{
+  display:flex!important;
+}
+body.premium-training #shell.app.hide-sidebar .content{
+  width:auto!important;
+}
+@media(max-width:1279px){
+  body.premium-training #shell.app.hide-sidebar .burger{
+    display:inline-flex!important;
+  }
+}
