@@ -535,7 +535,7 @@ function viewRegionalBoards(countryParam){
     nz:{landmark:'Auckland Sky Tower',image:pexelsImg('18742687'),source:'https://www.pexels.com/photo/sky-tower-in-auckland-18742687/'},
     ie:{landmark:"Ha'penny Bridge, Dublin",image:pexelsImg('35809667'),source:'https://www.pexels.com/photo/ha-penny-bridge-spanning-river-liffey-in-dublin-35809667/'},
     au:{landmark:'Sydney Opera House',image:pexelsImg('26834715'),source:'https://www.pexels.com/photo/sydney-opera-house-26834715/'},
-    us:{landmark:'Statue of Liberty, New York',image:pexelsImg('64271'),source:'https://www.pexels.com/photo/statue-of-liberty-64271/'},
+    us:{landmark:'Statue of Liberty, New York',image:'https://upload.wikimedia.org/wikipedia/commons/d/d3/Statue_of_Liberty%2C_NY.jpg',source:'https://commons.wikimedia.org/wiki/File:Statue_of_Liberty,_NY.jpg'},
     ca:{landmark:'CN Tower, Toronto',image:pexelsImg('27844750'),source:'https://www.pexels.com/photo/toronto-cn-tower-27844750/'},
     gb:{landmark:'Big Ben, London',image:pexelsImg('20624142'),source:'https://www.pexels.com/photo/big-ben-in-london-20624142/'},
     ng:{landmark:'Lagos Skyline',image:pexelsImg('37505507'),source:'https://www.pexels.com/photo/prominent-lagos-skyline-featuring-the-green-tower-37505507/'},
