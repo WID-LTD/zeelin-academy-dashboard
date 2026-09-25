@@ -44,45 +44,8 @@
     document.body.classList.toggle('premium-specialist-workspace', SPECIALIST_ROUTES.has(route));
   }
 
-  function enhanceTopbar(){
-    const top = document.getElementById('topbar');
-    if(!top) return;
-    if(!top.querySelector('.premium-search')){
-      const label = document.createElement('label');
-      label.className = 'premium-search';
-      label.innerHTML = svgIcon('search')+'<input type="search" aria-label="Search training portal" placeholder="Search courses, chapters, resources...">';
-      const title = Array.from(top.children).find(el => el.style && String(el.style.cssText).includes('justify-content: center'));
-      if(title) top.insertBefore(label,title); else top.insertBefore(label,top.querySelector('.top-actions'));
-      const input = label.querySelector('input');
-      input.addEventListener('keydown', function(e){
-        if(e.key !== 'Enter') return;
-        const q = input.value.trim().toLowerCase();
-        if(!q) return;
-        if(q.includes('roadmap') || q.includes('chapter')) location.hash='/roadmap';
-        else if(q.includes('video')) location.hash='/videos';
-        else if(q.includes('calendar') || q.includes('event')) location.hash='/calendar';
-        else if(q.includes('record')) location.hash='/recordings';
-        else if(q.includes('support') || q.includes('help')) location.hash='/support';
-        else if(q.includes('community')) location.hash='/community';
-        else if(q.includes('profile') || q.includes('insight')) location.hash='/profile';
-        else if(q.includes('account')) location.hash='/accountability';
-        else location.hash='/day';
-      });
-    }
-  }
-
-  function enhanceSidebar(){
-    const sidebar = document.getElementById('sidebar');
-    if(!sidebar) return;
-    const wrap = sidebar.children[1];
-    if(wrap && !wrap.querySelector('.premium-sidebar-motto')){
-      const box = document.createElement('div');
-      box.className = 'premium-sidebar-motto';
-      box.innerHTML = '<strong>Build Skills. Build Confidence. Get Job Ready.</strong><i></i>';
-      wrap.appendChild(box);
-    }
-  }
-
+  function enhanceTopbar(){ return; }
+  function enhanceSidebar(){ return; }
   function course(){
     try{
       if(typeof COURSES !== 'undefined' && COURSES && COURSES.length) return COURSES[0];
@@ -286,25 +249,7 @@
 
 /* Premium V3 micro-composition */
 (function(){
-  function refinePremiumChrome(){
-    const top=document.getElementById('topbar');
-    if(top){
-      const titleBox=Array.from(top.children).find(el=>el.style && String(el.style.cssText).includes('justify-content: center'));
-      if(titleBox && !titleBox.classList.contains('premium-title-lockup')){
-        titleBox.classList.add('premium-title-lockup');
-        const span=titleBox.querySelector('span');
-        if(span && span.textContent.trim()==='ZEELIN JOB TRAINING PORTAL'){
-          span.innerHTML='<b>ZEELIN</b><small>JOB TRAINING PORTAL</small>';
-        }
-      }
-    }
-    const sidebar=document.getElementById('sidebar');
-    if(sidebar){
-      const active=sidebar.querySelector('a[style*="background-color:#262626"],a[style*="background-color: #262626"],a[style*="background-color:#2a2218"],a[style*="background-color: #2a2218"]');
-      sidebar.querySelectorAll('a[aria-current]').forEach(a=>a.removeAttribute('aria-current'));
-      if(active) active.setAttribute('aria-current','page');
-    }
-  }
+  function refinePremiumChrome(){ return; }
   function refinePageSemantics(){
     const page=document.getElementById('page');
     if(!page) return;
