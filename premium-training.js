@@ -283,3 +283,44 @@
 
   schedule();
 })();
+
+/* Premium V3 micro-composition */
+(function(){
+  function refinePremiumChrome(){
+    const top=document.getElementById('topbar');
+    if(top){
+      const titleBox=Array.from(top.children).find(el=>el.style && String(el.style.cssText).includes('justify-content: center'));
+      if(titleBox && !titleBox.classList.contains('premium-title-lockup')){
+        titleBox.classList.add('premium-title-lockup');
+        const span=titleBox.querySelector('span');
+        if(span && span.textContent.trim()==='ZEELIN JOB TRAINING PORTAL'){
+          span.innerHTML='<b>ZEELIN</b><small>JOB TRAINING PORTAL</small>';
+        }
+      }
+    }
+    const sidebar=document.getElementById('sidebar');
+    if(sidebar){
+      const active=sidebar.querySelector('a[style*="background-color:#262626"],a[style*="background-color: #262626"],a[style*="background-color:#2a2218"],a[style*="background-color: #2a2218"]');
+      sidebar.querySelectorAll('a[aria-current]').forEach(a=>a.removeAttribute('aria-current'));
+      if(active) active.setAttribute('aria-current','page');
+    }
+  }
+  function refinePageSemantics(){
+    const page=document.getElementById('page');
+    if(!page) return;
+    const h1=page.querySelector('h1');
+    if(h1 && !h1.id) h1.id='pageTitle';
+    page.setAttribute('aria-labelledby',h1?'pageTitle':'');
+    page.querySelectorAll('img').forEach(img=>{
+      if(!img.loading) img.loading='lazy';
+      if(!img.decoding) img.decoding='async';
+    });
+  }
+  const run=()=>{refinePremiumChrome();refinePageSemantics();};
+  window.addEventListener('hashchange',()=>requestAnimationFrame(run));
+  window.addEventListener('load',run);
+  const p=document.getElementById('page');
+  const t=document.getElementById('topbar');
+  [p,t].filter(Boolean).forEach(el=>new MutationObserver(()=>requestAnimationFrame(run)).observe(el,{childList:true,subtree:false}));
+  run();
+})();
