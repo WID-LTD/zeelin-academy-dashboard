@@ -810,6 +810,7 @@ function viewBoost(){
 
   const boostTopbar = topbarHtml('ZEELIN JOB ACQUISITION PORTAL \u2022 Boost & Accountability','',pct)
     .replace('class="topbar job-copied-topbar"','class="topbar job-copied-topbar boost-topbar"')
+    .replace('<div class="ov-brand"><img decoding="async" src="assets/logo.png" alt="Zeelin Academy Logo"></div>','')
     .replace(/<div class="job-copied-topbar-space"[^>]*><\/div>/,'');
   return boostTopbar
     + css
