@@ -324,3 +324,149 @@
   [p,t].filter(Boolean).forEach(el=>new MutationObserver(()=>requestAnimationFrame(run)).observe(el,{childList:true,subtree:false}));
   run();
 })();
+
+/* ============================================================
+   PREMIUM V4 — PROFILE MENU + PLATFORM MICRO-INTERACTIONS
+   ============================================================ */
+(function(){
+  'use strict';
+
+  const menuIcon = {
+    user:'<path d="M12 12a4 4 0 1 0 0-8 4 4 0 0 0 0 8Zm7 8a7 7 0 0 0-14 0"/>',
+    check:'<path d="M9 11 12 14 20 6"/><path d="M20 12a8 8 0 1 1-5-7.4"/>',
+    chart:'<path d="M4 19V9M10 19V5M16 19v-7M22 19V3"/>',
+    help:'<circle cx="12" cy="12" r="9"/><path d="M9.6 9a2.6 2.6 0 1 1 4.3 2c-1.4 1-1.9 1.5-1.9 3M12 17.5h.01"/>',
+    layers:'<path d="m12 3 9 5-9 5-9-5 9-5Z"/><path d="m3 12 9 5 9-5M3 16l9 5 9-5"/>',
+    chevron:'<path d="m9 6 6 6-6 6"/>'
+  };
+  const mi=(name)=>'<span class="profile-menu-icon"><svg viewBox="0 0 24 24" aria-hidden="true">'+menuIcon[name]+'</svg></span>';
+
+  function getProfileMenu(){
+    let menu=document.getElementById('premiumProfileMenu');
+    if(menu) return menu;
+    menu=document.createElement('div');
+    menu.id='premiumProfileMenu';
+    menu.className='premium-profile-menu';
+    menu.setAttribute('role','menu');
+    menu.setAttribute('aria-label','Account menu');
+    menu.innerHTML=
+      '<div class="profile-menu-head">'
+        +'<img src="assets/avatar_1.png" alt="" class="profile-menu-avatar">'
+        +'<div><strong>John Doe</strong><span>Job Training Learner</span></div>'
+      +'</div>'
+      +'<div class="profile-menu-stats">'
+        +'<span><b>2,950</b><small>XP</small></span>'
+        +'<span><b>5</b><small>Day streak</small></span>'
+      +'</div>'
+      +'<div class="profile-menu-group">'
+        +'<button type="button" role="menuitem" data-profile-nav="/profile">'+mi('user')+'<span><b>Profile &amp; Insights</b><small>Progress, skills and readiness</small></span>'+mi('chevron')+'</button>'
+        +'<button type="button" role="menuitem" data-profile-nav="/checkin">'+mi('check')+'<span><b>Personal Check-In</b><small>Daily routine and XP claim</small></span>'+mi('chevron')+'</button>'
+        +'<button type="button" role="menuitem" data-profile-nav="/accountability">'+mi('chart')+'<span><b>Accountability</b><small>Weekly learning report</small></span>'+mi('chevron')+'</button>'
+        +'<button type="button" role="menuitem" data-profile-nav="/support">'+mi('help')+'<span><b>Support</b><small>Help centre and resources</small></span>'+mi('chevron')+'</button>'
+      +'</div>'
+      +'<div class="profile-menu-foot">'
+        +'<a href="/portal.html" role="menuitem">'+mi('layers')+'<span><b>Switch Portal</b><small>Return to Zeelin portals</small></span>'+mi('chevron')+'</a>'
+      +'</div>';
+    document.body.appendChild(menu);
+
+    menu.addEventListener('click',e=>{
+      const item=e.target.closest('[data-profile-nav]');
+      if(item){
+        closeProfileMenu();
+        location.hash=item.dataset.profileNav;
+      }
+    });
+    return menu;
+  }
+
+  function positionProfileMenu(){
+    const btn=document.querySelector('.profile-btn');
+    const menu=document.getElementById('premiumProfileMenu');
+    if(!btn||!menu||!menu.classList.contains('open')) return;
+    const r=btn.getBoundingClientRect();
+    const w=Math.min(340,window.innerWidth-24);
+    const left=Math.max(12,Math.min(window.innerWidth-w-12,r.right-w));
+    menu.style.width=w+'px';
+    menu.style.left=left+'px';
+    menu.style.top=Math.round(r.bottom+10)+'px';
+  }
+
+  function openProfileMenu(){
+    const btn=document.querySelector('.profile-btn');
+    if(!btn) return;
+    const menu=getProfileMenu();
+    menu.classList.add('open');
+    btn.classList.add('menu-open');
+    btn.setAttribute('aria-expanded','true');
+    btn.setAttribute('aria-haspopup','menu');
+    positionProfileMenu();
+    requestAnimationFrame(()=>menu.querySelector('[role="menuitem"]')?.focus({preventScroll:true}));
+  }
+
+  function closeProfileMenu(){
+    const btn=document.querySelector('.profile-btn');
+    const menu=document.getElementById('premiumProfileMenu');
+    if(menu) menu.classList.remove('open');
+    if(btn){
+      btn.classList.remove('menu-open');
+      btn.setAttribute('aria-expanded','false');
+    }
+  }
+
+  function toggleProfileMenu(){
+    const menu=getProfileMenu();
+    if(menu.classList.contains('open')) closeProfileMenu();
+    else openProfileMenu();
+  }
+
+  /* Capture before app.js's direct data-go profile handler. */
+  document.addEventListener('click',function(e){
+    const btn=e.target.closest && e.target.closest('.profile-btn');
+    if(btn){
+      e.preventDefault();
+      e.stopPropagation();
+      e.stopImmediatePropagation();
+      toggleProfileMenu();
+      return;
+    }
+    const menu=e.target.closest && e.target.closest('#premiumProfileMenu');
+    if(!menu) closeProfileMenu();
+  },true);
+
+  document.addEventListener('keydown',function(e){
+    const menu=document.getElementById('premiumProfileMenu');
+    if(!menu||!menu.classList.contains('open')) return;
+    if(e.key==='Escape'){
+      e.preventDefault();
+      closeProfileMenu();
+      document.querySelector('.profile-btn')?.focus();
+      return;
+    }
+    const items=[...menu.querySelectorAll('[role="menuitem"]')];
+    const idx=items.indexOf(document.activeElement);
+    if(e.key==='ArrowDown'){
+      e.preventDefault();
+      (items[(idx+1+items.length)%items.length]||items[0])?.focus();
+    }else if(e.key==='ArrowUp'){
+      e.preventDefault();
+      (items[(idx-1+items.length)%items.length]||items.at(-1))?.focus();
+    }
+  });
+
+  window.addEventListener('resize',positionProfileMenu,{passive:true});
+  window.addEventListener('scroll',positionProfileMenu,{passive:true,capture:true});
+  window.addEventListener('hashchange',closeProfileMenu);
+
+  /* Re-apply ARIA every time app.js recreates the topbar. */
+  const top=document.getElementById('topbar');
+  if(top){
+    new MutationObserver(()=>{
+      const btn=top.querySelector('.profile-btn');
+      if(btn){
+        btn.setAttribute('aria-haspopup','menu');
+        btn.setAttribute('aria-expanded','false');
+        btn.setAttribute('title','Open account menu');
+      }
+    }).observe(top,{childList:true});
+  }
+})();
