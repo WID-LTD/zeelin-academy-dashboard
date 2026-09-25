@@ -759,6 +759,10 @@ function viewBoost(){
     + '@media(max-width:1279px){.boost-premium{display:block;overflow-y:auto}.bp-main{overflow:visible}.bp-right{width:100%;height:auto;overflow:visible;border-left:0;border-top:1px solid #e4eaf1;padding:20px}.bp-right-inner{display:grid;grid-template-columns:repeat(3,minmax(0,1fr))}.bp-metrics{grid-template-columns:repeat(2,minmax(0,1fr))}}'
     + '@media(max-width:850px){.bp-grid{grid-template-columns:1fr}.bp-right-inner{grid-template-columns:1fr}}'
     + '@media(max-width:620px){.bp-main{padding:14px 13px 36px}.bp-hero{padding:24px 18px;min-height:0}.bp-hero h1{font-size:30px}.bp-metrics{grid-template-columns:1fr 1fr;gap:9px}.bp-form-grid{grid-template-columns:1fr}.bp-full{grid-column:auto}.bp-application{grid-template-columns:1fr}.bp-app-actions{justify-content:space-between}.bp-head{align-items:flex-start;flex-direction:column}}'
+    + '.boost-topbar{position:sticky!important;top:0!important;left:auto!important;width:100%!important;transform:none!important;flex:0 0 73px!important}'
+    + '@media(min-width:1280px){.sidebar.boost-sidebar-position{position:sticky!important;top:0!important;align-self:flex-start!important;height:100dvh!important;min-height:0!important;max-height:100dvh!important;overflow-y:auto!important;overflow-x:hidden!important;width:clamp(210px,13.5vw,270px)!important;min-width:clamp(210px,13.5vw,270px)!important}.layout:has(.boost-premium){background:#fff!important}.main:has(.boost-premium){background:#fff!important}}'
+    + '@media(min-width:1280px) and (max-width:1450px){.sidebar.boost-sidebar-position{width:220px!important;min-width:220px!important;padding-left:8px!important;padding-right:8px!important}.sidebar.boost-sidebar-position .nav-item{padding-left:10px!important;padding-right:10px!important;gap:10px!important}.sidebar.boost-sidebar-position .subnav .nav-item{padding-left:24px!important}}'
+    + '@media(max-width:1279px){.sidebar.boost-sidebar-position{position:fixed!important;left:0!important;top:0!important;bottom:0!important;width:300px!important;max-width:86vw!important;height:100dvh!important;min-height:0!important;overflow-y:auto!important}}'
     + '</style>';
 
   const main='<div class="bp-main"><div class="bp-inner">'
@@ -785,7 +789,10 @@ function viewBoost(){
     + '<section class="bp-side-card bp-tip"><div class="bp-side-label" style="color:#ffd46b">Career Momentum</div><h3>Stay consistent.</h3><p>Every verified application increases your exposure to real opportunities.</p><div class="bp-gold-stroke"></div></section>'
     + '</div></aside>';
 
-  return topbarHtml('ZEELIN JOB ACQUISITION PORTAL \u2022 Boost & Accountability','',pct)
+  const boostTopbar = topbarHtml('ZEELIN JOB ACQUISITION PORTAL \u2022 Boost & Accountability','',pct)
+    .replace('class="topbar job-copied-topbar"','class="topbar job-copied-topbar boost-topbar"')
+    .replace(/<div class="job-copied-topbar-space"[^>]*><\/div>/,'');
+  return boostTopbar
     + css
     + '<div class="boost-premium">'+main+right+'</div>';
 }
@@ -1679,9 +1686,11 @@ function updateSidebar(activeRoute){
   const sb=document.getElementById('sidebar');
   if(sb){
     sb.classList.add('overview-sidebar-copy');
+    sb.classList.toggle('boost-sidebar-position', activeRoute==='boost');
     sb.innerHTML=renderSidebar(activeRoute);
   }
   const fullWidth=['overview','regional-boards'].includes(activeRoute);
+  const isBoost=activeRoute==='boost';
   const layout=document.querySelector('.layout');
   const mainWrap=document.querySelector('.main');
   const sidebarEl=document.getElementById('sidebar');
@@ -1692,9 +1701,9 @@ function updateSidebar(activeRoute){
     try{document.body.style.background='#ffffff';}catch(e){}
   }else{
     if(sidebarEl){sidebarEl.style.display='flex';sidebarEl.style.width='';}
-    if(layout){layout.style.display='flex';layout.style.background='';}
-    if(mainWrap) mainWrap.style.background='';
-    try{document.body.style.background='';}catch(e){}
+    if(layout){layout.style.display='flex';layout.style.background=isBoost?'#ffffff':'';}
+    if(mainWrap) mainWrap.style.background=isBoost?'#ffffff':'';
+    try{document.body.style.background=isBoost?'#ffffff':'';}catch(e){}
   }
 }
 
@@ -1718,6 +1727,7 @@ function renderJBNav(view){
 function render(view, param){
   const fullWidthViews = ['overview','regional-boards'];
   const isFull = fullWidthViews.includes(view);
+  const isBoost = view==='boost';
   // update sidebar even for full width (for state)
   updateSidebar(view);
   renderJBNav(view);
@@ -1726,7 +1736,7 @@ function render(view, param){
   const main = document.getElementById('main-content');
   if(!main) return;
   // Ensure main-content wrapper styles — overview white, free, 80% scale handled inside
-  main.style.cssText = isFull ? 'display:block;overflow:auto;background:#ffffff;height:100vh;height:100dvh;min-height:0;flex:none;' : 'display:flex;flex-direction:column;overflow:hidden;background:#121212;height:100%;min-height:0;';
+  main.style.cssText = isFull ? 'display:block;overflow:auto;background:#ffffff;height:100vh;height:100dvh;min-height:0;flex:none;' : 'display:flex;flex-direction:column;overflow:hidden;background:'+(isBoost?'#ffffff':'#121212')+';height:100%;min-height:0;';
 
   let html='';
   switch(view){
