@@ -4149,3 +4149,21 @@ body.premium-training.premium-route-support #page{
   }
   .ts-modal-actions button{width:100%}
 }
+
+.ts-search-ico{
+  width:19px!important;
+  height:19px!important;
+  flex:0 0 19px!important;
+  display:grid!important;
+  place-items:center!important;
+  transform:none!important;
+}
+.ts-search-ico svg{
+  width:19px!important;
+  height:19px!important;
+  fill:none!important;
+  stroke:#63718a!important;
+  stroke-width:2!important;
+  stroke-linecap:round!important;
+  stroke-linejoin:round!important;
+}
