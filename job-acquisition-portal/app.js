@@ -708,77 +708,86 @@ function bindRegionalBoards(){
 window._jbSetRegion = (v)=>{ window._jbFilter.region=v; const m=document.getElementById('main-content'); m.innerHTML=viewRegionalBoards(); bindRegionalBoards(); };
 
 function viewBoost(){
-  const apps = state.boostApplications;
-  const q = apps.length;
-  const pct = Math.min(100, Math.round(q/5*100));
-  const historyHtml = apps.length ? apps.map((a,i)=>{
-    const statusColor = a.status==='accepted' ? '#16a34a' : a.status==='rejected' ? '#ef4444' : a.status==='interview' ? '#d97706' : '#52525b';
-    const statusBg = a.status==='accepted' ? '#064e3b' : a.status==='rejected' ? '#450a0a' : a.status==='interview' ? '#2c1a0e' : '#27272a';
-    const statusBorder = a.status==='accepted' ? '#10b981' : a.status==='rejected' ? '#ef4444' : a.status==='interview' ? '#d97706' : '#52525b';
-    return '<div style="background-color:#161616;border:2px solid #2a2a2a;border-radius:8px;padding:16px;display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;">'
-      + '<div style="flex:1;min-width:220px;">'
-      + '<h4 style="font-size:15px;font-weight:900;color:#ffffff;margin:0 0 4px 0;">'+esc(a.role||a.company+' — Application')+' — '+esc(a.company)+'</h4>'
-      + '<span style="font-size:12px;font-weight:700;color:#a3a3a3;">Link: <a href="'+esc(a.link)+'" target="_blank" style="color:#38bdf8;text-decoration:none;">'+esc(a.link.slice(0,38))+'</a> &bull; Applied: '+esc(fmtDate(a.dateApplied))+' &bull; Posted: '+esc(a.datePosted ? fmtDate(a.datePosted) : '—')+'</span>'
-      + '<div style="margin-top:6px;font-size:11px;color:#737373;">Req: '+esc((a.requirements||'').slice(0,90))+'</div>'
+  const apps=state.boostApplications;
+  const q=apps.length;
+  const pct=Math.min(100,Math.round(q/5*100));
+  const left=Math.max(0,5-q);
+  const interviews=apps.filter(a=>a.status==='interview').length;
+
+  const statusStyle=(status)=>{
+    if(status==='accepted') return {bg:'#eaf8f3',color:'#08785b',border:'#a9dfcc'};
+    if(status==='rejected') return {bg:'#fff0f2',color:'#b4233d',border:'#f2c0ca'};
+    if(status==='interview') return {bg:'#fff6dd',color:'#946000',border:'#ebcf77'};
+    return {bg:'#f3f6fa',color:'#59677e',border:'#dce4ed'};
+  };
+
+  const historyHtml=apps.length ? apps.map((a)=>{
+    const st=statusStyle(a.status);
+    return '<article class="bp-application">'
+      + '<div class="bp-app-copy">'
+      + '<h4>'+esc(a.role||a.company+' — Application')+' <span>— '+esc(a.company)+'</span></h4>'
+      + '<div class="bp-app-meta"><span>Applied: '+esc(fmtDate(a.dateApplied))+'</span><span>Posted: '+esc(a.datePosted?fmtDate(a.datePosted):'—')+'</span>'
+      + '<a href="'+esc(a.link)+'" target="_blank" rel="noopener">Open source ↗</a></div>'
+      + '<div class="bp-req">'+esc((a.requirements||'No requirements summary added.').slice(0,150))+'</div>'
       + '</div>'
-      + '<div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;">'
-      + '<select onchange="window._updateBoostStatus(\''+a.id+'\', this.value)" style="background-color:'+statusBg+';color:'+statusColor+';border:1px solid '+statusBorder+';padding:6px 10px;border-radius:6px;font-size:12px;font-weight:900;cursor:pointer;">'
+      + '<div class="bp-app-actions">'
+      + '<select onchange="window._updateBoostStatus(\''+a.id+'\',this.value)" style="background:'+st.bg+';color:'+st.color+';border-color:'+st.border+'">'
       + '<option value="applied" '+(a.status==='applied'?'selected':'')+'>Applied</option>'
       + '<option value="interview" '+(a.status==='interview'?'selected':'')+'>Interview</option>'
       + '<option value="accepted" '+(a.status==='accepted'?'selected':'')+'>Accepted</option>'
       + '<option value="rejected" '+(a.status==='rejected'?'selected':'')+'>Rejected</option>'
       + '</select>'
-      + '<span style="background-color:'+statusBg+';color:'+statusColor+';border:1px solid '+statusBorder+';padding:6px 12px;border-radius:6px;font-size:12px;font-weight:900;white-space:nowrap;">'+esc(a.status)+' ('+(i+1)+'/5)</span>'
-      + '<button onclick="window._deleteBoost(\''+a.id+'\')" style="background:#262626;color:#a3a3a3;border:1px solid #3a3a3a;padding:6px 10px;border-radius:6px;font-size:11px;font-weight:800;cursor:pointer;">✕</button>'
-      + '</div></div>';
-  }).join('') : '<div style="padding:20px;text-align:center;color:#737373;font-weight:700;border:2px dashed #2a2a2a;border-radius:8px;">No applications logged yet. Use the form above to log your first of 5 required.</div>';
+      + '<button class="bp-delete" onclick="window._deleteBoost(\''+a.id+'\')" aria-label="Remove '+esc(a.company)+' application">✕</button>'
+      + '</div>'
+      + '</article>';
+  }).join('') : '<div class="bp-empty">No applications logged yet. Use the form above to add your first verified application.</div>';
 
-  const main = ''
-    + '<div style="flex:1;padding:36px 52px;overflow-y:auto;background-color:#121212;">'
-    + '<div style="max-width:960px;margin:0 auto;display:flex;flex-direction:column;gap:32px;">'
-    + '<div style="background:linear-gradient(rgba(24,24,24,0.9), rgba(24,24,24,0.9)), url(\'https://images.unsplash.com/photo-1454165804606-c3d57bc86b40?auto=format&fit=crop&w=1200&q=80\') center/cover no-repeat;border:2px solid #3a3a3a;border-radius:12px;padding:32px;box-sizing:border-box;">'
-    + '<span style="font-size:12px;font-weight:800;color:#f59e0b;text-transform:uppercase;letter-spacing:0.8px;">Mandatory Cohort Enforcement</span>'
-    + '<h1 style="font-size:28px;font-weight:900;color:#ffffff;margin:8px 0 10px 0;">Boost Your Application Engine</h1>'
-    + '<p style="font-size:14px;font-weight:700;color:#c0c0c0;margin:0;line-height:1.6;">Log your external job applications below. You are required to submit a minimum of 5 verified applications. If your quota is not met, the system will safely lock progression and redirect you back to the Regional Job Boards. Multiple concurrent jobs supported.</p></div>'
-    + '<div style="background-color:#181818;border:2px solid #3a3a3a;border-radius:12px;padding:32px;display:flex;flex-direction:column;gap:20px;">'
-    + '<h2 style="font-size:20px;font-weight:900;color:#ffffff;margin:0;">Log New Job Application</h2>'
-    + '<div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;">'
-    + '<div><label style="font-size:13px;font-weight:800;color:#d4d4d4;display:block;margin-bottom:6px;">Company Name Applied To</label><input id="boost-company" type="text" placeholder="e.g. Greencore / TechCorp" style="width:100%;background-color:#161616;border:2px solid #3a3a3a;border-radius:8px;padding:12px;color:#ffffff;font-size:13px;font-weight:800;box-sizing:border-box;outline:none;"></div>'
-    + '<div><label style="font-size:13px;font-weight:800;color:#d4d4d4;display:block;margin-bottom:6px;">Job Application Link</label><input id="boost-link" type="text" placeholder="https://external-jobboard.com/apply/123" style="width:100%;background-color:#161616;border:2px solid #3a3a3a;border-radius:8px;padding:12px;color:#ffffff;font-size:13px;font-weight:800;box-sizing:border-box;outline:none;"></div>'
-    + '</div>'
-    + '<div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;">'
-    + '<div><label style="font-size:13px;font-weight:800;color:#d4d4d4;display:block;margin-bottom:6px;">Date Applied</label><input id="boost-dateApplied" type="date" value="'+new Date().toISOString().slice(0,10)+'" style="width:100%;background-color:#161616;border:2px solid #3a3a3a;border-radius:8px;padding:12px;color:#ffffff;font-size:13px;font-weight:800;box-sizing:border-box;outline:none;"></div>'
-    + '<div><label style="font-size:13px;font-weight:800;color:#d4d4d4;display:block;margin-bottom:6px;">Date Job Was Posted</label><input id="boost-datePosted" type="date" style="width:100%;background-color:#161616;border:2px solid #3a3a3a;border-radius:8px;padding:12px;color:#ffffff;font-size:13px;font-weight:800;box-sizing:border-box;outline:none;"></div>'
-    + '</div>'
-    + '<div><label style="font-size:13px;font-weight:800;color:#d4d4d4;display:block;margin-bottom:6px;">Job Requirements Summary</label><textarea id="boost-req" placeholder="Summarize key requirements (e.g. Business Analysis, SQL, Stakeholder Mapping)..." style="width:100%;height:90px;background-color:#161616;border:2px solid #3a3a3a;border-radius:8px;padding:12px;color:#ffffff;font-size:13px;font-weight:800;resize:vertical;box-sizing:border-box;outline:none;"></textarea></div>'
-    + '<div><label style="font-size:13px;font-weight:800;color:#d4d4d4;display:block;margin-bottom:6px;">Job Status</label><select id="boost-status" style="width:200px;background-color:#161616;border:2px solid #3a3a3a;border-radius:8px;padding:10px;color:#ffffff;font-size:13px;font-weight:800;outline:none;"><option value="applied">Applied</option><option value="interview">Interview</option><option value="accepted">Accepted</option><option value="rejected">Rejected</option></select> <span style="font-size:11px;color:#737373;margin-left:8px;">Update anytime via history &rarr; job tracking</span></div>'
-    + '<div style="display:flex;justify-content:flex-end;"><button onclick="window._submitBoost()" style="background:linear-gradient(135deg, #f59e0b 0%, #d97706 100%);color:#ffffff;border:1px solid #f59e0b;padding:14px 28px;border-radius:8px;font-size:14px;font-weight:900;cursor:pointer;box-shadow:0 4px 16px rgba(217,119,6,0.4);">Submit & Count Application (+1)</button></div>'
-    + '</div>'
-    + '<div style="background-color:#181818;border:2px solid #3a3a3a;border-radius:12px;padding:32px;">'
-    + '<div style="display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;margin-bottom:20px;"><h2 style="font-size:20px;font-weight:900;color:#ffffff;margin:0;">Verified Application History</h2><span style="font-size:12px;font-weight:800;color:#a3a3a3;">Job Tracking: Applied &rarr; Interview &rarr; Accepted / Rejected</span></div>'
-    + '<div style="display:flex;flex-direction:column;gap:12px;">'+historyHtml+'</div></div>'
+  const checklistHtml=apps.slice(0,5).map(a=>
+    '<div class="bp-check"><span class="bp-box done">✓</span><span>'+esc(a.company)+' application logged</span></div>'
+  ).join('') + (left
+    ? '<div class="bp-check"><span class="bp-box"></span><span>Reach the 5-application weekly quota</span></div>'
+    : '<div class="bp-check"><span class="bp-box done">✓</span><span>Weekly quota complete — progression unlocked</span></div>');
+
+  const css='<style>'
+    + '.boost-premium,.boost-premium *{box-sizing:border-box}.boost-premium{--bp-navy:#071b33;--bp-gold:#d99a0a;--bp-gold2:#f0c456;--bp-green:#0b9b72;--bp-blue:#0758cf;--bp-text:#07143a;--bp-muted:#697590;--bp-line:#e3e9f0;--bp-soft:#f6f8fb;display:flex;flex:1;min-height:0;background:#fff;color:var(--bp-text);font-family:Inter,"Segoe UI",Arial,sans-serif}.boost-premium button,.boost-premium input,.boost-premium select,.boost-premium textarea{font:inherit}.boost-premium a{text-decoration:none}'
+    + '.bp-main{flex:1;min-width:0;overflow-y:auto;background:#fff;padding:22px 22px 50px}.bp-inner{max-width:1120px;margin:0 auto}.bp-hero{min-height:270px;border-radius:18px;overflow:hidden;padding:32px 34px;color:#fff;background:linear-gradient(90deg,rgba(5,20,38,.96),rgba(5,20,38,.84) 52%,rgba(5,20,38,.28)),url("https://images.unsplash.com/photo-1454165804606-c3d57bc86b40?auto=format&fit=crop&w=1600&q=85") center/cover;box-shadow:0 18px 40px rgba(19,47,77,.12)}.bp-eyebrow{font-size:11px;font-weight:900;letter-spacing:.75px;color:#ffd267;text-transform:uppercase}.bp-hero h1{font-size:clamp(30px,3vw,45px);line-height:1.03;margin:12px 0}.bp-hero h1 span{color:var(--bp-gold2)}.bp-hero p{max-width:700px;font-size:14px;line-height:1.68;color:#dbe5ef;margin:0}.bp-actions{display:flex;gap:10px;flex-wrap:wrap;margin-top:22px}.bp-btn{min-height:44px;border-radius:11px;padding:0 17px;border:1px solid #d6dfe8;background:#fff;color:var(--bp-navy);font-size:12px;font-weight:900;cursor:pointer;display:inline-flex;align-items:center;justify-content:center;gap:8px;transition:.18s}.bp-btn:hover{transform:translateY(-1px)}.bp-btn.primary{background:linear-gradient(100deg,#d59608,#e9bb38);border-color:#d89c11;color:#fff;box-shadow:0 8px 20px rgba(201,144,7,.28)}.bp-btn.navy{background:var(--bp-navy);color:#fff;border-color:var(--bp-navy)}'
+    + '.bp-metrics{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px;margin:16px 0 20px}.bp-metric,.bp-card,.bp-side-card{background:#fff;border:1px solid #dfe7ef;border-radius:15px;box-shadow:0 5px 16px rgba(31,58,91,.045)}.bp-metric{padding:16px}.bp-metric-label{font-size:10px;color:#7a8598;font-weight:900;letter-spacing:.35px}.bp-metric b{display:block;font-size:26px;margin-top:10px}.bp-metric p{margin:3px 0 0;font-size:11px;color:#7a8598}'
+    + '.bp-grid{display:grid;grid-template-columns:minmax(0,1fr) minmax(330px,.78fr);gap:18px}.bp-card{overflow:hidden}.bp-head{padding:18px 20px;border-bottom:1px solid #e7edf3;display:flex;justify-content:space-between;align-items:center;gap:12px}.bp-head h2{margin:0;font-size:19px}.bp-head p{margin:4px 0 0;color:#7a8598;font-size:12px;line-height:1.45}.bp-pill{padding:7px 10px;border-radius:999px;background:#fff6d9;border:1px solid #e7c158;color:#8a5b00;font-size:10px;font-weight:900;white-space:nowrap}.bp-body{padding:20px}.bp-form-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px}.bp-full{grid-column:1/-1}.bp-field label{display:block;font-size:11px;font-weight:900;color:#45526a;margin-bottom:7px}.bp-field input,.bp-field select,.bp-field textarea{width:100%;padding:12px 13px;border:1px solid #dbe3ec;border-radius:11px;background:#f8fafc;color:#17233e;outline:0;transition:.16s}.bp-field input:focus,.bp-field select:focus,.bp-field textarea:focus{background:#fff;border-color:#9db7d7;box-shadow:0 0 0 4px rgba(7,88,207,.06)}.bp-field textarea{min-height:94px;resize:vertical}.bp-form-foot{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;margin-top:16px}.bp-helper{font-size:11px;color:#7b879a}'
+    + '.bp-quota{background:linear-gradient(145deg,#0b2744,#071b33);color:#fff;padding:22px}.bp-qtop{display:flex;justify-content:space-between;gap:14px}.bp-quota h3{font-size:19px;margin:5px 0}.bp-quota p{font-size:12px;color:#c8d5e2;margin:0}.bp-qvalue{text-align:right}.bp-qvalue b{font-size:30px;color:#ffd361;display:block}.bp-qvalue span{font-size:10px}.bp-progress{height:11px;border-radius:999px;background:rgba(255,255,255,.12);overflow:hidden;margin:18px 0 8px}.bp-progress span{display:block;height:100%;background:linear-gradient(90deg,#d99a0a,#10a477);border-radius:inherit}.bp-qrow{display:flex;justify-content:space-between;font-size:11px}.bp-checklist{display:flex;flex-direction:column;gap:10px;margin-top:18px}.bp-check{display:flex;align-items:center;gap:10px;font-size:12px;line-height:1.35}.bp-box{width:20px;height:20px;flex:0 0 20px;border-radius:6px;border:1px solid rgba(255,255,255,.28);display:grid;place-items:center}.bp-box.done{background:#10a477;border-color:#10a477}'
+    + '.bp-history{margin-top:18px}.bp-list{display:flex;flex-direction:column;gap:11px;padding:16px}.bp-application{border:1px solid #e0e7ef;border-radius:14px;padding:15px;display:grid;grid-template-columns:minmax(0,1fr) auto;gap:14px;align-items:center;background:#fff}.bp-application h4{margin:0 0 5px;font-size:14px}.bp-application h4 span{color:#66748a;font-weight:700}.bp-app-meta{font-size:11px;color:#778297;display:flex;gap:8px;flex-wrap:wrap}.bp-app-meta a{color:var(--bp-blue);font-weight:800}.bp-req{margin-top:7px;font-size:11px;color:#57657d;line-height:1.45}.bp-app-actions{display:flex;align-items:center;gap:7px}.bp-app-actions select{width:auto;min-width:116px;border:1px solid #dce4ed;border-radius:9px;padding:8px 9px;font-size:12px;font-weight:800;outline:none}.bp-delete{width:34px;height:34px;border-radius:9px;border:1px solid #e1e6ed;background:#fff;color:#7b8799;cursor:pointer}.bp-delete:hover{background:#fff0f2;color:#b91c35;border-color:#f4c5ce}.bp-empty{padding:30px;text-align:center;color:#788398;border:1px dashed #d6dee8;border-radius:13px;background:#fafcff}'
+    + '.bp-right{width:360px;flex:0 0 360px;height:100%;overflow-y:auto;border-left:1px solid #e4eaf1;background:#fbfcfe;padding:18px 17px;scrollbar-width:thin;scrollbar-color:#d0d9e4 #fbfcfe}.bp-right-inner{display:flex;flex-direction:column;gap:14px}.bp-side-card{padding:18px}.bp-side-label{color:#9a6400;font-size:11px;font-weight:900;letter-spacing:.55px;text-transform:uppercase}.bp-side-card h3{margin:7px 0 6px;font-size:17px}.bp-side-card p{color:#697590;font-size:12px;line-height:1.56;margin:0}.bp-ring-wrap{position:relative}.bp-ring{width:108px;height:108px;border-radius:50%;margin:16px auto;background:conic-gradient(#10a477 0 '+pct+'%,#e8edf3 '+pct+'% 100%);display:grid;place-items:center}.bp-ring:before{content:"";width:78px;height:78px;border-radius:50%;background:#fff}.bp-ring-copy{position:absolute;inset:0;display:grid;place-items:center;text-align:center}.bp-ring-copy b{font-size:23px;display:block}.bp-ring-copy span{display:block;font-size:10px;color:#7c8899}.bp-side-progress{height:9px;background:#e5ebf1;border-radius:999px;overflow:hidden;margin:10px 0}.bp-side-progress span{display:block;height:100%;background:linear-gradient(90deg,#d99a0a,#10a477)}.bp-side-line{display:flex;justify-content:space-between;gap:10px;font-size:11px;font-weight:800}.bp-tip{min-height:180px;color:#fff;background:linear-gradient(180deg,rgba(7,27,51,.12),rgba(7,27,51,.92)),url("https://images.unsplash.com/photo-1521737604893-d14cc237f11d?auto=format&fit=crop&w=900&q=80") center/cover;display:flex;flex-direction:column;justify-content:flex-end}.bp-tip p{color:#e3ebf2}.bp-tip .bp-gold-stroke{width:77px;height:4px;background:#ffc544;border-radius:99px;transform:rotate(-7deg);margin-top:14px}'
+    + '@media(max-width:1279px){.boost-premium{display:block;overflow-y:auto}.bp-main{overflow:visible}.bp-right{width:100%;height:auto;overflow:visible;border-left:0;border-top:1px solid #e4eaf1;padding:20px}.bp-right-inner{display:grid;grid-template-columns:repeat(3,minmax(0,1fr))}.bp-metrics{grid-template-columns:repeat(2,minmax(0,1fr))}}'
+    + '@media(max-width:850px){.bp-grid{grid-template-columns:1fr}.bp-right-inner{grid-template-columns:1fr}}'
+    + '@media(max-width:620px){.bp-main{padding:14px 13px 36px}.bp-hero{padding:24px 18px;min-height:0}.bp-hero h1{font-size:30px}.bp-metrics{grid-template-columns:1fr 1fr;gap:9px}.bp-form-grid{grid-template-columns:1fr}.bp-full{grid-column:auto}.bp-application{grid-template-columns:1fr}.bp-app-actions{justify-content:space-between}.bp-head{align-items:flex-start;flex-direction:column}}'
+    + '</style>';
+
+  const main='<div class="bp-main"><div class="bp-inner">'
+    + '<section class="bp-hero"><div class="bp-eyebrow">MANDATORY COHORT ENFORCEMENT</div><h1>Boost Your <span>Application Engine</span></h1><p>Track every external application, maintain your weekly quota, and move through ZEELIN’s employment-readiness pipeline with evidence-backed accountability.</p><div class="bp-actions"><button class="bp-btn primary" type="button" onclick="document.getElementById(\'boost-company\').focus()">＋ Log New Application</button><button class="bp-btn" type="button" onclick="document.getElementById(\'boost-history\').scrollIntoView({behavior:\'smooth\'})">View Application History</button></div></section>'
+    + '<section class="bp-metrics"><article class="bp-metric"><div class="bp-metric-label">WEEKLY QUOTA</div><b>'+q+'/5</b><p>Applications logged</p></article><article class="bp-metric"><div class="bp-metric-label">COMPLETION</div><b>'+pct+'%</b><p>Quota progress</p></article><article class="bp-metric"><div class="bp-metric-label">INTERVIEWS</div><b>'+interviews+'</b><p>Active interview stage</p></article><article class="bp-metric"><div class="bp-metric-label">REMAINING</div><b>'+left+'</b><p>Applications to quota</p></article></section>'
+    + '<section class="bp-grid">'
+    + '<article class="bp-card"><div class="bp-head"><div><h2>Log New Job Application</h2><p>Add a verified external application to your weekly accountability record.</p></div><span class="bp-pill">VERIFIED LOG</span></div><div class="bp-body"><div class="bp-form-grid">'
+    + '<div class="bp-field"><label for="boost-company">COMPANY NAME</label><input id="boost-company" type="text" placeholder="e.g. Greencore / TechCorp"></div>'
+    + '<div class="bp-field"><label for="boost-role">ROLE / POSITION</label><input id="boost-role" type="text" placeholder="e.g. Senior Business Analyst"></div>'
+    + '<div class="bp-field"><label for="boost-link">JOB APPLICATION LINK</label><input id="boost-link" type="url" placeholder="https://external-jobboard.com/apply"></div>'
+    + '<div class="bp-field"><label for="boost-status">APPLICATION STATUS</label><select id="boost-status"><option value="applied">Applied</option><option value="interview">Interview</option><option value="accepted">Accepted</option><option value="rejected">Rejected</option></select></div>'
+    + '<div class="bp-field"><label for="boost-dateApplied">DATE APPLIED</label><input id="boost-dateApplied" type="date" value="'+new Date().toISOString().slice(0,10)+'"></div>'
+    + '<div class="bp-field"><label for="boost-datePosted">DATE JOB WAS POSTED</label><input id="boost-datePosted" type="date"></div>'
+    + '<div class="bp-field bp-full"><label for="boost-req">JOB REQUIREMENTS SUMMARY</label><textarea id="boost-req" placeholder="Business Analysis, SQL, Stakeholder Mapping, Power BI..."></textarea></div>'
+    + '</div><div class="bp-form-foot"><span class="bp-helper">Each verified entry contributes to the mandatory 5-application weekly quota.</span><button class="bp-btn primary" type="button" onclick="window._submitBoost()">Submit &amp; Count Application (+1)</button></div></div></article>'
+    + '<article class="bp-card bp-quota"><div class="bp-qtop"><div><div class="bp-eyebrow">ACCOUNTABILITY ENGINE</div><h3>5-Application Quota</h3><p>Strict progression rule</p></div><div class="bp-qvalue"><b>'+q+' / 5</b><span>'+(left?left+' LEFT':'QUOTA MET')+'</span></div></div><div class="bp-progress"><span style="width:'+pct+'%"></span></div><div class="bp-qrow"><span>Weekly progress</span><strong>'+pct+'%</strong></div><div class="bp-checklist">'+checklistHtml+'</div><button class="bp-btn" type="button" style="width:100%;margin-top:20px" onclick="window._nav(\'regional-boards\')">Explore More Job Boards →</button></article>'
+    + '</section>'
+    + '<section class="bp-card bp-history" id="boost-history"><div class="bp-head"><div><h2>Verified Application History</h2><p>Track Applied → Interview → Accepted / Rejected.</p></div><span class="bp-pill">'+q+' APPLICATION'+(q===1?'':'S')+'</span></div><div class="bp-list">'+historyHtml+'</div></section>'
     + '</div></div>';
 
-  const right = ''
-    + '<div style="width:360px;background-color:#181818;border-left:2px solid #3a3a3a;display:flex;flex-direction:column;justify-content:space-between;overflow-y:auto;flex-shrink:0;">'
-    + '<div style="padding:28px;">'
-    + '<div style="margin-bottom:24px;border-bottom:2px solid #3a3a3a;padding-bottom:16px;">'
-    + '<span style="font-size:11px;font-weight:800;color:#f59e0b;text-transform:uppercase;letter-spacing:0.8px;">Accountability Engine</span>'
-    + '<h3 style="font-size:18px;font-weight:900;color:#ffffff;margin:4px 0 2px 0;">5-Application Quota</h3><p style="font-size:12px;font-weight:700;color:#c0c0c0;margin:0;">Strict Progression Rule</p></div>'
-    + '<div style="background-color:#161616;border:2px solid #3a3a3a;border-radius:10px;padding:20px;margin-bottom:24px;">'
-    + '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;"><span style="font-size:13px;font-weight:900;color:#ffffff;">Progress: '+q+' / 5</span><span style="font-size:13px;font-weight:900;color:#f59e0b;">'+(5 - q)+' Left</span></div>'
-    + '<div style="height:10px;background-color:#1f1f1f;border:1px solid #3a3a3a;border-radius:5px;overflow:hidden;margin-bottom:12px;"><div style="width:'+pct+'%;height:100%;background:linear-gradient(90deg, #d97706 0%, #16a34a 100%);"></div></div>'
-    + '<p style="font-size:12px;font-weight:700;color:#a3a3a3;margin:0;line-height:1.5;">If quota is not fulfilled, system redirects you directly back to the Regional Job Boards.</p></div>'
-    + '<div style="display:flex;flex-direction:column;gap:12px;font-size:13px;font-weight:700;color:#d4d4d4;margin-bottom:32px;">'
-    + apps.map((a,i)=>'<label style="display:flex;align-items:center;gap:10px;cursor:pointer;"><input type="checkbox" checked style="accent-color:#16a34a;width:16px;height:16px;"> Logged: '+esc(a.company)+' ('+esc(a.status)+')</label>').join('')
-    + (q<5 ? '<label style="display:flex;align-items:center;gap:10px;cursor:pointer;"><input type="checkbox" style="accent-color:#d97706;width:16px;height:16px;"> Reach 5 Applications Quota</label>' : '<label style="display:flex;align-items:center;gap:10px;cursor:pointer;"><input type="checkbox" checked style="accent-color:#16a34a;width:16px;height:16px;"> Quota Met — Unlocked CV & Mocks</label>')
-    + '</div></div>'
-    + '<div style="padding:24px;background-color:#161616;border-top:2px solid #3a3a3a;">'
-    + '<button onclick="window._nav(\'cv-maker\')" style="width:100%;background:linear-gradient(135deg, #f59e0b 0%, #d97706 100%);color:#ffffff;border:1px solid #f59e0b;padding:14px;border-radius:8px;font-size:14px;font-weight:900;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px;box-shadow:0 4px 16px rgba(217, 119, 6, 0.4);">'
-    + '<span>Proceed to CV Maker & Portfolio</span><svg style="width:16px;height:16px;fill:currentColor;" viewBox="0 0 24 24"><path d="M5 13h11.86l-5.43 5.43 1.42 1.42L21.14 12l-8.29-8.29-1.42 1.42L16.86 11H5v2z"/></svg></button></div></div>';
+  const right='<aside class="bp-right"><div class="bp-right-inner">'
+    + '<section class="bp-side-card"><div class="bp-side-label">Weekly Accountability</div><h3>Application Quota</h3><p>Complete five verified applications to remain active in the employment cohort.</p><div class="bp-ring-wrap"><div class="bp-ring"></div><div class="bp-ring-copy"><div><b>'+q+'/5</b><span>Logged</span></div></div></div><div class="bp-side-line"><span>Current progress</span><span>'+pct+'%</span></div><div class="bp-side-progress"><span style="width:'+pct+'%"></span></div></section>'
+    + '<section class="bp-side-card"><div class="bp-side-label">Next Action</div><h3>'+(left?left+' application'+(left===1?'':'s')+' remaining':'Weekly quota complete')+'</h3><p>'+(left?'Return to Regional Job Boards, identify suitable opportunities, and log each verified application here.':'Your five-application weekly quota is complete. Continue tracking interviews and offer outcomes.')+'</p><button class="bp-btn navy" type="button" style="width:100%;margin-top:14px" onclick="window._nav(\'regional-boards\')">Go to Regional Job Boards →</button></section>'
+    + '<section class="bp-side-card bp-tip"><div class="bp-side-label" style="color:#ffd46b">Career Momentum</div><h3>Stay consistent.</h3><p>Every verified application increases your exposure to real opportunities.</p><div class="bp-gold-stroke"></div></section>'
+    + '</div></aside>';
 
-  return topbarHtml('ZEELIN JOB ACQUISITION PORTAL \u2022 Boost & Accountability', '<span>Quota Status: <strong style="color:#f59e0b;">'+q+' / 5 Logged</strong></span><span style="color:#34d399;font-weight:800;">Active Enforcement</span>', Math.round(q/5*100))
-    + '<div class="jb-split" style="flex:1;display:flex;overflow:hidden;min-height:0;">'+main+right+'</div>';
+  return topbarHtml('ZEELIN JOB ACQUISITION PORTAL \u2022 Boost & Accountability','',pct)
+    + css
+    + '<div class="boost-premium">'+main+right+'</div>';
 }
 
 function linkedInPreviewHtml(){
@@ -1474,12 +1483,14 @@ window._nav = function(hash){
 };
 window._submitBoost = function(){
   const cEl=document.getElementById('boost-company');
+  const roleEl=document.getElementById('boost-role');
   const lEl=document.getElementById('boost-link');
   const rEl=document.getElementById('boost-req');
   const daEl=document.getElementById('boost-dateApplied');
   const dpEl=document.getElementById('boost-datePosted');
   const sEl=document.getElementById('boost-status');
   const company=(cEl&&cEl.value.trim())||'';
+  const role=(roleEl&&roleEl.value.trim())||'';
   const link=(lEl&&lEl.value.trim())||'';
   const req=(rEl&&rEl.value.trim())||'';
   const dateApplied=(daEl&&daEl.value)||new Date().toISOString().slice(0,10);
@@ -1494,7 +1505,7 @@ window._submitBoost = function(){
   const entry={
     id:'b'+Date.now(),
     company:company,
-    role: company+' — Application',
+    role: role || company+' — Application',
     link:link,
     requirements:req,
     dateApplied:dateApplied,
