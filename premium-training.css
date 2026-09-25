@@ -5018,3 +5018,473 @@ body.premium-training #shell.app.hide-sidebar .content{
     display:inline-flex!important;
   }
 }
+
+
+/* ============================================================
+   PREMIUM V8 — RESTORE ORIGINAL TRAINING STRUCTURE
+   The old training layout is authoritative. Premium CSS only beautifies it.
+   ============================================================ */
+
+:root{
+  --sidebar-w:300px;
+  --topbar-h:72px;
+}
+
+/* Restore original stacked shell */
+body.premium-training #shell.app{
+  display:flex!important;
+  flex-direction:column!important;
+  width:100%!important;
+  min-height:100vh!important;
+  height:auto!important;
+  overflow:visible!important;
+  background:#f5f7fb!important;
+}
+body.premium-training #shell.app>.shell-row{
+  flex:1 1 auto!important;
+  display:flex!important;
+  min-width:0!important;
+  min-height:0!important;
+  align-items:stretch!important;
+  background:#f5f7fb!important;
+}
+body.premium-training #shell.app>.shell-row>.content{
+  flex:1 1 auto!important;
+  min-width:0!important;
+  width:auto!important;
+  display:flex!important;
+  flex-direction:column!important;
+  background:#f5f7fb!important;
+}
+
+/* HOME / COURSE LANDING: original route behaviour — absolutely no sidebar or topbar */
+body.premium-training #shell.app.hide-sidebar{
+  min-height:100vh!important;
+  height:auto!important;
+}
+body.premium-training #shell.app.hide-sidebar>#topbar,
+body.premium-training #shell.app.hide-sidebar .sidebar{
+  display:none!important;
+}
+body.premium-training #shell.app.hide-sidebar>.shell-row{
+  width:100%!important;
+  min-height:100vh!important;
+  height:auto!important;
+  display:block!important;
+  background:
+    radial-gradient(circle at 88% 6%,rgba(211,158,36,.10),transparent 25rem),
+    linear-gradient(180deg,#f8fafc 0%,#f3f6fa 100%)!important;
+}
+body.premium-training #shell.app.hide-sidebar .content{
+  width:100%!important;
+  min-height:100vh!important;
+  display:block!important;
+}
+body.premium-training.premium-route-home #page{
+  width:100%!important;
+  max-width:none!important;
+  min-height:100vh!important;
+  margin:0!important;
+  padding:clamp(34px,4vw,68px)!important;
+  display:flex!important;
+  align-items:center!important;
+  justify-content:center!important;
+  background:transparent!important;
+}
+body.premium-training.premium-route-home .home{
+  width:100%!important;
+  max-width:none!important;
+  margin:0!important;
+  padding:0!important;
+}
+body.premium-training.premium-route-home .home-welcome{
+  max-width:980px!important;
+  margin:0 0 clamp(26px,3vh,42px)!important;
+}
+body.premium-training.premium-route-home .home-welcome h1{
+  font-size:clamp(46px,4.2vw,72px)!important;
+  line-height:1.02!important;
+  letter-spacing:-2.5px!important;
+  margin:6px 0 12px!important;
+}
+body.premium-training.premium-route-home .home-welcome .sub{
+  max-width:920px!important;
+  font-size:clamp(15px,1vw,18px)!important;
+  line-height:1.65!important;
+}
+body.premium-training.premium-route-home .cat-head{
+  margin:0 0 14px!important;
+}
+body.premium-training.premium-route-home .enrolled.single{
+  width:100%!important;
+  grid-template-columns:1fr!important;
+}
+body.premium-training.premium-route-home .enrolled.single .enr-card{
+  width:100%!important;
+  min-height:clamp(470px,56vh,650px)!important;
+  display:grid!important;
+  grid-template-columns:minmax(360px,38%) minmax(430px,1fr) minmax(300px,28%)!important;
+  flex-direction:unset!important;
+  align-items:stretch!important;
+  border:1.5px solid #cad5e2!important;
+  border-radius:24px!important;
+  overflow:hidden!important;
+  background:#fff!important;
+  box-shadow:0 28px 70px rgba(24,49,82,.12)!important;
+}
+body.premium-training.premium-route-home .enrolled.single .enr-hero{
+  width:100%!important;
+  height:100%!important;
+  min-height:470px!important;
+  border:0!important;
+  border-right:1px solid #dce4ed!important;
+  position:relative!important;
+}
+body.premium-training.premium-route-home .enrolled.single .enr-hero img.cover{
+  position:absolute!important;
+  inset:0!important;
+  width:100%!important;
+  height:100%!important;
+  object-fit:cover!important;
+}
+body.premium-training.premium-route-home .enrolled.single .enr-body{
+  min-width:0!important;
+  padding:clamp(30px,3vw,50px)!important;
+  display:flex!important;
+  flex-direction:column!important;
+  justify-content:center!important;
+}
+body.premium-training.premium-route-home .enrolled.single .enr-body h3{
+  font-size:clamp(27px,2vw,36px)!important;
+  line-height:1.12!important;
+  letter-spacing:-1px!important;
+}
+body.premium-training.premium-route-home .enrolled.single .enr-sub{
+  font-size:15px!important;
+}
+body.premium-training.premium-route-home .enrolled.single .enr-foot{
+  width:auto!important;
+  padding:clamp(28px,2.7vw,46px)!important;
+  border-left:1px solid #dce4ed!important;
+  border-top:0!important;
+  display:flex!important;
+  flex-direction:column!important;
+  justify-content:center!important;
+  background:linear-gradient(180deg,#fbfcfe,#f5f8fb)!important;
+}
+body.premium-training.premium-route-home .enrolled.single .stat-row{
+  gap:10px!important;
+}
+body.premium-training.premium-route-home .enrolled.single .stat-box{
+  padding:14px!important;
+  min-height:72px!important;
+}
+body.premium-training.premium-route-home .enrolled.single .btn{
+  min-height:50px!important;
+  font-size:13px!important;
+}
+
+/* Non-home pages: original training topbar structure, beautified only */
+body.premium-training #topbar{
+  position:sticky!important;
+  top:0!important;
+  z-index:70!important;
+  width:100%!important;
+  height:var(--topbar-h)!important;
+  min-height:var(--topbar-h)!important;
+  flex:0 0 var(--topbar-h)!important;
+  display:flex!important;
+  align-items:center!important;
+  gap:18px!important;
+  padding:0 24px!important;
+  background:#fff!important;
+  border-bottom:1px solid #dfe6ef!important;
+  box-shadow:0 5px 18px rgba(31,55,88,.055)!important;
+  color:#0b1c38!important;
+  font-family:Inter,"Segoe UI",Arial,sans-serif!important;
+}
+body.premium-training #topbar>div:first-of-type{
+  display:flex!important;
+}
+body.premium-training #topbar>div:first-of-type img{
+  display:block!important;
+  height:38px!important;
+  width:auto!important;
+  object-fit:contain!important;
+}
+body.premium-training #topbar>div[style*="justify-content:center"]{
+  display:flex!important;
+  flex:1 1 auto!important;
+  min-width:220px!important;
+  justify-content:center!important;
+}
+body.premium-training #topbar>div[style*="justify-content:center"]>span{
+  color:#0b1c38!important;
+  font-size:18px!important;
+  font-weight:900!important;
+  letter-spacing:.55px!important;
+  text-align:center!important;
+}
+body.premium-training #topbar .top-actions{
+  margin-left:auto!important;
+  display:flex!important;
+  align-items:center!important;
+  gap:9px!important;
+  flex-shrink:0!important;
+}
+body.premium-training #topbar .top-chip{
+  min-height:36px!important;
+  padding:0 11px!important;
+  border-radius:999px!important;
+}
+body.premium-training #topbar .top-icon{
+  width:36px!important;
+  height:36px!important;
+  min-height:36px!important;
+  border:1px solid #dce4ed!important;
+  border-radius:10px!important;
+  background:#fff!important;
+  color:#50617a!important;
+}
+body.premium-training #topbar .profile-btn{
+  min-height:42px!important;
+  height:auto!important;
+  padding:4px 9px 4px 4px!important;
+  border:1px solid #dce4ed!important;
+  border-left:1px solid #dce4ed!important;
+  border-radius:999px!important;
+  background:#fff!important;
+}
+body.premium-training #topbar .profile-avatar{
+  width:32px!important;
+  height:32px!important;
+  filter:none!important;
+}
+body.premium-training #topbar .profile-name{
+  display:inline!important;
+  font-size:12.5px!important;
+}
+
+/* Restore training sidebar geometry; this portal needs more width than acquisition. */
+body.premium-training #sidebar{
+  position:sticky!important;
+  top:var(--topbar-h)!important;
+  left:auto!important;
+  align-self:flex-start!important;
+  width:300px!important;
+  min-width:300px!important;
+  flex:0 0 300px!important;
+  height:calc(100vh - var(--topbar-h))!important;
+  max-height:calc(100vh - var(--topbar-h))!important;
+  padding:16px 12px 22px!important;
+  overflow-y:auto!important;
+  overflow-x:hidden!important;
+  z-index:40!important;
+  border-radius:0!important;
+  transform:none!important;
+  background:
+    radial-gradient(circle at 110% 18%,rgba(200,147,35,.17),transparent 22rem),
+    linear-gradient(180deg,#102d4a 0%,#071b33 64%,#0a2746 100%)!important;
+  box-shadow:7px 0 22px rgba(15,40,68,.13)!important;
+}
+body.premium-training #sidebar>div:first-child{
+  min-height:78px!important;
+  height:auto!important;
+  display:flex!important;
+  align-items:center!important;
+  justify-content:center!important;
+  padding:16px 14px 20px!important;
+  margin:0 0 8px!important;
+  border-bottom:1px solid rgba(255,255,255,.20)!important;
+  text-align:center!important;
+  background:transparent!important;
+}
+body.premium-training #sidebar>div:first-child span{
+  max-width:235px!important;
+  color:#f7fbff!important;
+  font-size:13px!important;
+  line-height:1.35!important;
+  letter-spacing:.85px!important;
+  font-weight:800!important;
+}
+body.premium-training #sidebar>div:nth-child(2){
+  display:flex!important;
+  flex-direction:column!important;
+  gap:2px!important;
+  padding:8px 2px 0!important;
+  font-size:13px!important;
+}
+/* Remove all premium injected decorative sidebar blocks and nested fake guide lines. */
+body.premium-training #sidebar .premium-sidebar-motto,
+body.premium-training #sidebar .training-sidebar-brand,
+body.premium-training #sidebar .training-acq-brand{
+  display:none!important;
+}
+body.premium-training #sidebar div[style*="padding-left:16px"]::before{
+  content:none!important;
+  display:none!important;
+}
+body.premium-training #sidebar a{
+  width:100%!important;
+  min-height:42px!important;
+  height:auto!important;
+  display:flex!important;
+  align-items:center!important;
+  gap:10px!important;
+  margin:1px 0!important;
+  padding:8px 12px!important;
+  border-radius:9px!important;
+  color:#e7eef7!important;
+  font-size:12.5px!important;
+  line-height:1.3!important;
+  font-weight:500!important;
+  letter-spacing:0!important;
+  white-space:normal!important;
+}
+body.premium-training #sidebar a>span{
+  min-width:0!important;
+}
+body.premium-training #sidebar a[style*="justify-content:space-between"]{
+  justify-content:space-between!important;
+}
+body.premium-training #sidebar a[style*="background-color:#262626"],
+body.premium-training #sidebar a[style*="background-color: #262626"],
+body.premium-training #sidebar a[style*="background-color:#2a2218"],
+body.premium-training #sidebar a[style*="background-color: #2a2218"]{
+  background:linear-gradient(100deg,#ffe8a0,#edb640)!important;
+  color:#102341!important;
+  font-weight:800!important;
+  box-shadow:0 4px 16px rgba(242,193,72,.28)!important;
+}
+body.premium-training #sidebar a[style*="padding:6px 10px"]{
+  min-height:35px!important;
+  padding:6px 10px!important;
+  font-size:11.5px!important;
+}
+body.premium-training #sidebar div[style*="padding:10px 12px"],
+body.premium-training #sidebar div[style*="padding:8px 12px"]{
+  font-size:12px!important;
+  line-height:1.3!important;
+}
+body.premium-training #sidebar div[style*="letter-spacing:0.5px"]{
+  margin:16px 10px 8px!important;
+  padding:0!important;
+  color:#ffc43e!important;
+  font-size:11px!important;
+  line-height:1.35!important;
+  letter-spacing:.7px!important;
+  font-weight:800!important;
+}
+body.premium-training #sidebar svg{
+  flex:0 0 auto!important;
+}
+body.premium-training #sidebar span[style*="color:#5a5a5a"]{
+  color:#9babbd!important;
+}
+body.premium-training #sidebar span[style*="font-weight:500"]{
+  overflow-wrap:normal!important;
+}
+/* Avoid the unreadable multi-column-looking Day 1 line from the screenshot. */
+body.premium-training #sidebar a[onclick*="_navDay"]{
+  display:grid!important;
+  grid-template-columns:12px auto 1fr!important;
+  column-gap:8px!important;
+  align-items:center!important;
+}
+body.premium-training #sidebar a[onclick*="_navDay"] span:last-child{
+  white-space:nowrap!important;
+  font-size:10.5px!important;
+}
+/* Scrollbar */
+body.premium-training #sidebar{
+  scrollbar-width:thin!important;
+  scrollbar-color:#aebdce transparent!important;
+}
+body.premium-training #sidebar::-webkit-scrollbar{width:6px!important}
+body.premium-training #sidebar::-webkit-scrollbar-track{background:transparent!important}
+body.premium-training #sidebar::-webkit-scrollbar-thumb{
+  background:#aebdce!important;
+  border:0!important;
+  border-radius:999px!important;
+}
+
+/* Correct page sizing after restoring the old shell */
+body.premium-training:not(.premium-route-home) #page{
+  width:100%!important;
+  min-width:0!important;
+}
+body.premium-training:not(.premium-route-home) .content{
+  min-width:0!important;
+}
+
+/* Tablet/mobile retains old off-canvas sidebar behaviour */
+@media(max-width:1279px){
+  body.premium-training #sidebar{
+    position:fixed!important;
+    top:0!important;
+    bottom:0!important;
+    left:0!important;
+    width:300px!important;
+    min-width:0!important;
+    max-width:86vw!important;
+    height:100dvh!important;
+    max-height:100dvh!important;
+    transform:translateX(-106%)!important;
+    transition:transform .25s ease!important;
+    z-index:95!important;
+    border-radius:0 16px 16px 0!important;
+  }
+  body.premium-training #sidebar.open{transform:none!important}
+  body.premium-training #topbar .burger{
+    display:inline-flex!important;
+    width:38px!important;
+    height:38px!important;
+    align-items:center!important;
+    justify-content:center!important;
+    color:#0b1c38!important;
+  }
+}
+@media(max-width:1050px){
+  body.premium-training.premium-route-home .enrolled.single .enr-card{
+    grid-template-columns:minmax(300px,.9fr) minmax(360px,1.1fr)!important;
+  }
+  body.premium-training.premium-route-home .enrolled.single .enr-foot{
+    grid-column:1/-1!important;
+    border-left:0!important;
+    border-top:1px solid #dce4ed!important;
+  }
+}
+@media(max-width:760px){
+  body.premium-training.premium-route-home #page{
+    padding:24px 14px 70px!important;
+    align-items:flex-start!important;
+  }
+  body.premium-training.premium-route-home .home-welcome h1{
+    font-size:38px!important;
+    letter-spacing:-1.5px!important;
+  }
+  body.premium-training.premium-route-home .enrolled.single .enr-card{
+    display:flex!important;
+    flex-direction:column!important;
+    min-height:0!important;
+  }
+  body.premium-training.premium-route-home .enrolled.single .enr-hero{
+    width:100%!important;
+    min-height:260px!important;
+    height:260px!important;
+    border-right:0!important;
+    border-bottom:1px solid #dce4ed!important;
+  }
+  body.premium-training.premium-route-home .enrolled.single .enr-foot{
+    width:100%!important;
+    border-left:0!important;
+  }
+  body.premium-training #topbar{
+    min-height:64px!important;
+    height:auto!important;
+    padding:10px 12px!important;
+  }
+  body.premium-training #topbar>div[style*="justify-content:center"]{
+    display:none!important;
+  }
+}
