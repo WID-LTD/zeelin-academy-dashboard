@@ -4501,3 +4501,506 @@ body.premium-training.premium-route-home .enrolled:not(.single):not(.dual){
     font-size:8.5px!important;
   }
 }
+
+
+/* ============================================================
+   PREMIUM V5 — ACQUISITION-PORTAL CHROME PARITY
+   Full-height sidebar + acquisition topbar arrangement.
+   ============================================================ */
+
+/* Shell: sidebar owns the full left edge, topbar begins to its right */
+body.premium-training #shell.app{
+  display:flex!important;
+  flex-direction:row!important;
+  width:100%!important;
+  height:100dvh!important;
+  min-height:100dvh!important;
+  overflow:hidden!important;
+  background:#fff!important;
+}
+body.premium-training .training-main-shell{
+  flex:1 1 auto;
+  min-width:0;
+  height:100dvh;
+  display:flex;
+  flex-direction:column;
+  overflow:hidden;
+  background:#fff;
+}
+body.premium-training .training-main-shell>.shell-row{
+  flex:1 1 auto!important;
+  min-height:0!important;
+  min-width:0!important;
+  display:flex!important;
+  align-items:stretch!important;
+  overflow:hidden!important;
+  background:var(--z-canvas)!important;
+}
+body.premium-training .training-main-shell>.shell-row>.content{
+  flex:1 1 auto!important;
+  min-width:0!important;
+  min-height:0!important;
+  overflow-y:auto!important;
+  overflow-x:hidden!important;
+  background:transparent!important;
+  scrollbar-width:thin;
+  scrollbar-color:#c9d3e0 #ffffff;
+}
+body.premium-training .training-main-shell>.shell-row>.content::-webkit-scrollbar{width:7px}
+body.premium-training .training-main-shell>.shell-row>.content::-webkit-scrollbar-track{background:#fff}
+body.premium-training .training-main-shell>.shell-row>.content::-webkit-scrollbar-thumb{
+  background:#c9d3e0;border:1px solid #e8edf4;border-radius:999px
+}
+
+/* Exact acquisition sidebar geometry */
+body.premium-training #sidebar{
+  position:relative!important;
+  top:0!important;
+  left:0!important;
+  align-self:stretch!important;
+  width:clamp(210px,13.5vw,270px)!important;
+  min-width:clamp(210px,13.5vw,270px)!important;
+  flex:0 0 clamp(210px,13.5vw,270px)!important;
+  height:100dvh!important;
+  max-height:100dvh!important;
+  padding:24px 15px 20px!important;
+  overflow-y:auto!important;
+  overflow-x:hidden!important;
+  z-index:80!important;
+  background:
+    radial-gradient(circle at 110% 21%,rgba(200,147,35,.25),transparent 24%),
+    linear-gradient(145deg,#102d4a 0%,#071b33 62%,#0a2746 100%)!important;
+  color:#f7fbff!important;
+  border-right:0!important;
+  box-shadow:8px 0 22px rgba(15,40,68,.16)!important;
+  scrollbar-width:thin!important;
+  scrollbar-color:#c9d3e0 #ffffff!important;
+}
+body.premium-training #sidebar::-webkit-scrollbar{width:6px!important}
+body.premium-training #sidebar::-webkit-scrollbar-track{background:#ffffff!important}
+body.premium-training #sidebar::-webkit-scrollbar-thumb{
+  background:#c9d3e0!important;
+  border:1px solid #e8edf4!important;
+  border-radius:999px!important;
+}
+
+/* Brand moves to sidebar exactly like acquisition portal */
+body.premium-training #sidebar .training-sidebar-brand{
+  height:104px!important;
+  min-height:104px!important;
+  display:flex!important;
+  align-items:flex-start!important;
+  justify-content:center!important;
+  padding:0 0 23px!important;
+  margin:0!important;
+  border-bottom:1px solid rgba(255,255,255,.28)!important;
+  background:transparent!important;
+  flex-shrink:0!important;
+}
+body.premium-training #sidebar .training-sidebar-brand img{
+  height:42px!important;
+  width:auto!important;
+  max-width:150px!important;
+  object-fit:contain!important;
+  background:transparent!important;
+  filter:none!important;
+}
+body.premium-training #sidebar .training-system-title{
+  margin:16px 7px 18px!important;
+  padding:0!important;
+  color:#f7fbff!important;
+  font:800 15px/1.35 Inter,"Segoe UI",Arial,sans-serif!important;
+  letter-spacing:1px!important;
+  text-align:left!important;
+  text-transform:none!important;
+}
+
+/* Acquisition nav sizing/spacing */
+body.premium-training #sidebar>div:nth-child(2){
+  padding:0!important;
+  gap:2px!important;
+  font-family:Inter,"Segoe UI",Arial,sans-serif!important;
+}
+body.premium-training #sidebar a{
+  min-height:50px!important;
+  height:auto!important;
+  display:flex!important;
+  align-items:center!important;
+  gap:18px!important;
+  padding:0 18px!important;
+  margin:2px 0!important;
+  border-radius:11px!important;
+  color:#f5f7fb!important;
+  font-size:15px!important;
+  font-weight:400!important;
+  line-height:1.25!important;
+}
+body.premium-training #sidebar a[style*="background-color:#262626"],
+body.premium-training #sidebar a[style*="background-color: #262626"],
+body.premium-training #sidebar a[style*="background-color:#2a2218"],
+body.premium-training #sidebar a[style*="background-color: #2a2218"]{
+  background:linear-gradient(100deg,#ffe8a0,#edb640)!important;
+  color:#102341!important;
+  font-weight:800!important;
+  box-shadow:0 4px 16px rgba(242,193,72,.32)!important;
+}
+body.premium-training #sidebar a[style*="padding:6px 10px"],
+body.premium-training #sidebar a[onclick]{
+  min-height:42px!important;
+  padding-top:8px!important;
+  padding-bottom:8px!important;
+  font-size:13px!important;
+}
+body.premium-training #sidebar div[style*="letter-spacing:0.5px"]{
+  margin:19px 15px 12px!important;
+  padding:0!important;
+  color:#ffc43e!important;
+  font-size:14px!important;
+  font-weight:800!important;
+  letter-spacing:.3px!important;
+}
+body.premium-training #sidebar .premium-sidebar-motto{
+  margin-top:17px!important;
+  min-height:160px!important;
+  height:160px!important;
+  border-radius:14px!important;
+  padding:26px 24px!important;
+}
+body.premium-training #sidebar .premium-sidebar-motto strong{
+  width:150px!important;
+  font-size:20px!important;
+  line-height:1.28!important;
+  font-weight:500!important;
+}
+
+/* Acquisition topbar: exact height, white surface, spacing and search treatment */
+body.premium-training #topbar{
+  position:relative!important;
+  top:0!important;
+  z-index:75!important;
+  flex:0 0 73px!important;
+  width:100%!important;
+  height:73px!important;
+  min-height:73px!important;
+  display:flex!important;
+  align-items:center!important;
+  gap:34px!important;
+  padding:0 31px!important;
+  background:#ffffff!important;
+  color:#07143a!important;
+  border-bottom:1px solid #e8edf4!important;
+  box-shadow:0 1px 0 #e8edf4,0 8px 22px rgba(27,50,85,.06)!important;
+  font-family:Inter,"Segoe UI",Arial,sans-serif!important;
+}
+body.premium-training #topbar>img,
+body.premium-training #topbar>div>img:not(.profile-avatar){
+  display:none!important;
+}
+body.premium-training .training-portal-trigger{
+  width:23px!important;
+  height:23px!important;
+  flex:0 0 23px!important;
+  display:grid!important;
+  place-items:center!important;
+  color:#07143a!important;
+  text-decoration:none!important;
+}
+body.premium-training .training-portal-trigger .sv{
+  width:23px!important;
+  height:23px!important;
+}
+body.premium-training #topbar .premium-search.acquisition-search{
+  width:445px!important;
+  height:42px!important;
+  flex:0 0 445px!important;
+  display:flex!important;
+  align-items:center!important;
+  gap:16px!important;
+  padding:0 18px!important;
+  border:0!important;
+  border-radius:24px!important;
+  background:#f1f4f8!important;
+  box-shadow:none!important;
+  color:#4c5772!important;
+}
+body.premium-training .training-search-icon{
+  width:19px!important;
+  height:19px!important;
+  flex:0 0 19px!important;
+  display:grid!important;
+  place-items:center!important;
+  color:#4c5772!important;
+}
+body.premium-training .training-search-icon svg{
+  width:19px!important;
+  height:19px!important;
+  fill:none!important;
+  stroke:currentColor!important;
+  stroke-width:2!important;
+  stroke-linecap:round!important;
+  stroke-linejoin:round!important;
+}
+body.premium-training #topbar .premium-search input{
+  flex:1!important;
+  min-width:0!important;
+  padding:0!important;
+  border:0!important;
+  outline:0!important;
+  background:transparent!important;
+  color:#4c5772!important;
+  box-shadow:none!important;
+  font:500 14px/1 Inter,"Segoe UI",Arial,sans-serif!important;
+}
+body.premium-training #topbar .premium-search input::placeholder{color:#8a94a8!important}
+
+/* Dedicated per-page topbar content */
+body.premium-training .training-route-context{
+  flex:1 1 auto!important;
+  min-width:0!important;
+  max-width:390px!important;
+  display:grid!important;
+  grid-template-columns:auto 1fr!important;
+  grid-template-rows:auto auto!important;
+  column-gap:10px!important;
+  align-items:center!important;
+  color:#07143a!important;
+}
+body.premium-training .training-route-context>span{
+  grid-row:1 / span 2!important;
+  align-self:center!important;
+  display:inline-flex!important;
+  min-height:27px!important;
+  align-items:center!important;
+  padding:0 9px!important;
+  border-radius:999px!important;
+  background:#fff4d4!important;
+  border:1px solid #ecd58d!important;
+  color:#825500!important;
+  font-size:9px!important;
+  font-weight:900!important;
+  letter-spacing:.65px!important;
+  white-space:nowrap!important;
+}
+body.premium-training .training-route-context>strong{
+  overflow:hidden!important;
+  text-overflow:ellipsis!important;
+  white-space:nowrap!important;
+  color:#07143a!important;
+  font-size:13px!important;
+  font-weight:800!important;
+  line-height:1.2!important;
+}
+body.premium-training .training-route-context>small{
+  overflow:hidden!important;
+  text-overflow:ellipsis!important;
+  white-space:nowrap!important;
+  color:#697590!important;
+  font-size:10.5px!important;
+  font-weight:500!important;
+  line-height:1.25!important;
+  margin-top:2px!important;
+}
+
+/* Right-side controls arranged like acquisition portal */
+body.premium-training #topbar .acquisition-top-actions{
+  margin-left:auto!important;
+  flex:0 0 auto!important;
+  display:flex!important;
+  align-items:center!important;
+  gap:18px!important;
+  height:73px!important;
+}
+body.premium-training #topbar .top-chip{
+  min-height:32px!important;
+  height:32px!important;
+  padding:0 10px!important;
+  border-radius:999px!important;
+  font-size:10.5px!important;
+  font-weight:800!important;
+}
+body.premium-training #topbar .top-icon{
+  width:23px!important;
+  height:23px!important;
+  min-height:23px!important;
+  padding:0!important;
+  border:0!important;
+  border-radius:0!important;
+  background:transparent!important;
+  color:#07143a!important;
+  box-shadow:none!important;
+}
+body.premium-training #topbar .top-icon .sv{
+  width:20px!important;
+  height:20px!important;
+}
+body.premium-training #topbar .profile-btn{
+  position:relative!important;
+  display:flex!important;
+  align-items:center!important;
+  gap:10px!important;
+  min-height:61px!important;
+  height:61px!important;
+  margin-left:3px!important;
+  padding:7px 9px 7px 19px!important;
+  border:0!important;
+  border-left:1px solid #e6ebf2!important;
+  border-radius:12px!important;
+  background:#fff!important;
+  box-shadow:none!important;
+  color:#07143a!important;
+}
+body.premium-training #topbar .profile-avatar{
+  width:47px!important;
+  height:47px!important;
+  border-radius:50%!important;
+  object-fit:cover!important;
+  filter:grayscale(1)!important;
+}
+body.premium-training #topbar .profile-name{
+  display:block!important;
+  color:#07143a!important;
+  font-size:13px!important;
+  font-weight:800!important;
+}
+body.premium-training #topbar .profile-btn>.sv{
+  width:17px!important;
+  height:17px!important;
+  color:#07143a!important;
+}
+@media (hover:hover) and (pointer:fine){
+  body.premium-training #topbar .profile-btn:hover,
+  body.premium-training #topbar .profile-btn:focus-within{
+    transform:translateY(-2px)!important;
+    background:#f7f9fc!important;
+    box-shadow:0 6px 18px rgba(27,50,85,.10)!important;
+  }
+  body.premium-training #topbar .profile-btn:hover .profile-avatar{
+    transform:scale(1.06)!important;
+    box-shadow:0 0 0 3px #f2c65d!important;
+  }
+}
+
+/* Right rail now scrolls independently inside the new shell */
+body.premium-training .training-main-shell>.shell-row>.premium-context-rail{
+  position:relative!important;
+  top:0!important;
+  align-self:stretch!important;
+  height:auto!important;
+  max-height:none!important;
+  overflow-y:auto!important;
+  flex-shrink:0!important;
+}
+
+/* Old full-width chrome artifacts are no longer relevant */
+body.premium-training #page::before{display:none!important}
+
+/* 1280–1450 acquisition compact width */
+@media(min-width:1280px) and (max-width:1450px){
+  body.premium-training #sidebar{
+    width:220px!important;
+    min-width:220px!important;
+    flex-basis:220px!important;
+    padding-left:8px!important;
+    padding-right:8px!important;
+  }
+  body.premium-training #sidebar a{
+    padding-left:10px!important;
+    padding-right:10px!important;
+    gap:10px!important;
+  }
+  body.premium-training #topbar{
+    gap:20px!important;
+    padding-left:22px!important;
+    padding-right:22px!important;
+  }
+  body.premium-training #topbar .premium-search.acquisition-search{
+    width:360px!important;
+    flex-basis:360px!important;
+  }
+  body.premium-training .training-route-context{max-width:280px!important}
+  body.premium-training #topbar .acquisition-top-actions{gap:12px!important}
+}
+
+/* Tablet/mobile: same acquisition behavior — full-height off-canvas sidebar */
+@media(max-width:1279px){
+  body.premium-training #shell.app{
+    display:block!important;
+    height:100dvh!important;
+  }
+  body.premium-training .training-main-shell{
+    width:100%!important;
+    height:100dvh!important;
+  }
+  body.premium-training #sidebar{
+    position:fixed!important;
+    left:0!important;
+    top:0!important;
+    bottom:0!important;
+    width:300px!important;
+    min-width:0!important;
+    max-width:86vw!important;
+    height:100dvh!important;
+    transform:translateX(-106%)!important;
+    transition:transform .25s ease!important;
+    border-radius:0 16px 16px 0!important;
+    z-index:95!important;
+  }
+  body.premium-training #sidebar.open{transform:none!important}
+  body.premium-training #topbar{
+    padding:0 16px!important;
+    gap:14px!important;
+  }
+  body.premium-training #topbar .acquisition-burger{
+    display:inline-flex!important;
+    width:42px!important;
+    height:42px!important;
+    align-items:center!important;
+    justify-content:center!important;
+    border:1px solid #e1e7ef!important;
+    border-radius:10px!important;
+    background:#fff!important;
+    color:#07143a!important;
+  }
+  body.premium-training .training-portal-trigger{display:none!important}
+  body.premium-training #topbar .premium-search.acquisition-search{
+    width:min(390px,38vw)!important;
+    flex:1 1 300px!important;
+    min-width:180px!important;
+  }
+  body.premium-training .training-route-context{display:none!important}
+  body.premium-training #topbar .acquisition-top-actions{gap:10px!important}
+  body.premium-training #topbar .top-chip{display:none!important}
+}
+@media(max-width:767px){
+  body.premium-training #topbar{
+    min-height:73px!important;
+    height:auto!important;
+    flex-wrap:wrap!important;
+    padding:10px 12px!important;
+    row-gap:9px!important;
+  }
+  body.premium-training #topbar .premium-search.acquisition-search{
+    order:5!important;
+    flex-basis:100%!important;
+    width:100%!important;
+    height:40px!important;
+  }
+  body.premium-training #topbar .acquisition-top-actions{
+    height:42px!important;
+    margin-left:auto!important;
+  }
+  body.premium-training #topbar .profile-btn{
+    height:42px!important;
+    min-height:42px!important;
+    padding:3px 7px!important;
+    border-left:0!important;
+  }
+  body.premium-training #topbar .profile-avatar{
+    width:34px!important;
+    height:34px!important;
+  }
+  body.premium-training #topbar .profile-name{display:none!important}
+  body.premium-training .training-main-shell>.shell-row{
+    min-height:0!important;
+  }
+}
