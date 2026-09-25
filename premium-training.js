@@ -685,7 +685,7 @@
       +'<div class="ts-support-eyebrow">HELP CENTRE</div>'
       +'<h1>'+escText(data.hero.title)+'</h1>'
       +'<p>'+escText(data.hero.body)+'</p>'
-      +'<label class="ts-support-search"><span class="ts-search-ico" aria-hidden="true">⌕</span><input type="search" placeholder="What can we help you with?" aria-label="Search support"></label>'
+      +'<label class="ts-support-search"><span class="ts-search-ico" aria-hidden="true"><svg viewBox="0 0 24 24"><circle cx="10" cy="10" r="7"/><path d="m15 15 6 6"/></svg></span><input type="search" placeholder="What can we help you with?" aria-label="Search support"></label>'
       +'</section>'
       +'<section class="ts-support-grid">'+data.cards.map(cardHtml).join('')+'</section>'
       +'<section class="ts-section" id="trainingSupportFaq">'
