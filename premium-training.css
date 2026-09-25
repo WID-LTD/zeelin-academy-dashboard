@@ -5019,75 +5019,308 @@ body.premium-training #shell.app.hide-sidebar .content{
   }
 }
 
-
 /* ============================================================
-   PREMIUM V8 — RESTORE ORIGINAL TRAINING STRUCTURE
-   The old training layout is authoritative. Premium CSS only beautifies it.
+   PREMIUM V9 — TRAINING PORTAL STRUCTURE CORRECTION
+   Preserve the training portal's own information architecture,
+   use acquisition-quality chrome, and keep the course landing
+   full-screen without sidebar/topbar.
    ============================================================ */
 
 :root{
-  --sidebar-w:300px;
-  --topbar-h:72px;
+  --training-sidebar-w:300px;
+  --training-topbar-h:73px;
 }
 
-/* Restore original stacked shell */
-body.premium-training #shell.app{
-  display:flex!important;
-  flex-direction:column!important;
+/* ---------- Internal training pages: sidebar reaches the very top ---------- */
+body.premium-training:not(.premium-route-home) #shell.app{
+  display:block!important;
+  min-height:100dvh!important;
   width:100%!important;
-  min-height:100vh!important;
-  height:auto!important;
+  background:#fff!important;
   overflow:visible!important;
-  background:#f5f7fb!important;
 }
-body.premium-training #shell.app>.shell-row{
-  flex:1 1 auto!important;
+body.premium-training:not(.premium-route-home) #shell.app>.shell-row{
+  width:100%!important;
+  min-height:100dvh!important;
   display:flex!important;
-  min-width:0!important;
-  min-height:0!important;
-  align-items:stretch!important;
-  background:#f5f7fb!important;
+  align-items:flex-start!important;
+  padding-left:var(--training-sidebar-w)!important;
+  padding-top:var(--training-topbar-h)!important;
+  background:#fff!important;
 }
-body.premium-training #shell.app>.shell-row>.content{
+body.premium-training:not(.premium-route-home) #shell.app>.shell-row>.content{
   flex:1 1 auto!important;
   min-width:0!important;
   width:auto!important;
-  display:flex!important;
-  flex-direction:column!important;
-  background:#f5f7fb!important;
+  margin:0!important;
+  background:#fff!important;
 }
 
-/* HOME / COURSE LANDING: original route behaviour — absolutely no sidebar or topbar */
-body.premium-training #shell.app.hide-sidebar{
-  min-height:100vh!important;
-  height:auto!important;
+/* The course sidebar owns the ZEELIN brand and remains full-height. */
+body.premium-training:not(.premium-route-home) #sidebar{
+  position:fixed!important;
+  left:0!important;
+  top:0!important;
+  bottom:0!important;
+  width:var(--training-sidebar-w)!important;
+  min-width:var(--training-sidebar-w)!important;
+  height:100dvh!important;
+  max-height:100dvh!important;
+  flex:0 0 var(--training-sidebar-w)!important;
+  padding:0 12px 22px!important;
+  overflow-y:auto!important;
+  overflow-x:hidden!important;
+  z-index:90!important;
+  transform:none!important;
+  border:0!important;
+  border-radius:0!important;
+  color:#f7fbff!important;
+  background:
+    radial-gradient(circle at 112% 18%,rgba(205,151,34,.23),transparent 22rem),
+    linear-gradient(145deg,#102d4a 0%,#071b33 64%,#0a2746 100%)!important;
+  box-shadow:8px 0 22px rgba(15,40,68,.16)!important;
+  scrollbar-width:thin!important;
+  scrollbar-color:#aebdce transparent!important;
 }
-body.premium-training #shell.app.hide-sidebar>#topbar,
-body.premium-training #shell.app.hide-sidebar .sidebar{
+body.premium-training:not(.premium-route-home) #sidebar::-webkit-scrollbar{width:6px!important}
+body.premium-training:not(.premium-route-home) #sidebar::-webkit-scrollbar-track{background:transparent!important}
+body.premium-training:not(.premium-route-home) #sidebar::-webkit-scrollbar-thumb{
+  background:#aebdce!important;
+  border:0!important;
+  border-radius:999px!important;
+}
+
+/* Real training sidebar brand — logo stays here, not in the topbar. */
+body.premium-training .training-sidebar-brand{
+  min-height:122px!important;
+  margin:0 -12px 8px!important;
+  padding:23px 18px 20px!important;
+  display:flex!important;
+  flex-direction:column!important;
+  align-items:center!important;
+  justify-content:flex-start!important;
+  gap:14px!important;
+  text-align:center!important;
+  position:sticky!important;
+  top:0!important;
+  z-index:8!important;
+  background:#0e2a47!important;
+  border-bottom:1px solid rgba(255,255,255,.24)!important;
+}
+body.premium-training .training-sidebar-brand img{
+  display:block!important;
+  width:auto!important;
+  height:42px!important;
+  max-width:170px!important;
+  object-fit:contain!important;
+}
+body.premium-training .training-sidebar-brand span{
+  max-width:245px!important;
+  color:#f7fbff!important;
+  font-size:13px!important;
+  line-height:1.35!important;
+  font-weight:800!important;
+  letter-spacing:.9px!important;
+}
+
+/* Preserve the training tree, but give every row consistent premium spacing. */
+body.premium-training #sidebar>div:nth-child(2){
+  padding:8px 2px 0!important;
+  gap:2px!important;
+}
+body.premium-training #sidebar a{
+  min-height:42px!important;
+  height:auto!important;
+  margin:1px 0!important;
+  padding:8px 12px!important;
+  border-radius:10px!important;
+  color:#e8eef6!important;
+  font-size:12.5px!important;
+  line-height:1.3!important;
+  font-weight:500!important;
+  transition:background .18s ease,color .18s ease,transform .18s ease!important;
+}
+body.premium-training #sidebar a:hover{
+  background:rgba(255,255,255,.12)!important;
+  color:#fff!important;
+}
+body.premium-training #sidebar a[style*="background-color:#262626"],
+body.premium-training #sidebar a[style*="background-color: #262626"],
+body.premium-training #sidebar a[style*="background-color:#2a2218"],
+body.premium-training #sidebar a[style*="background-color: #2a2218"]{
+  background:linear-gradient(100deg,#ffe8a0,#edb640)!important;
+  color:#102341!important;
+  font-weight:800!important;
+  box-shadow:0 4px 16px rgba(242,193,72,.28)!important;
+}
+body.premium-training #sidebar div[style*="letter-spacing:0.5px"]{
+  margin:17px 10px 8px!important;
+  padding:0!important;
+  color:#ffc43e!important;
+  font-size:11px!important;
+  line-height:1.35!important;
+  font-weight:800!important;
+  letter-spacing:.7px!important;
+  text-transform:uppercase!important;
+}
+body.premium-training #sidebar div[style*="color:#ffffff"],
+body.premium-training #sidebar div[style*="color:#e5e5e5"],
+body.premium-training #sidebar div[style*="color:#d4d4d4"]{
+  color:#f5f7fb!important;
+}
+body.premium-training #sidebar div[style*="color:#a3a3a3"]{color:#d0dae6!important}
+body.premium-training #sidebar span[style*="color:#5a5a5a"]{color:#91a2b5!important}
+body.premium-training #sidebar .dg-link{
+  min-height:34px!important;
+  padding:6px 10px!important;
+  font-size:11.5px!important;
+}
+body.premium-training #sidebar .dg-link.active{
+  background:rgba(255,232,160,.14)!important;
+  color:#ffd36a!important;
+}
+body.premium-training #sidebar .premium-sidebar-motto,
+body.premium-training #sidebar .training-acq-brand{display:none!important}
+
+/* ---------- Internal topbar: acquisition quality, training-specific content ---------- */
+body.premium-training:not(.premium-route-home) #topbar{
+  position:fixed!important;
+  top:0!important;
+  left:var(--training-sidebar-w)!important;
+  right:0!important;
+  width:auto!important;
+  height:var(--training-topbar-h)!important;
+  min-height:var(--training-topbar-h)!important;
+  z-index:80!important;
+  margin:0!important;
+  padding:0 28px!important;
+  display:flex!important;
+  align-items:center!important;
+  gap:18px!important;
+  color:#07143a!important;
+  background:#fff!important;
+  border:0!important;
+  border-bottom:1px solid #e8edf4!important;
+  box-shadow:0 1px 0 #e8edf4,0 8px 22px rgba(27,50,85,.055)!important;
+}
+body.premium-training .training-topbar-title{
+  flex:1 1 auto!important;
+  min-width:0!important;
+  display:flex!important;
+  align-items:center!important;
+  justify-content:flex-start!important;
+}
+body.premium-training .training-topbar-title span{
+  color:#07143a!important;
+  font-size:15px!important;
+  line-height:1!important;
+  font-weight:900!important;
+  letter-spacing:.65px!important;
+  white-space:nowrap!important;
+}
+body.premium-training #topbar .burger{display:none!important}
+body.premium-training #topbar .top-actions{
+  margin-left:auto!important;
+  display:flex!important;
+  align-items:center!important;
+  gap:10px!important;
+  flex-shrink:0!important;
+}
+body.premium-training #topbar .top-chip{
+  min-height:36px!important;
+  padding:0 11px!important;
+  border:1px solid #e1e7ef!important;
+  border-radius:999px!important;
+  background:#f7f9fc!important;
+  color:#58657b!important;
+}
+body.premium-training #topbar .top-chip.top-xp{
+  color:#946000!important;
+  background:#fff7df!important;
+  border-color:#eed89d!important;
+}
+body.premium-training #topbar .top-chip.top-streak{
+  color:#007b5e!important;
+  background:#effbf7!important;
+  border-color:#c9eee2!important;
+}
+body.premium-training #topbar .top-icon{
+  width:38px!important;
+  height:38px!important;
+  min-height:38px!important;
+  border:1px solid #e1e7ef!important;
+  border-radius:10px!important;
+  background:#fff!important;
+  color:#53617d!important;
+}
+body.premium-training #topbar .profile-btn{
+  min-height:44px!important;
+  padding:4px 10px 4px 4px!important;
+  border:1px solid #e1e7ef!important;
+  border-radius:999px!important;
+  background:#fff!important;
+  color:#07143a!important;
+}
+body.premium-training #topbar .profile-avatar{
+  width:34px!important;
+  height:34px!important;
+  filter:none!important;
+}
+body.premium-training #topbar .profile-name{
+  display:inline!important;
+  color:#07143a!important;
+  font-size:12.5px!important;
+  font-weight:700!important;
+}
+
+/* Main content should use the screen rather than sitting in a narrow old column. */
+body.premium-training:not(.premium-route-home) #page{
+  width:100%!important;
+  max-width:1480px!important;
+  min-width:0!important;
+  margin:0 auto!important;
+  padding:22px 24px 56px!important;
+}
+body.premium-training.has-premium-rail:not(.premium-route-home) #page{
+  max-width:none!important;
+}
+
+/* ---------- HOME / COURSE LANDING ---------- */
+/* The original course landing is full-screen and deliberately has no chrome. */
+body.premium-training.premium-route-home #shell.app.hide-sidebar>#topbar,
+body.premium-training.premium-route-home #shell.app.hide-sidebar #sidebar{
   display:none!important;
 }
-body.premium-training #shell.app.hide-sidebar>.shell-row{
-  width:100%!important;
-  min-height:100vh!important;
-  height:auto!important;
+body.premium-training.premium-route-home #shell.app.hide-sidebar{
   display:block!important;
-  background:
-    radial-gradient(circle at 88% 6%,rgba(211,158,36,.10),transparent 25rem),
-    linear-gradient(180deg,#f8fafc 0%,#f3f6fa 100%)!important;
+  min-height:100dvh!important;
+  width:100%!important;
+  background:#fff!important;
 }
-body.premium-training #shell.app.hide-sidebar .content{
+body.premium-training.premium-route-home #shell.app.hide-sidebar>.shell-row{
   width:100%!important;
-  min-height:100vh!important;
+  min-height:100dvh!important;
   display:block!important;
+  padding:0!important;
+  background:
+    radial-gradient(circle at 88% 8%,rgba(213,158,25,.10),transparent 28rem),
+    linear-gradient(180deg,#fbfcfe 0%,#f4f7fb 100%)!important;
+}
+body.premium-training.premium-route-home #shell.app.hide-sidebar .content{
+  width:100%!important;
+  min-height:100dvh!important;
+  margin:0!important;
+  display:block!important;
+  background:transparent!important;
 }
 body.premium-training.premium-route-home #page{
   width:100%!important;
-  max-width:none!important;
-  min-height:100vh!important;
-  margin:0!important;
-  padding:clamp(34px,4vw,68px)!important;
+  max-width:1660px!important;
+  min-height:100dvh!important;
+  margin:0 auto!important;
+  padding:clamp(32px,4vw,62px)!important;
   display:flex!important;
-  align-items:center!important;
+  flex-direction:column!important;
   justify-content:center!important;
   background:transparent!important;
 }
@@ -5099,46 +5332,67 @@ body.premium-training.premium-route-home .home{
 }
 body.premium-training.premium-route-home .home-welcome{
   max-width:980px!important;
-  margin:0 0 clamp(26px,3vh,42px)!important;
+  margin:0 0 30px!important;
+}
+body.premium-training.premium-route-home .home-welcome .home-hello{
+  color:#9a6500!important;
+  font-size:12px!important;
+  font-weight:900!important;
+  letter-spacing:.8px!important;
+  text-transform:uppercase!important;
 }
 body.premium-training.premium-route-home .home-welcome h1{
-  font-size:clamp(46px,4.2vw,72px)!important;
-  line-height:1.02!important;
-  letter-spacing:-2.5px!important;
-  margin:6px 0 12px!important;
+  margin:7px 0 10px!important;
+  color:#07143a!important;
+  font-size:clamp(38px,3.4vw,58px)!important;
+  line-height:1.04!important;
+  letter-spacing:-1.8px!important;
 }
 body.premium-training.premium-route-home .home-welcome .sub{
-  max-width:920px!important;
-  font-size:clamp(15px,1vw,18px)!important;
+  max-width:860px!important;
+  color:#64708a!important;
+  font-size:15px!important;
   line-height:1.65!important;
 }
 body.premium-training.premium-route-home .cat-head{
-  margin:0 0 14px!important;
+  margin:0 0 13px!important;
 }
+body.premium-training.premium-route-home .cat-title{
+  color:#9a6500!important;
+  font-size:13px!important;
+  font-weight:900!important;
+}
+body.premium-training.premium-route-home .cat-badge{
+  background:#effbf7!important;
+  color:#007b5e!important;
+  border:1px solid #c9eee2!important;
+}
+
+/* Preserve the old single-course horizontal composition; just make it premium. */
 body.premium-training.premium-route-home .enrolled.single{
   width:100%!important;
   grid-template-columns:1fr!important;
 }
 body.premium-training.premium-route-home .enrolled.single .enr-card{
   width:100%!important;
-  min-height:clamp(470px,56vh,650px)!important;
-  display:grid!important;
-  grid-template-columns:minmax(360px,38%) minmax(430px,1fr) minmax(300px,28%)!important;
-  flex-direction:unset!important;
+  min-height:390px!important;
+  display:flex!important;
+  flex-direction:row!important;
   align-items:stretch!important;
-  border:1.5px solid #cad5e2!important;
-  border-radius:24px!important;
   overflow:hidden!important;
+  border:1px solid #dce5ee!important;
+  border-radius:20px!important;
   background:#fff!important;
-  box-shadow:0 28px 70px rgba(24,49,82,.12)!important;
+  box-shadow:0 22px 55px rgba(24,49,82,.11)!important;
 }
 body.premium-training.premium-route-home .enrolled.single .enr-hero{
-  width:100%!important;
-  height:100%!important;
-  min-height:470px!important;
-  border:0!important;
-  border-right:1px solid #dce4ed!important;
+  width:clamp(340px,34vw,540px)!important;
+  min-height:390px!important;
+  height:auto!important;
+  flex:0 0 clamp(340px,34vw,540px)!important;
   position:relative!important;
+  border:0!important;
+  border-right:1px solid #dce5ee!important;
 }
 body.premium-training.premium-route-home .enrolled.single .enr-hero img.cover{
   position:absolute!important;
@@ -5148,320 +5402,187 @@ body.premium-training.premium-route-home .enrolled.single .enr-hero img.cover{
   object-fit:cover!important;
 }
 body.premium-training.premium-route-home .enrolled.single .enr-body{
+  flex:1 1 auto!important;
   min-width:0!important;
-  padding:clamp(30px,3vw,50px)!important;
+  padding:34px 36px!important;
   display:flex!important;
   flex-direction:column!important;
   justify-content:center!important;
 }
 body.premium-training.premium-route-home .enrolled.single .enr-body h3{
-  font-size:clamp(27px,2vw,36px)!important;
+  margin:0 0 8px!important;
+  color:#07143a!important;
+  font-size:clamp(24px,2vw,32px)!important;
   line-height:1.12!important;
-  letter-spacing:-1px!important;
+  letter-spacing:-.7px!important;
 }
 body.premium-training.premium-route-home .enrolled.single .enr-sub{
-  font-size:15px!important;
+  color:#697590!important;
+  font-size:13px!important;
 }
-body.premium-training.premium-route-home .enrolled.single .enr-foot{
-  width:auto!important;
-  padding:clamp(28px,2.7vw,46px)!important;
-  border-left:1px solid #dce4ed!important;
-  border-top:0!important;
-  display:flex!important;
-  flex-direction:column!important;
-  justify-content:center!important;
-  background:linear-gradient(180deg,#fbfcfe,#f5f8fb)!important;
+body.premium-training.premium-route-home .enrolled.single .enr-pills{
+  margin:18px 0!important;
 }
-body.premium-training.premium-route-home .enrolled.single .stat-row{
-  gap:10px!important;
+body.premium-training.premium-route-home .enrolled.single .enr-pills span{
+  border:1px solid #e1e7ef!important;
+  background:#f4f7fa!important;
+  color:#53617d!important;
 }
 body.premium-training.premium-route-home .enrolled.single .stat-box{
-  padding:14px!important;
-  min-height:72px!important;
+  min-height:70px!important;
+  padding:13px!important;
+  background:#f8fafc!important;
+  border:1px solid #e3e9f0!important;
 }
-body.premium-training.premium-route-home .enrolled.single .btn{
-  min-height:50px!important;
-  font-size:13px!important;
+body.premium-training.premium-route-home .enrolled.single .stat-box .v{
+  color:#07143a!important;
+  font-size:15px!important;
 }
-
-/* Non-home pages: original training topbar structure, beautified only */
-body.premium-training #topbar{
-  position:sticky!important;
-  top:0!important;
-  z-index:70!important;
-  width:100%!important;
-  height:var(--topbar-h)!important;
-  min-height:var(--topbar-h)!important;
-  flex:0 0 var(--topbar-h)!important;
-  display:flex!important;
-  align-items:center!important;
-  gap:18px!important;
-  padding:0 24px!important;
-  background:#fff!important;
-  border-bottom:1px solid #dfe6ef!important;
-  box-shadow:0 5px 18px rgba(31,55,88,.055)!important;
-  color:#0b1c38!important;
-  font-family:Inter,"Segoe UI",Arial,sans-serif!important;
-}
-body.premium-training #topbar>div:first-of-type{
-  display:flex!important;
-}
-body.premium-training #topbar>div:first-of-type img{
-  display:block!important;
-  height:38px!important;
-  width:auto!important;
-  object-fit:contain!important;
-}
-body.premium-training #topbar>div[style*="justify-content:center"]{
-  display:flex!important;
-  flex:1 1 auto!important;
-  min-width:220px!important;
-  justify-content:center!important;
-}
-body.premium-training #topbar>div[style*="justify-content:center"]>span{
-  color:#0b1c38!important;
-  font-size:18px!important;
-  font-weight:900!important;
-  letter-spacing:.55px!important;
-  text-align:center!important;
-}
-body.premium-training #topbar .top-actions{
-  margin-left:auto!important;
-  display:flex!important;
-  align-items:center!important;
-  gap:9px!important;
-  flex-shrink:0!important;
-}
-body.premium-training #topbar .top-chip{
-  min-height:36px!important;
-  padding:0 11px!important;
-  border-radius:999px!important;
-}
-body.premium-training #topbar .top-icon{
-  width:36px!important;
-  height:36px!important;
-  min-height:36px!important;
-  border:1px solid #dce4ed!important;
-  border-radius:10px!important;
-  background:#fff!important;
-  color:#50617a!important;
-}
-body.premium-training #topbar .profile-btn{
-  min-height:42px!important;
-  height:auto!important;
-  padding:4px 9px 4px 4px!important;
-  border:1px solid #dce4ed!important;
-  border-left:1px solid #dce4ed!important;
-  border-radius:999px!important;
-  background:#fff!important;
-}
-body.premium-training #topbar .profile-avatar{
-  width:32px!important;
-  height:32px!important;
-  filter:none!important;
-}
-body.premium-training #topbar .profile-name{
-  display:inline!important;
-  font-size:12.5px!important;
-}
-
-/* Restore training sidebar geometry; this portal needs more width than acquisition. */
-body.premium-training #sidebar{
-  position:sticky!important;
-  top:var(--topbar-h)!important;
-  left:auto!important;
-  align-self:flex-start!important;
-  width:300px!important;
-  min-width:300px!important;
-  flex:0 0 300px!important;
-  height:calc(100vh - var(--topbar-h))!important;
-  max-height:calc(100vh - var(--topbar-h))!important;
-  padding:16px 12px 22px!important;
-  overflow-y:auto!important;
-  overflow-x:hidden!important;
-  z-index:40!important;
-  border-radius:0!important;
-  transform:none!important;
-  background:
-    radial-gradient(circle at 110% 18%,rgba(200,147,35,.17),transparent 22rem),
-    linear-gradient(180deg,#102d4a 0%,#071b33 64%,#0a2746 100%)!important;
-  box-shadow:7px 0 22px rgba(15,40,68,.13)!important;
-}
-body.premium-training #sidebar>div:first-child{
-  min-height:78px!important;
-  height:auto!important;
-  display:flex!important;
-  align-items:center!important;
-  justify-content:center!important;
-  padding:16px 14px 20px!important;
-  margin:0 0 8px!important;
-  border-bottom:1px solid rgba(255,255,255,.20)!important;
-  text-align:center!important;
-  background:transparent!important;
-}
-body.premium-training #sidebar>div:first-child span{
-  max-width:235px!important;
-  color:#f7fbff!important;
-  font-size:13px!important;
-  line-height:1.35!important;
-  letter-spacing:.85px!important;
-  font-weight:800!important;
-}
-body.premium-training #sidebar>div:nth-child(2){
+body.premium-training.premium-route-home .enrolled.single .stat-box.warn .v{color:#a56700!important}
+body.premium-training.premium-route-home .enrolled.single .enr-foot{
+  width:clamp(280px,23vw,360px)!important;
+  flex:0 0 clamp(280px,23vw,360px)!important;
+  padding:32px!important;
   display:flex!important;
   flex-direction:column!important;
-  gap:2px!important;
-  padding:8px 2px 0!important;
-  font-size:13px!important;
-}
-/* Remove all premium injected decorative sidebar blocks and nested fake guide lines. */
-body.premium-training #sidebar .premium-sidebar-motto,
-body.premium-training #sidebar .training-sidebar-brand,
-body.premium-training #sidebar .training-acq-brand{
-  display:none!important;
-}
-body.premium-training #sidebar div[style*="padding-left:16px"]::before{
-  content:none!important;
-  display:none!important;
-}
-body.premium-training #sidebar a{
-  width:100%!important;
-  min-height:42px!important;
-  height:auto!important;
-  display:flex!important;
-  align-items:center!important;
-  gap:10px!important;
-  margin:1px 0!important;
-  padding:8px 12px!important;
-  border-radius:9px!important;
-  color:#e7eef7!important;
-  font-size:12.5px!important;
-  line-height:1.3!important;
-  font-weight:500!important;
-  letter-spacing:0!important;
-  white-space:normal!important;
-}
-body.premium-training #sidebar a>span{
-  min-width:0!important;
-}
-body.premium-training #sidebar a[style*="justify-content:space-between"]{
-  justify-content:space-between!important;
-}
-body.premium-training #sidebar a[style*="background-color:#262626"],
-body.premium-training #sidebar a[style*="background-color: #262626"],
-body.premium-training #sidebar a[style*="background-color:#2a2218"],
-body.premium-training #sidebar a[style*="background-color: #2a2218"]{
-  background:linear-gradient(100deg,#ffe8a0,#edb640)!important;
-  color:#102341!important;
-  font-weight:800!important;
-  box-shadow:0 4px 16px rgba(242,193,72,.28)!important;
-}
-body.premium-training #sidebar a[style*="padding:6px 10px"]{
-  min-height:35px!important;
-  padding:6px 10px!important;
-  font-size:11.5px!important;
-}
-body.premium-training #sidebar div[style*="padding:10px 12px"],
-body.premium-training #sidebar div[style*="padding:8px 12px"]{
-  font-size:12px!important;
-  line-height:1.3!important;
-}
-body.premium-training #sidebar div[style*="letter-spacing:0.5px"]{
-  margin:16px 10px 8px!important;
-  padding:0!important;
-  color:#ffc43e!important;
-  font-size:11px!important;
-  line-height:1.35!important;
-  letter-spacing:.7px!important;
-  font-weight:800!important;
-}
-body.premium-training #sidebar svg{
-  flex:0 0 auto!important;
-}
-body.premium-training #sidebar span[style*="color:#5a5a5a"]{
-  color:#9babbd!important;
-}
-body.premium-training #sidebar span[style*="font-weight:500"]{
-  overflow-wrap:normal!important;
-}
-/* Avoid the unreadable multi-column-looking Day 1 line from the screenshot. */
-body.premium-training #sidebar a[onclick*="_navDay"]{
-  display:grid!important;
-  grid-template-columns:12px auto 1fr!important;
-  column-gap:8px!important;
-  align-items:center!important;
-}
-body.premium-training #sidebar a[onclick*="_navDay"] span:last-child{
-  white-space:nowrap!important;
-  font-size:10.5px!important;
-}
-/* Scrollbar */
-body.premium-training #sidebar{
-  scrollbar-width:thin!important;
-  scrollbar-color:#aebdce transparent!important;
-}
-body.premium-training #sidebar::-webkit-scrollbar{width:6px!important}
-body.premium-training #sidebar::-webkit-scrollbar-track{background:transparent!important}
-body.premium-training #sidebar::-webkit-scrollbar-thumb{
-  background:#aebdce!important;
+  justify-content:center!important;
+  gap:16px!important;
   border:0!important;
-  border-radius:999px!important;
+  border-left:1px solid #dce5ee!important;
+  background:linear-gradient(180deg,#fbfcfe,#f5f8fb)!important;
+}
+body.premium-training.premium-route-home .enrolled.single .readiness .rl{
+  color:#697590!important;
+}
+body.premium-training.premium-route-home .enrolled.single .readiness .rl b{
+  color:#07143a!important;
+}
+body.premium-training.premium-route-home .enrolled.single .btn{
+  min-height:48px!important;
+  border-radius:11px!important;
+  font-size:12.5px!important;
+  font-weight:900!important;
 }
 
-/* Correct page sizing after restoring the old shell */
-body.premium-training:not(.premium-route-home) #page{
-  width:100%!important;
-  min-width:0!important;
-}
-body.premium-training:not(.premium-route-home) .content{
-  min-width:0!important;
+/* ---------- Compact desktop ---------- */
+@media(min-width:1280px) and (max-width:1450px){
+  :root{--training-sidebar-w:270px}
+  body.premium-training:not(.premium-route-home) #sidebar a{
+    font-size:12px!important;
+    padding-left:10px!important;
+    padding-right:10px!important;
+  }
+  body.premium-training:not(.premium-route-home) #topbar{
+    padding-left:20px!important;
+    padding-right:20px!important;
+  }
+  body.premium-training .training-topbar-title span{font-size:14px!important}
+  body.premium-training:not(.premium-route-home) #page{padding-left:18px!important;padding-right:18px!important}
 }
 
-/* Tablet/mobile retains old off-canvas sidebar behaviour */
+/* ---------- Tablet / mobile ---------- */
 @media(max-width:1279px){
-  body.premium-training #sidebar{
+  body.premium-training:not(.premium-route-home) #shell.app>.shell-row{
+    padding-left:0!important;
+  }
+  body.premium-training:not(.premium-route-home) #sidebar{
     position:fixed!important;
+    left:0!important;
     top:0!important;
     bottom:0!important;
-    left:0!important;
     width:300px!important;
     min-width:0!important;
     max-width:86vw!important;
     height:100dvh!important;
-    max-height:100dvh!important;
     transform:translateX(-106%)!important;
     transition:transform .25s ease!important;
-    z-index:95!important;
+    z-index:100!important;
     border-radius:0 16px 16px 0!important;
   }
-  body.premium-training #sidebar.open{transform:none!important}
+  body.premium-training:not(.premium-route-home) #sidebar.open{transform:none!important}
+  body.premium-training:not(.premium-route-home) #topbar{
+    left:0!important;
+    right:0!important;
+    width:100%!important;
+    padding:0 16px!important;
+  }
   body.premium-training #topbar .burger{
     display:inline-flex!important;
-    width:38px!important;
-    height:38px!important;
+    width:40px!important;
+    height:40px!important;
     align-items:center!important;
     justify-content:center!important;
-    color:#0b1c38!important;
+    flex:0 0 40px!important;
+    border:1px solid #e1e7ef!important;
+    border-radius:11px!important;
+    background:#fff!important;
+    color:#07143a!important;
+  }
+  body.premium-training .premium-context-rail{
+    position:static!important;
+    width:100%!important;
+    height:auto!important;
+    flex:0 0 auto!important;
+    padding:0 20px 24px!important;
   }
 }
+
 @media(max-width:1050px){
   body.premium-training.premium-route-home .enrolled.single .enr-card{
-    grid-template-columns:minmax(300px,.9fr) minmax(360px,1.1fr)!important;
+    display:grid!important;
+    grid-template-columns:minmax(280px,40%) minmax(0,1fr)!important;
+  }
+  body.premium-training.premium-route-home .enrolled.single .enr-hero{
+    width:100%!important;
+    min-width:0!important;
+    min-height:360px!important;
+    flex:none!important;
   }
   body.premium-training.premium-route-home .enrolled.single .enr-foot{
+    width:100%!important;
     grid-column:1/-1!important;
+    flex:none!important;
+    padding:22px 28px!important;
     border-left:0!important;
-    border-top:1px solid #dce4ed!important;
+    border-top:1px solid #dce5ee!important;
   }
 }
+
+@media(max-width:900px){
+  body.premium-training .training-topbar-title span{font-size:13px!important}
+  body.premium-training #topbar .top-chip:not(.top-xp){display:none!important}
+  body.premium-training #topbar .profile-name{display:none!important}
+}
+
 @media(max-width:760px){
+  body.premium-training:not(.premium-route-home) #topbar{
+    min-height:64px!important;
+    height:64px!important;
+  }
+  body.premium-training:not(.premium-route-home) #shell.app>.shell-row{
+    padding-top:64px!important;
+  }
+  body.premium-training .training-topbar-title{display:none!important}
+  body.premium-training #topbar .top-chip{display:none!important}
+  body.premium-training #topbar .top-actions{gap:8px!important}
+  body.premium-training:not(.premium-route-home) #page{
+    padding:14px 13px 84px!important;
+  }
+
   body.premium-training.premium-route-home #page{
-    padding:24px 14px 70px!important;
-    align-items:flex-start!important;
+    min-height:100dvh!important;
+    padding:24px 14px 74px!important;
+    justify-content:flex-start!important;
+  }
+  body.premium-training.premium-route-home .home-welcome{
+    margin-bottom:22px!important;
   }
   body.premium-training.premium-route-home .home-welcome h1{
-    font-size:38px!important;
-    letter-spacing:-1.5px!important;
+    font-size:34px!important;
+    letter-spacing:-1.1px!important;
+  }
+  body.premium-training.premium-route-home .home-welcome .sub{
+    font-size:13px!important;
   }
   body.premium-training.premium-route-home .enrolled.single .enr-card{
     display:flex!important;
@@ -5470,21 +5591,40 @@ body.premium-training:not(.premium-route-home) .content{
   }
   body.premium-training.premium-route-home .enrolled.single .enr-hero{
     width:100%!important;
-    min-height:260px!important;
-    height:260px!important;
+    min-height:230px!important;
+    height:230px!important;
+    flex:0 0 230px!important;
     border-right:0!important;
-    border-bottom:1px solid #dce4ed!important;
+    border-bottom:1px solid #dce5ee!important;
+  }
+  body.premium-training.premium-route-home .enrolled.single .enr-body{
+    padding:23px 20px!important;
+  }
+  body.premium-training.premium-route-home .enrolled.single .enr-body h3{
+    font-size:23px!important;
+  }
+  body.premium-training.premium-route-home .enrolled.single .stat-row{
+    grid-template-columns:repeat(3,minmax(0,1fr))!important;
+    gap:8px!important;
+  }
+  body.premium-training.premium-route-home .enrolled.single .stat-box{
+    min-height:62px!important;
+    padding:10px 8px!important;
   }
   body.premium-training.premium-route-home .enrolled.single .enr-foot{
     width:100%!important;
+    flex:none!important;
+    padding:20px!important;
     border-left:0!important;
+    border-top:1px solid #dce5ee!important;
   }
-  body.premium-training #topbar{
-    min-height:64px!important;
-    height:auto!important;
-    padding:10px 12px!important;
+}
+
+@media(max-width:420px){
+  body.premium-training.premium-route-home .enrolled.single .stat-row{
+    grid-template-columns:1fr 1fr!important;
   }
-  body.premium-training #topbar>div[style*="justify-content:center"]{
-    display:none!important;
+  body.premium-training.premium-route-home .enrolled.single .stat-box:last-child{
+    grid-column:1/-1!important;
   }
 }
