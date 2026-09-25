@@ -219,9 +219,10 @@ function overviewTopbarCopy(options){
   const burger=o.regional
     ? '<label class="ov-burger job-copied-burger" for="rbNavToggle" aria-label="Open navigation" aria-expanded="false"><svg class="ico" viewBox="0 0 24 24"><use href="#menu"></use></svg></label>'
     : '<button class="ov-burger job-copied-burger" onclick="document.getElementById(\'sidebar\')&&document.getElementById(\'sidebar\').classList.add(\'open\');document.getElementById(\'sidebarOverlay\')&&document.getElementById(\'sidebarOverlay\').classList.add(\'show\')" aria-label="Open navigation" aria-expanded="false"><svg class="ico" viewBox="0 0 24 24"><use href="#menu"></use></svg></button>';
+  const portalMenu=o.hidePortalMenu?'':'<svg class="ico" onclick="window._nav(\'portal\')" style="cursor:pointer"><use href="#menu"></use></svg>';
   return '<header class="topbar job-copied-topbar">'
     + burger
-    + '<svg class="ico" onclick="window._nav(\'portal\')" style="cursor:pointer"><use href="#menu"></use></svg>'
+    + portalMenu
     + '<div class="search"><svg class="ico" style="width:19px;flex-shrink:0;" aria-hidden="true"><use href="#search"></use></svg><input type="search" placeholder="Search for jobs, courses, resources..." aria-label="Search for jobs, courses, resources" onkeydown="if(event.key===\'Enter\'){window._nav(\'regional-boards\')}" style="flex:1;min-width:0;background:transparent;border:none;outline:none;color:#4c5772;font-size:14px;font-family:inherit;"></div>'
     + '</header><div class="job-copied-topbar-space" aria-hidden="true"></div>';
 }
@@ -382,7 +383,7 @@ function viewOverview(){
     + '</aside>'
     + '<div class="ov-overlay" onclick="window._ovNav(false)" aria-hidden="true"></div>'
     + '<section class="workspace">'
-    + '<header class="topbar"><button class="ov-burger" onclick="window._ovNav(true)" aria-label="Open navigation" aria-expanded="false"><svg class="ico" viewBox="0 0 24 24"><use href="#menu"/></svg></button><svg class="ico" onclick="window._nav(\'portal\')" style="cursor:pointer"><use href="#menu"/></svg><div class="search"><svg class="ico" style="width:19px;flex-shrink:0;" aria-hidden="true"><use href="#search"/></svg><input id="ovSearch" type="search" placeholder="Search for jobs, courses, resources..." aria-label="Search for jobs, courses, resources" onkeydown="if(event.key===\'Enter\'){window._nav(\'regional-boards\')}" style="flex:1;min-width:0;background:transparent;border:none;outline:none;color:#4c5772;font-size:14px;font-family:inherit;"></div>' + '</header>'
+    + '<header class="topbar"><button class="ov-burger" onclick="window._ovNav(true)" aria-label="Open navigation" aria-expanded="false"><svg class="ico" viewBox="0 0 24 24"><use href="#menu"/></svg></button><div class="search"><svg class="ico" style="width:19px;flex-shrink:0;" aria-hidden="true"><use href="#search"/></svg><input id="ovSearch" type="search" placeholder="Search for jobs, courses, resources..." aria-label="Search for jobs, courses, resources" onkeydown="if(event.key===\'Enter\'){window._nav(\'regional-boards\')}" style="flex:1;min-width:0;background:transparent;border:none;outline:none;color:#4c5772;font-size:14px;font-family:inherit;"></div>' + '</header>'
     + '<main class="main" id="ov-main">'
     + '<section class="hero">'
     + '<img class="hero-photo" src="assets/overview/hero.jpg" alt="Smiling professional woman at her laptop">'
@@ -616,7 +617,7 @@ function viewRegionalBoards(countryParam){
   }
 
   function topbar(){
-    return overviewTopIconsCopy()+overviewTopbarCopy({includeBrand:false,regional:true});
+    return overviewTopIconsCopy()+overviewTopbarCopy({includeBrand:false,regional:true,hidePortalMenu:true});
   }
 
   function shell(mainHtml,rightHtml){
