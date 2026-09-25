@@ -453,10 +453,9 @@ function renderSidebar() {
       + (isOpen ? days : '') + `</div>`;
   };
   $('#sidebar').innerHTML = `
-    <div style="padding:22px 16px;border-bottom:2px solid #3a3a3a;display:flex;align-items:center;justify-content:center;text-align:center;">
-      <span style="font-size:13px;font-weight:800;color:#ffffff;letter-spacing:1px;line-height:1.4;">ZEELIN JOB READINESS SYSTEM</span>
-    </div>
+    <div class="training-sidebar-brand"><img decoding="async" fetchpriority="high" src="${A}logo.png" alt="Zeelin Academy Logo"></div>
     <div style="padding:12px 8px;display:flex;flex-direction:column;gap:4px;font-size:13px;">
+      <div class="training-system-title">ZEELIN JOB READINESS SYSTEM</div>
       ${navA('guide','#/guide','info','User Guide')}
       ${navA('board','#/board','feed','General Message Board','4')}
       ${navA('community','#/community','users','General Community')}
@@ -488,24 +487,64 @@ function renderSidebar() {
 }
 
 function renderTopbar() {
-  const claimed = claimedToday();
   const routeName = parseHash()[0] || 'home';
-  const crumb = routeName === 'home' ? 'Your Courses' : `${esc(dayCard(STATE.day).title)} - Day ${STATE.day} of 7`;
+  const routeMeta = {
+    home: { kicker:'TRAINING PORTAL', title:'Your Courses', detail:'Learning dashboard' },
+    dashboard: { kicker:'TRAINING PORTAL', title:'Your Courses', detail:'Learning dashboard' },
+    day: { kicker:'DAY '+STATE.day, title:dayCard(STATE.day).title, detail:'Course overview & daily actions' },
+    checkin: { kicker:'DAILY ROUTINE', title:'Personal Check-In', detail:'Complete your blocks and claim XP' },
+    roadmap: { kicker:'READING INDEX', title:'Structured Reading Roadmap', detail:'20 chapters across 3 books' },
+    book: { kicker:'DAILY READING', title:'Reading Workspace', detail:'Foundation in Business Analysis Practice' },
+    videos: { kicker:'VIDEO LEARNING', title:'Video Tutorials', detail:'Expert walkthroughs & applied methods' },
+    watch: { kicker:'VIDEO PLAYER', title:'Tutorial Session', detail:'Watch, review and complete the quiz' },
+    visual: { kicker:'VISUAL LEARNING', title:'Pitch Deck Summary', detail:'Core principles & exam application' },
+    calendar: { kicker:'LIVE LEARNING', title:'Calendar & Events', detail:'Workshops, Q&A and cohort sessions' },
+    accountability: { kicker:'WEEKLY REPORT', title:'Accountability', detail:'Completion, study rhythm & readiness' },
+    profile: { kicker:'ACCOUNT', title:'Profile & Insights', detail:'Skills, progress and learning analytics' },
+    guide: { kicker:'GETTING STARTED', title:'User Guide', detail:'Navigate your Job Readiness System' },
+    board: { kicker:'ANNOUNCEMENTS', title:'General Message Board', detail:'Official Zeelin Academy updates' },
+    community: { kicker:'COMMUNITY', title:'General Community', detail:'Peers, coursework and exam preparation' },
+    monday: { kicker:'WEEKLY FOCUS', title:'Monday Motivations', detail:'Purpose, consistency and momentum' },
+    recordings: { kicker:'MEDIA LIBRARY', title:'Event Recordings', detail:'Workshops, cohort sessions and replays' },
+    support: { kicker:'HELP CENTRE', title:'Support', detail:'FAQs, resources, account and billing' },
+    aluminal: { kicker:'LIFETIME COMMUNITY', title:'Aluminal', detail:'Graduate benefits and membership' }
+  };
+  const meta = routeMeta[routeName] || routeMeta.home;
   $('#topbar').innerHTML = `
-    <button class="burger" id="burger" aria-label="Open navigation" aria-expanded="false">${ic('burger', 20, 20)}</button>
-    <div style="display:flex;align-items:center;gap:12px;flex-shrink:0;">
-      <img decoding="async" fetchpriority="high" src="${A}logo.png" alt="Zeelin Academy Logo" style="height:42px;width:auto;object-fit:contain;">
+    <button class="burger acquisition-burger" id="burger" aria-label="Open navigation" aria-expanded="false">${ic('burger', 20, 20)}</button>
+    <a href="/portal.html" class="training-portal-trigger" aria-label="Switch portal" title="Switch portal">${ic('layers', 19, 19)}</a>
+    <label class="premium-search acquisition-search">
+      <span class="training-search-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><circle cx="10" cy="10" r="7"></circle><path d="m15 15 6 6"></path></svg></span>
+      <input type="search" aria-label="Search training portal" placeholder="Search courses, chapters, resources..." />
+    </label>
+    <div class="training-route-context">
+      <span>${esc(meta.kicker)}</span>
+      <strong>${esc(meta.title)}</strong>
+      <small>${esc(meta.detail)}</small>
     </div>
-    <div style="flex:1;display:flex;align-items:center;justify-content:center;min-width:280px;">
-      <span style="font-size:26px;font-weight:900;letter-spacing:1.2px;color:#ffffff;white-space:nowrap;text-align:center;width:100%;">ZEELIN JOB TRAINING PORTAL</span>
-    </div>
-    <div class="top-actions" style="flex-shrink:0;">
-      <a href="/portal.html" class="top-chip" style="text-decoration:none;border-color:#3a3a3a;background:#1e1e1e;color:#f59e0b" title="Switch Portal">${ic('layers', 14, 14)} Portals</a>
+    <div class="top-actions acquisition-top-actions">
       <span class="top-chip top-xp">${ic('zap', 15, 15)} ${STATE.xp.toLocaleString()} XP</span>
       <span class="top-chip top-streak">${ic('fire', 15, 15)} ${STATE.streak}</span>
-      <button class="top-icon" data-go="checkin" title="Check-In">${ic('user-check', 17, 17)}</button>
-      <button class="profile-btn" data-go="profile"><img decoding="async" class="profile-avatar" src="${USER.avatar}" alt=""/><span class="profile-name">${esc(USER.name)}</span>${ic('caret', 14, 14)}</button>
+      <button class="top-icon" data-go="checkin" title="Daily Check-In" aria-label="Daily Check-In">${ic('user-check', 17, 17)}</button>
+      <button class="profile-btn" type="button" aria-haspopup="menu" aria-expanded="false"><img decoding="async" class="profile-avatar" src="${USER.avatar}" alt=""/><span class="profile-name">${esc(USER.name)}</span>${ic('caret', 14, 14)}</button>
     </div>`;
+  const search = $('.premium-search input', $('#topbar'));
+  if (search) search.addEventListener('keydown', (e) => {
+    if (e.key !== 'Enter') return;
+    const q = search.value.trim().toLowerCase();
+    if (!q) return;
+    if (q.includes('roadmap') || q.includes('chapter') || q.includes('reading index')) go('/roadmap');
+    else if (q.includes('video')) go('/videos');
+    else if (q.includes('calendar') || q.includes('event')) go('/calendar');
+    else if (q.includes('record')) go('/recordings');
+    else if (q.includes('support') || q.includes('help')) go('/support');
+    else if (q.includes('community')) go('/community');
+    else if (q.includes('profile') || q.includes('insight')) go('/profile');
+    else if (q.includes('accountability') || q.includes('report')) go('/accountability');
+    else if (q.includes('guide')) go('/guide');
+    else if (q.includes('message') || q.includes('announcement')) go('/board');
+    else go('/day');
+  });
   $$('[data-go]', $('#topbar')).forEach((b) => b.addEventListener('click', () => go('/' + b.dataset.go)));
   $('#burger').addEventListener('click', () => { const o = $('#sidebar').classList.toggle('open'); $('#backdrop').classList.toggle('show', o); $('#burger').setAttribute('aria-expanded', o ? 'true' : 'false'); });
   $('#backdrop').addEventListener('click', () => { $('#sidebar').classList.remove('open'); $('#backdrop').classList.remove('show'); $('#burger').setAttribute('aria-expanded', 'false'); });
@@ -515,8 +554,6 @@ function renderTopbar() {
     document.addEventListener('keydown', (e) => { if (e.key === 'Escape') { $('#sidebar').classList.remove('open'); $('#backdrop').classList.remove('show'); const b = $('#burger'); if (b) b.setAttribute('aria-expanded', 'false'); } });
   }
 }
-
-/* ============ STAR RATING + FEEDBACK ============ */
 function starRow(cur) {
   return `<div class="star-row">${[1, 2, 3, 4, 5].map((n) => `<button class="starb${cur === n ? ' on' : ''}" data-star="${n}">${ic('star', 24, 24)}</button>`).join('')}</div>`;
 }
