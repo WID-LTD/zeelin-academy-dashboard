@@ -2240,3 +2240,32 @@ body.premium-training ::selection{
     padding:28px 22px!important;
   }
 }
+
+
+/* V3 chrome lockup */
+body.premium-training .premium-title-lockup{
+  min-width:220px!important;
+  flex:0 1 auto!important;
+}
+body.premium-training .premium-title-lockup>span{
+  display:flex!important;
+  flex-direction:column!important;
+  align-items:flex-start!important;
+  gap:1px!important;
+  line-height:1.05!important;
+}
+body.premium-training .premium-title-lockup>span b{
+  font-size:10px!important;
+  letter-spacing:1.8px!important;
+  color:#9a6500!important;
+  font-weight:900!important;
+}
+body.premium-training .premium-title-lockup>span small{
+  font-size:14px!important;
+  letter-spacing:.25px!important;
+  color:var(--z-navy)!important;
+  font-weight:850!important;
+}
+@media(max-width:1050px){
+  body.premium-training .premium-title-lockup{display:none!important}
+}
