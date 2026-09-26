@@ -381,46 +381,60 @@ const GENERAL_BOARD = [
   { id:'g4', title:'Scheduled Maintenance — Recordings Archive', body:'The recordings archive will be briefly unavailable this Sunday between 2:00 AM and 4:00 AM while we publish the new workshop replays.', meta:'Zeelin Admin \u2022 Aug 9' },
 ];
 function renderBoard() {
-  const cards = GENERAL_BOARD.map((g) => `<div style="background-color:#181818;border:1px solid #2a2a2a;border-radius:10px;overflow:hidden;margin-bottom:20px;">`
-    + `<div style="padding:16px 20px;border-bottom:1px solid #2a2a2a;display:flex;align-items:center;justify-content:space-between;">`
-    + `<div style="display:flex;align-items:center;gap:12px;">`
-    + `<div style="width:36px;height:36px;border-radius:50%;background-color:#d97706;display:flex;align-items:center;justify-content:center;font-weight:bold;color:white;font-size:14px;">ZA</div>`
-    + `<div><div style="font-size:14px;font-weight:600;color:#ffffff;">Zeelin Admin</div>`
-    + `<div style="font-size:12px;color:#a3a3a3;">${esc(g.meta)}</div></div></div>`
-    + `<span style="background-color:#382818;color:#d97706;font-size:11px;font-weight:600;padding:4px 8px;border-radius:4px;">Announcement</span></div>`
-    + `<div style="padding:20px;">`
-    + `<h3 style="font-size:16px;font-weight:600;color:#ffffff;margin:0 0 10px 0;">${esc(g.title)}</h3>`
-    + `<p style="font-size:13px;color:#d4d4d4;line-height:1.5;margin:0;">${esc(g.body)}</p>`
-    + `</div></div>`).join('');
-  $('#page').innerHTML = `
-    <div style="padding:24px;max-width:900px;margin:0 auto;width:100%;box-sizing:border-box;">
-      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:24px;border-bottom:1px solid #2a2a2a;padding-bottom:16px;">
-        <div>
-          <h1 style="font-size:22px;font-weight:700;color:#ffffff;margin:0 0 4px 0;">General Message Board</h1>
-          <p style="font-size:13px;color:#a3a3a3;margin:0;">Official announcements from the Zeelin Admin — read-only, no replies.</p>
-        </div>
+  const pinned = GENERAL_BOARD[0];
+  const rest = GENERAL_BOARD.slice(1);
+  const boardIcon = (kind) => kind === 'schedule' ? ic('calendar',18,18) : kind === 'quiz' ? ic('check',18,18) : kind === 'maintenance' ? ic('settings',18,18) : ic('feed',18,18);
+  const typeFor = (g) => g.id === 'g2' ? 'schedule' : g.id === 'g3' ? 'quiz' : g.id === 'g4' ? 'maintenance' : 'announcement';
+  const labelFor = (g) => g.id === 'g2' ? 'Live learning' : g.id === 'g3' ? 'Assessment' : g.id === 'g4' ? 'System notice' : 'Announcement';
+  const card = (g) => `
+    <article class="board-card" tabindex="0">
+      <div class="board-card-icon">${boardIcon(typeFor(g))}</div>
+      <div class="board-card-body">
+        <div class="board-card-kicker">${esc(labelFor(g))}<span>${esc(g.meta.replace('Zeelin Admin • ','').replace('Zeelin Admin · ',''))}</span></div>
+        <h2>${esc(g.title)}</h2>
+        <p>${esc(g.body)}</p>
       </div>
-      ${cards}
+      <div class="board-card-arrow" aria-hidden="true">${ic('arrow',18,18)}</div>
+    </article>`;
+  $('#page').innerHTML = `
+    <div class="board-premium">
+      <header class="board-hero">
+        <div>
+          <span class="board-eyebrow">OFFICIAL ZEELIN CHANNEL</span>
+          <h1>General Message Board</h1>
+          <p>Important cohort announcements, learning updates, assessment guidance and platform notices from the Zeelin Admin team.</p>
+        </div>
+        <div class="board-hero-stats" aria-label="Message board summary">
+          <span><b>${GENERAL_BOARD.length}</b><small>Announcements</small></span>
+          <span><b>Read only</b><small>Official channel</small></span>
+        </div>
+      </header>
+
+      <section class="board-pinned">
+        <div class="board-pinned-media">
+          <span class="board-pin-badge">${ic('feed',15,15)} PINNED</span>
+          <div class="board-admin-mark">ZA</div>
+          <div class="board-pinned-copy">
+            <span>Zeelin Admin</span>
+            <small>${esc(pinned.meta.replace('Zeelin Admin • ','').replace('Zeelin Admin · ',''))}</small>
+          </div>
+        </div>
+        <div class="board-pinned-content">
+          <span class="board-notice-label">Start here</span>
+          <h2>${esc(pinned.title)}</h2>
+          <p>${esc(pinned.body)}</p>
+          <div class="board-readonly">${ic('lock',14,14)} Official announcement · replies disabled</div>
+        </div>
+      </section>
+
+      <div class="board-section-head">
+        <div><span>LATEST UPDATES</span><h2>Everything you need to know</h2></div>
+        <small>Most recent notices from Zeelin Academy</small>
+      </div>
+      <section class="board-grid">${rest.map(card).join('')}</section>
     </div>`;
   $('#page').addEventListener('click', backLink);
 }
-/* calendar demo store */
-let CAL_VIEW = { y:2026, m:7 };
-const MONTHS = ['January','February','March','April','May','June','July','August','September','October','November','December'];
-window._calNav = function(d){ let m = CAL_VIEW.m + d, y = CAL_VIEW.y; while(m<0){m+=12;y--;} while(m>11){m-=12;y++;} CAL_VIEW = {y:y,m:m}; route(); };
-window._calAdd = function(t){ toast('Added to your calendar (demo)'); };
-window._calDetails = function(id){
-  const e = CALENDAR_EVENTS.find((x)=>x.id===id); if(!e) return;
-  const el = $('#calDet-'+id); if(el) el.style.display = el.style.display==='none'?'block':'none';
-};
-/* recordings demo store */
-let REC_FILTER = 'all';
-window._recFilter = function(v){ REC_FILTER = v; route(); };
-const REC_VIDEO = { r1:'v1', r2:'v2' };
-window._playRec = function(id){ go('/watch/' + (REC_VIDEO[id] || 'v1')); };
-
-
-/* ============ SIDEBAR / TOPBAR ============ */
 function renderSidebar() {
   const r = parseHash()[0] || 'home';
   const open = treeOpen();
