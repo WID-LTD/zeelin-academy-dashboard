@@ -1,0 +1,541 @@
+
+/* ============================================================
+   ZEELIN COURSE PORTAL — FINAL DENSE FULL-WIDTH LAYOUT
+   Source of truth for spacing, card proportion and screen usage.
+   Loaded after premium-training.css and before sidebar-collapse.css.
+   ============================================================ */
+
+:root{
+  --course-edge:12px;
+  --course-gap:14px;
+  --course-radius:18px;
+  --course-line:#d9e1eb;
+  --course-ink:#07143a;
+  --course-muted:#58677d;
+  --course-gold:#d4a02a;
+  --course-gold-soft:#fff5d8;
+  --course-shadow:0 9px 26px rgba(28,54,88,.08);
+  --course-shadow-hover:0 20px 42px rgba(25,51,86,.15);
+}
+
+body.premium-training .content{
+  width:100%!important;
+  max-width:none!important;
+  min-width:0!important;
+  margin:0!important;
+  padding:0!important;
+}
+body.premium-training #page{
+  width:100%!important;
+  max-width:none!important;
+  margin:0!important;
+  padding:14px var(--course-edge) 54px!important;
+  color:var(--course-ink)!important;
+  font-size:15.5px!important;
+}
+body.premium-training #page > *{
+  max-width:none!important;
+  width:100%!important;
+  margin-left:0!important;
+  margin-right:0!important;
+}
+body.premium-training #page h1{
+  font-size:clamp(32px,2.45vw,44px)!important;
+  line-height:1.08!important;
+  letter-spacing:-1px!important;
+  font-weight:900!important;
+}
+body.premium-training #page h2{
+  font-weight:850!important;
+}
+body.premium-training #page p,
+body.premium-training #page .sub,
+body.premium-training #page .card-sub,
+body.premium-training #page .pt-sub{
+  line-height:1.62!important;
+}
+
+/* Core cards should feel substantial, not miniature. */
+body.premium-training .card,
+body.premium-training .p-card,
+body.premium-training .xv-panel,
+body.premium-training .frameworks,
+body.premium-training .met{
+  border-radius:var(--course-radius)!important;
+  border-color:var(--course-line)!important;
+  box-shadow:var(--course-shadow)!important;
+}
+body.premium-training .card{
+  padding:22px!important;
+}
+body.premium-training .card-title{
+  font-size:17px!important;
+  font-weight:850!important;
+}
+body.premium-training .card-sub{
+  font-size:13.5px!important;
+  color:var(--course-muted)!important;
+}
+
+/* -------- HOME: use the entire canvas, especially for one enrolled course -------- */
+body.premium-training.premium-route-home #page{
+  padding:0!important;
+}
+body.premium-training.premium-route-home .home{
+  width:100%!important;
+  max-width:none!important;
+  margin:0!important;
+  padding:28px var(--course-edge) 58px!important;
+}
+body.premium-training.premium-route-home .home-welcome{
+  margin-bottom:22px!important;
+}
+body.premium-training.premium-route-home .home-welcome h1{
+  font-size:clamp(36px,3vw,50px)!important;
+}
+body.premium-training.premium-route-home .home-welcome .sub{
+  max-width:950px!important;
+  font-size:15.5px!important;
+}
+body.premium-training.premium-route-home .cat-head{
+  margin-bottom:12px!important;
+}
+body.premium-training.premium-route-home .enrolled{
+  width:100%!important;
+  max-width:none!important;
+  gap:var(--course-gap)!important;
+}
+body.premium-training.premium-route-home .enrolled.single{
+  grid-template-columns:1fr!important;
+}
+body.premium-training.premium-route-home .enrolled.single .enr-card{
+  width:100%!important;
+  max-width:none!important;
+  min-height:430px!important;
+  display:grid!important;
+  grid-template-columns:minmax(420px,.92fr) minmax(440px,1.08fr)!important;
+  grid-template-rows:1fr auto!important;
+  grid-template-areas:"hero body" "hero foot"!important;
+  overflow:hidden!important;
+}
+body.premium-training.premium-route-home .enrolled.single .enr-hero{
+  grid-area:hero!important;
+  min-height:430px!important;
+}
+body.premium-training.premium-route-home .enrolled.single .enr-body{
+  grid-area:body!important;
+  padding:34px 34px 24px!important;
+}
+body.premium-training.premium-route-home .enrolled.single .enr-foot{
+  grid-area:foot!important;
+  padding:20px 34px 28px!important;
+}
+body.premium-training.premium-route-home .enr-body h3{
+  font-size:clamp(24px,2vw,34px)!important;
+  line-height:1.16!important;
+}
+body.premium-training.premium-route-home .stat-row{
+  gap:12px!important;
+}
+body.premium-training.premium-route-home .stat-box{
+  min-height:90px!important;
+  padding:17px!important;
+}
+body.premium-training.premium-route-home .stat-box .v{
+  font-size:23px!important;
+}
+
+/* -------- DAY OVERVIEW: auto-fill the row; never leave a stranded empty column -------- */
+body.premium-training.premium-route-day #page{
+  padding:14px var(--course-edge) 56px!important;
+}
+body.premium-training.premium-route-day .day-titlebar{
+  margin-bottom:16px!important;
+}
+body.premium-training.premium-route-day .p-grid{
+  width:100%!important;
+  display:grid!important;
+  grid-template-columns:repeat(auto-fit,minmax(305px,1fr))!important;
+  gap:var(--course-gap)!important;
+}
+body.premium-training.premium-route-day .p-card{
+  min-height:230px!important;
+}
+body.premium-training.premium-route-day .p-top{
+  padding:21px!important;
+}
+body.premium-training.premium-route-day .pt-title{
+  font-size:18.5px!important;
+  line-height:1.25!important;
+}
+body.premium-training.premium-route-day .pt-sub{
+  font-size:13.5px!important;
+}
+body.premium-training.premium-route-day .p-foot{
+  padding:15px 20px!important;
+}
+
+/* ============================================================
+   MESSAGE BOARD — BALANCED, SQUARE, FULL-WIDTH
+   ============================================================ */
+body.premium-training.premium-route-board #page{
+  display:block!important;
+  width:100%!important;
+  max-width:none!important;
+  padding:14px var(--course-edge) 54px!important;
+}
+body.premium-training.premium-route-board #page > .board-premium{
+  display:block!important;
+  grid-template-columns:none!important;
+  gap:0!important;
+  width:100%!important;
+  max-width:none!important;
+  min-height:0!important;
+  margin:0!important;
+  padding:0!important;
+}
+body.premium-training.premium-route-board #page > .board-premium > *{
+  width:100%!important;
+  max-width:none!important;
+  grid-column:auto!important;
+  grid-row:auto!important;
+  margin-left:0!important;
+  margin-right:0!important;
+}
+body.premium-training.premium-route-board #page > .board-premium > .board-top-grid{
+  display:grid!important;
+  grid-template-columns:minmax(0,1fr) minmax(0,1fr)!important;
+  gap:var(--course-gap)!important;
+  align-items:stretch!important;
+  margin:0!important;
+  padding:0!important;
+  background:transparent!important;
+  border:0!important;
+  box-shadow:none!important;
+}
+body.premium-training.premium-route-board #page .board-top-grid > .board-hero,
+body.premium-training.premium-route-board #page .board-top-grid > .board-pinned{
+  width:100%!important;
+  min-width:0!important;
+  min-height:365px!important;
+  height:100%!important;
+  margin:0!important;
+  border-radius:20px!important;
+  overflow:hidden!important;
+}
+body.premium-training.premium-route-board #page .board-top-grid > .board-hero{
+  display:grid!important;
+  grid-template-columns:minmax(0,1fr) 250px!important;
+  gap:24px!important;
+  align-items:center!important;
+  padding:36px!important;
+  border:0!important;
+  background:
+    radial-gradient(circle at 86% 14%,rgba(236,200,99,.18),transparent 18rem),
+    linear-gradient(135deg,#070d1f 0%,#111a35 100%)!important;
+  box-shadow:0 18px 44px rgba(4,10,26,.15)!important;
+}
+body.premium-training.premium-route-board #page .board-hero h1{
+  color:#fff!important;
+  font-size:clamp(38px,3vw,52px)!important;
+  line-height:1.02!important;
+  margin:0 0 14px!important;
+}
+body.premium-training.premium-route-board #page .board-hero p{
+  color:#d5dcec!important;
+  font-size:15.5px!important;
+  line-height:1.72!important;
+  max-width:680px!important;
+}
+body.premium-training.premium-route-board #page .board-hero-stats{
+  display:grid!important;
+  grid-template-columns:1fr!important;
+  gap:12px!important;
+}
+body.premium-training.premium-route-board #page .board-hero-stats span{
+  min-height:104px!important;
+  padding:19px!important;
+  border-radius:16px!important;
+}
+body.premium-training.premium-route-board #page .board-hero-stats b{
+  font-size:23px!important;
+}
+body.premium-training.premium-route-board #page .board-top-grid > .board-pinned{
+  display:grid!important;
+  grid-template-columns:minmax(250px,42%) minmax(0,58%)!important;
+  border:1.5px solid #dfbd65!important;
+  background:#fff!important;
+  box-shadow:var(--course-shadow)!important;
+}
+body.premium-training.premium-route-board #page .board-pinned-media{
+  min-height:365px!important;
+  padding:28px!important;
+}
+body.premium-training.premium-route-board #page .board-pinned-content{
+  padding:34px!important;
+  justify-content:center!important;
+}
+body.premium-training.premium-route-board #page .board-pinned-content h2{
+  font-size:clamp(28px,2.1vw,38px)!important;
+  line-height:1.1!important;
+  margin:10px 0 14px!important;
+}
+body.premium-training.premium-route-board #page .board-pinned-content p{
+  font-size:15px!important;
+  line-height:1.72!important;
+}
+
+/* Latest updates is a compact heading + three equal boxy cards. */
+body.premium-training.premium-route-board #page > .board-premium > .board-updates{
+  display:block!important;
+  grid-template-columns:none!important;
+  min-height:0!important;
+  margin:16px 0 0!important;
+  padding:18px!important;
+  background:#f7f9fc!important;
+  border:1px solid #e0e6ee!important;
+  border-radius:20px!important;
+  box-shadow:none!important;
+}
+body.premium-training.premium-route-board #page .board-updates > .board-section-head{
+  display:flex!important;
+  align-items:flex-end!important;
+  justify-content:space-between!important;
+  gap:18px!important;
+  width:100%!important;
+  min-height:0!important;
+  height:auto!important;
+  margin:0 0 14px!important;
+  padding:0 2px!important;
+  background:transparent!important;
+  border:0!important;
+  border-radius:0!important;
+  box-shadow:none!important;
+}
+body.premium-training.premium-route-board #page .board-section-head h2{
+  font-size:28px!important;
+  line-height:1.12!important;
+  margin:4px 0 0!important;
+}
+body.premium-training.premium-route-board #page .board-section-head small{
+  font-size:12px!important;
+  color:#6a778a!important;
+}
+body.premium-training.premium-route-board #page .board-updates > .board-grid{
+  display:grid!important;
+  grid-template-columns:repeat(3,minmax(0,1fr))!important;
+  gap:var(--course-gap)!important;
+  width:100%!important;
+  margin:0!important;
+  padding:0!important;
+}
+body.premium-training.premium-route-board #page .board-grid > .board-card{
+  width:100%!important;
+  min-width:0!important;
+  min-height:330px!important;
+  aspect-ratio:1.12 / 1!important;
+  padding:26px!important;
+  display:grid!important;
+  grid-template-columns:54px minmax(0,1fr)!important;
+  grid-template-rows:1fr auto!important;
+  gap:17px!important;
+  border:1.5px solid var(--course-line)!important;
+  border-radius:18px!important;
+  background:#fff!important;
+  box-shadow:var(--course-shadow)!important;
+}
+body.premium-training.premium-route-board #page .board-card-icon{
+  width:54px!important;
+  height:54px!important;
+  border-radius:15px!important;
+}
+body.premium-training.premium-route-board #page .board-card-kicker{
+  font-size:10px!important;
+}
+body.premium-training.premium-route-board #page .board-card-kicker span{
+  font-size:9.5px!important;
+}
+body.premium-training.premium-route-board #page .board-card h2{
+  font-size:22px!important;
+  line-height:1.18!important;
+  margin:13px 0 10px!important;
+  overflow-wrap:normal!important;
+  word-break:normal!important;
+}
+body.premium-training.premium-route-board #page .board-card p{
+  font-size:14px!important;
+  line-height:1.67!important;
+  color:#536178!important;
+  overflow-wrap:normal!important;
+  word-break:normal!important;
+}
+body.premium-training.premium-route-board #page .board-card-arrow{
+  grid-column:2!important;
+  align-self:end!important;
+}
+
+/* -------- COMMUNITY / MONDAY / GUIDE: remove centred narrow islands -------- */
+body.premium-training.premium-route-community #page,
+body.premium-training.premium-route-monday #page,
+body.premium-training.premium-route-guide #page,
+body.premium-training.premium-route-recordings #page,
+body.premium-training.premium-route-calendar #page,
+body.premium-training.premium-route-accountability #page,
+body.premium-training.premium-route-profile #page,
+body.premium-training.premium-route-videos #page,
+body.premium-training.premium-route-roadmap #page,
+body.premium-training.premium-route-checkin #page{
+  max-width:none!important;
+  width:100%!important;
+  padding-left:var(--course-edge)!important;
+  padding-right:var(--course-edge)!important;
+}
+body.premium-training.premium-route-community #page > div:first-child,
+body.premium-training.premium-route-monday #page > div:first-child,
+body.premium-training.premium-route-guide #page > div:first-child,
+body.premium-training.premium-route-recordings #page > div:first-child,
+body.premium-training.premium-route-calendar #page > div:first-child{
+  width:100%!important;
+  max-width:none!important;
+  margin-left:0!important;
+  margin-right:0!important;
+}
+body.premium-training .community-premium,
+body.premium-training .community-room-page{
+  width:100%!important;
+  max-width:none!important;
+}
+body.premium-training .community-room-grid,
+body.premium-training .community-recent-grid{
+  grid-template-columns:repeat(auto-fit,minmax(300px,1fr))!important;
+  gap:var(--course-gap)!important;
+}
+body.premium-training .community-room-card,
+body.premium-training .community-recent-card{
+  min-height:240px!important;
+  padding:22px!important;
+}
+body.premium-training .monday-quote-grid{
+  grid-template-columns:repeat(auto-fit,minmax(290px,1fr))!important;
+  gap:var(--course-gap)!important;
+}
+
+/* Support / Aluminal cards consume width rather than floating in the middle. */
+body.premium-training .sup-grid,
+body.premium-training.premium-route-aluminal .alum-grid{
+  width:100%!important;
+  grid-template-columns:repeat(3,minmax(0,1fr))!important;
+  gap:var(--course-gap)!important;
+}
+body.premium-training .sup-card,
+body.premium-training .alum-card{
+  min-height:330px!important;
+}
+
+/* Videos: use wider rows and larger copy. */
+body.premium-training.premium-route-videos .video-row{
+  width:100%!important;
+  grid-template-columns:240px minmax(0,1fr) auto!important;
+  gap:24px!important;
+  padding:22px!important;
+}
+body.premium-training.premium-route-videos .thumb-wrap{
+  width:240px!important;
+  height:136px!important;
+}
+body.premium-training.premium-route-videos .video-row h3{
+  font-size:20px!important;
+}
+body.premium-training.premium-route-videos .video-row p{
+  font-size:14px!important;
+}
+
+/* Roadmap and accountability: roomier rows, no narrow centre. */
+body.premium-training.premium-route-roadmap .roadmap-standalone-row{
+  padding:20px 22px!important;
+}
+body.premium-training .acc-layout{
+  width:100%!important;
+  grid-template-columns:minmax(0,1.55fr) minmax(330px,.45fr)!important;
+  gap:var(--course-gap)!important;
+}
+body.premium-training .met{
+  min-height:104px!important;
+  padding:20px!important;
+}
+body.premium-training .met .mv{
+  font-size:30px!important;
+}
+
+/* Desktop hover stays obvious but does not make the grid jump uncontrollably. */
+@media(hover:hover) and (pointer:fine){
+  body.premium-training .board-card:hover,
+  body.premium-training .community-room-card:hover,
+  body.premium-training .community-recent-card:hover,
+  body.premium-training .p-card:hover,
+  body.premium-training .enr-card:hover,
+  body.premium-training .sup-card:hover,
+  body.premium-training .alum-card:hover{
+    transform:translateY(-6px) scale(1.012)!important;
+    box-shadow:var(--course-shadow-hover)!important;
+    border-color:#d5aa3d!important;
+  }
+}
+
+/* -------- Responsive -------- */
+@media(max-width:1250px){
+  body.premium-training.premium-route-home .enrolled.single .enr-card{
+    grid-template-columns:1fr!important;
+    grid-template-areas:"hero" "body" "foot"!important;
+  }
+  body.premium-training.premium-route-home .enrolled.single .enr-hero{min-height:330px!important}
+  body.premium-training.premium-route-board #page > .board-premium > .board-top-grid{
+    grid-template-columns:1fr!important;
+  }
+  body.premium-training.premium-route-board #page .board-top-grid > .board-hero,
+  body.premium-training.premium-route-board #page .board-top-grid > .board-pinned{
+    min-height:330px!important;
+  }
+  body.premium-training .acc-layout{grid-template-columns:1fr!important}
+}
+@media(max-width:900px){
+  :root{--course-edge:10px;--course-gap:10px}
+  body.premium-training #page{padding-top:10px!important}
+  body.premium-training.premium-route-board #page .board-top-grid > .board-hero{
+    grid-template-columns:1fr!important;
+    padding:28px!important;
+  }
+  body.premium-training.premium-route-board #page .board-hero-stats{
+    grid-template-columns:1fr 1fr!important;
+  }
+  body.premium-training.premium-route-board #page .board-top-grid > .board-pinned{
+    grid-template-columns:1fr!important;
+  }
+  body.premium-training.premium-route-board #page .board-pinned-media{min-height:230px!important}
+  body.premium-training.premium-route-board #page .board-updates > .board-grid{
+    grid-template-columns:1fr!important;
+  }
+  body.premium-training.premium-route-board #page .board-grid > .board-card{
+    aspect-ratio:auto!important;
+    min-height:260px!important;
+  }
+  body.premium-training .sup-grid,
+  body.premium-training.premium-route-aluminal .alum-grid{
+    grid-template-columns:1fr!important;
+  }
+  body.premium-training.premium-route-videos .video-row{
+    grid-template-columns:1fr!important;
+  }
+  body.premium-training.premium-route-videos .thumb-wrap{
+    width:100%!important;height:210px!important;
+  }
+}
+@media(max-width:600px){
+  body.premium-training.premium-route-board #page .board-updates > .board-section-head{
+    align-items:flex-start!important;
+    flex-direction:column!important;
+  }
+  body.premium-training.premium-route-board #page .board-hero-stats{
+    grid-template-columns:1fr!important;
+  }
+}
