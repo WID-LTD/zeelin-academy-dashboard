@@ -178,13 +178,13 @@ body.premium-training.premium-route-day .p-foot{
 /* ============================================================
    MESSAGE BOARD — BALANCED, SQUARE, FULL-WIDTH
    ============================================================ */
-body.premium-training.premium-route-board #page{
+body.premium-training.premium-route-board #page#page{
   display:block!important;
   width:100%!important;
   max-width:none!important;
   padding:14px var(--course-edge) 54px!important;
 }
-body.premium-training.premium-route-board #page > .board-premium{
+body.premium-training.premium-route-board #page#page > .board-premium{
   display:block!important;
   grid-template-columns:none!important;
   gap:0!important;
@@ -194,7 +194,7 @@ body.premium-training.premium-route-board #page > .board-premium{
   margin:0!important;
   padding:0!important;
 }
-body.premium-training.premium-route-board #page > .board-premium > *{
+body.premium-training.premium-route-board #page#page > .board-premium > *{
   width:100%!important;
   max-width:none!important;
   grid-column:auto!important;
@@ -202,7 +202,7 @@ body.premium-training.premium-route-board #page > .board-premium > *{
   margin-left:0!important;
   margin-right:0!important;
 }
-body.premium-training.premium-route-board #page > .board-premium > .board-top-grid{
+body.premium-training.premium-route-board #page#page > .board-premium > .board-top-grid{
   display:grid!important;
   grid-template-columns:minmax(0,1fr) minmax(0,1fr)!important;
   gap:var(--course-gap)!important;
@@ -213,8 +213,8 @@ body.premium-training.premium-route-board #page > .board-premium > .board-top-gr
   border:0!important;
   box-shadow:none!important;
 }
-body.premium-training.premium-route-board #page .board-top-grid > .board-hero,
-body.premium-training.premium-route-board #page .board-top-grid > .board-pinned{
+body.premium-training.premium-route-board #page#page .board-top-grid > .board-hero,
+body.premium-training.premium-route-board #page#page .board-top-grid > .board-pinned{
   width:100%!important;
   min-width:0!important;
   min-height:365px!important;
@@ -223,7 +223,7 @@ body.premium-training.premium-route-board #page .board-top-grid > .board-pinned{
   border-radius:20px!important;
   overflow:hidden!important;
 }
-body.premium-training.premium-route-board #page .board-top-grid > .board-hero{
+body.premium-training.premium-route-board #page#page .board-top-grid > .board-hero{
   display:grid!important;
   grid-template-columns:minmax(0,1fr) 250px!important;
   gap:24px!important;
@@ -235,58 +235,58 @@ body.premium-training.premium-route-board #page .board-top-grid > .board-hero{
     linear-gradient(135deg,#070d1f 0%,#111a35 100%)!important;
   box-shadow:0 18px 44px rgba(4,10,26,.15)!important;
 }
-body.premium-training.premium-route-board #page .board-hero h1{
+body.premium-training.premium-route-board #page#page .board-hero h1{
   color:#fff!important;
   font-size:clamp(38px,3vw,52px)!important;
   line-height:1.02!important;
   margin:0 0 14px!important;
 }
-body.premium-training.premium-route-board #page .board-hero p{
+body.premium-training.premium-route-board #page#page .board-hero p{
   color:#d5dcec!important;
   font-size:15.5px!important;
   line-height:1.72!important;
   max-width:680px!important;
 }
-body.premium-training.premium-route-board #page .board-hero-stats{
+body.premium-training.premium-route-board #page#page .board-hero-stats{
   display:grid!important;
   grid-template-columns:1fr!important;
   gap:12px!important;
 }
-body.premium-training.premium-route-board #page .board-hero-stats span{
+body.premium-training.premium-route-board #page#page .board-hero-stats span{
   min-height:104px!important;
   padding:19px!important;
   border-radius:16px!important;
 }
-body.premium-training.premium-route-board #page .board-hero-stats b{
+body.premium-training.premium-route-board #page#page .board-hero-stats b{
   font-size:23px!important;
 }
-body.premium-training.premium-route-board #page .board-top-grid > .board-pinned{
+body.premium-training.premium-route-board #page#page .board-top-grid > .board-pinned{
   display:grid!important;
   grid-template-columns:minmax(250px,42%) minmax(0,58%)!important;
   border:1.5px solid #dfbd65!important;
   background:#fff!important;
   box-shadow:var(--course-shadow)!important;
 }
-body.premium-training.premium-route-board #page .board-pinned-media{
+body.premium-training.premium-route-board #page#page .board-pinned-media{
   min-height:365px!important;
   padding:28px!important;
 }
-body.premium-training.premium-route-board #page .board-pinned-content{
+body.premium-training.premium-route-board #page#page .board-pinned-content{
   padding:34px!important;
   justify-content:center!important;
 }
-body.premium-training.premium-route-board #page .board-pinned-content h2{
+body.premium-training.premium-route-board #page#page .board-pinned-content h2{
   font-size:clamp(28px,2.1vw,38px)!important;
   line-height:1.1!important;
   margin:10px 0 14px!important;
 }
-body.premium-training.premium-route-board #page .board-pinned-content p{
+body.premium-training.premium-route-board #page#page .board-pinned-content p{
   font-size:15px!important;
   line-height:1.72!important;
 }
 
 /* Latest updates is a compact heading + three equal boxy cards. */
-body.premium-training.premium-route-board #page > .board-premium > .board-updates{
+body.premium-training.premium-route-board #page#page > .board-premium > .board-updates{
   display:block!important;
   grid-template-columns:none!important;
   min-height:0!important;
@@ -297,7 +297,7 @@ body.premium-training.premium-route-board #page > .board-premium > .board-update
   border-radius:20px!important;
   box-shadow:none!important;
 }
-body.premium-training.premium-route-board #page .board-updates > .board-section-head{
+body.premium-training.premium-route-board #page#page .board-updates > .board-section-head{
   display:flex!important;
   align-items:flex-end!important;
   justify-content:space-between!important;
@@ -312,16 +312,16 @@ body.premium-training.premium-route-board #page .board-updates > .board-section-
   border-radius:0!important;
   box-shadow:none!important;
 }
-body.premium-training.premium-route-board #page .board-section-head h2{
+body.premium-training.premium-route-board #page#page .board-section-head h2{
   font-size:28px!important;
   line-height:1.12!important;
   margin:4px 0 0!important;
 }
-body.premium-training.premium-route-board #page .board-section-head small{
+body.premium-training.premium-route-board #page#page .board-section-head small{
   font-size:12px!important;
   color:#6a778a!important;
 }
-body.premium-training.premium-route-board #page .board-updates > .board-grid{
+body.premium-training.premium-route-board #page#page .board-updates > .board-grid{
   display:grid!important;
   grid-template-columns:repeat(3,minmax(0,1fr))!important;
   gap:var(--course-gap)!important;
@@ -329,7 +329,7 @@ body.premium-training.premium-route-board #page .board-updates > .board-grid{
   margin:0!important;
   padding:0!important;
 }
-body.premium-training.premium-route-board #page .board-grid > .board-card{
+body.premium-training.premium-route-board #page#page .board-grid > .board-card{
   width:100%!important;
   min-width:0!important;
   min-height:330px!important;
@@ -344,32 +344,32 @@ body.premium-training.premium-route-board #page .board-grid > .board-card{
   background:#fff!important;
   box-shadow:var(--course-shadow)!important;
 }
-body.premium-training.premium-route-board #page .board-card-icon{
+body.premium-training.premium-route-board #page#page .board-card-icon{
   width:54px!important;
   height:54px!important;
   border-radius:15px!important;
 }
-body.premium-training.premium-route-board #page .board-card-kicker{
+body.premium-training.premium-route-board #page#page .board-card-kicker{
   font-size:10px!important;
 }
-body.premium-training.premium-route-board #page .board-card-kicker span{
+body.premium-training.premium-route-board #page#page .board-card-kicker span{
   font-size:9.5px!important;
 }
-body.premium-training.premium-route-board #page .board-card h2{
+body.premium-training.premium-route-board #page#page .board-card h2{
   font-size:22px!important;
   line-height:1.18!important;
   margin:13px 0 10px!important;
   overflow-wrap:normal!important;
   word-break:normal!important;
 }
-body.premium-training.premium-route-board #page .board-card p{
+body.premium-training.premium-route-board #page#page .board-card p{
   font-size:14px!important;
   line-height:1.67!important;
   color:#536178!important;
   overflow-wrap:normal!important;
   word-break:normal!important;
 }
-body.premium-training.premium-route-board #page .board-card-arrow{
+body.premium-training.premium-route-board #page#page .board-card-arrow{
   grid-column:2!important;
   align-self:end!important;
 }
@@ -489,11 +489,11 @@ body.premium-training .met .mv{
     grid-template-areas:"hero" "body" "foot"!important;
   }
   body.premium-training.premium-route-home .enrolled.single .enr-hero{min-height:330px!important}
-  body.premium-training.premium-route-board #page > .board-premium > .board-top-grid{
+  body.premium-training.premium-route-board #page#page > .board-premium > .board-top-grid{
     grid-template-columns:1fr!important;
   }
-  body.premium-training.premium-route-board #page .board-top-grid > .board-hero,
-  body.premium-training.premium-route-board #page .board-top-grid > .board-pinned{
+  body.premium-training.premium-route-board #page#page .board-top-grid > .board-hero,
+  body.premium-training.premium-route-board #page#page .board-top-grid > .board-pinned{
     min-height:330px!important;
   }
   body.premium-training .acc-layout{grid-template-columns:1fr!important}
@@ -501,21 +501,21 @@ body.premium-training .met .mv{
 @media(max-width:900px){
   :root{--course-edge:10px;--course-gap:10px}
   body.premium-training #page{padding-top:10px!important}
-  body.premium-training.premium-route-board #page .board-top-grid > .board-hero{
+  body.premium-training.premium-route-board #page#page .board-top-grid > .board-hero{
     grid-template-columns:1fr!important;
     padding:28px!important;
   }
-  body.premium-training.premium-route-board #page .board-hero-stats{
+  body.premium-training.premium-route-board #page#page .board-hero-stats{
     grid-template-columns:1fr 1fr!important;
   }
-  body.premium-training.premium-route-board #page .board-top-grid > .board-pinned{
+  body.premium-training.premium-route-board #page#page .board-top-grid > .board-pinned{
     grid-template-columns:1fr!important;
   }
-  body.premium-training.premium-route-board #page .board-pinned-media{min-height:230px!important}
-  body.premium-training.premium-route-board #page .board-updates > .board-grid{
+  body.premium-training.premium-route-board #page#page .board-pinned-media{min-height:230px!important}
+  body.premium-training.premium-route-board #page#page .board-updates > .board-grid{
     grid-template-columns:1fr!important;
   }
-  body.premium-training.premium-route-board #page .board-grid > .board-card{
+  body.premium-training.premium-route-board #page#page .board-grid > .board-card{
     aspect-ratio:auto!important;
     min-height:260px!important;
   }
@@ -531,11 +531,11 @@ body.premium-training .met .mv{
   }
 }
 @media(max-width:600px){
-  body.premium-training.premium-route-board #page .board-updates > .board-section-head{
+  body.premium-training.premium-route-board #page#page .board-updates > .board-section-head{
     align-items:flex-start!important;
     flex-direction:column!important;
   }
-  body.premium-training.premium-route-board #page .board-hero-stats{
+  body.premium-training.premium-route-board #page#page .board-hero-stats{
     grid-template-columns:1fr!important;
   }
 }
