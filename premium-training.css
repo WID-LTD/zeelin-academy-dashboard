@@ -6396,3 +6396,218 @@ body.premium-training #sidebar a[onclick*="_navDay"][style*="color: #d97706"] sv
     transform:none!important;
   }
 }
+
+
+/* ============================================================
+   FINAL — EXACT JOB ACQUISITION SIDEBAR COPY FOR TRAINING
+   This block intentionally wins over every earlier sidebar experiment.
+   ============================================================ */
+body.premium-training #sidebar.training-job-sidebar{
+  font-family:Inter,"Segoe UI",Arial,sans-serif!important;
+  background:
+    radial-gradient(circle at 110% 21%,rgba(200,147,35,.25),transparent 24%),
+    linear-gradient(145deg,#102d4a 0%,#071b33 62%,#0a2746 100%)!important;
+  color:#f7fbff!important;
+  border-right:0!important;
+  padding:24px 15px 20px!important;
+  box-shadow:8px 0 22px rgba(15,40,68,.16)!important;
+  overflow-y:auto!important;
+  overflow-x:hidden!important;
+  scrollbar-width:thin!important;
+  scrollbar-color:#c9d3e0 #ffffff!important;
+}
+body.premium-training #sidebar.training-job-sidebar::-webkit-scrollbar{width:6px!important}
+body.premium-training #sidebar.training-job-sidebar::-webkit-scrollbar-track{background:#ffffff!important}
+body.premium-training #sidebar.training-job-sidebar::-webkit-scrollbar-thumb{
+  background:#c9d3e0!important;border:1px solid #e8edf4!important;border-radius:999px!important;
+}
+body.premium-training #sidebar.training-job-sidebar .ico{
+  width:23px!important;height:23px!important;fill:none!important;stroke:currentColor!important;stroke-width:2!important;
+  stroke-linecap:round!important;stroke-linejoin:round!important;display:inline-block!important;vertical-align:middle!important;flex:0 0 auto!important;
+}
+body.premium-training #sidebar.training-job-sidebar .brand{
+  height:104px!important;min-height:104px!important;display:flex!important;align-items:flex-start!important;justify-content:center!important;
+  border-bottom:1px solid rgba(255,255,255,.28)!important;padding:0 0 23px!important;margin:0!important;flex-shrink:0!important;
+  background:transparent!important;box-shadow:none!important;
+}
+body.premium-training #sidebar.training-job-sidebar .brand-mark{display:flex!important;align-items:center!important;justify-content:center!important;gap:10px!important}
+body.premium-training #sidebar.training-job-sidebar .brand img{height:42px!important;width:auto!important;max-width:160px!important;object-fit:contain!important}
+body.premium-training #sidebar.training-job-sidebar .system-title{
+  display:block!important;font:800 15px/1.35 Inter,"Segoe UI",Arial,sans-serif!important;letter-spacing:1px!important;
+  margin:16px 7px 18px!important;padding:0!important;color:#f7fbff!important;text-align:left!important;background:transparent!important
+}
+body.premium-training #sidebar.training-job-sidebar .nav-main,
+body.premium-training #sidebar.training-job-sidebar .subnav,
+body.premium-training #sidebar.training-job-sidebar .course-week-list,
+body.premium-training #sidebar.training-job-sidebar .course-day-list,
+body.premium-training #sidebar.training-job-sidebar .course-tool-list{
+  list-style:none!important;margin:0!important;padding:0!important;
+}
+body.premium-training #sidebar.training-job-sidebar .nav-item{
+  min-height:50px!important;height:50px!important;display:flex!important;align-items:center!important;gap:18px!important;padding:0 18px!important;
+  border-radius:11px!important;font:400 15px/1.2 Inter,"Segoe UI",Arial,sans-serif!important;margin:2px 0!important;
+  color:#f5f7fb!important;cursor:pointer!important;background:transparent!important;border:0!important;box-shadow:none!important;
+  transition:background .18s ease,transform .18s ease,color .18s ease,box-shadow .18s ease!important;
+}
+body.premium-training #sidebar.training-job-sidebar .nav-item .course-nav-label{min-width:0;flex:1}
+body.premium-training #sidebar.training-job-sidebar .nav-item.parent{font-weight:700!important}
+body.premium-training #sidebar.training-job-sidebar .chev{margin-left:auto!important;color:inherit!important}
+body.premium-training #sidebar.training-job-sidebar .nav-item.active{
+  background:linear-gradient(100deg,#ffe8a0,#edb640)!important;color:#102341!important;font-weight:800!important;
+  box-shadow:0 4px 16px rgba(242,193,72,.32)!important;
+}
+body.premium-training #sidebar.training-job-sidebar .nav-item.active .ico{color:#102341!important}
+body.premium-training #sidebar.training-job-sidebar .course-nav-badge{
+  margin-left:auto!important;min-width:25px;height:25px;padding:0 7px;border-radius:999px;display:grid;place-items:center;
+  background:rgba(255,255,255,.16);color:#fff;font-size:10px;font-weight:900
+}
+body.premium-training #sidebar.training-job-sidebar .nav-item.active .course-nav-badge{background:#102341;color:#ffe8a0}
+body.premium-training #sidebar.training-job-sidebar .stage{
+  color:#ffc43e!important;font:800 14px/1.3 Inter,"Segoe UI",Arial,sans-serif!important;letter-spacing:.3px!important;
+  margin:19px 15px 12px!important;padding:0!important;text-transform:none!important;background:transparent!important
+}
+body.premium-training #sidebar.training-job-sidebar .divider{height:1px!important;background:rgba(255,255,255,.22)!important;margin:10px 7px 12px!important}
+body.premium-training #sidebar.training-job-sidebar .subnav>.nav-item{
+  min-height:46px!important;height:46px!important;padding-left:44px!important;font-size:14px!important;gap:20px!important
+}
+
+/* Course hierarchy continues the exact acquisition rhythm without charcoal panels. */
+body.premium-training #sidebar.training-job-sidebar .course-weeks-wrap{list-style:none!important}
+body.premium-training #sidebar.training-job-sidebar .course-tree-block{list-style:none!important}
+body.premium-training #sidebar.training-job-sidebar .course-tree-row{
+  min-height:44px!important;height:auto!important;padding:9px 12px 9px 44px!important;margin:1px 0!important;font-size:13px!important;gap:11px!important
+}
+body.premium-training #sidebar.training-job-sidebar .course-module-row{padding-left:44px!important}
+body.premium-training #sidebar.training-job-sidebar .course-week-row{padding-left:52px!important;font-weight:700!important}
+body.premium-training #sidebar.training-job-sidebar .course-week-row .course-tree-chev{
+  width:15px!important;height:15px!important;transition:transform .18s ease!important
+}
+body.premium-training #sidebar.training-job-sidebar .course-week-row.is-open .course-tree-chev{transform:rotate(90deg)!important}
+body.premium-training #sidebar.training-job-sidebar .course-day-row{padding-left:64px!important;font-size:12.5px!important}
+body.premium-training #sidebar.training-job-sidebar .course-day-row small{margin-left:auto;color:#96a9bd;font-size:10.5px;font-weight:600}
+body.premium-training #sidebar.training-job-sidebar .course-tool-item{
+  min-height:38px!important;height:38px!important;padding:0 12px 0 82px!important;font-size:11.5px!important;gap:10px!important;border-radius:9px!important
+}
+body.premium-training #sidebar.training-job-sidebar .course-tool-item .ico{width:16px!important;height:16px!important}
+body.premium-training #sidebar.training-job-sidebar .course-static-parent{cursor:default!important}
+body.premium-training #sidebar.training-job-sidebar .training-journey{
+  height:160px!important;border:1px solid rgba(255,255,255,.15)!important;border-radius:14px!important;margin-top:17px!important;
+  padding:26px 24px!important;background:
+    linear-gradient(90deg,rgba(6,20,38,.66),rgba(5,24,43,.28)),
+    url('assets/stock/confident.jpg') center/cover!important;
+  color:#fff!important;position:relative!important;overflow:hidden!important;flex-shrink:0!important
+}
+body.premium-training #sidebar.training-job-sidebar .training-journey p{margin:0!important;font-size:20px!important;line-height:1.28!important;font-weight:500!important;width:165px!important}
+body.premium-training #sidebar.training-job-sidebar .training-journey .gold-stroke{
+  width:77px!important;height:4px!important;background:#ffc544!important;border-radius:99px!important;transform:rotate(-7deg)!important;margin-top:18px!important
+}
+
+@media(min-width:1280px){
+  body.premium-training #sidebar.training-job-sidebar{
+    width:clamp(210px,13.5vw,270px)!important;min-width:clamp(210px,13.5vw,270px)!important;flex-basis:clamp(210px,13.5vw,270px)!important;
+  }
+}
+@media(min-width:1280px) and (max-width:1450px){
+  body.premium-training #sidebar.training-job-sidebar{
+    width:220px!important;min-width:220px!important;flex-basis:220px!important;padding-left:8px!important;padding-right:8px!important
+  }
+  body.premium-training #sidebar.training-job-sidebar .nav-item{padding-left:10px!important;padding-right:10px!important;gap:10px!important}
+  body.premium-training #sidebar.training-job-sidebar .subnav>.nav-item{padding-left:24px!important}
+  body.premium-training #sidebar.training-job-sidebar .course-tree-row{padding-left:30px!important}
+  body.premium-training #sidebar.training-job-sidebar .course-week-row{padding-left:36px!important}
+  body.premium-training #sidebar.training-job-sidebar .course-day-row{padding-left:44px!important}
+  body.premium-training #sidebar.training-job-sidebar .course-tool-item{padding-left:58px!important}
+}
+@media(hover:hover) and (pointer:fine){
+  body.premium-training #sidebar.training-job-sidebar .nav-item:not(.active):not(.course-static-parent):hover{
+    background:rgba(255,255,255,.16)!important;color:#fff!important;transform:translateX(6px) scale(1.015)!important;
+    box-shadow:0 7px 16px rgba(0,0,0,.10)!important
+  }
+  body.premium-training #sidebar.training-job-sidebar .nav-item.active:hover{
+    transform:scale(1.015)!important;box-shadow:0 8px 20px rgba(242,193,72,.42)!important
+  }
+}
+
+/* ============================================================
+   GENERAL MESSAGE BOARD — HARD LAYOUT RESET
+   Fixes legacy #page child-grid rules that split the redesign.
+   ============================================================ */
+body.premium-training.premium-route-board #page{
+  display:block!important;max-width:1380px!important;padding:30px 34px 72px!important
+}
+body.premium-training.premium-route-board .board-premium{
+  display:block!important;grid-template-columns:none!important;width:100%!important;max-width:1220px!important;
+  min-height:0!important;margin:0 auto!important;padding:0!important
+}
+body.premium-training.premium-route-board .board-premium>*{
+  grid-column:auto!important;grid-row:auto!important;width:100%!important;max-width:none!important
+}
+body.premium-training.premium-route-board .board-hero{
+  width:100%!important;min-height:260px!important;display:grid!important;grid-template-columns:minmax(0,1fr) 300px!important;
+  gap:32px!important;padding:40px 44px!important;margin:0!important;border-radius:22px!important
+}
+body.premium-training.premium-route-board .board-pinned{
+  width:100%!important;display:grid!important;grid-template-columns:300px minmax(0,1fr)!important;min-height:260px!important;
+  margin:18px 0 0!important
+}
+body.premium-training.premium-route-board .board-section-head{
+  min-height:0!important;height:auto!important;display:flex!important;align-items:flex-end!important;justify-content:space-between!important;
+  margin:32px 0 14px!important;padding:0!important;background:transparent!important;border:0!important;box-shadow:none!important
+}
+body.premium-training.premium-route-board .board-grid{
+  display:grid!important;grid-template-columns:repeat(3,minmax(0,1fr))!important;gap:16px!important;width:100%!important
+}
+body.premium-training.premium-route-board .board-card{
+  width:auto!important;min-width:0!important;min-height:250px!important;padding:22px!important;
+  grid-template-columns:46px minmax(0,1fr)!important
+}
+body.premium-training.premium-route-board .board-card h2{
+  font-size:18px!important;line-height:1.28!important;overflow-wrap:anywhere!important
+}
+body.premium-training.premium-route-board .board-card p{
+  font-size:12.5px!important;line-height:1.62!important;overflow-wrap:anywhere!important
+}
+
+/* Exact hover/click previews: visibly grow, highlight, then compress on press. */
+@media(hover:hover) and (pointer:fine){
+  body.premium-training button:not(:disabled):hover,
+  body.premium-training a[href]:hover,
+  body.premium-training [role="button"]:hover{
+    transform:translateY(-3px) scale(1.035)!important;
+    filter:brightness(1.035)!important;
+  }
+  body.premium-training .board-card:hover,
+  body.premium-training .community-room-card:hover,
+  body.premium-training .community-recent-card:hover,
+  body.premium-training .community-post:hover,
+  body.premium-training .monday-quote-card:hover,
+  body.premium-training .p-card:hover,
+  body.premium-training .card:hover,
+  body.premium-training .met:hover,
+  body.premium-training .hero-mini:hover,
+  body.premium-training .ins-chip:hover{
+    transform:translateY(-7px) scale(1.022)!important;
+    border-color:#d4a02a!important;
+    box-shadow:0 20px 38px rgba(31,55,88,.15),0 0 0 1px rgba(212,160,42,.12)!important
+  }
+}
+body.premium-training button:not(:disabled):active,
+body.premium-training a[href]:active,
+body.premium-training [role="button"]:active{
+  transform:translateY(0) scale(.965)!important
+}
+
+/* Five-star rating: selected state is cumulative; hover previews EXACTLY the hovered count. */
+body.premium-training .star-row.star-previewing .starb.on.preview-off{
+  background:#fff!important;color:#A6AFBC!important;border-color:#D8E0E9!important;box-shadow:none!important
+}
+body.premium-training .starb.preview-on{
+  background:linear-gradient(135deg,#ECC863,#D4A02A)!important;color:#040A1A!important;border-color:#C59A2A!important;
+  box-shadow:0 8px 18px rgba(212,160,42,.28)!important;transform:translateY(-3px) scale(1.09)!important
+}
+body.premium-training .starb.preview-off{transform:none!important}
+@media(max-width:900px){
+  body.premium-training.premium-route-board .board-hero,
+  body.premium-training.premium-route-board .board-pinned{grid-template-columns:1fr!important}
+  body.premium-training.premium-route-board .board-grid{grid-template-columns:1fr!important}
+}
