@@ -340,6 +340,7 @@ function approvedVaultPath(folderId, list, trail){
 function approvedVaultFolderIcon(locked){
   return '<span class="adv-folder-icon"><svg viewBox="0 0 24 20" aria-hidden="true"><path d="M2 4.5A2.5 2.5 0 0 1 4.5 2H10l2 2.5h7.5A2.5 2.5 0 0 1 22 7v8.5a2.5 2.5 0 0 1-2.5 2.5h-15A2.5 2.5 0 0 1 2 15.5z"/></svg>'+(locked?'<span class="adv-lockmark"><svg viewBox="0 0 24 24"><path d="M8 10V7a4 4 0 0 1 8 0v3M6 10h12v10H6z"/></svg></span>':'')+'</span>';
 }
+function approvedVaultMiniFolderIcon(){ return '<svg viewBox="0 0 24 20" aria-hidden="true"><path d="M2 4.5A2.5 2.5 0 0 1 4.5 2H10l2 2.5h7.5A2.5 2.5 0 0 1 22 7v8.5a2.5 2.5 0 0 1-2.5 2.5h-15A2.5 2.5 0 0 1 2 15.5z"/></svg>'; }
 function approvedVaultDocIcon(){
   return '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 3h9l4 4v14H6z"/><path d="M14 3v5h5"/></svg>';
 }
@@ -379,14 +380,14 @@ function approvedVaultFileRow(n,parentId){
 }
 function approvedVaultPathMenu(folderId){
   const path=approvedVaultPath(folderId);
-  let html=`<div class="adv-menu-label">FOLDER NAVIGATION</div><button class="${folderId==='root'?'current':''}" onclick="location.hash='#p/${currentProjectId}/docs-vault'">${approvedVaultFolderIcon(false)}<span>Docs &amp; Files</span><span class="adv-level">Root</span></button>`;
+  let html=`<div class="adv-menu-label">FOLDER NAVIGATION</div><button class="${folderId==='root'?'current':''}" onclick="location.hash='#p/${currentProjectId}/docs-vault'">${approvedVaultMiniFolderIcon()}<span>Docs &amp; Files</span><span class="adv-level">Root</span></button>`;
   path.forEach((n,i)=>{ html += `<button class="${i===path.length-1?'current':''}" onclick="location.hash='#p/${currentProjectId}/vault/${n.id}'">${approvedVaultFolderIcon(!!(n.locked||n.sealed))}<span>${esc(n.name)}</span><span class="adv-level">Level ${i+1}</span></button>`; });
-  if(path.length) html += `<button onclick="location.hash='#p/${currentProjectId}/docs-vault'">${approvedVaultFolderIcon(false)}<span>All Parent Folders</span><span class="adv-level">Root</span></button>`;
+  if(path.length) html += `<button onclick="location.hash='#p/${currentProjectId}/docs-vault'">${approvedVaultMiniFolderIcon()}<span>All Parent Folders</span><span class="adv-level">Root</span></button>`;
   return html;
 }
 function approvedVaultTree(folderId){
   const path=approvedVaultPath(folderId); const activeTop=path[0] ? path[0].id : '';
-  return `<button class="${folderId==='root'?'active':''}" onclick="location.hash='#p/${currentProjectId}/docs-vault'">${approvedVaultFolderIcon(false)}<span>Docs &amp; Files</span></button>` + vTree().map(n=>`<button class="${activeTop===n.id?'active':''}" onclick="location.hash='#p/${currentProjectId}/vault/${n.id}'">${approvedVaultFolderIcon(!!(n.locked||n.sealed))}<span>${esc(n.name)}</span></button>`).join('');
+  return `<button class="${folderId==='root'?'active':''}" onclick="location.hash='#p/${currentProjectId}/docs-vault'">${approvedVaultMiniFolderIcon()}<span>Docs &amp; Files</span></button>` + vTree().map(n=>`<button class="${activeTop===n.id?'active':''}" onclick="location.hash='#p/${currentProjectId}/vault/${n.id}'">${approvedVaultFolderIcon(!!(n.locked||n.sealed))}<span>${esc(n.name)}</span></button>`).join('');
 }
 function approvedVaultView(folderId){
   currentVaultFolderId = folderId || 'root';
