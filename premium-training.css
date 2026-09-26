@@ -5716,3 +5716,115 @@ body.premium-training.premium-route-home .enrolled.single .btn{
     border-left:0!important;
   }
 }
+
+
+/* ============================================================
+   SIDEBAR CLEANUP — ONE CONTINUOUS NAVY SURFACE, NO NESTED BACKGROUNDS
+   ============================================================ */
+
+/* Brand/title area: no panel, no divider, no extra background. */
+body.premium-training #sidebar .training-sidebar-brand{
+  min-height:auto!important;
+  height:auto!important;
+  display:flex!important;
+  flex-direction:column!important;
+  align-items:flex-start!important;
+  justify-content:flex-start!important;
+  gap:12px!important;
+  padding:16px 14px 18px!important;
+  margin:0!important;
+  background:transparent!important;
+  border:0!important;
+  border-bottom:0!important;
+  box-shadow:none!important;
+}
+body.premium-training #sidebar .training-sidebar-brand img{
+  display:block!important;
+  width:auto!important;
+  height:42px!important;
+  max-width:150px!important;
+  object-fit:contain!important;
+  background:transparent!important;
+  border:0!important;
+  box-shadow:none!important;
+}
+body.premium-training #sidebar .training-sidebar-brand span{
+  display:block!important;
+  max-width:240px!important;
+  margin:0!important;
+  padding:0!important;
+  background:transparent!important;
+  border:0!important;
+  color:#f7fbff!important;
+  font-size:13px!important;
+  line-height:1.35!important;
+  font-weight:800!important;
+  letter-spacing:.8px!important;
+}
+
+/* The tree itself must remain visually transparent. */
+body.premium-training #sidebar div[onclick],
+body.premium-training #sidebar div[onclick*="_navTree"],
+body.premium-training #sidebar div[onclick*="_navCohort"],
+body.premium-training #sidebar a[onclick],
+body.premium-training #sidebar a[onclick*="_navDay"],
+body.premium-training #sidebar .dg-link{
+  background:transparent!important;
+  box-shadow:none!important;
+  border-color:transparent!important;
+}
+
+/* Remove the legacy hard-coded Week 1 / active-day charcoal fills. */
+body.premium-training #sidebar div[style*="background-color:#222222"],
+body.premium-training #sidebar div[style*="background-color: #222222"],
+body.premium-training #sidebar a[style*="background-color:#2a2218"],
+body.premium-training #sidebar a[style*="background-color: #2a2218"]{
+  background:transparent!important;
+  box-shadow:none!important;
+}
+
+/* Nested selection is text/icon emphasis only — no pill/card background. */
+body.premium-training #sidebar .dg-link.active,
+body.premium-training #sidebar a[onclick*="_navDay"][style*="color:#d97706"]{
+  background:transparent!important;
+  color:#ffd15d!important;
+  font-weight:800!important;
+}
+body.premium-training #sidebar .dg-link.active .sv,
+body.premium-training #sidebar a[onclick*="_navDay"][style*="color:#d97706"] svg{
+  color:#ffd15d!important;
+  fill:currentColor!important;
+}
+
+/* Keep parent hierarchy rows clean on hover too. */
+@media(hover:hover) and (pointer:fine){
+  body.premium-training #sidebar div[onclick]:hover,
+  body.premium-training #sidebar a[onclick]:hover,
+  body.premium-training #sidebar .dg-link:hover{
+    background:transparent!important;
+    box-shadow:none!important;
+    color:#fff!important;
+    transform:none!important;
+  }
+  body.premium-training #sidebar .dg-link.active:hover,
+  body.premium-training #sidebar a[onclick*="_navDay"][style*="color:#d97706"]:hover{
+    color:#ffd15d!important;
+  }
+}
+
+/* No artificial tree rails/dividers. */
+body.premium-training #sidebar div[style*="padding-left:16px"]::before,
+body.premium-training #sidebar div[style*="padding-left:16px"]::after{
+  content:none!important;
+  display:none!important;
+}
+body.premium-training #sidebar div[style*="border-left"]{
+  border-left:0!important;
+}
+
+/* Top-level portal navigation may still show the true current route. */
+body.premium-training #sidebar>div:nth-child(2)>a[style*="background-color:#262626"]{
+  background:linear-gradient(100deg,#ffe8a0,#edb640)!important;
+  color:#102341!important;
+  box-shadow:0 4px 16px rgba(242,193,72,.24)!important;
+}
