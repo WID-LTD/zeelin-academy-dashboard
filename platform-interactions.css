@@ -70,3 +70,37 @@ select:focus-visible{
   filter:drop-shadow(0 3px 7px rgba(212,160,42,.22));
   transform:translateY(-1px) scale(1.04);
 }
+
+
+/* Strong visual previews requested across Zeelin platform. */
+@media(hover:hover) and (pointer:fine){
+  button:not(:disabled):hover,
+  a[href]:hover,
+  [role="button"]:hover,
+  [onclick]:hover{
+    transform:translateY(-3px) scale(1.035);
+    filter:brightness(1.04);
+  }
+  .card:hover,
+  .pcard:hover,
+  [class*="card"]:hover,
+  [class*="tile"]:hover{
+    transform:translateY(-7px) scale(1.022);
+    box-shadow:0 20px 40px rgba(0,0,0,.16);
+  }
+  .overview-sidebar-copy .nav-item:not(.active):hover{
+    transform:translateX(6px) scale(1.015)!important;
+    background:rgba(255,255,255,.17)!important;
+    box-shadow:0 7px 16px rgba(0,0,0,.10)!important;
+  }
+  .overview-sidebar-copy .nav-item.active:hover{
+    transform:scale(1.015)!important;
+    box-shadow:0 8px 20px rgba(242,193,72,.42)!important;
+  }
+}
+button:not(:disabled):active,
+a[href]:active,
+[role="button"]:active,
+[onclick]:active{
+  transform:translateY(0) scale(.96);
+}
