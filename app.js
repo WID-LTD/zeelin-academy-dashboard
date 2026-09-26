@@ -369,7 +369,7 @@ window._sendPost = function(){
   const ta = $('#composerText'); const v = (ta.value||'').trim();
   if(!v){ toast('Write something first'); return; }
   const s = socialState();
-  s.posts.unshift({ id:'u'+Date.now(), author:'John Doe', initials:'JD', color:'#d97706', tag:'General', reacts:'0 likes · 0 replies', time:'Just now', title:'', body:v, mine:true });
+  s.posts.unshift({ id:'u'+Date.now(), author:'John Doe', initials:'JD', color:'#D4A02A', tag:'General', reacts:'0 likes · 0 replies', time:'Just now', title:'', body:v, mine:true });
   socialSave(s); route(); toast('Posted to community');
 };
 window._newPost = function(){ const ta = $('#composerText'); if(ta){ ta.focus(); ta.scrollIntoView({behavior:'smooth',block:'center'}); } };
@@ -1750,50 +1750,158 @@ function renderGuide() {
   $('#page').addEventListener('click', backLink);
 }
 window._playWelcome = function(){ go('/watch/v1'); };
+window._enterCommunityRoom = function(id){ go('/community/' + id); };
+window._communityBack = function(){ go('/community'); };
+window._sendRoomPost = function(room){
+  const ta = $('#roomComposerText');
+  const v = ta ? String(ta.value||'').trim() : '';
+  if(!v){ toast('Write something first'); return; }
+  const s = socialState();
+  s.posts = s.posts || [];
+  s.posts.unshift({ id:'u'+Date.now(), author:'John Doe', initials:'JD', color:'#D4A02A', tag:room==='study-group'?'Study Group':room==='exam-prep'?'Exam Prep':room==='accountability'?'Accountability':'General', reacts:'0 likes · 0 replies', time:'Just now', title:'', body:v, mine:true, room:room });
+  socialSave(s); route(); toast('Posted to community room');
+};
+window._toggleCommunityReplies = function(id){
+  const el = $('#communityReplies-'+id);
+  if(el) el.hidden = !el.hidden;
+};
+window._sendCommunityReply = function(id, room){
+  const input = $('#replyInput-'+id);
+  const v = input ? String(input.value||'').trim() : '';
+  if(!v){ toast('Write a reply first'); return; }
+  const s = socialState();
+  s.replies = s.replies || {};
+  s.replies[id] = s.replies[id] || [];
+  s.replies[id].push({body:v,time:'Just now'});
+  socialSave(s); route(); toast('Reply posted');
+};
 function renderCommunity() {
-  const posts = allPosts();
-  const card = (p) => {
-    const meta = POST_META[p.id] || { title:'', role:'Cohort 001 Student', time:p.time||'Just now', color:p.color||'#d97706', tag:p.tag||'General', tagBg:'#2e1065', tagColor:'#c084fc' };
+  const rooms = [
+    { id:'general', name:'General Community', kicker:'OPEN LOUNGE', desc:'Ask questions, share study wins and connect with the wider Zeelin Academy cohort.', members:'128 members', online:'12 online', icon:'users', tone:'gold' },
+    { id:'study-group', name:'Study Group', kicker:'PEER LEARNING', desc:'Find study partners, review chapters together and organise short peer learning sessions.', members:'46 members', online:'7 online', icon:'book', tone:'green' },
+    { id:'exam-prep', name:'Exam Prep Room', kicker:'CERTIFICATION', desc:'Discuss mock questions, exam techniques, difficult concepts and readiness strategies.', members:'83 members', online:'9 online', icon:'check', tone:'blue' },
+    { id:'accountability', name:'Accountability Room', kicker:'STAY CONSISTENT', desc:'Share weekly goals, study hours, progress updates and keep each other moving forward.', members:'61 members', online:'5 online', icon:'fire', tone:'brown' }
+  ];
+  const parts = parseHash();
+  const roomId = parts[1] || '';
+  const room = rooms.find((x)=>x.id===roomId);
+  const postRoom = (p) => p.room || ((POST_META[p.id]?.tag || p.tag || '').toLowerCase().includes('study') ? 'study-group' : 'general');
+  const roomPosts = (id) => allPosts().filter((p)=>postRoom(p)===id);
+
+  const roomPostCard = (p, activeRoom) => {
+    const meta = POST_META[p.id] || { title:'', role:'Cohort 001 Student', time:p.time||'Just now', color:p.color||'#D4A02A', tag:p.tag||'General' };
     const n = postNums(p);
+    const s = socialState();
+    const replies = (s.replies && s.replies[p.id]) || [];
     const title = meta.title || p.title || String(p.body||'').slice(0,80);
     const body = (meta.title || p.title) ? p.body : '';
-    const likes = n.likes + ((socialState().likes[p.id])||0);
-    return `<div style="background-color:#181818;border:1px solid #2a2a2a;border-radius:10px;overflow:hidden;margin-bottom:20px;">`
-      + `<div style="padding:16px 20px;border-bottom:1px solid #2a2a2a;display:flex;align-items:center;justify-content:space-between;">`
-      + `<div style="display:flex;align-items:center;gap:12px;">`
-      + `<div style="width:36px;height:36px;border-radius:50%;background-color:${meta.color};display:flex;align-items:center;justify-content:center;font-weight:bold;color:white;font-size:14px;">${esc(p.initials||'ZA')}</div>`
-      + `<div><div style="font-size:14px;font-weight:600;color:#ffffff;">${esc(p.author)}</div>`
-      + `<div style="font-size:12px;color:#a3a3a3;">${esc(meta.role)} &bull; ${esc(meta.time)}</div></div></div>`
-      + `<span style="background-color:${meta.tagBg};color:${meta.tagColor};font-size:11px;font-weight:600;padding:4px 8px;border-radius:4px;">${esc(meta.tag)}</span></div>`
-      + `<div style="padding:20px;">`
-      + `<h3 style="font-size:16px;font-weight:600;color:#ffffff;margin:0 0 10px 0;">${esc(title)}</h3>`
-      + (body ? `<p style="font-size:13px;color:#d4d4d4;line-height:1.5;margin:0 0 16px 0;">${esc(body)}</p>` : '')
-      + `<div style="display:flex;gap:16px;font-size:13px;color:#a3a3a3;border-top:1px solid #262626;padding-top:12px;">`
-      + `<span onclick="window._likePost('${p.id}',this)" style="cursor:pointer;display:flex;align-items:center;gap:6px;">&#128077; <b>${likes}</b>&nbsp;Likes</span>`
-      + `<span style="display:flex;align-items:center;gap:6px;">&#128172; ${n.replies} Comments</span>`
-      + `</div></div></div>`;
+    const likes = n.likes + ((s.likes[p.id])||0);
+    return `<article class="community-post">
+      <header>
+        <div class="community-person">
+          <span class="community-avatar" style="--avatar:${meta.color || '#D4A02A'}">${esc(p.initials||'ZA')}</span>
+          <div><strong>${esc(p.author)}</strong><small>${esc(meta.role)} · ${esc(meta.time)}</small></div>
+        </div>
+        <span class="community-post-tag">${esc(meta.tag || activeRoom.name)}</span>
+      </header>
+      <div class="community-post-body">
+        <h3>${esc(title)}</h3>
+        ${body ? `<p>${esc(body)}</p>` : ''}
+      </div>
+      <footer>
+        <button type="button" onclick="window._likePost('${p.id}',this)" class="community-action">${ic('heart',15,15)} <b>${likes}</b> Likes</button>
+        <button type="button" onclick="window._toggleCommunityReplies('${p.id}')" class="community-action">${ic('feed',15,15)} ${n.replies + replies.length} Comments</button>
+      </footer>
+      <div class="community-replies" id="communityReplies-${p.id}" hidden>
+        ${replies.map((r)=>`<div class="community-reply"><span>JD</span><div><strong>John Doe</strong><p>${esc(r.body)}</p><small>${esc(r.time||'Just now')}</small></div></div>`).join('')}
+        <div class="community-reply-form">
+          <input id="replyInput-${p.id}" type="text" placeholder="Write a reply..." aria-label="Reply to post">
+          <button type="button" onclick="window._sendCommunityReply('${p.id}','${activeRoom.id}')">${ic('arrow',15,15)} Reply</button>
+        </div>
+      </div>
+    </article>`;
   };
+
+  if (room) {
+    const posts = roomPosts(room.id);
+    $('#page').innerHTML = `
+      <div class="community-room-page">
+        <button type="button" class="community-back" onclick="window._communityBack()">${ic('caret',14,14)} All community rooms</button>
+        <header class="community-room-hero tone-${room.tone}">
+          <div class="community-room-icon">${ic(room.icon,28,28)}</div>
+          <div>
+            <span>${esc(room.kicker)}</span>
+            <h1>${esc(room.name)}</h1>
+            <p>${esc(room.desc)}</p>
+          </div>
+          <div class="community-room-presence"><i></i>${esc(room.online)}<small>${esc(room.members)}</small></div>
+        </header>
+
+        <div class="community-room-layout">
+          <main class="community-room-feed">
+            <section class="community-room-composer">
+              <div class="community-composer-head">
+                <img src="${USER.avatar}" alt="" decoding="async">
+                <div><strong>${esc(USER.name)}</strong><span>Share with ${esc(room.name)}</span></div>
+              </div>
+              <textarea id="roomComposerText" rows="3" placeholder="Share a question, study update or useful tip with this room..."></textarea>
+              <div class="community-composer-actions">
+                <span>${ic('users',14,14)} Visible to everyone in this room</span>
+                <button type="button" onclick="window._sendRoomPost('${room.id}')">Post to room ${ic('arrow',14,14)}</button>
+              </div>
+            </section>
+            <div class="community-feed-heading"><div><span>ROOM ACTIVITY</span><h2>Conversation</h2></div><small>${posts.length} ${posts.length===1?'post':'posts'}</small></div>
+            ${posts.length ? posts.map((p)=>roomPostCard(p,room)).join('') : `<div class="community-empty"><div>${ic('users',26,26)}</div><h3>Start the conversation</h3><p>This room is ready for its first community post.</p></div>`}
+          </main>
+          <aside class="community-room-side">
+            <section><span class="community-side-label">ROOM GUIDE</span><h3>Keep it useful</h3><p>Share clear questions, practical examples and study support that helps other learners move forward.</p></section>
+            <section><span class="community-side-label">COMMUNITY RHYTHM</span><div class="community-mini-stat"><b>${room.online.split(' ')[0]}</b><span>Online now</span></div><div class="community-mini-stat"><b>${room.members.split(' ')[0]}</b><span>Room members</span></div></section>
+            <section class="community-side-image"><span>ZEELIN COMMUNITY</span><h3>Learn together. Progress together.</h3></section>
+          </aside>
+        </div>
+      </div>`;
+    $('#page').addEventListener('click', backLink);
+    return;
+  }
+
+  const recent = allPosts().slice(0,2);
   $('#page').innerHTML = `
-    <div style="padding:24px;max-width:900px;margin:0 auto;width:100%;box-sizing:border-box;">
-      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:24px;border-bottom:1px solid #2a2a2a;padding-bottom:16px;">
+    <div class="community-premium">
+      <header class="community-hero">
         <div>
-          <h1 style="font-size:22px;font-weight:700;color:#ffffff;margin:0 0 4px 0;">Zeelin Academy General Community</h1>
-          <p style="font-size:13px;color:#a3a3a3;margin:0;">Connect with peers, share exam prep strategies, and discuss coursework.</p>
+          <span class="community-eyebrow">ZEELIN ACADEMY COMMUNITY</span>
+          <h1>Learn with people who are building alongside you.</h1>
+          <p>Choose a room, join the conversation and get practical support from peers preparing for the same learning and career goals.</p>
+          <div class="community-hero-actions"><button type="button" onclick="window._enterCommunityRoom('general')">Enter General Community ${ic('arrow',15,15)}</button><span><i></i> 33 learners online now</span></div>
         </div>
-        <div style="display:flex;gap:10px;">
-          <button onclick="window._newPost()" style="background-color:#d97706;color:#ffffff;border:none;padding:8px 16px;border-radius:6px;font-size:13px;font-weight:600;cursor:pointer;">New Post</button>
+        <div class="community-hero-art">
+          <div class="community-floating-card c1"><b>Study Group</b><span>7 online</span></div>
+          <div class="community-floating-card c2"><b>Exam Prep</b><span>9 online</span></div>
+          <div class="community-floating-card c3"><b>Accountability</b><span>5 online</span></div>
         </div>
-      </div>
-      <div style="background-color:#181818;border:1px solid #2a2a2a;border-radius:10px;padding:16px;margin-bottom:20px;">
-        <div style="display:flex;gap:12px;align-items:flex-start;">
-          <div style="width:36px;height:36px;border-radius:50%;background-color:#d97706;display:flex;align-items:center;justify-content:center;font-weight:bold;color:white;font-size:14px;flex-shrink:0;">JD</div>
-          <textarea id="composerText" rows="2" placeholder="Share your thoughts, questions or study tips with the community..." style="flex:1;background-color:#222222;border:1px solid #2e2e2e;border-radius:6px;padding:10px 14px;color:#e5e5e5;font-size:13px;font-family:inherit;resize:vertical;outline:none;"></textarea>
-        </div>
-        <div style="display:flex;justify-content:flex-end;margin-top:10px;">
-          <button onclick="window._sendPost()" style="background-color:#d97706;color:#ffffff;border:none;padding:8px 18px;border-radius:6px;font-size:13px;font-weight:600;cursor:pointer;">Post</button>
-        </div>
-      </div>
-      ${posts.map(card).join('')}
+      </header>
+
+      <div class="community-section-head"><div><span>COMMUNITY ROOMS</span><h2>Where do you want to join in?</h2></div><p>Each room has a clear purpose so useful conversations are easier to find.</p></div>
+      <section class="community-room-grid">
+        ${rooms.map((r)=>`<button type="button" class="community-room-card tone-${r.tone}" onclick="window._enterCommunityRoom('${r.id}')">
+          <span class="community-room-card-icon">${ic(r.icon,23,23)}</span>
+          <span class="community-room-card-copy"><small>${esc(r.kicker)}</small><strong>${esc(r.name)}</strong><em>${esc(r.desc)}</em></span>
+          <span class="community-room-card-meta"><i></i>${esc(r.online)}<b>${esc(r.members)}</b></span>
+          <span class="community-room-card-enter">Enter room ${ic('arrow',15,15)}</span>
+        </button>`).join('')}
+      </section>
+
+      <div class="community-section-head compact"><div><span>RECENT ACTIVITY</span><h2>What the community is discussing</h2></div></div>
+      <section class="community-recent-grid">
+        ${recent.map((p)=> {
+          const meta=POST_META[p.id]||{title:p.title||'',role:'Cohort 001 Student',time:p.time||'Just now',tag:p.tag||'General'};
+          const rr=rooms.find(x=>x.id===postRoom(p))||rooms[0];
+          return `<article class="community-recent-card" onclick="window._enterCommunityRoom('${rr.id}')" tabindex="0">
+            <span>${esc(meta.tag)}</span><h3>${esc(meta.title || p.title || p.body)}</h3><p>${esc(p.body)}</p>
+            <footer><small>${esc(p.author)} · ${esc(meta.time)}</small><b>Open room ${ic('arrow',14,14)}</b></footer>
+          </article>`;
+        }).join('')}
+      </section>
     </div>`;
   $('#page').addEventListener('click', backLink);
 }
@@ -1863,12 +1971,12 @@ function renderCalendar() {
 }
 function renderRecordings() {
   const HOST = {
-    r1: { init:'ZA', color:'#d97706', name:'Zeelin Academy Education Team', sub:'Live Workshop Replay &bull; Recorded Jul 28', tag:'Current Event', tagBg:'#382818', tagColor:'#d97706' },
+    r1: { init:'ZA', color:'#D4A02A', name:'Zeelin Academy Education Team', sub:'Live Workshop Replay &bull; Recorded Jul 28', tag:'Current Event', tagBg:'#382818', tagColor:'#d97706' },
     r2: { init:'OE', color:'#2563eb', name:'Dr. O. Emeka', sub:'Previous Workshop Replay &bull; Recorded Jul 20', tag:'Previous Event', tagBg:'#1e293b', tagColor:'#38bdf8' },
   };
   const list = RECORDINGS.filter((x) => REC_FILTER === 'all' || (REC_FILTER === 'current' ? /current/i.test(x.badge.text) : /previous/i.test(x.badge.text)));
   const cards = list.map((x) => {
-    const h = HOST[x.id] || { init:'ZA', color:'#d97706', name:x.host.name, sub:x.meta, tag:x.badge.text, tagBg:'#382818', tagColor:'#d97706' };
+    const h = HOST[x.id] || { init:'ZA', color:'#D4A02A', name:x.host.name, sub:x.meta, tag:x.badge.text, tagBg:'#382818', tagColor:'#d97706' };
     return `<div style="background-color:#181818;border:1px solid #2a2a2a;border-radius:10px;overflow:hidden;margin-bottom:24px;">`
       + `<div style="padding:20px;border-bottom:1px solid #2a2a2a;display:flex;align-items:center;justify-content:space-between;">`
       + `<div style="display:flex;align-items:center;gap:12px;">`
