@@ -63,3 +63,10 @@ select:focus-visible{
     scroll-behavior:auto!important;
   }
 }
+
+.platform-star-selected,
+.platform-star-preview{
+  color:#D4A02A!important;
+  filter:drop-shadow(0 3px 7px rgba(212,160,42,.22));
+  transform:translateY(-1px) scale(1.04);
+}
