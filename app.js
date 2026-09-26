@@ -420,43 +420,48 @@ function renderBoard() {
     </article>`;
   $('#page').innerHTML = `
     <div class="board-premium">
-      <header class="board-hero">
-        <div>
-          <span class="board-eyebrow">OFFICIAL ZEELIN CHANNEL</span>
-          <h1>General Message Board</h1>
-          <p>Important cohort announcements, learning updates, assessment guidance and platform notices from the Zeelin Admin team.</p>
-        </div>
-        <div class="board-hero-stats" aria-label="Message board summary">
-          <span><b>${GENERAL_BOARD.length}</b><small>Announcements</small></span>
-          <span><b>Read only</b><small>Official channel</small></span>
-        </div>
-      </header>
-
-      <section class="board-pinned">
-        <div class="board-pinned-media">
-          <span class="board-pin-badge">${ic('feed',15,15)} PINNED</span>
-          <div class="board-admin-mark">ZA</div>
-          <div class="board-pinned-copy">
-            <span>Zeelin Admin</span>
-            <small>${esc(pinned.meta.replace('Zeelin Admin • ','').replace('Zeelin Admin · ',''))}</small>
+      <div class="board-top-grid">
+        <header class="board-hero">
+          <div>
+            <span class="board-eyebrow">OFFICIAL ZEELIN CHANNEL</span>
+            <h1>General Message Board</h1>
+            <p>Important cohort announcements, learning updates, assessment guidance and platform notices from the Zeelin Admin team.</p>
           </div>
-        </div>
-        <div class="board-pinned-content">
-          <span class="board-notice-label">Start here</span>
-          <h2>${esc(pinned.title)}</h2>
-          <p>${esc(pinned.body)}</p>
-          <div class="board-readonly">${ic('lock',14,14)} Official announcement · replies disabled</div>
-        </div>
-      </section>
+          <div class="board-hero-stats" aria-label="Message board summary">
+            <span><b>${GENERAL_BOARD.length}</b><small>Announcements</small></span>
+            <span><b>Read only</b><small>Official channel</small></span>
+          </div>
+        </header>
 
-      <div class="board-section-head">
-        <div><span>LATEST UPDATES</span><h2>Everything you need to know</h2></div>
-        <small>Most recent notices from Zeelin Academy</small>
+        <section class="board-pinned">
+          <div class="board-pinned-media">
+            <span class="board-pin-badge">${ic('feed',15,15)} PINNED</span>
+            <div class="board-admin-mark">ZA</div>
+            <div class="board-pinned-copy">
+              <span>Zeelin Admin</span>
+              <small>${esc(pinned.meta.replace('Zeelin Admin • ','').replace('Zeelin Admin · ',''))}</small>
+            </div>
+          </div>
+          <div class="board-pinned-content">
+            <span class="board-notice-label">Start here</span>
+            <h2>${esc(pinned.title)}</h2>
+            <p>${esc(pinned.body)}</p>
+            <div class="board-readonly">${ic('lock',14,14)} Official announcement · replies disabled</div>
+          </div>
+        </section>
       </div>
-      <section class="board-grid">${rest.map(card).join('')}</section>
+
+      <section class="board-updates">
+        <div class="board-section-head">
+          <div><span>LATEST UPDATES</span><h2>Everything you need to know</h2></div>
+          <small>Most recent notices from Zeelin Academy</small>
+        </div>
+        <div class="board-grid">${rest.map(card).join('')}</div>
+      </section>
     </div>`;
   $('#page').addEventListener('click', backLink);
 }
+
 function renderSidebar() {
   const r = parseHash()[0] || 'home';
   const open = treeOpen();
