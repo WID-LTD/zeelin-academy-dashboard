@@ -5628,3 +5628,91 @@ body.premium-training.premium-route-home .enrolled.single .btn{
     grid-column:1/-1!important;
   }
 }
+
+
+/* ============================================================
+   SUPPORT RAIL FIX — STICKY, TRANSPARENT CONTAINER
+   ============================================================ */
+@media (min-width:1280px){
+  body.premium-training.premium-route-support .training-support-premium{
+    align-items:flex-start!important;
+    overflow:visible!important;
+  }
+
+  body.premium-training.premium-route-support .ts-support-main{
+    align-self:stretch!important;
+  }
+
+  body.premium-training.premium-route-support .ts-support-side{
+    position:sticky!important;
+    top:calc(var(--topbar-h) + 14px)!important;
+    align-self:flex-start!important;
+
+    width:360px!important;
+    flex:0 0 360px!important;
+    height:auto!important;
+    min-height:0!important;
+    max-height:calc(100vh - var(--topbar-h) - 28px)!important;
+
+    padding:0 17px 18px!important;
+    margin-top:18px!important;
+
+    overflow-y:auto!important;
+    overflow-x:visible!important;
+
+    border-left:0!important;
+    border-top:0!important;
+    background:transparent!important;
+    box-shadow:none!important;
+
+    scrollbar-width:thin!important;
+    scrollbar-color:#cbd5e1 transparent!important;
+    z-index:12!important;
+  }
+
+  body.premium-training.premium-route-support .ts-support-side::-webkit-scrollbar{
+    width:5px!important;
+  }
+  body.premium-training.premium-route-support .ts-support-side::-webkit-scrollbar-track{
+    background:transparent!important;
+  }
+  body.premium-training.premium-route-support .ts-support-side::-webkit-scrollbar-thumb{
+    background:#cbd5e1!important;
+    border-radius:999px!important;
+  }
+
+  body.premium-training.premium-route-support .ts-support-side .ts-side-card{
+    width:100%!important;
+    margin:0 0 14px!important;
+    background:#fff!important;
+  }
+
+  body.premium-training.premium-route-support .ts-support-side .ts-side-card:last-child{
+    margin-bottom:0!important;
+  }
+
+  body.premium-training.premium-route-support .ts-support-side .ts-side-image{
+    background:
+      linear-gradient(180deg,rgba(7,27,51,.08),rgba(7,27,51,.95)),
+      url("https://images.pexels.com/photos/7709116/pexels-photo-7709116.jpeg?auto=compress&cs=tinysrgb&w=1200") center 34%/cover!important;
+  }
+}
+
+@media (min-width:1280px) and (max-width:1450px){
+  body.premium-training.premium-route-support .ts-support-side{
+    width:320px!important;
+    flex-basis:320px!important;
+  }
+}
+
+/* Stacked/tablet support rail must remain in normal document flow. */
+@media (max-width:1279px){
+  body.premium-training.premium-route-support .ts-support-side{
+    position:static!important;
+    top:auto!important;
+    max-height:none!important;
+    overflow:visible!important;
+    background:transparent!important;
+    border-left:0!important;
+  }
+}
