@@ -790,3 +790,55 @@ body.project-premium.zp-route-checkout #main-content>div{
   body.project-premium .mp-grid{grid-template-columns:1fr!important}
   body.project-premium .chart-row{grid-template-columns:1fr!important}
 }
+
+
+/* Final legacy token cleanup: make old inline accent surfaces fit the shared Zeelin palette. */
+body.project-premium #main-content [style*="background-color: #26170b"],
+body.project-premium #main-content [style*="background-color:#26170b"],
+body.project-premium #main-content [style*="background-color: #2c1a0e"],
+body.project-premium #main-content [style*="background-color:#2c1a0e"]{
+  background:#fff5d7!important;
+}
+body.project-premium #main-content [style*="background-color: #172554"],
+body.project-premium #main-content [style*="background-color:#172554"]{
+  background:#edf3ff!important;
+}
+body.project-premium #main-content [style*="background-color: #14532d"],
+body.project-premium #main-content [style*="background-color:#14532d"]{
+  background:#e9f8f2!important;
+}
+body.project-premium #main-content [style*="border: 1px solid #404040"],
+body.project-premium #main-content [style*="border:1px solid #404040"],
+body.project-premium #main-content [style*="border: 1px solid #454545"],
+body.project-premium #main-content [style*="border:1px solid #454545"],
+body.project-premium #main-content [style*="border-bottom: 1px solid #3a3a3a"],
+body.project-premium #main-content [style*="border-bottom:1px solid #3a3a3a"],
+body.project-premium #main-content [style*="border-top: 1px solid #3a3a3a"],
+body.project-premium #main-content [style*="border-top:1px solid #3a3a3a"]{
+  border-color:var(--zp-line)!important;
+}
+body.project-premium #main-content button[style*="background-color: #d97706"],
+body.project-premium #main-content button[style*="background-color:#d97706"],
+body.project-premium #main-content button[style*="background-color: #f59e0b"],
+body.project-premium #main-content button[style*="background-color:#f59e0b"],
+body.project-premium #main-content button[style*="background-color: #16a34a"],
+body.project-premium #main-content button[style*="background-color:#16a34a"],
+body.project-premium #main-content button[style*="background-color: #2563eb"],
+body.project-premium #main-content button[style*="background-color:#2563eb"]{
+  background:linear-gradient(135deg,var(--zp-gold-light),var(--zp-gold))!important;
+  color:var(--zp-navy)!important;
+  border-color:#c99a22!important;
+  box-shadow:0 7px 17px rgba(212,160,42,.18)!important;
+}
+body.project-premium #main-content [style*="color: #d97706"],
+body.project-premium #main-content [style*="color:#d97706"],
+body.project-premium #main-content [style*="color: #f59e0b"],
+body.project-premium #main-content [style*="color:#f59e0b"]{
+  color:var(--zp-gold-dark)!important;
+}
+body.project-premium #main-content [style*="color: #4ade80"],
+body.project-premium #main-content [style*="color:#4ade80"],
+body.project-premium #main-content [style*="color: #60a5fa"],
+body.project-premium #main-content [style*="color:#60a5fa"]{
+  color:#315f94!important;
+}
