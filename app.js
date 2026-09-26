@@ -362,7 +362,7 @@ function postNums(p){
   const m = String(p.reacts||'').match(/(\d+)\s*likes?\s*[^\d]*(\d+)\s*repl/i);
   return { likes: m?Number(m[1]):0, replies: m?Number(m[2]):0 };
 }
-window._likePost = function(id, el){ const s = socialState(); s.likes[id] = (s.likes[id]||0)+1; socialSave(s); const b = el.querySelector('b'); if(b) b.textContent = postLikes(id); toast('Liked'); };
+window._likePost = function(id, el){ const s = socialState(); s.likes[id] = (s.likes[id]||0)+1; socialSave(s); const p = allPosts().find((x)=>x.id===id); const b = el.querySelector('b'); if(b && p) b.textContent = postLikes(p); toast('Liked'); };
 function postLikes(p){ const s = socialState(); const n = postNums(p); return n.likes + (s.likes[p.id]||0); }
 function allPosts(){ const mine = socialState().posts || []; return [...mine, ...COMMUNITY.posts]; }
 window._sendPost = function(){
