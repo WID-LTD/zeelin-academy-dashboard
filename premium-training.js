@@ -595,9 +595,11 @@
   }
 
   function previewStars(row,value,on){
+    row.classList.toggle('star-previewing',!!on);
     row.querySelectorAll('.starb[data-star]').forEach(star=>{
       const n=Number(star.dataset.star||0);
-      star.classList.toggle('preview-on',on && n<=value);
+      star.classList.toggle('preview-on',!!on && n<=value);
+      star.classList.toggle('preview-off',!!on && n>value);
     });
   }
 
