@@ -530,7 +530,8 @@ function renderTopbar() {
 
 /* ============ STAR RATING + FEEDBACK ============ */
 function starRow(cur) {
-  return `<div class="star-row">${[1, 2, 3, 4, 5].map((n) => `<button class="starb${cur === n ? ' on' : ''}" data-star="${n}">${ic('star', 24, 24)}</button>`).join('')}</div>`;
+  const selected = Number(cur) || 0;
+  return `<div class="star-row" role="radiogroup" aria-label="Rate this session">${[1, 2, 3, 4, 5].map((n) => `<button type="button" class="starb${n <= selected ? ' on' : ''}" data-star="${n}" role="radio" aria-checked="${n === selected ? 'true' : 'false'}" aria-label="${n} star${n === 1 ? '' : 's'}">${ic('star', 24, 24)}</button>`).join('')}</div>`;
 }
 function stackedOptChips(opts, prefix, selVal) {
   return opts.map((o, i) => `<button type="button" class="radio-chip${selVal === i ? ' sel' : ''}" data-${prefix}="${i}">${esc(o)}</button>`).join('');
@@ -669,7 +670,7 @@ function wireCheckin(container) {
     const star = e.target.closest('.starb');
     if (star) {
       STATE.stars = Number(star.dataset.star); save();
-      $$('.starb', container).forEach((s) => s.classList.toggle('on', Number(s.dataset.star) === STATE.stars));
+      $('.starb', container).forEach((s) => { const n = Number(s.dataset.star); s.classList.toggle('on', n <= STATE.stars); s.setAttribute('aria-checked', n === STATE.stars ? 'true' : 'false'); });
       const wrap = container.querySelector('#ciWrap') || container;
       const q = wrap.querySelectorAll('.ci-q')[2];
       if (q) {
@@ -2030,48 +2031,48 @@ function renderAluminal() {
   $('#page').addEventListener('click', backLink);
 }
 function renderMonday() {
-  const arch = MONDAY.map((m) => `<div style="background-color:#181818;border:1px solid #2a2a2a;border-radius:10px;overflow:hidden;margin-bottom:16px;">`
-    + `<div style="padding:16px 20px;display:flex;align-items:center;gap:12px;">`
-    + `<div style="width:36px;height:36px;border-radius:50%;background-color:#d97706;display:flex;align-items:center;justify-content:center;font-weight:bold;color:white;font-size:14px;flex-shrink:0;">ZA</div>`
-    + `<div style="flex:1;"><div style="font-size:15px;font-weight:600;color:#ffffff;">${esc(m.q)}</div>`
-    + `<div style="font-size:12.5px;color:#d4d4d4;margin-top:4px;line-height:1.55;">${esc(m.body)}</div></div>`
-    + `<span style="background-color:#382818;color:#d97706;font-size:11px;font-weight:600;padding:4px 8px;border-radius:4px;flex-shrink:0;">${esc(m.author)}</span></div></div>`).join('');
+  const images = [
+    'https://images.unsplash.com/photo-1524178232363-1fb2b075b655?auto=format&fit=crop&w=1200&q=86',
+    'https://images.unsplash.com/photo-1522202176988-66273c2fd55f?auto=format&fit=crop&w=1200&q=86',
+    'https://images.unsplash.com/photo-1523240795612-9a054b0db644?auto=format&fit=crop&w=1200&q=86'
+  ];
+  const arch = MONDAY.map((m,i) => `<article class="monday-quote-card">
+    <div class="monday-quote-image"><img loading="lazy" decoding="async" src="${images[i % images.length]}" alt="Learners building skills together"></div>
+    <div class="monday-quote-copy">
+      <span>${esc(m.author)}</span>
+      <h3>“${esc(m.q)}”</h3>
+      <p>${esc(m.body)}</p>
+      <div class="monday-quote-foot"><b>MONDAY BRIEF ${String(i+1).padStart(2,'0')}</b><i></i></div>
+    </div>
+  </article>`).join('');
   $('#page').innerHTML = `
-    <div style="padding:24px;max-width:900px;margin:0 auto;width:100%;box-sizing:border-box;">
-      <div style="background:linear-gradient(135deg, #2c1a0e 0%, #1a1a1a 100%);border:1px solid #3d2411;border-radius:12px;padding:40px 20px;text-align:center;margin-bottom:24px;position:relative;overflow:hidden;">
-        <h1 style="font-size:28px;font-weight:700;color:#ffffff;margin:0 0 12px 0;letter-spacing:-0.5px;">Monday Motivations</h1>
-        <div style="display:inline-block;background-color:#b45309;color:#ffffff;font-size:13px;font-weight:600;padding:8px 16px;border-radius:6px;margin-bottom:16px;">Start your week with purpose and peak job readiness system mindset.</div>
-        <p style="font-size:13px;color:#d4d4d4;max-width:500px;margin:0 auto;line-height:1.5;">Weekly inspirational insights, focus directives, and success strategies tailored for Zeelin Academy candidates.</p>
-      </div>
-      <div style="background-color:#181818;border:1px solid #2a2a2a;border-radius:10px;overflow:hidden;margin-bottom:24px;">
-        <div style="padding:20px;border-bottom:1px solid #2a2a2a;display:flex;align-items:center;justify-content:space-between;">
-          <div style="display:flex;align-items:center;gap:12px;">
-            <div style="width:36px;height:36px;border-radius:50%;background-color:#d97706;display:flex;align-items:center;justify-content:center;font-weight:bold;color:white;font-size:14px;">ZA</div>
-            <div>
-              <div style="font-size:14px;font-weight:600;color:#ffffff;">Zeelin Academy Leadership</div>
-              <div style="font-size:12px;color:#a3a3a3;">Monday Edition &bull; Aug 3</div>
-            </div>
-          </div>
-          <div style="display:flex;gap:8px;">
-            <span style="background-color:#382818;color:#d97706;font-size:11px;font-weight:600;padding:4px 8px;border-radius:4px;">${esc(MONDAY_FEATURED.badge)}</span>
-          </div>
+    <div class="monday-premium">
+      <header class="monday-hero">
+        <div class="monday-hero-copy">
+          <span class="monday-eyebrow">MONDAY MOTIVATIONS</span>
+          <h1>Start the week with direction, not pressure.</h1>
+          <p>Weekly encouragement for learners balancing work, life, study and the goal of becoming job ready.</p>
+          <div class="monday-week-focus"><span>THIS WEEK'S FOCUS</span><b>${esc(MONDAY_FEATURED.title)}</b></div>
         </div>
-        <div style="padding:20px;">
-          <h2 style="font-size:18px;font-weight:600;color:#ffffff;margin:0 0 16px 0;">${esc(MONDAY_FEATURED.title)}</h2>
-          <div style="width:100%;height:320px;border-radius:8px;overflow:hidden;background-color:#262626;position:relative;margin-bottom:16px;">
-            <img loading="lazy" decoding="async" src="${MONDAY_FEATURED.image}" alt="Team motivation study" style="width:100%;height:100%;object-fit:cover;">
-          </div>
-          <p style="font-size:13px;color:#d4d4d4;line-height:1.6;margin:0 0 12px 0;">${esc(MONDAY_FEATURED.body)}</p>
-          <p style="font-size:13px;color:#d4d4d4;line-height:1.6;margin:0;">Take 5 minutes today to map out your calendar events, review the recording backlog if needed, and engage with your peers in the community. You have got this!</p>
+        <div class="monday-hero-image"><img loading="eager" decoding="async" src="https://images.unsplash.com/photo-1652971422886-784758cc28d7?auto=format&fit=crop&w=1600&q=88" alt="Professional learners collaborating"></div>
+      </header>
+
+      <section class="monday-feature">
+        <div class="monday-feature-image"><img loading="lazy" decoding="async" src="${MONDAY_FEATURED.image}" alt="Team motivation study"></div>
+        <div class="monday-feature-copy">
+          <div class="monday-feature-meta"><span>ZEELIN ACADEMY LEADERSHIP</span><b>${esc(MONDAY_FEATURED.badge)}</b></div>
+          <h2>${esc(MONDAY_FEATURED.title)}</h2>
+          <blockquote>“${esc(MONDAY_FEATURED.body)}”</blockquote>
+          <p>Take 5 minutes today to map out your calendar events, review the recording backlog if needed, and engage with your peers in the community. You have got this!</p>
+          <div class="monday-feature-actions"><button type="button" onclick="location.hash='/calendar'">Open Calendar ${ic('arrow',14,14)}</button><button type="button" class="ghost" onclick="location.hash='/community'">Visit Community</button></div>
         </div>
-      </div>
-      <div style="font-size:11px;font-weight:600;color:#737373;letter-spacing:0.5px;margin:0 0 12px 2px;">PAST BRIEFS</div>
-      ${arch}
+      </section>
+
+      <div class="monday-section-head"><span>PAST BRIEFS</span><h2>Keep the words that move you.</h2><p>Visual reminders for the weeks when momentum needs rebuilding.</p></div>
+      <section class="monday-quote-grid">${arch}</section>
     </div>`;
   $('#page').addEventListener('click', backLink);
 }
-/* ============ BOOT ============ */
-/* continuous stage scale — identical layout at every desktop width (base 0.8) */
 function fitStage(){ try{ document.body.style.zoom = ''; }catch(e){} }
 window.addEventListener('resize', fitStage);
 fitStage();
