@@ -558,3 +558,80 @@
   if(page)new MutationObserver(run).observe(page,{childList:true,subtree:false});
   run();
 })();
+
+
+/* ============================================================
+   GLOBAL INTERACTION PREVIEW — METRICS + STAR HOVER
+   ============================================================ */
+(function(){
+  'use strict';
+
+  function metricHelp(text){
+    const t=String(text||'').toLowerCase();
+    if(t.includes('readiness')) return 'Readiness combines completed learning, quizzes and practical progress.';
+    if(t.includes('course progress') || t.includes('complete')) return 'Shows how much of the current learning pathway is completed.';
+    if(t.includes('days remaining')) return 'Time remaining in the current course or study window.';
+    if(t.includes('certification')) return 'Estimated time remaining on the current certification pathway.';
+    if(t.includes('strength')) return 'A combined view of performance across the strongest completed activities.';
+    if(t.includes('xp')) return 'Experience points earned from completed learning and check-in activities.';
+    if(t.includes('quiz')) return 'Quiz progress reflects completed and passed knowledge checks.';
+    if(t.includes('hours')) return 'Study time logged against the planned learning hours.';
+    if(t.includes('consistency')) return 'Consistency reflects how regularly learning activity is completed.';
+    if(t.includes('accuracy')) return 'Accuracy reflects performance across scored learning activities.';
+    return '';
+  }
+
+  function enrichMetrics(){
+    const root=document.getElementById('page');
+    if(!root) return;
+    root.querySelectorAll('.met,.stat-box,.hero-mini,.ins-chip,.xv-panel .metric,.profile-metric').forEach(el=>{
+      if(el.hasAttribute('data-hover-help')) return;
+      const help=metricHelp(el.textContent);
+      if(help){
+        el.setAttribute('data-hover-help',help);
+        el.setAttribute('tabindex',el.getAttribute('tabindex')||'0');
+      }
+    });
+  }
+
+  function previewStars(row,value,on){
+    row.querySelectorAll('.starb[data-star]').forEach(star=>{
+      const n=Number(star.dataset.star||0);
+      star.classList.toggle('preview-on',on && n<=value);
+    });
+  }
+
+  document.addEventListener('mouseover',e=>{
+    const star=e.target.closest && e.target.closest('.starb[data-star]');
+    if(!star) return;
+    const row=star.closest('.star-row');
+    if(row) previewStars(row,Number(star.dataset.star),true);
+  });
+
+  document.addEventListener('mouseout',e=>{
+    const star=e.target.closest && e.target.closest('.starb[data-star]');
+    if(!star) return;
+    const row=star.closest('.star-row');
+    if(row && !row.contains(e.relatedTarget)) previewStars(row,0,false);
+  });
+
+  document.addEventListener('focusin',e=>{
+    const star=e.target.closest && e.target.closest('.starb[data-star]');
+    if(!star) return;
+    const row=star.closest('.star-row');
+    if(row) previewStars(row,Number(star.dataset.star),true);
+  });
+
+  document.addEventListener('focusout',e=>{
+    const star=e.target.closest && e.target.closest('.starb[data-star]');
+    if(!star) return;
+    const row=star.closest('.star-row');
+    if(row && !row.contains(e.relatedTarget)) previewStars(row,0,false);
+  });
+
+  const page=document.getElementById('page');
+  if(page) new MutationObserver(()=>requestAnimationFrame(enrichMetrics)).observe(page,{childList:true,subtree:true});
+  window.addEventListener('hashchange',()=>requestAnimationFrame(enrichMetrics));
+  window.addEventListener('load',enrichMetrics);
+  enrichMetrics();
+})();
