@@ -76,7 +76,7 @@ const DEFAULTS = {
 };
 function dateStamp() { const d = new Date(); return d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0'); }
 function nowHMS() { const d = new Date(); return d.toTimeString ? d.toTimeString().slice(0, 8) : '--:--:--'; }
-function loadState() { try { return Object.assign({}, DEFAULTS, JSON.parse(localStorage.getItem(SK) || '{}')); } catch { return { ...DEFAULTS }; } }
+function loadState() { try { const s = Object.assign({}, DEFAULTS, JSON.parse(localStorage.getItem(SK) || '{}')); const n = Number(s.stars); s.stars = Number.isFinite(n) && n >= 1 && n <= 5 ? Math.round(n) : null; return s; } catch { return { ...DEFAULTS }; } }
 function save() { localStorage.setItem(SK, JSON.stringify(STATE)); }
 let STATE = loadState();
 
@@ -339,9 +339,32 @@ function cohortSave(o){ try { localStorage.setItem('zdash_cohort', o ? '1' : '0'
 window._navCohort = function(){ cohortSave(!cohortOpen()); renderSidebar(); };
 window._navTree = function(w){ const o = treeOpen(); const next = (o.length === 1 && o[0] === w) ? [] : [w]; treeSave(next); renderSidebar(); };
 window._navDay = function(n){ STATE.day = n; save(); if((parseHash()[0]||'home')==='day'){ route(); } else { go('/day'); } };
+function trainingSidebarIcon(name){
+  const paths={
+    info:'<circle cx="12" cy="12" r="10"/><path d="M12 11v6M12 7h.01"/>',
+    feed:'<rect x="4" y="3" width="16" height="18" rx="2"/><path d="M8 8h8M8 12h8M8 16h5"/>',
+    users:'<circle cx="8" cy="8" r="3"/><circle cx="17" cy="8" r="3"/><path d="M2 20v-2c0-3 2-5 6-5s6 2 6 5v2M14 14c4-1 8 1 8 5v1"/>',
+    heart:'<path d="M20.8 4.6a5.5 5.5 0 0 0-7.8 0L12 5.6l-1-1a5.5 5.5 0 0 0-7.8 7.8l1 1L12 21l7.8-7.6 1-1a5.5 5.5 0 0 0 0-7.8z"/>',
+    folder:'<path d="M3 6h7l2 2h9v11H3z"/><path d="M3 6v13"/>',
+    calendar:'<rect x="3" y="5" width="18" height="16" rx="2"/><path d="M8 3v4M16 3v4M3 10h18"/>',
+    rec:'<rect x="4" y="3" width="16" height="18" rx="2"/><path d="M9 8l7 4-7 4z"/>',
+    user:'<circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 3-7 8-7s8 3 8 7"/>',
+    help:'<circle cx="12" cy="12" r="10"/><path d="M9.5 9a2.7 2.7 0 1 1 4.5 2c-1.5 1-2 1.5-2 3M12 18h.01"/>',
+    crown:'<path d="M4 7l4 4 4-7 4 7 4-4-2 11H6z"/><path d="M7 21h10"/>',
+    plus:'<rect x="4" y="4" width="16" height="16" rx="2"/><path d="M12 8v8M8 12h8"/>',
+    check:'<path d="m5 12 4 4L19 6"/>',
+    book:'<path d="M3 5c4-2 7-1 9 1v15c-2-2-5-3-9-1zM21 5c-4-2-7-1-9 1v15c2-2 5-3 9-1z"/>',
+    video:'<rect x="3" y="5" width="14" height="14" rx="2"/><path d="m17 10 4-3v10l-4-3"/>',
+    compass:'<circle cx="12" cy="12" r="9"/><path d="m15 9-2 4-4 2 2-4z"/>',
+    layers:'<path d="m12 3 9 5-9 5-9-5z"/><path d="m3 12 9 5 9-5M3 16l9 5 9-5"/>',
+    chart:'<path d="M4 20V10M10 20V5M16 20v-8M22 20V2"/><path d="m3 9 6-4 6 5 7-8"/>',
+    chev:'<path d="m9 6 6 6-6 6"/>'
+  };
+  return '<svg class="ico" viewBox="0 0 24 24" aria-hidden="true">'+(paths[name]||paths.info)+'</svg>';
+}
 function dayGroupsHTML(r){
   const links = [
-    { route:'checkin', href:'#/checkin', icon:'user-check', text:'Check-In' },
+    { route:'checkin', href:'#/checkin', icon:'check', text:'Check-In' },
     { route:'roadmap', href:'#/roadmap', icon:'compass', text:'Reading Roadmap' },
     { route:'book', href:'#'+dayReadingHref(STATE.day), icon:'book', text:'Daily Reading' },
     { route:'videos', href:'#/videos', icon:'video', text:'Video Tutorials' },
@@ -349,9 +372,8 @@ function dayGroupsHTML(r){
     { route:'calendar', href:'#/calendar', icon:'calendar', text:'Calendar' },
     { route:'accountability', href:'#/accountability', icon:'chart', text:'Accountability' },
   ];
-  return `<div class="day-groups">` + links.map((l) => `<a class="dg-link${r===l.route?' active':''}" href="${l.href}">${ic(l.icon,13,13)}<span>${l.text}</span></a>`).join('') + `</div>`;
+  return links.map((l) => `<li class="nav-item course-tool-item${r===l.route?' active':''}" tabindex="0" role="button" onclick="location.hash='${l.href}'" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();location.hash='${l.href}'}">${trainingSidebarIcon(l.icon)}<span>${esc(l.text)}</span></li>`).join('');
 }
-/* social demo store */
 function socialState(){ try { return Object.assign({ likes:{}, posts:[] }, JSON.parse(localStorage.getItem('zdash_social') || '{}')); } catch { return { likes:{}, posts:[] }; } }
 function socialSave(s){ try { localStorage.setItem('zdash_social', JSON.stringify(s)); } catch {} }
 const POST_META = {
@@ -438,70 +460,78 @@ function renderBoard() {
 function renderSidebar() {
   const r = parseHash()[0] || 'home';
   const open = treeOpen();
-  const navA = (route, href, icon, text, badge, badgeHot) => {
-    const act = r === route;
-    return `<a href="${href}" style="display:flex;align-items:center;${badge?'justify-content:space-between;':'gap:10px;'}padding:10px 12px;color:${act?'#ffffff':'#a3a3a3'};${act?'background-color:#262626;font-weight:500;':''}border-radius:6px;text-decoration:none;">`
-      + (badge
-        ? `<span style="display:flex;align-items:center;gap:10px;">${ic(icon,16,16)}<span>${text}</span></span><span style="background-color:${act&&badgeHot?'#382818':'#2a2a2a'};color:${act&&badgeHot?'#d97706':'#a3a3a3'};font-size:11px;padding:2px 6px;border-radius:10px;">${badge}</span>`
-        : `${ic(icon,16,16)}<span>${text}</span>`) + `</a>`;
-  };
-  const lbl = (t) => `<div style="padding:16px 12px 6px 12px;font-size:11px;font-weight:600;color:#737373;letter-spacing:0.5px;">${t}</div>`;
   const dayRoutes = ['day','book','videos','visual','roadmap','checkin','accountability'];
   const isDayRoute = dayRoutes.includes(r);
+  const sb = $('#sidebar');
+  if(!sb) return;
+  sb.className = 'sidebar overview-sidebar-copy training-job-sidebar';
+
+  const item = (label, route, icon, active, extra, badge) => `<li class="nav-item${active?' active':''}${extra?' '+extra:''}" tabindex="0" role="button" onclick="go('/${route}')" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();go('/${route}')}">${trainingSidebarIcon(icon)}<span class="course-nav-label">${esc(label)}</span>${badge?`<span class="course-nav-badge">${esc(badge)}</span>`:''}</li>`;
+
   const weekHTML = (w) => {
     const isOpen = open.includes(w.id);
     const days = w.days.map((n) => {
-      const act = isDayRoute && STATE.day === n;
-    const wd = TREE_DAYS[(n - 1) % 6] || '';
-      let h = `<div style="padding-left:16px;display:flex;flex-direction:column;gap:2px;font-size:12px;">`
-        + `<a onclick="window._navDay(${n})" style="display:flex;align-items:center;gap:8px;padding:6px 10px;color:${act?'#d97706':'#a3a3a3'};${act?'background-color:#2a2218;':''}border-radius:4px;text-decoration:none;cursor:pointer;">`
-        + `<svg style="width:12px;height:12px;fill:currentColor;" viewBox="0 0 24 24"><path d="${PLUS_D}"/></svg><span>Day ${n}</span><span style="color:#5a5a5a;">&bull; ${wd}</span></a>`;
-      if (n === 1) h += dayGroupsHTML(r);
-      return h + `</div>`;
-    }).join('')
-    + (!w.days.length ? `<div style="padding:6px 10px 6px 26px;font-size:11.5px;color:#5a5a5a;">Demo &mdash; unlocks in full program</div>` : '');
-    const wAct = w.id === 'w1';
-    return `<div style="padding-left:16px;display:flex;flex-direction:column;gap:2px;${w.id!=='w1'?'margin-top:4px;':''}">`
-      + `<div onclick="window._navTree('${w.id}')" style="display:flex;align-items:center;justify-content:space-between;padding:6px 10px;color:#a3a3a3;border-radius:6px;cursor:pointer;${wAct?'background-color:#222222;':''}">`
-      + `<span style="display:flex;align-items:center;gap:6px;">${chevSvg(10,isOpen)}<span style="font-size:12px;${wAct?'font-weight:500;color:#fff;':''}">${w.label}</span></span></div>`
-      + (isOpen ? days : '') + `</div>`;
-  };
-  $('#sidebar').innerHTML = `
-    <div class="training-sidebar-brand">
-      <img decoding="async" src="${A}logo.png" alt="Zeelin Academy Logo">
-      <span>ZEELIN JOB READINESS SYSTEM</span>
-    </div>
-    <div style="padding:12px 8px;display:flex;flex-direction:column;gap:4px;font-size:13px;">
-      ${navA('guide','#/guide','info','User Guide')}
-      ${navA('board','#/board','feed','General Message Board','4')}
-      ${navA('community','#/community','users','General Community')}
-      ${navA('monday','#/monday','heart','Monday Motivations')}
-      ${lbl('CORE / CLASSIC BUSINESS ANALYSIS')}
-      <div style="display:flex;flex-direction:column;">
-        <div style="display:flex;align-items:center;justify-content:space-between;padding:10px 12px;color:#ffffff;border-radius:6px;cursor:pointer;">
-          <span style="display:flex;align-items:center;gap:10px;">${chevSvg(14,true)}${folderSvg(16)}<span style="font-weight:500;">Core / Classic Business Analysis</span></span>
-        </div>
-        <div style="padding-left:16px;display:flex;flex-direction:column;gap:2px;">
-          <div onclick="window._navCohort()" title="Collapse cohort" style="display:flex;align-items:center;justify-content:space-between;padding:8px 12px;color:#e5e5e5;border-radius:6px;cursor:pointer;">
-            <span style="display:flex;align-items:center;gap:8px;">${chevSvg(12,cohortOpen())}${folderSvg(14)}<span>Cohort 001</span></span>
+      const act = isDayRoute && STATE.day === n && r === 'day';
+      const wd = TREE_DAYS[(n - 1) % 6] || '';
+      return `
+        <li class="course-tree-block course-day-block">
+          <div class="nav-item course-tree-row course-day-row${act?' active':''}" tabindex="0" role="button" onclick="window._navDay(${n})" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();window._navDay(${n})}">
+            ${trainingSidebarIcon('plus')}<span>Day ${n}</span><small>• ${wd}</small>
           </div>
-          ${cohortOpen() ? `<div style="padding-left:16px;display:flex;flex-direction:column;gap:2px;">
-            <div style="display:flex;align-items:center;justify-content:space-between;padding:8px 12px;color:#d4d4d4;border-radius:6px;cursor:pointer;">
-              <span style="display:flex;align-items:center;gap:8px;">${chevSvg(12,true)}${folderSvg(14)}<span>MODULE 1</span></span>
-            </div>
-            ${TREE_WEEKS.map(weekHTML).join('')}
-          </div>` : ''}
+          ${n===1 ? `<ul class="course-tool-list">${dayGroupsHTML(r)}</ul>` : ''}
+        </li>`;
+    }).join('');
+    return `
+      <li class="course-tree-block">
+        <div class="nav-item course-tree-row course-week-row${isOpen?' is-open':''}" tabindex="0" role="button" onclick="window._navTree('${w.id}')" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();window._navTree('${w.id}')}">
+          <svg class="ico course-tree-chev" viewBox="0 0 24 24" aria-hidden="true"><path d="m9 6 6 6-6 6"/></svg><span>${esc(w.label)}</span>
         </div>
-      </div>
-      ${navA('calendar','#/calendar','calendar','Calendar','3',true)}
-      ${navA('recordings','#/recordings','rec','Recordings')}
-      ${lbl('Account')}
-      ${navA('profile','#/profile','user','Profile & Insights')}
-      ${navA('support','#/support','help','Support')}
-      ${navA('aluminal','#/aluminal','crown','Aluminal')}
-    </div>`;
-}
+        ${isOpen ? `<ul class="course-day-list">${days}</ul>` : ''}
+      </li>`;
+  };
 
+  sb.innerHTML = `
+    <div class="brand"><div class="brand-mark" style="justify-content:center"><img decoding="async" fetchpriority="high" src="assets/logo.png" alt="Zeelin Academy Logo" style="height:42px;width:auto;object-fit:contain;background:transparent"></div></div>
+    <div class="system-title">ZEELIN JOB READINESS SYSTEM</div>
+
+    <ul class="nav-main">
+      ${item('User Guide','guide','info',r==='guide','', '')}
+      ${item('General Message Board','board','feed',r==='board','', '4')}
+      ${item('General Community','community','users',r==='community','', '')}
+      ${item('Monday Motivations','monday','heart',r==='monday','', '')}
+    </ul>
+
+    <div class="stage">CORE / CLASSIC BUSINESS ANALYSIS</div>
+    <ul class="nav-main">
+      <li class="nav-item parent course-static-parent">${trainingSidebarIcon('folder')}<span>Core / Classic Business Analysis</span><span class="chev">⌄</span></li>
+    </ul>
+
+    <ul class="subnav course-subnav">
+      <li class="nav-item parent course-tree-row cohort-row" tabindex="0" role="button" onclick="window._navCohort()" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();window._navCohort()}">
+        ${trainingSidebarIcon('folder')}<span>Cohort 001</span><span class="chev">${cohortOpen()?'⌄':'›'}</span>
+      </li>
+      ${cohortOpen() ? `
+        <li class="nav-item parent course-module-row">${trainingSidebarIcon('folder')}<span>MODULE 1</span><span class="chev">⌄</span></li>
+        <li class="course-weeks-wrap"><ul class="course-week-list">${TREE_WEEKS.map(weekHTML).join('')}</ul></li>
+      ` : ''}
+    </ul>
+
+    <div class="divider"></div>
+    <ul class="nav-main">
+      ${item('Calendar','calendar','calendar',r==='calendar','', '3')}
+      ${item('Recordings','recordings','rec',r==='recordings','', '')}
+    </ul>
+
+    <div class="stage">ACCOUNT</div>
+    <ul class="nav-main">
+      ${item('Profile & Insights','profile','user',r==='profile','', '')}
+      ${item('Support','support','help',r==='support','', '')}
+      ${item('Aluminal','aluminal','crown',r==='aluminal','', '')}
+    </ul>
+
+    <div class="journey training-journey"><p>“Build Skills. Build Confidence. Get Job Ready.”</p><div class="gold-stroke"></div></div>
+  `;
+}
 function renderTopbar() {
   const claimed = claimedToday();
   const routeName = parseHash()[0] || 'home';
@@ -530,7 +560,7 @@ function renderTopbar() {
 
 /* ============ STAR RATING + FEEDBACK ============ */
 function starRow(cur) {
-  const selected = Number(cur) || 0;
+  const selected = Math.max(0, Math.min(5, Number(cur) || 0));
   return `<div class="star-row" role="radiogroup" aria-label="Rate this session">${[1, 2, 3, 4, 5].map((n) => `<button type="button" class="starb${n <= selected ? ' on' : ''}" data-star="${n}" role="radio" aria-checked="${n === selected ? 'true' : 'false'}" aria-label="${n} star${n === 1 ? '' : 's'}">${ic('star', 24, 24)}</button>`).join('')}</div>`;
 }
 function stackedOptChips(opts, prefix, selVal) {
