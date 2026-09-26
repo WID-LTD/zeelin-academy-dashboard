@@ -6370,3 +6370,29 @@ body.premium-training .starb.preview-on{
   .community-room-hero{grid-template-columns:48px 1fr}.community-room-presence{grid-column:1/-1}
   .community-room-card{grid-template-columns:44px 1fr;padding:18px}.community-room-card-icon{width:44px;height:44px}
 }
+
+
+/* Final nested sidebar selected state: full gold fill, hover stays preview-only. */
+body.premium-training #sidebar .dg-link.active,
+body.premium-training #sidebar a[onclick*="_navDay"][style*="color:#d97706"],
+body.premium-training #sidebar a[onclick*="_navDay"][style*="color: #d97706"]{
+  background:linear-gradient(100deg,#F7EBD0,var(--za-gold-light))!important;
+  color:var(--za-navy)!important;
+  font-weight:800!important;
+  box-shadow:0 4px 14px rgba(212,160,42,.24)!important;
+}
+body.premium-training #sidebar .dg-link.active .sv,
+body.premium-training #sidebar a[onclick*="_navDay"][style*="color:#d97706"] svg,
+body.premium-training #sidebar a[onclick*="_navDay"][style*="color: #d97706"] svg{
+  color:var(--za-navy)!important;
+  fill:currentColor!important;
+}
+@media(hover:hover) and (pointer:fine){
+  body.premium-training #sidebar .dg-link.active:hover,
+  body.premium-training #sidebar a[onclick*="_navDay"][style*="color:#d97706"]:hover,
+  body.premium-training #sidebar a[onclick*="_navDay"][style*="color: #d97706"]:hover{
+    background:linear-gradient(100deg,#F7EBD0,var(--za-gold-light))!important;
+    color:var(--za-navy)!important;
+    transform:none!important;
+  }
+}
