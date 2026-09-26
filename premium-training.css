@@ -6611,3 +6611,50 @@ body.premium-training .starb.preview-off{transform:none!important}
   body.premium-training.premium-route-board .board-pinned{grid-template-columns:1fr!important}
   body.premium-training.premium-route-board .board-grid{grid-template-columns:1fr!important}
 }
+
+
+/* ============================================================
+   FINAL DESKTOP SHELL ALIGNMENT — SIDEBAR WIDTH IS SOURCE OF TRUTH
+   ============================================================ */
+@media(min-width:1451px){
+  body.premium-training #sidebar.training-job-sidebar{
+    position:fixed!important;
+    left:0!important;top:0!important;bottom:0!important;
+    width:clamp(210px,13.5vw,270px)!important;
+    min-width:clamp(210px,13.5vw,270px)!important;
+    max-width:clamp(210px,13.5vw,270px)!important;
+    height:100vh!important;
+    flex:0 0 clamp(210px,13.5vw,270px)!important;
+    transform:none!important;
+    border-radius:0!important;
+  }
+  body.premium-training #topbar{
+    position:fixed!important;
+    left:clamp(210px,13.5vw,270px)!important;
+    right:0!important;top:0!important;
+    width:auto!important;
+    height:73px!important;min-height:73px!important;
+  }
+  body.premium-training .shell-row{
+    min-height:100vh!important;
+    padding-left:clamp(210px,13.5vw,270px)!important;
+    padding-top:73px!important;
+  }
+}
+@media(min-width:1280px) and (max-width:1450px){
+  body.premium-training #sidebar.training-job-sidebar{
+    position:fixed!important;
+    left:0!important;top:0!important;bottom:0!important;
+    width:220px!important;min-width:220px!important;max-width:220px!important;
+    height:100vh!important;flex:0 0 220px!important;
+    transform:none!important;border-radius:0!important;
+  }
+  body.premium-training #topbar{
+    position:fixed!important;left:220px!important;right:0!important;top:0!important;
+    width:auto!important;height:73px!important;min-height:73px!important;
+  }
+  body.premium-training .shell-row{
+    min-height:100vh!important;padding-left:220px!important;padding-top:73px!important;
+  }
+}
+/* Collapse stylesheet loads after this block and intentionally overrides these offsets. */
