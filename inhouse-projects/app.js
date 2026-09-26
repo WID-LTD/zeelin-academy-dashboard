@@ -189,7 +189,7 @@ function applyCheckinRewards(){ if(state.lastCheckin === today()) return false; 
   return `
   <div class="apd-dash">
     <header class="apd-topbar">
-      <div class="apd-brand"><img src="assets/logo.png" alt="Zeelin Academy"><div class="apd-brand-copy"><b>ZEELIN ACADEMY</b><span>Work Experience System</span></div></div>
+      <img class="apd-logo-only" src="assets/logo.png" alt="Zeelin Academy">
       <div class="apd-portal-title">ZEELIN WORK EXPERIENCE PORTAL</div>
       <div class="apd-top-actions">
         <button class="apd-pill" onclick="location.href='/portal.html'"><svg viewBox="0 0 24 24"><path d="m12 3 8 5-8 5-8-5 8-5Z"/><path d="m4 12 8 5 8-5"/></svg>Portals</button>
