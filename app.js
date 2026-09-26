@@ -700,7 +700,7 @@ function wireCheckin(container) {
     const star = e.target.closest('.starb');
     if (star) {
       STATE.stars = Number(star.dataset.star); save();
-      $('.starb', container).forEach((s) => { const n = Number(s.dataset.star); s.classList.toggle('on', n <= STATE.stars); s.setAttribute('aria-checked', n === STATE.stars ? 'true' : 'false'); });
+      Array.from(container.querySelectorAll('.starb')).forEach((s) => { const n = Number(s.dataset.star); s.classList.toggle('on', n <= STATE.stars); s.setAttribute('aria-checked', n === STATE.stars ? 'true' : 'false'); });
       const wrap = container.querySelector('#ciWrap') || container;
       const q = wrap.querySelectorAll('.ci-q')[2];
       if (q) {
