@@ -1756,6 +1756,33 @@ function renderGuide() {
   $('#page').addEventListener('click',backLink);
 }
 
+window._playWelcome = function(){ go('/watch/v1'); };
+window._enterCommunityRoom = function(id){ go('/community/' + id); };
+window._communityBack = function(){ go('/community'); };
+window._sendRoomPost = function(room){
+  const ta = $('#roomComposerText');
+  const v = ta ? String(ta.value||'').trim() : '';
+  if(!v){ toast('Write something first'); return; }
+  const s = socialState();
+  s.posts = s.posts || [];
+  s.posts.unshift({ id:'u'+Date.now(), author:'John Doe', initials:'JD', color:'#D4A02A', tag:room==='study-group'?'Study Group':room==='exam-prep'?'Exam Prep':room==='accountability'?'Accountability':'General', reacts:'0 likes · 0 replies', time:'Just now', title:'', body:v, mine:true, room:room });
+  socialSave(s); route(); toast('Posted to community room');
+};
+window._toggleCommunityReplies = function(id){
+  const el = $('#communityReplies-'+id);
+  if(el) el.hidden = !el.hidden;
+};
+window._sendCommunityReply = function(id, room){
+  const input = $('#replyInput-'+id);
+  const v = input ? String(input.value||'').trim() : '';
+  if(!v){ toast('Write a reply first'); return; }
+  const s = socialState();
+  s.replies = s.replies || {};
+  s.replies[id] = s.replies[id] || [];
+  s.replies[id].push({body:v,time:'Just now'});
+  socialSave(s); route(); toast('Reply posted');
+};
+
 function renderCommunity() {
   const rooms = [
     { id:'general', name:'General Community', kicker:'OPEN LOUNGE', desc:'Ask questions, share study wins and connect with the wider Zeelin Academy cohort.', members:'128 members', online:'12 online', icon:'users', tone:'gold' },
