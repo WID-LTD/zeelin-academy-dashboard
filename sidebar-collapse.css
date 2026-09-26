@@ -199,3 +199,168 @@
       opacity .20s ease!important;
   }
 }
+
+
+/* ============================================================
+   COURSE PORTAL — COLLAPSED MODE MUST REFLOW EVERY ROUTE
+   Removes route-level centred/fixed-width islands after sidebar closes.
+   ============================================================ */
+@media(min-width:1280px){
+
+  /* Every route starts from the full reclaimed canvas. */
+  body.premium-training.zeelin-sidebar-collapsed #page{
+    padding-left:12px!important;
+    padding-right:12px!important;
+  }
+  body.premium-training.zeelin-sidebar-collapsed #page > div,
+  body.premium-training.zeelin-sidebar-collapsed #page > section,
+  body.premium-training.zeelin-sidebar-collapsed #page > main,
+  body.premium-training.zeelin-sidebar-collapsed #page > article{
+    width:100%!important;
+    max-width:none!important;
+    min-width:0!important;
+    margin-left:0!important;
+    margin-right:0!important;
+    box-sizing:border-box!important;
+  }
+
+  /* Legacy Guide / Calendar / Recordings wrappers. */
+  body.premium-training.zeelin-sidebar-collapsed #page > div[style*="max-width:900px"],
+  body.premium-training.zeelin-sidebar-collapsed #page div[style*="max-width:900px"][style*="margin:0 auto"]{
+    width:100%!important;
+    max-width:none!important;
+    margin:0!important;
+    padding-left:0!important;
+    padding-right:0!important;
+  }
+
+  /* Reading workspace article: reclaim the extra width instead of centering at 780px. */
+  body.premium-training.zeelin-sidebar-collapsed #page div[style*="max-width:780px"][style*="margin:0 auto"]{
+    width:100%!important;
+    max-width:none!important;
+    margin:0!important;
+    padding-left:clamp(28px,3vw,52px)!important;
+    padding-right:clamp(28px,3vw,52px)!important;
+  }
+  body.premium-training.zeelin-sidebar-collapsed #page div[style*="padding:32px 40px"][style*="overflow-y:auto"]{
+    padding-left:20px!important;
+    padding-right:20px!important;
+  }
+
+  /* Any legacy route container centred with auto margins becomes edge-aligned. */
+  body.premium-training.zeelin-sidebar-collapsed #page > div[style*="margin:0 auto"],
+  body.premium-training.zeelin-sidebar-collapsed #page > section[style*="margin:0 auto"]{
+    margin-left:0!important;
+    margin-right:0!important;
+  }
+
+  /* Major modern route roots all expand to the reclaimed canvas. */
+  body.premium-training.zeelin-sidebar-collapsed .board-premium,
+  body.premium-training.zeelin-sidebar-collapsed .community-premium,
+  body.premium-training.zeelin-sidebar-collapsed .community-room-page,
+  body.premium-training.zeelin-sidebar-collapsed .monday-premium,
+  body.premium-training.zeelin-sidebar-collapsed .home,
+  body.premium-training.zeelin-sidebar-collapsed .day-titlebar,
+  body.premium-training.zeelin-sidebar-collapsed .p-grid,
+  body.premium-training.zeelin-sidebar-collapsed .dash-wide-grid,
+  body.premium-training.zeelin-sidebar-collapsed .acc-layout,
+  body.premium-training.zeelin-sidebar-collapsed .profile-hero,
+  body.premium-training.zeelin-sidebar-collapsed .visual-layout,
+  body.premium-training.zeelin-sidebar-collapsed .watch-layout,
+  body.premium-training.zeelin-sidebar-collapsed .sup-grid,
+  body.premium-training.zeelin-sidebar-collapsed .alum-grid,
+  body.premium-training.zeelin-sidebar-collapsed .grid,
+  body.premium-training.zeelin-sidebar-collapsed .roadmap-standalone-row{
+    width:100%!important;
+    max-width:none!important;
+    min-width:0!important;
+    margin-left:0!important;
+    margin-right:0!important;
+    box-sizing:border-box!important;
+  }
+
+  /* Reflow auto-fit card areas so they consume newly available width. */
+  body.premium-training.zeelin-sidebar-collapsed .p-grid{
+    grid-template-columns:repeat(auto-fit,minmax(330px,1fr))!important;
+  }
+  body.premium-training.zeelin-sidebar-collapsed .community-room-grid,
+  body.premium-training.zeelin-sidebar-collapsed .community-recent-grid{
+    grid-template-columns:repeat(auto-fit,minmax(330px,1fr))!important;
+  }
+  body.premium-training.zeelin-sidebar-collapsed .monday-quote-grid{
+    grid-template-columns:repeat(auto-fit,minmax(310px,1fr))!important;
+  }
+  body.premium-training.zeelin-sidebar-collapsed .sup-grid,
+  body.premium-training.zeelin-sidebar-collapsed .alum-grid{
+    grid-template-columns:repeat(3,minmax(0,1fr))!important;
+  }
+
+  /* Profile/accountability two-column workspaces scale with the screen. */
+  body.premium-training.zeelin-sidebar-collapsed .acc-layout{
+    grid-template-columns:minmax(0,1.7fr) minmax(340px,.3fr)!important;
+  }
+  body.premium-training.zeelin-sidebar-collapsed .grid.grid-2{
+    grid-template-columns:repeat(2,minmax(0,1fr))!important;
+  }
+  body.premium-training.zeelin-sidebar-collapsed .grid.grid-3{
+    grid-template-columns:repeat(3,minmax(0,1fr))!important;
+  }
+
+  /* Book, video watch and visual deck: keep the utility rail, grow the main stage. */
+  body.premium-training.zeelin-sidebar-collapsed .watch-layout,
+  body.premium-training.zeelin-sidebar-collapsed .visual-layout{
+    display:flex!important;
+    gap:14px!important;
+    align-items:stretch!important;
+  }
+  body.premium-training.zeelin-sidebar-collapsed .watch-layout > :first-child,
+  body.premium-training.zeelin-sidebar-collapsed .visual-layout > :first-child{
+    flex:1 1 auto!important;
+    width:auto!important;
+    max-width:none!important;
+    min-width:0!important;
+  }
+
+  /* Calendar/recordings cards and Guide media become broader, not floating islands. */
+  body.premium-training.zeelin-sidebar-collapsed.premium-route-guide #page > div:first-child,
+  body.premium-training.zeelin-sidebar-collapsed.premium-route-calendar #page > div:first-child,
+  body.premium-training.zeelin-sidebar-collapsed.premium-route-recordings #page > div:first-child{
+    width:100%!important;
+    max-width:none!important;
+    margin:0!important;
+    padding-left:0!important;
+    padding-right:0!important;
+  }
+  body.premium-training.zeelin-sidebar-collapsed.premium-route-guide #page img,
+  body.premium-training.zeelin-sidebar-collapsed.premium-route-recordings #page img{
+    width:100%!important;
+    object-fit:cover!important;
+  }
+
+  /* The home course card grows with the canvas rather than preserving old sidebar math. */
+  body.premium-training.zeelin-sidebar-collapsed.premium-route-home .enrolled.single,
+  body.premium-training.zeelin-sidebar-collapsed.premium-route-home .enrolled.single .enr-card{
+    width:100%!important;
+    max-width:none!important;
+  }
+
+  /* Make the resize visible and app-like. */
+  body.premium-training #page > div,
+  body.premium-training #page > section,
+  body.premium-training .p-grid,
+  body.premium-training .acc-layout,
+  body.premium-training .community-room-grid,
+  body.premium-training .community-recent-grid,
+  body.premium-training .monday-quote-grid,
+  body.premium-training .sup-grid,
+  body.premium-training .alum-grid,
+  body.premium-training .visual-layout,
+  body.premium-training .watch-layout{
+    transition:
+      width .34s cubic-bezier(.16,1,.3,1),
+      max-width .34s cubic-bezier(.16,1,.3,1),
+      margin .34s cubic-bezier(.16,1,.3,1),
+      grid-template-columns .34s cubic-bezier(.16,1,.3,1),
+      gap .34s cubic-bezier(.16,1,.3,1)!important;
+  }
+}
