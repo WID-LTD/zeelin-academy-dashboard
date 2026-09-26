@@ -364,3 +364,174 @@
       gap .34s cubic-bezier(.16,1,.3,1)!important;
   }
 }
+
+
+/* ============================================================
+   FINAL COURSE COLLAPSE GEOMETRY FIX
+   The previous collapsed state used 100vw on children while an older
+   #shell.app > .shell-row rule still reserved the sidebar offset.
+   This block wins on specificity and fixes the parent geometry first.
+   ============================================================ */
+@media(min-width:1280px){
+
+  /* 1) Kill the REAL reserved sidebar offset at the shell level. */
+  body.premium-training.zeelin-sidebar-collapsed:not(.premium-route-home) #shell.app>.shell-row{
+    width:100%!important;
+    max-width:none!important;
+    min-width:0!important;
+    padding-left:0!important;
+    padding-right:0!important;
+    margin-left:0!important;
+    margin-right:0!important;
+    box-sizing:border-box!important;
+  }
+
+  /* Also cover any route where the route class changes during navigation. */
+  body.premium-training.zeelin-sidebar-collapsed #shell.app>.shell-row{
+    width:100%!important;
+    max-width:none!important;
+    min-width:0!important;
+    padding-left:0!important;
+    padding-right:0!important;
+    margin-left:0!important;
+    margin-right:0!important;
+    box-sizing:border-box!important;
+  }
+
+  /* 2) Topbar moves left into the reclaimed sidebar space. */
+  body.premium-training.zeelin-sidebar-collapsed:not(.premium-route-home) #topbar,
+  body.premium-training.zeelin-sidebar-collapsed #shell.app>#topbar{
+    left:0!important;
+    right:0!important;
+    width:auto!important;
+    max-width:none!important;
+    margin:0!important;
+  }
+
+  /* 3) Sidebar genuinely contributes zero layout width. */
+  body.premium-training.zeelin-sidebar-collapsed:not(.premium-route-home) #sidebar.training-job-sidebar,
+  body.premium-training.zeelin-sidebar-collapsed #shell.app #sidebar.training-job-sidebar{
+    width:0!important;
+    min-width:0!important;
+    max-width:0!important;
+    flex:0 0 0!important;
+    flex-basis:0!important;
+    padding-left:0!important;
+    padding-right:0!important;
+    margin:0!important;
+    border:0!important;
+    opacity:0!important;
+    visibility:hidden!important;
+    overflow:hidden!important;
+    pointer-events:none!important;
+    box-shadow:none!important;
+  }
+
+  /* 4) Content fills the shell. NO viewport-width child math. */
+  body.premium-training.zeelin-sidebar-collapsed:not(.premium-route-home) #shell.app>.shell-row>.content,
+  body.premium-training.zeelin-sidebar-collapsed #shell.app>.shell-row>.content{
+    flex:1 1 auto!important;
+    width:auto!important;
+    max-width:none!important;
+    min-width:0!important;
+    margin:0!important;
+    padding:0!important;
+    box-sizing:border-box!important;
+  }
+
+  body.premium-training.zeelin-sidebar-collapsed #shell.app>.shell-row>.content>#page{
+    width:100%!important;
+    max-width:none!important;
+    min-width:0!important;
+    margin:0!important;
+    box-sizing:border-box!important;
+    overflow-x:hidden!important;
+  }
+
+  /* 5) Children inherit available width instead of using 100vw. */
+  body.premium-training.zeelin-sidebar-collapsed #page > div,
+  body.premium-training.zeelin-sidebar-collapsed #page > section,
+  body.premium-training.zeelin-sidebar-collapsed #page > main,
+  body.premium-training.zeelin-sidebar-collapsed #page > article{
+    width:100%!important;
+    max-width:none!important;
+    min-width:0!important;
+    margin-left:0!important;
+    margin-right:0!important;
+    box-sizing:border-box!important;
+  }
+
+  /* Legacy fixed-width route wrappers: Guide, Calendar, Recordings. */
+  body.premium-training.zeelin-sidebar-collapsed #shell.app>.shell-row>.content>#page>div[style*="max-width:900px"]{
+    width:100%!important;
+    max-width:none!important;
+    margin:0!important;
+    padding-left:12px!important;
+    padding-right:12px!important;
+  }
+
+  /* Reading article expands inside its own main pane, not to the viewport. */
+  body.premium-training.zeelin-sidebar-collapsed #page div[style*="max-width:780px"][style*="margin:0 auto"]{
+    width:100%!important;
+    max-width:none!important;
+    margin:0!important;
+  }
+
+  /* Modern route roots. */
+  body.premium-training.zeelin-sidebar-collapsed .home,
+  body.premium-training.zeelin-sidebar-collapsed .board-premium,
+  body.premium-training.zeelin-sidebar-collapsed .community-premium,
+  body.premium-training.zeelin-sidebar-collapsed .community-room-page,
+  body.premium-training.zeelin-sidebar-collapsed .monday-premium,
+  body.premium-training.zeelin-sidebar-collapsed .p-grid,
+  body.premium-training.zeelin-sidebar-collapsed .dash-wide-grid,
+  body.premium-training.zeelin-sidebar-collapsed .acc-layout,
+  body.premium-training.zeelin-sidebar-collapsed .profile-hero,
+  body.premium-training.zeelin-sidebar-collapsed .visual-layout,
+  body.premium-training.zeelin-sidebar-collapsed .watch-layout,
+  body.premium-training.zeelin-sidebar-collapsed .sup-grid,
+  body.premium-training.zeelin-sidebar-collapsed .alum-grid{
+    width:100%!important;
+    max-width:none!important;
+    min-width:0!important;
+    margin-left:0!important;
+    margin-right:0!important;
+  }
+
+  /* Re-layout cards to use the newly reclaimed width. */
+  body.premium-training.zeelin-sidebar-collapsed .p-grid{
+    grid-template-columns:repeat(auto-fit,minmax(340px,1fr))!important;
+  }
+  body.premium-training.zeelin-sidebar-collapsed .community-room-grid,
+  body.premium-training.zeelin-sidebar-collapsed .community-recent-grid{
+    grid-template-columns:repeat(auto-fit,minmax(350px,1fr))!important;
+  }
+  body.premium-training.zeelin-sidebar-collapsed .monday-quote-grid{
+    grid-template-columns:repeat(auto-fit,minmax(320px,1fr))!important;
+  }
+  body.premium-training.zeelin-sidebar-collapsed .sup-grid,
+  body.premium-training.zeelin-sidebar-collapsed .alum-grid{
+    grid-template-columns:repeat(3,minmax(0,1fr))!important;
+  }
+  body.premium-training.zeelin-sidebar-collapsed .acc-layout{
+    grid-template-columns:minmax(0,1.65fr) minmax(330px,.35fr)!important;
+  }
+  body.premium-training.zeelin-sidebar-collapsed .grid.grid-2{
+    grid-template-columns:repeat(2,minmax(0,1fr))!important;
+  }
+
+  /* The transition is on the true geometry. */
+  body.premium-training #shell.app>.shell-row,
+  body.premium-training #shell.app>.shell-row>.content,
+  body.premium-training #topbar,
+  body.premium-training #sidebar.training-job-sidebar{
+    transition:
+      padding-left .34s cubic-bezier(.16,1,.3,1),
+      left .34s cubic-bezier(.16,1,.3,1),
+      width .34s cubic-bezier(.16,1,.3,1),
+      max-width .34s cubic-bezier(.16,1,.3,1),
+      min-width .34s cubic-bezier(.16,1,.3,1),
+      flex-basis .34s cubic-bezier(.16,1,.3,1),
+      opacity .18s ease!important;
+  }
+}
