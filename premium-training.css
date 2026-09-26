@@ -6703,3 +6703,284 @@ body.premium-training.premium-route-board #page .board-card p{
   line-height:1.62!important;
   margin:0!important;
 }
+
+
+/* ============================================================
+   2026-09-26 UI AUDIT PASS
+   Compact check-in, restored premium calendar, and legacy-light cleanup
+   ============================================================ */
+
+/* CHECK-IN OVERLAY — rectangular, all-content viewport fit */
+body.premium-training .dash-overlay{
+  align-items:center!important;
+  padding:16px!important;
+  overflow:auto!important;
+}
+body.premium-training .dash-modal.ci-modal{
+  width:min(980px,calc(100vw - 32px))!important;
+  max-width:980px!important;
+  max-height:calc(100dvh - 32px)!important;
+  overflow:auto!important;
+  padding:18px 20px 16px!important;
+  border-radius:20px!important;
+  scrollbar-width:thin;
+  scrollbar-color:#c9d3e0 transparent;
+}
+body.premium-training .dash-modal.ci-modal::-webkit-scrollbar{width:7px}
+body.premium-training .dash-modal.ci-modal::-webkit-scrollbar-thumb{background:#c9d3e0;border-radius:999px}
+body.premium-training .ci-modal .ci-head{margin-bottom:10px!important}
+body.premium-training .ci-modal .ci-wrap{min-width:0}
+body.premium-training .ci-modal .ci-bar-head{margin-bottom:10px!important}
+body.premium-training .ci-modal .ci-claim{
+  margin-bottom:12px!important;
+  padding:13px 16px!important;
+  gap:12px!important;
+  border-radius:13px!important
+}
+body.premium-training .ci-modal .ci-claim .xp{font-size:29px!important}
+body.premium-training .ci-modal .ci-claim-txt{font-size:12.5px!important;line-height:1.45!important}
+body.premium-training .ci-modal .btn-claim{min-width:170px!important;min-height:42px!important}
+body.premium-training .ci-modal .ci-form{
+  grid-template-columns:minmax(0,1fr) 250px!important;
+  gap:14px!important;
+  align-items:start!important
+}
+body.premium-training .ci-modal .ci-qs{
+  display:grid!important;
+  grid-template-columns:repeat(2,minmax(0,1fr))!important;
+  gap:12px 16px!important;
+  min-width:0
+}
+body.premium-training .ci-modal .ci-q{
+  min-width:0!important;
+  margin:0!important;
+  padding:13px 14px!important;
+  border:1.5px solid var(--z-line)!important;
+  border-radius:13px!important;
+  background:#fff!important;
+  box-shadow:0 5px 15px rgba(31,55,88,.045)!important
+}
+body.premium-training .ci-modal .ci-q:nth-child(3){grid-column:1/-1}
+body.premium-training .ci-modal .ci-label{font-size:13px!important;margin-bottom:8px!important}
+body.premium-training .ci-modal .radio-row{gap:7px!important}
+body.premium-training .ci-modal .radio-chip{min-height:36px!important;padding:7px 10px!important;font-size:11px!important}
+body.premium-training .ci-modal .star-row{gap:7px!important;margin-top:3px!important}
+body.premium-training .ci-modal .starb{width:39px!important;height:39px!important;border-radius:9px!important}
+body.premium-training .ci-modal .starb .sv{width:21px!important;height:21px!important}
+body.premium-training .ci-modal .fb-branch{margin-top:10px!important;padding:12px!important;border-radius:11px!important}
+body.premium-training .ci-modal .branch-q{font-size:12.5px!important}
+body.premium-training .ci-modal .branch-prompt{font-size:11px!important}
+body.premium-training .ci-modal .fb-area{min-height:68px!important;margin-top:7px!important;padding:9px 11px!important;font-size:12px!important}
+body.premium-training .ci-modal .ci-side{
+  padding:14px!important;
+  border-radius:13px!important;
+  position:sticky!important;
+  top:0!important
+}
+body.premium-training .ci-modal .ci-side .lbl{font-size:12.5px!important}
+body.premium-training .ci-modal .streak{gap:5px!important;flex-wrap:wrap!important}
+body.premium-training .ci-modal .ci-skip{margin-top:10px!important}
+
+/* RESTORED CALENDAR — old calendar structure, premium light treatment */
+body.premium-training.premium-route-calendar #page{
+  max-width:1340px!important;
+  padding-top:24px!important
+}
+.training-calendar-shell{width:100%;max-width:1180px;margin:0 auto}
+.training-calendar-head{
+  display:flex;align-items:flex-end;justify-content:space-between;gap:24px;
+  margin-bottom:18px;padding-bottom:18px;border-bottom:1.5px solid var(--z-line)
+}
+.training-calendar-eyebrow{
+  color:#966000;font-size:10px;font-weight:900;letter-spacing:1.2px;text-transform:uppercase
+}
+.training-calendar-head h1{
+  margin:5px 0 5px;color:var(--z-ink);font:800 32px/1.12 "Plus Jakarta Sans",Inter,sans-serif;letter-spacing:-.55px
+}
+.training-calendar-head p{margin:0;color:var(--z-muted);font-size:13px;line-height:1.55}
+.training-calendar-month-chip{
+  display:inline-flex;align-items:center;gap:8px;white-space:nowrap;padding:9px 12px;border-radius:999px;
+  background:var(--z-gold-soft);border:1px solid #e2c36f;color:#765000;font-size:11px;font-weight:850
+}
+.training-calendar-card{
+  background:#fff;border:1.5px solid var(--z-line);border-radius:18px;box-shadow:var(--z-shadow);
+  overflow:hidden
+}
+.training-calendar-toolbar{
+  min-height:62px;padding:13px 16px 13px 20px;display:flex;align-items:center;justify-content:space-between;gap:16px;
+  border-bottom:1px solid var(--z-line);background:#fbfcfe
+}
+.training-calendar-toolbar strong{font:800 16px/1.2 "Plus Jakarta Sans",Inter,sans-serif;color:var(--z-ink)}
+.training-calendar-nav{display:flex;gap:7px}
+.training-calendar-nav button{
+  width:38px;height:38px;border-radius:9px;border:1.5px solid var(--z-line-strong);background:#fff;color:#52627a;
+  display:grid;place-items:center;font-size:17px;font-weight:850
+}
+.training-calendar-nav button:hover{background:#f5f8fb;color:var(--z-ink)}
+body.premium-training .training-calendar-card .cal-grid{
+  border:0!important;border-radius:0!important;background:#fff!important
+}
+body.premium-training .training-calendar-card .cal-dow{
+  padding:10px 0!important;background:#f5f7fa!important;color:#718096!important;border-bottom:1px solid var(--z-line)!important
+}
+body.premium-training .training-calendar-card .cal-day{
+  min-height:88px!important;padding:10px!important;background:#fff!important;border-color:#edf1f5!important
+}
+body.premium-training .training-calendar-card .cal-day .d{color:#52627a!important;font-weight:750!important}
+body.premium-training .training-calendar-card .cal-day.pm{background:#fafbfd!important}
+body.premium-training .training-calendar-card .cal-day.pm .d{color:#b5bfcb!important}
+body.premium-training .training-calendar-card .cal-day.today{
+  outline:2px solid #d69b13!important;outline-offset:-2px!important;background:#fffaf0!important
+}
+body.premium-training .training-calendar-card .cal-dot{width:7px!important;height:7px!important;margin-top:10px!important}
+.training-calendar-legend{
+  display:flex;gap:16px;flex-wrap:wrap;padding:11px 18px;border-top:1px solid var(--z-line);background:#fbfcfe;
+  color:#718096;font-size:10.5px;font-weight:700
+}
+.training-calendar-legend span{display:inline-flex;align-items:center;gap:6px}
+.training-calendar-legend i{width:8px;height:8px;border-radius:50%;display:inline-block}
+.training-calendar-legend i.gold{background:#d99a0a}.training-calendar-legend i.blue{background:#3c76d8}
+.training-calendar-events{margin-top:22px}
+.training-calendar-events-head{display:flex;align-items:end;justify-content:space-between;gap:16px;margin-bottom:8px}
+.training-calendar-events-head h2{margin:0;color:var(--z-ink);font:800 20px/1.2 "Plus Jakarta Sans",Inter,sans-serif}
+.training-calendar-events-head span{color:var(--z-muted);font-size:11px;font-weight:750}
+body.premium-training .training-calendar-shell .event-row{
+  margin-top:10px!important;background:#fff!important;border:1.5px solid var(--z-line)!important;border-radius:14px!important;
+  box-shadow:0 6px 18px rgba(31,55,88,.055)!important
+}
+body.premium-training .training-calendar-shell .event-dcol{
+  min-width:104px!important;background:#fff7df!important;border-right:1px solid #ead79f!important;padding:16px!important
+}
+body.premium-training .training-calendar-shell .event-dcol.blue{background:#eef4ff!important;border-right-color:#cbd9f4!important}
+body.premium-training .training-calendar-shell .event-dcol .bd{color:#875b00!important;font-size:24px!important}
+body.premium-training .training-calendar-shell .event-dcol.blue .bd{color:#285eb7!important}
+body.premium-training .training-calendar-shell .event-dcol .bt{color:#8e6b12!important}
+body.premium-training .training-calendar-shell .event-dcol.blue .bt{color:#3e67a7!important}
+body.premium-training .training-calendar-shell .event-body{padding:16px 18px!important}
+body.premium-training .training-calendar-shell .event-title{color:var(--z-ink)!important;font-size:15px!important;font-weight:850!important}
+body.premium-training .training-calendar-shell .event-meta{color:var(--z-muted)!important;font-size:12px!important}
+.training-event-pill{display:inline-flex;margin-top:8px;padding:5px 8px;border-radius:999px;background:#fff4cf;color:#7b5200;font-size:9px;font-weight:900;text-transform:uppercase}
+.training-event-pill.blue{background:#edf3ff;color:#315f9f}
+.training-event-details{margin-top:10px;padding:10px 12px;border-radius:9px;background:#f7f9fc;border:1px solid var(--z-line);color:#64748b;font-size:11.5px;line-height:1.55}
+body.premium-training .training-calendar-shell .event-btns{justify-content:flex-start!important;flex-wrap:wrap!important}
+body.premium-training .training-calendar-shell .event-btns .btn{flex:0 0 auto!important;min-height:36px!important}
+.training-calendar-empty{padding:28px;text-align:center;color:var(--z-muted);background:#fff;border:1.5px dashed var(--z-line-strong);border-radius:14px}
+
+/* RECORDINGS — remove remaining legacy dark cards */
+.training-recordings-shell{width:100%;max-width:1120px;margin:0 auto}
+.training-recordings-head{display:flex;align-items:flex-end;justify-content:space-between;gap:20px;margin-bottom:18px;padding-bottom:18px;border-bottom:1.5px solid var(--z-line)}
+.training-recordings-head h1{margin:5px 0;color:var(--z-ink);font:800 31px/1.12 "Plus Jakarta Sans",Inter,sans-serif}
+.training-recordings-head p{margin:0;color:var(--z-muted);font-size:13px}
+.training-recordings-filter{min-height:40px;padding:0 12px;background:#fff;color:var(--z-ink-2);border:1.5px solid var(--z-line-strong);border-radius:10px;font:700 12px Inter,sans-serif}
+.training-recording-card{display:grid;grid-template-columns:320px minmax(0,1fr);gap:0;margin-bottom:16px;background:#fff;border:1.5px solid var(--z-line);border-radius:16px;overflow:hidden;box-shadow:var(--z-shadow-sm)}
+.training-recording-thumb{position:relative;min-height:190px;background:#101b2d;overflow:hidden}
+.training-recording-thumb img{width:100%;height:100%;object-fit:cover;display:block}
+.training-recording-thumb:after{content:"";position:absolute;inset:0;background:linear-gradient(90deg,rgba(4,16,35,.08),rgba(4,16,35,.28))}
+.training-recording-play{position:absolute;z-index:2;left:50%;top:50%;transform:translate(-50%,-50%);width:54px;height:54px;border-radius:50%;border:0;background:#dda81f;color:#fff;display:grid;place-items:center;box-shadow:0 8px 20px rgba(0,0,0,.25)}
+.training-recording-play svg{width:22px;height:22px;fill:currentColor;margin-left:2px}
+.training-recording-body{padding:20px 22px;display:flex;flex-direction:column;justify-content:center;min-width:0}
+.training-recording-meta{display:flex;align-items:center;gap:9px;flex-wrap:wrap;color:var(--z-muted);font-size:10.5px;font-weight:700}
+.training-recording-avatar{width:30px;height:30px;border-radius:50%;display:grid;place-items:center;background:#0c2b49;color:#fff;font-size:10px;font-weight:900}
+.training-recording-tag{padding:5px 8px;border-radius:999px;background:var(--z-gold-soft);color:#815500;font-size:9px;font-weight:900;text-transform:uppercase}
+.training-recording-tag.blue{background:#edf3ff;color:#315f9f}
+.training-recording-body h2{margin:12px 0 7px;color:var(--z-ink);font:800 18px/1.3 "Plus Jakarta Sans",Inter,sans-serif}
+.training-recording-body p{margin:0;color:var(--z-muted);font-size:12px;line-height:1.55}
+.training-recording-actions{margin-top:14px;display:flex;gap:8px}
+.training-recording-actions button{min-height:37px}
+
+/* USER GUIDE — replace remaining legacy dark composition */
+.training-guide-shell{width:100%;max-width:1120px;margin:0 auto}
+.training-guide-crumb{margin-bottom:12px;color:#7b8799;font-size:11px;font-weight:700}
+.training-guide-crumb b{color:var(--z-ink)}
+.training-guide-hero{
+  min-height:300px;padding:42px 49% 42px 42px;border:1.5px solid var(--z-line);border-radius:20px;box-shadow:var(--z-shadow);
+  background:linear-gradient(90deg,rgba(255,255,255,.99) 0%,rgba(255,255,255,.96) 47%,rgba(255,255,255,.18) 70%),url("assets/stock/classroom.jpg") right center/54% 100% no-repeat;
+  display:flex;flex-direction:column;justify-content:center
+}
+.training-guide-hero span{color:#966000;font-size:10px;font-weight:900;letter-spacing:1.1px;text-transform:uppercase}
+.training-guide-hero h1{margin:6px 0 10px;color:var(--z-ink);font:800 37px/1.08 "Plus Jakarta Sans",Inter,sans-serif;letter-spacing:-.7px}
+.training-guide-hero p{margin:0;color:var(--z-ink-2);font-size:14px;line-height:1.65}
+.training-guide-video-card{margin-top:18px;background:#fff;border:1.5px solid var(--z-line);border-radius:16px;overflow:hidden;box-shadow:var(--z-shadow-sm)}
+.training-guide-video-head{padding:15px 18px;display:flex;align-items:center;justify-content:space-between;gap:14px;background:#f8fafc;border-bottom:1px solid var(--z-line)}
+.training-guide-admin{display:flex;align-items:center;gap:10px}
+.training-guide-avatar{width:34px;height:34px;border-radius:50%;display:grid;place-items:center;background:#d6a125;color:#fff;font-size:11px;font-weight:900}
+.training-guide-admin strong{display:block;color:var(--z-ink);font-size:12px}
+.training-guide-admin span{display:block;margin-top:2px;color:var(--z-muted);font-size:10.5px}
+.training-guide-tags{display:flex;gap:6px;flex-wrap:wrap}.training-guide-tags span{padding:5px 8px;border-radius:999px;background:#edf3ff;color:#315f9f;font-size:9px;font-weight:900}.training-guide-tags span:first-child{background:var(--z-gold-soft);color:#815500}
+.training-guide-video-body{padding:18px}
+.training-guide-video-body h2{margin:0 0 13px;color:var(--z-ink);font:800 18px/1.3 "Plus Jakarta Sans",Inter,sans-serif}
+.training-guide-media{height:330px;border-radius:13px;overflow:hidden;position:relative;background:#0a1728}
+.training-guide-media img{width:100%;height:100%;object-fit:cover}
+.training-guide-media:after{content:"";position:absolute;inset:0;background:rgba(4,17,36,.22)}
+.training-guide-play{position:absolute;z-index:2;left:50%;top:50%;transform:translate(-50%,-50%);width:62px;height:62px;border-radius:50%;border:0;background:#dca91f;color:#fff;display:grid;place-items:center;box-shadow:0 10px 24px rgba(0,0,0,.25)}
+.training-guide-play svg{width:25px;height:25px;fill:currentColor;margin-left:3px}
+
+/* LEGACY LIGHT AUDIT — pages that still emitted dark inline styles */
+body.premium-training.premium-route-roadmap #page .page-header h1,
+body.premium-training.premium-route-roadmap #page .page-header .sub,
+body.premium-training.premium-route-videos #page h1,
+body.premium-training.premium-route-videos #page h3,
+body.premium-training.premium-route-book #page h1,
+body.premium-training.premium-route-book #page h2,
+body.premium-training.premium-route-book #page h3,
+body.premium-training.premium-route-book #page h4,
+body.premium-training.premium-route-watch .watch-layout>div:last-child h3,
+body.premium-training.premium-route-watch .watch-layout>div:last-child h4,
+body.premium-training.premium-route-visual .visual-layout h2,
+body.premium-training.premium-route-visual .visual-layout h3,
+body.premium-training.premium-route-visual .visual-layout h4{
+  color:var(--z-ink)!important
+}
+body.premium-training.premium-route-roadmap #page .page-header .sub,
+body.premium-training.premium-route-videos #page p,
+body.premium-training.premium-route-book #page p,
+body.premium-training.premium-route-book #page li,
+body.premium-training.premium-route-watch .watch-layout>div:last-child p,
+body.premium-training.premium-route-visual .visual-layout p{
+  color:var(--z-muted)!important
+}
+body.premium-training.premium-route-book #page strong,
+body.premium-training.premium-route-visual .visual-layout strong{color:var(--z-ink)!important}
+body.premium-training.premium-route-videos #page>div:nth-child(2) [style*="color:#ffffff"],
+body.premium-training.premium-route-videos #page>div:nth-child(2) [style*="color:#a3a3a3"],
+body.premium-training.premium-route-watch #page>div:nth-child(2) [style*="color:#ffffff"],
+body.premium-training.premium-route-watch #page>div:nth-child(2) [style*="color:#a3a3a3"]{color:var(--z-ink-2)!important}
+body.premium-training.premium-route-roadmap #page>div[style*="justify-content:space-between"] [style*="color:#fff"]{color:var(--z-ink)!important}
+body.premium-training.premium-route-roadmap #page>div[style*="justify-content:space-between"] [style*="background:#0d0d0d"]{background:#e7edf4!important;border-color:#d8e1eb!important}
+body.premium-training.premium-route-book #page>div:first-child [style*="color:#ffffff"]{color:var(--z-ink)!important}
+body.premium-training.premium-route-book #page>div:first-child [style*="color:#a3a3a3"]{color:var(--z-muted)!important}
+body.premium-training.premium-route-visual .visual-layout>div:first-child>div>div:first-child h2,
+body.premium-training.premium-route-visual .visual-layout>div:first-child>div>div:first-child p{color:var(--z-ink)!important}
+body.premium-training.premium-route-visual .visual-layout>div:first-child>div>div:first-child [style*="color:#a3a3a3"]{color:#69778b!important}
+
+/* Responsive audit */
+@media(max-width:900px){
+  body.premium-training .dash-modal.ci-modal{width:min(820px,calc(100vw - 24px))!important;max-height:calc(100dvh - 24px)!important}
+  body.premium-training .ci-modal .ci-form{grid-template-columns:1fr!important}
+  body.premium-training .ci-modal .ci-side{position:static!important}
+  .training-calendar-head,.training-recordings-head{align-items:flex-start;flex-direction:column;gap:10px}
+  .training-recording-card{grid-template-columns:260px minmax(0,1fr)}
+}
+@media(max-width:680px){
+  body.premium-training .dash-overlay{padding:8px!important;align-items:flex-start!important}
+  body.premium-training .dash-modal.ci-modal{width:calc(100vw - 16px)!important;max-height:calc(100dvh - 16px)!important;padding:14px!important;border-radius:15px!important}
+  body.premium-training .ci-modal .ci-qs{grid-template-columns:1fr!important}
+  body.premium-training .ci-modal .ci-q:nth-child(3){grid-column:auto}
+  body.premium-training .ci-modal .ci-claim{align-items:flex-start!important}
+  body.premium-training .ci-modal .btn-claim{width:100%!important}
+  .training-calendar-shell,.training-recordings-shell,.training-guide-shell{max-width:none}
+  .training-calendar-card{overflow-x:auto}
+  body.premium-training .training-calendar-card .cal-grid{min-width:640px}
+  .training-recording-card{grid-template-columns:1fr}
+  .training-recording-thumb{min-height:210px}
+  .training-guide-hero{padding:28px 24px;min-height:270px;background:linear-gradient(90deg,rgba(255,255,255,.97),rgba(255,255,255,.86)),url("assets/stock/classroom.jpg") center/cover no-repeat}
+  .training-guide-hero h1{font-size:31px}
+  .training-guide-video-head{align-items:flex-start;flex-direction:column}.training-guide-media{height:240px}
+}
+@media(max-width:460px){
+  .training-calendar-head h1,.training-recordings-head h1{font-size:27px}
+  .training-calendar-toolbar{padding:11px 12px}.training-calendar-toolbar strong{font-size:14px}
+  body.premium-training .training-calendar-shell .event-row{flex-direction:column!important}
+  body.premium-training .training-calendar-shell .event-dcol{min-width:0!important;border-right:0!important;border-bottom:1px solid #ead79f!important;flex-direction:row!important;gap:8px!important;justify-content:flex-start!important}
+  .training-recording-actions{flex-direction:column}.training-recording-actions button{width:100%}
+}

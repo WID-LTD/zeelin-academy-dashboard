@@ -1746,71 +1746,16 @@ function renderProfile() {
 
 /* ============ SECONDARY PAGES ============ */
 function renderGuide() {
-  $('#page').innerHTML = `
-    <div style="padding:24px;max-width:900px;margin:0 auto;width:100%;box-sizing:border-box;">
-      <div style="font-size:13px;color:#a3a3a3;margin-bottom:12px;display:flex;align-items:center;gap:6px;">
-        <span>User Guide</span><span>/</span><span style="color:#ffffff;">Day 1 Overview</span>
-      </div>
-      <div style="background:linear-gradient(135deg, #2c1a0e 0%, #1a1a1a 100%);border:1px solid #3d2411;border-radius:12px;padding:40px 20px;text-align:center;margin-bottom:24px;position:relative;overflow:hidden;">
-        <h1 style="font-size:28px;font-weight:700;color:#ffffff;margin:0 0 12px 0;letter-spacing:-0.5px;">Zeelin Academy Job Readiness System</h1>
-        <div style="display:inline-block;background-color:#b45309;color:#ffffff;font-size:13px;font-weight:600;padding:8px 16px;border-radius:6px;margin-bottom:16px;">Start here. Five minutes now saves hours later.</div>
-        <p style="font-size:13px;color:#d4d4d4;max-width:500px;margin:0 auto;line-height:1.5;">A quick tour of your Job Readiness System so you know exactly where everything lives, and how to get the most out of the next weeks.</p>
-      </div>
-      <div style="background-color:#181818;border:1px solid #2a2a2a;border-radius:10px;overflow:hidden;margin-bottom:24px;">
-        <div style="padding:20px;border-bottom:1px solid #2a2a2a;display:flex;align-items:center;justify-content:space-between;">
-          <div style="display:flex;align-items:center;gap:12px;">
-            <div style="width:36px;height:36px;border-radius:50%;background-color:#d97706;display:flex;align-items:center;justify-content:center;font-weight:bold;color:white;font-size:14px;">ZA</div>
-            <div>
-              <div style="font-size:14px;font-weight:600;color:#ffffff;">Zeelin Admin | Support Team</div>
-              <div style="font-size:12px;color:#a3a3a3;">Lead Educator &bull; Aug 1</div>
-            </div>
-          </div>
-          <div style="display:flex;gap:8px;">
-            <span style="background-color:#262626;color:#d97706;font-size:11px;font-weight:600;padding:4px 8px;border-radius:4px;">Admin</span>
-            <span style="background-color:#262626;color:#38bdf8;font-size:11px;font-weight:600;padding:4px 8px;border-radius:4px;">Navigator</span>
-          </div>
-        </div>
-        <div style="padding:20px;">
-          <h2 style="font-size:18px;font-weight:600;color:#ffffff;margin:0 0 16px 0;">MUST WATCH FIRST! Welcome to Zeelin Academy</h2>
-          <div style="width:100%;height:320px;border-radius:8px;overflow:hidden;background-color:#262626;position:relative;">
-            <img loading="lazy" decoding="async" src="assets/stock/classroom.jpg" alt="Learning platform preview" style="width:100%;height:100%;object-fit:cover;">
-            <div style="position:absolute;inset:0;background:rgba(0,0,0,0.3);display:flex;align-items:center;justify-content:center;">
-              <div onclick="window._playWelcome()" style="width:60px;height:60px;background-color:#d97706;border-radius:50%;display:flex;align-items:center;justify-content:center;box-shadow:0 4px 12px rgba(0,0,0,0.5);cursor:pointer;">
-                <svg style="width:24px;height:24px;fill:white;margin-left:3px;" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>`;
-  $('#page').addEventListener('click', backLink);
+  $('#page').innerHTML=
+    '<div class="training-guide-shell">'
+    +'<div class="training-guide-crumb">User Guide <span> / </span> <b>Day 1 Overview</b></div>'
+    +'<section class="training-guide-hero"><span>START HERE</span><h1>Zeelin Academy Job Readiness System</h1><p>A five-minute orientation to the training portal, your daily learning flow, and where to find the tools you will use throughout the programme.</p></section>'
+    +'<section class="training-guide-video-card"><div class="training-guide-video-head"><div class="training-guide-admin"><div class="training-guide-avatar">ZA</div><div><strong>Zeelin Admin | Support Team</strong><span>Lead Educator · Portal Orientation</span></div></div><div class="training-guide-tags"><span>Admin</span><span>Navigator</span></div></div>'
+    +'<div class="training-guide-video-body"><h2>MUST WATCH FIRST! Welcome to Zeelin Academy</h2><div class="training-guide-media"><img loading="lazy" decoding="async" src="assets/stock/classroom.jpg" alt="Zeelin Academy training orientation"><button type="button" class="training-guide-play" onclick="window._playWelcome()" aria-label="Play Zeelin Academy welcome video"><svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg></button></div></div></section>'
+    +'</div>';
+  $('#page').addEventListener('click',backLink);
 }
-window._playWelcome = function(){ go('/watch/v1'); };
-window._enterCommunityRoom = function(id){ go('/community/' + id); };
-window._communityBack = function(){ go('/community'); };
-window._sendRoomPost = function(room){
-  const ta = $('#roomComposerText');
-  const v = ta ? String(ta.value||'').trim() : '';
-  if(!v){ toast('Write something first'); return; }
-  const s = socialState();
-  s.posts = s.posts || [];
-  s.posts.unshift({ id:'u'+Date.now(), author:'John Doe', initials:'JD', color:'#D4A02A', tag:room==='study-group'?'Study Group':room==='exam-prep'?'Exam Prep':room==='accountability'?'Accountability':'General', reacts:'0 likes · 0 replies', time:'Just now', title:'', body:v, mine:true, room:room });
-  socialSave(s); route(); toast('Posted to community room');
-};
-window._toggleCommunityReplies = function(id){
-  const el = $('#communityReplies-'+id);
-  if(el) el.hidden = !el.hidden;
-};
-window._sendCommunityReply = function(id, room){
-  const input = $('#replyInput-'+id);
-  const v = input ? String(input.value||'').trim() : '';
-  if(!v){ toast('Write a reply first'); return; }
-  const s = socialState();
-  s.replies = s.replies || {};
-  s.replies[id] = s.replies[id] || [];
-  s.replies[id].push({body:v,time:'Just now'});
-  socialSave(s); route(); toast('Reply posted');
-};
+
 function renderCommunity() {
   const rooms = [
     { id:'general', name:'General Community', kicker:'OPEN LOUNGE', desc:'Ask questions, share study wins and connect with the wider Zeelin Academy cohort.', members:'128 members', online:'12 online', icon:'users', tone:'gold' },
@@ -1941,113 +1886,106 @@ function renderCommunity() {
     </div>`;
   $('#page').addEventListener('click', backLink);
 }
+let CAL_VIEW = (function(){
+  const first=(typeof CALENDAR_EVENTS!=='undefined'&&CALENDAR_EVENTS&&CALENDAR_EVENTS[0])||null;
+  const now=new Date();
+  return {y:first&&first.year?first.year:now.getFullYear(),m:first&&first.month?Math.max(0,first.month-1):now.getMonth()};
+})();
+window._calNav=function(delta){
+  let m=CAL_VIEW.m+Number(delta||0),y=CAL_VIEW.y;
+  if(m<0){m=11;y--;} if(m>11){m=0;y++;}
+  CAL_VIEW={m,y}; renderCalendar();
+};
+window._calAdd=function(id){
+  const ev=CALENDAR_EVENTS.find(x=>x.id===id);
+  if(!ev) return;
+  const dt=String(ev.year||CAL_VIEW.y)+String(ev.month||CAL_VIEW.m+1).padStart(2,'0')+String(ev.date).padStart(2,'0');
+  const ics=['BEGIN:VCALENDAR','VERSION:2.0','PRODID:-//Zeelin Academy//Training Portal//EN','BEGIN:VEVENT','UID:'+ev.id+'@zeelin.academy','DTSTART:'+dt+'T140000','SUMMARY:'+String(ev.title||'Zeelin Academy Event').replace(/[\n\r]/g,' '),'DESCRIPTION:'+String(ev.meta||'').replace(/[\n\r]/g,' '),'END:VEVENT','END:VCALENDAR'].join('\r\n');
+  const a=document.createElement('a');
+  a.href=URL.createObjectURL(new Blob([ics],{type:'text/calendar'}));
+  a.download='zeelin-'+ev.id+'.ics';
+  document.body.appendChild(a);a.click();a.remove();
+  setTimeout(()=>URL.revokeObjectURL(a.href),250);
+  toast('Calendar file created');
+};
+window._calDetails=function(id){
+  const el=document.getElementById('calDet-'+id);
+  if(!el) return;
+  const open=el.hidden;
+  el.hidden=!open;
+  const btn=document.querySelector('[data-cal-details="'+id+'"]');
+  if(btn){btn.setAttribute('aria-expanded',open?'true':'false');btn.textContent=open?'Hide Details':'View Details';}
+};
 function renderCalendar() {
-  const y = CAL_VIEW.y, m = CAL_VIEW.m;
-  const first = (new Date(y, m, 1).getDay() + 6) % 7;
-  const dim = new Date(y, m + 1, 0).getDate();
-  const prevDim = new Date(y, m, 0).getDate();
-  const ev = CALENDAR_EVENTS.filter((e) => e.year === y && (e.month - 1) === m);
-  const dotColor = { amber:'#d97706', blue:'#38bdf8' };
-  let cells = '';
-  for (let i = first - 1; i >= 0; i--) cells += `<div style="padding:10px;color:#404040;">${prevDim - i}</div>`;
-  for (let d = 1; d <= dim; d++) {
-    const dots = ev.filter((e) => e.date === d).map((e) => `<div style="width:4px;height:4px;background-color:${dotColor[e.color]||'#d97706'};border-radius:50%;margin:2px auto 0 auto;"></div>`).join('');
-    cells += `<div style="padding:10px;color:#a3a3a3;">${d}${dots}</div>`;
-  }
-  const mShort = MONTHS[m].slice(0, 3);
-  const cards = ev.map((e) => {
-    const time = String(e.meta||'').split('\u2014')[0].trim();
-    const pill = (e.pills&&e.pills[0]) || { text:'Session', cls:'' };
-    const pillStyle = pill.cls === 'pill-blue'
-      ? 'background-color:#1e293b;color:#38bdf8;'
-      : 'background-color:#382818;color:#d97706;';
-    return `<div style="background-color:#181818;border:1px solid #2a2a2a;border-radius:10px;overflow:hidden;margin-bottom:16px;display:flex;align-items:stretch;">`
-      + `<div style="background-color:#26170b;border-right:1px solid #3d2411;padding:20px;display:flex;flex-direction:column;align-items:center;justify-content:center;min-width:90px;text-align:center;">`
-      + `<span style="font-size:11px;font-weight:600;color:#d97706;text-transform:uppercase;letter-spacing:0.5px;">${mShort}</span>`
-      + `<span style="font-size:24px;font-weight:700;color:#ffffff;line-height:1.1;">${String(e.date).padStart(2,'0')}</span>`
-      + `<span style="font-size:11px;color:#a3a3a3;">${esc(e.dow||'')} &bull; ${esc(time)}</span></div>`
-      + `<div style="padding:20px;flex:1;display:flex;flex-direction:column;justify-content:center;">`
-      + `<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;">`
-      + `<h3 style="font-size:16px;font-weight:600;color:#ffffff;margin:0;">${esc(e.title)}</h3>`
-      + `<span style="${pillStyle}font-size:11px;font-weight:600;padding:3px 8px;border-radius:4px;">${esc(pill.text)}</span></div>`
-      + `<p style="font-size:13px;color:#d4d4d4;margin:0 0 12px 0;">${esc(e.meta)}</p>`
-      + `<div id="calDet-${e.id}" style="display:none;font-size:13px;color:#d4d4d4;background:#141414;border:1px solid #2a2a2a;border-radius:6px;padding:10px 12px;margin-bottom:12px;">${esc(e.title)} — ${esc(e.meta)}. Join via the cohort channel at the scheduled time.</div>`
-      + `<div style="display:flex;gap:12px;">`
-      + `<button onclick="window._calAdd('${e.id}')" style="background-color:#d97706;color:#ffffff;border:none;padding:6px 14px;border-radius:4px;font-size:12px;font-weight:600;cursor:pointer;">Add to Calendar</button>`
-      + `<button onclick="window._calDetails('${e.id}')" style="background-color:#262626;color:#a3a3a3;border:1px solid #333333;padding:6px 14px;border-radius:4px;font-size:12px;font-weight:600;cursor:pointer;">View Details</button>`
-      + `</div></div></div>`;
+  const y=CAL_VIEW.y,m=CAL_VIEW.m;
+  const first=(new Date(y,m,1).getDay()+6)%7;
+  const dim=new Date(y,m+1,0).getDate();
+  const prevDim=new Date(y,m,0).getDate();
+  const nextCount=42-first-dim;
+  const ev=CALENDAR_EVENTS.filter(e=>(e.year||y)===y&&((e.month||m+1)-1)===m);
+  const now=new Date();
+  const sameToday=now.getFullYear()===y&&now.getMonth()===m;
+  const cells=[];
+  for(let i=0;i<first;i++) cells.push({n:prevDim-first+1+i,muted:true});
+  for(let d=1;d<=dim;d++) cells.push({n:d,muted:false});
+  for(let d=1;d<=nextCount;d++) cells.push({n:d,muted:true,next:true});
+  const dotsFor=(n)=>ev.filter(e=>e.date===n).map(e=>'<span class="cal-dot '+(e.color==='blue'?'blue':'amber')+'" aria-hidden="true"></span>').join('');
+  const cards=ev.map(e=>{
+    const blue=e.color==='blue'||((e.pills&&e.pills[0]&&e.pills[0].cls)||'').includes('blue');
+    const time=String(e.meta||'').split('—')[0].split('·')[0].trim();
+    const tag=(e.pills&&e.pills[0]&&e.pills[0].text)||'Live Session';
+    return '<article class="event-row">'
+      +'<div class="event-dcol '+(blue?'blue':'')+'"><div class="bd">'+String(e.date).padStart(2,'0')+'</div><div class="bt">'+esc((e.dow||MONTHS[m].slice(0,3))+(time?' · '+time:''))+'</div></div>'
+      +'<div class="event-body"><div class="event-title">'+esc(e.title)+'</div><div class="event-meta">'+esc(e.meta||'')+'</div><span class="training-event-pill '+(blue?'blue':'')+'">'+esc(tag)+'</span>'
+      +'<div id="calDet-'+e.id+'" class="training-event-details" hidden>'+esc(e.title)+' — '+esc(e.meta||'')+'. Join through your Zeelin cohort channel at the scheduled time.</div>'
+      +'<div class="event-btns"><button type="button" class="btn btn-gradient" onclick="window._calAdd(\''+e.id+'\')">Add to Calendar</button><button type="button" class="btn btn-outline" data-cal-details="'+e.id+'" aria-expanded="false" onclick="window._calDetails(\''+e.id+'\')">View Details</button></div>'
+      +'</div></article>';
   }).join('');
-  $('#page').innerHTML = `
-    <div style="padding:24px;max-width:900px;margin:0 auto;width:100%;box-sizing:border-box;">
-      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:24px;border-bottom:1px solid #2a2a2a;padding-bottom:16px;">
-        <div>
-          <h1 style="font-size:22px;font-weight:700;color:#ffffff;margin:0 0 4px 0;">Calendar &amp; Live Events</h1>
-          <p style="font-size:13px;color:#a3a3a3;margin:0;">Interactive schedule view for ${MONTHS[m]} ${y} live workshops and Q&amp;A sessions.</p>
-        </div>
-        <div style="display:flex;gap:10px;">
-          <span style="background-color:#262626;color:#d97706;font-size:12px;font-weight:600;padding:6px 12px;border-radius:6px;border:1px solid #3d2411;">${MONTHS[m]} ${y}</span>
-        </div>
-      </div>
-      <div style="background-color:#181818;border:1px solid #2a2a2a;border-radius:10px;padding:20px;margin-bottom:24px;">
-        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;">
-          <span style="font-size:15px;font-weight:600;color:#ffffff;">${MONTHS[m]} ${y}</span>
-          <div style="display:flex;gap:6px;">
-            <button onclick="window._calNav(-1)" style="background-color:#262626;color:#a3a3a3;border:1px solid #333333;padding:4px 10px;border-radius:4px;font-size:12px;cursor:pointer;">&lt;</button>
-            <button onclick="window._calNav(1)" style="background-color:#262626;color:#a3a3a3;border:1px solid #333333;padding:4px 10px;border-radius:4px;font-size:12px;cursor:pointer;">&gt;</button>
-          </div>
-        </div>
-        <div style="display:grid;grid-template-columns:repeat(7,1fr);text-align:center;font-size:12px;font-weight:600;color:#737373;margin-bottom:8px;padding-bottom:8px;border-bottom:1px solid #262626;">
-          <span>Mon</span><span>Tue</span><span>Wed</span><span>Thu</span><span>Fri</span><span>Sat</span><span>Sun</span>
-        </div>
-        <div style="display:grid;grid-template-columns:repeat(7,1fr);gap:4px;text-align:center;font-size:12px;">${cells}</div>
-      </div>
-      ${cards || `<p style="font-size:13px;color:#737373;text-align:center;padding:12px;">No live events this month — check back soon.</p>`}
-    </div>`;
-  $('#page').addEventListener('click', backLink);
+  $('#page').innerHTML=
+    '<div class="training-calendar-shell">'
+    +'<header class="training-calendar-head"><div><div class="training-calendar-eyebrow">SCHEDULE & LIVE LEARNING</div><h1>Calendar & Live Events</h1><p>Your workshops, cohort sessions and live learning schedule in one place.</p></div><span class="training-calendar-month-chip">'+MONTHS[m]+' '+y+'</span></header>'
+    +'<section class="training-calendar-card" aria-label="'+MONTHS[m]+' '+y+' calendar">'
+    +'<div class="training-calendar-toolbar"><strong>'+MONTHS[m]+' '+y+'</strong><div class="training-calendar-nav"><button type="button" onclick="window._calNav(-1)" aria-label="Previous month">‹</button><button type="button" onclick="window._calNav(1)" aria-label="Next month">›</button></div></div>'
+    +'<div class="cal-grid">'
+    +['Mon','Tue','Wed','Thu','Fri','Sat','Sun'].map(d=>'<div class="cal-dow">'+d+'</div>').join('')
+    +cells.map(c=>'<div class="cal-day'+(c.muted?' pm':'')+(!c.muted&&sameToday&&c.n===now.getDate()?' today':'')+'"><span class="d">'+c.n+'</span>'+(!c.muted?dotsFor(c.n):'')+'</div>').join('')
+    +'</div><div class="training-calendar-legend"><span><i class="gold"></i> Workshop / cohort event</span><span><i class="blue"></i> Q&A / special session</span></div></section>'
+    +'<section class="training-calendar-events"><div class="training-calendar-events-head"><h2>Upcoming this month</h2><span>'+ev.length+' scheduled event'+(ev.length===1?'':'s')+'</span></div>'
+    +(cards||'<div class="training-calendar-empty">No live events are scheduled for this month yet.</div>')
+    +'</section></div>';
+  $('#page').addEventListener('click',backLink);
 }
+
+let REC_FILTER='all';
+window._recFilter=function(value){REC_FILTER=value||'all';renderRecordings();};
+window._playRec=function(id){
+  const idx=Math.max(0,RECORDINGS.findIndex(x=>x.id===id));
+  const vids=(typeof VIDEOS!=='undefined'&&VIDEOS)||[];
+  const target=vids[idx]||vids[0];
+  if(target) go('/watch/'+target.id);
+  else toast('Recording playback is not available yet');
+};
 function renderRecordings() {
-  const HOST = {
-    r1: { init:'ZA', color:'#D4A02A', name:'Zeelin Academy Education Team', sub:'Live Workshop Replay &bull; Recorded Jul 28', tag:'Current Event', tagBg:'#382818', tagColor:'#d97706' },
-    r2: { init:'OE', color:'#2563eb', name:'Dr. O. Emeka', sub:'Previous Workshop Replay &bull; Recorded Jul 20', tag:'Previous Event', tagBg:'#1e293b', tagColor:'#38bdf8' },
-  };
-  const list = RECORDINGS.filter((x) => REC_FILTER === 'all' || (REC_FILTER === 'current' ? /current/i.test(x.badge.text) : /previous/i.test(x.badge.text)));
-  const cards = list.map((x) => {
-    const h = HOST[x.id] || { init:'ZA', color:'#D4A02A', name:x.host.name, sub:x.meta, tag:x.badge.text, tagBg:'#382818', tagColor:'#d97706' };
-    return `<div style="background-color:#181818;border:1px solid #2a2a2a;border-radius:10px;overflow:hidden;margin-bottom:24px;">`
-      + `<div style="padding:20px;border-bottom:1px solid #2a2a2a;display:flex;align-items:center;justify-content:space-between;">`
-      + `<div style="display:flex;align-items:center;gap:12px;">`
-      + `<div style="width:36px;height:36px;border-radius:50%;background-color:${h.color};display:flex;align-items:center;justify-content:center;font-weight:bold;color:white;font-size:14px;">${h.init}</div>`
-      + `<div><div style="font-size:14px;font-weight:600;color:#ffffff;">${esc(h.name)}</div>`
-      + `<div style="font-size:12px;color:#a3a3a3;">${h.sub}</div></div></div>`
-      + `<span style="background-color:${h.tagBg};color:${h.tagColor};font-size:11px;font-weight:600;padding:4px 8px;border-radius:4px;">${esc(h.tag)}</span></div>`
-      + `<div style="padding:20px;">`
-      + `<h2 style="font-size:18px;font-weight:600;color:#ffffff;margin:0 0 16px 0;">${esc(x.title)}</h2>`
-      + `<div style="width:100%;height:320px;border-radius:8px;overflow:hidden;background-color:#262626;position:relative;">`
-      + `<img loading="lazy" decoding="async" src="${x.cover}" alt="Recording video thumbnail" style="width:100%;height:100%;object-fit:cover;">`
-      + `<div style="position:absolute;inset:0;background:rgba(0,0,0,0.3);display:flex;align-items:center;justify-content:center;">`
-      + `<div onclick="window._playRec('${x.id}')" style="width:60px;height:60px;background-color:#d97706;border-radius:50%;display:flex;align-items:center;justify-content:center;box-shadow:0 4px 12px rgba(0,0,0,0.5);cursor:pointer;">`
-      + `<svg style="width:24px;height:24px;fill:white;margin-left:3px;" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>`
-      + `</div></div></div></div></div>`;
+  const list=RECORDINGS.filter(x=>REC_FILTER==='all'||(REC_FILTER==='current'?/current/i.test(x.badge.text):/previous/i.test(x.badge.text)));
+  const cards=list.map((x,i)=>{
+    const previous=/previous/i.test(x.badge.text);
+    const initials=previous?'OE':'ZA';
+    const host=previous?'Dr. O. Emeka':'Zeelin Academy Education Team';
+    return '<article class="training-recording-card">'
+      +'<div class="training-recording-thumb"><img loading="lazy" decoding="async" src="'+x.cover+'" alt="Recording thumbnail for '+esc(x.title)+'"><button class="training-recording-play" type="button" onclick="window._playRec(\''+x.id+'\')" aria-label="Play '+esc(x.title)+'"><svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg></button></div>'
+      +'<div class="training-recording-body"><div class="training-recording-meta"><span class="training-recording-avatar">'+initials+'</span><span>'+host+'</span><span class="training-recording-tag '+(previous?'blue':'')+'">'+esc(x.badge.text)+'</span></div>'
+      +'<h2>'+esc(x.title)+'</h2><p>'+esc(x.meta||'Workshop replay from the Zeelin Academy training calendar.')+'</p>'
+      +'<div class="training-recording-actions"><button type="button" class="btn btn-gradient" onclick="window._playRec(\''+x.id+'\')">Replay Recording</button></div></div></article>';
   }).join('');
-  $('#page').innerHTML = `
-    <div style="padding:24px;max-width:900px;margin:0 auto;width:100%;box-sizing:border-box;">
-      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:24px;border-bottom:1px solid #2a2a2a;padding-bottom:16px;">
-        <div>
-          <h1 style="font-size:22px;font-weight:700;color:#ffffff;margin:0 0 4px 0;">Event Recordings &amp; Archives</h1>
-          <p style="font-size:13px;color:#a3a3a3;margin:0;">Access video replays of current events, previous workshops, and cohort sessions.</p>
-        </div>
-        <div style="display:flex;gap:10px;">
-          <select onchange="window._recFilter(this.value)" style="background-color:#181818;border:1px solid #2a2a2a;padding:6px 12px;border-radius:6px;font-size:13px;color:#a3a3a3;cursor:pointer;outline:none;font-family:inherit;">`
-          + `<option value="all"${REC_FILTER==='all'?' selected':''}>All Categories</option>`
-          + `<option value="current"${REC_FILTER==='current'?' selected':''}>Current Event</option>`
-          + `<option value="previous"${REC_FILTER==='previous'?' selected':''}>Previous Event</option>`
-          + `</select>
-        </div>
-      </div>
-      ${cards || `<p style="font-size:13px;color:#737373;text-align:center;padding:12px;">No recordings in this category.</p>`}
-    </div>`;
-  $('#page').addEventListener('click', backLink);
+  $('#page').innerHTML=
+    '<div class="training-recordings-shell">'
+    +'<header class="training-recordings-head"><div><div class="training-calendar-eyebrow">PLAYBACK LIBRARY</div><h1>Event Recordings & Archives</h1><p>Rewatch live workshops, cohort sessions and previous events without leaving your training flow.</p></div>'
+    +'<select class="training-recordings-filter" aria-label="Filter recordings" onchange="window._recFilter(this.value)"><option value="all"'+(REC_FILTER==='all'?' selected':'')+'>All Categories</option><option value="current"'+(REC_FILTER==='current'?' selected':'')+'>Current Event</option><option value="previous"'+(REC_FILTER==='previous'?' selected':'')+'>Previous Event</option></select></header>'
+    +(cards||'<div class="training-calendar-empty">No recordings are available in this category.</div>')
+    +'</div>';
+  $('#page').addEventListener('click',backLink);
 }
+
 function renderSupport() {
   $('#page').innerHTML = `
     ${backBtn()}
