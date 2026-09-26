@@ -152,20 +152,90 @@ const PROJ_BADGES = {supported:['#26170b','#f59e0b'],mandate:['#172554','#60a5fa
 function viewModes(){
   const proj=getProject(currentProjectId);
   const cp=proj.catalog||null;
-  const cards=PROJECTS.map(p=>{
+  const modeMeta={
+    supported:{
+      label:'Mentor guided',short:'Supported',tone:'gold',
+      intro:'Structured delivery with expert checkpoints and direct feedback.',
+      benefits:['Dedicated mentor checkpoints','Weekly sprint rhythm','Direct review and feedback'],
+      foot:'Best when you want structure and support.'
+    },
+    mandate:{
+      label:'Independent',short:'Mandatory',tone:'blue',
+      intro:'Own the brief, priorities and deadlines with a real-world delivery mindset.',
+      benefits:['Self-directed execution','Deadline ownership','Portfolio-ready evidence'],
+      foot:'Best when you want to prove independent delivery.'
+    },
+    group:{
+      label:'Team delivery',short:'Group',tone:'green',
+      intro:'Work as a delivery team, coordinate stand-ups and review each other’s output.',
+      benefits:['Shared team workspace','Stand-ups and collaboration','Peer review workflow'],
+      foot:'Best when you want realistic team experience.'
+    }
+  };
+  const cards=PROJECTS.map((p,index)=>{
     const m=PROJ_METRICS[p.id]||['Readiness','Score','Days'];
-    return `<article class="apm-card">
-      <div class="apm-ico"><svg viewBox="0 0 24 24">${p.icon}</svg></div>
-      <div class="apm-badges"><span class="apm-badge">${esc(p.badge||p.name)}</span><span class="apm-badge">${p.mode==='guided'?'Mentor Guided':'Independent'}</span></div>
-      <h2>${esc(p.name)}</h2>
-      <p>${esc(p.desc)}</p>
-      <div class="apm-progress"><div class="apm-progress-top"><span>Progress</span><b>${p.progress}%</b></div><div class="apm-track"><i style="width:${p.progress}%"></i></div></div>
-      <div class="apm-stats"><div class="apm-stat"><small>${esc(m[0])}</small><b>${esc(p.readiness)}</b></div><div class="apm-stat"><small>${esc(m[1])}</small><b>${esc(p.stat2)}</b></div><div class="apm-stat"><small>${esc(m[2])}</small><b>${esc(p.stat3)}</b></div></div>
-      <button onclick="_enterProject('${p.id}')">${esc(p.btnLabel||'Open Mode')} →</button>
+    const meta=modeMeta[p.id]||modeMeta.supported;
+    const current=(typeof currentMode!=='undefined'&&currentMode===p.id);
+    const iconPath=String(p.icon||'').replace(/stroke="#ffffff"/g,'').replace(/fill="none"/g,'');
+    return `<article class="apm-card apm-card-${meta.tone}${current?' is-current':''}">
+      <div class="apm-card-accent"></div>
+      <div class="apm-card-top">
+        <div class="apm-ico"><svg viewBox="0 0 24 24" aria-hidden="true">${iconPath}</svg></div>
+        <span class="apm-number">0${index+1}</span>
+      </div>
+      <div class="apm-badges">
+        <span class="apm-badge apm-badge-primary">${esc(meta.short)}</span>
+        <span class="apm-badge">${esc(meta.label)}</span>
+        ${current?'<span class="apm-badge apm-badge-current">Current mode</span>':''}
+      </div>
+      <div class="apm-card-copy">
+        <h2>${esc(p.name)}</h2>
+        <p>${esc(meta.intro)}</p>
+      </div>
+      <div class="apm-benefits">
+        ${meta.benefits.map(x=>`<div><span aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M9.2 16.4L4.8 12l1.6-1.6 2.8 2.8 8.4-8.4 1.6 1.6-10 10z"/></svg></span><b>${esc(x)}</b></div>`).join('')}
+      </div>
+      <div class="apm-progress">
+        <div class="apm-progress-top"><span>Project progress</span><b>${p.progress}%</b></div>
+        <div class="apm-track" role="progressbar" aria-label="${esc(p.name)} progress" aria-valuemin="0" aria-valuemax="100" aria-valuenow="${p.progress}"><i style="width:${p.progress}%"></i></div>
+      </div>
+      <div class="apm-stats">
+        <div class="apm-stat"><small>${esc(m[0])}</small><b>${esc(p.readiness)}</b></div>
+        <div class="apm-stat"><small>${esc(m[1])}</small><b>${esc(p.stat2)}</b></div>
+        <div class="apm-stat"><small>${esc(m[2])}</small><b>${esc(p.stat3)}</b></div>
+      </div>
+      <div class="apm-card-footnote">${esc(meta.foot)}</div>
+      <button type="button" onclick="_enterProject('${p.id}')" aria-label="${esc(p.btnLabel||'Open Mode')} — ${esc(p.name)}"><span>${esc(p.btnLabel||'Open Mode')}</span><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 11h11.2l-4.6-4.6L13 5l7 7-7 7-1.4-1.4 4.6-4.6H5v-2z"/></svg></button>
     </article>`;
   }).join('');
-  return dashTopbarHtml()+`<main class="apm"><section class="apm-hero"><a class="apm-back" href="#dashboard">← Back to Projects</a><span class="apm-kicker">INSIDE ${esc(cp?cp.title:'CURRENT PROJECT')}</span><h1>Project Modes</h1><p>Choose how you want to complete this project. Supported, Mandate and Group remain separate experiences inside the same project workspace.</p></section><section class="apm-grid">${cards}</section></main>`;
-} /* ─── Daily Check-In gate: pops up before entering a project ─── */
+  const projectTitle=cp?cp.title:'Current Project';
+  const role=cp?cp.jobRole:'Project workspace';
+  return dashTopbarHtml()+`<main class="apm">
+    <section class="apm-hero">
+      <div class="apm-hero-main">
+        <a class="apm-back" href="#dashboard"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20 11H7.8l5.6-5.6L12 4l-8 8 8 8 1.4-1.4L7.8 13H20v-2z"/></svg><span>Back to Projects</span></a>
+        <span class="apm-kicker">CHOOSE YOUR DELIVERY EXPERIENCE</span>
+        <h1>Project Modes</h1>
+        <p>Complete the same project in the working model that fits your development goal. Your project workspace stays connected while each mode keeps its own delivery experience.</p>
+      </div>
+      <aside class="apm-project-summary" aria-label="Current project">
+        <span class="apm-summary-label">Current project</span>
+        <strong>${esc(projectTitle)}</strong>
+        <span class="apm-summary-role">${esc(role)}</span>
+        <div class="apm-summary-grid">
+          <div><b>3</b><span>Delivery modes</span></div>
+          <div><b>1</b><span>Shared project</span></div>
+        </div>
+      </aside>
+    </section>
+    <div class="apm-section-head">
+      <div><span class="apm-section-kicker">WORKING MODEL</span><h2>How do you want to deliver?</h2></div>
+      <p>You can move between modes from the project navigation. Progress and evidence stay tied to this project.</p>
+    </div>
+    <section class="apm-grid" aria-label="Project delivery modes">${cards}</section>
+  </main>`;
+}
+/* ─── Daily Check-In gate: pops up before entering a project ─── */
 window._enterProject = function(pid){ const c = (typeof catalog==='function') ? catalog() : null; if(c && !c.MARKETPLACE_PROJECTS.some(p=>p.id===pid)){ if(['supported','mandate','group'].includes(pid)){ window._setMode(pid); return; } } if(state.lastCheckin === today()){ navigate('#p/'+pid+'/modes'); return; } openCheckinGate(pid);
 }; window._enterMode = function(pid, mode){ if(!['supported','mandate','group'].includes(mode)) return; currentProjectId = pid; state.currentProject = pid; currentMode = mode; state.currentMode = mode; saveState(); navigate('#p/'+pid+'/home');
 }; window._switchProject = function(pid){ currentProjectId = pid; state.currentProject = pid; saveState(); navigate('#p/'+pid+'/modes');
@@ -194,6 +264,16 @@ function gateBlockHtml(b){
     todayPlan:'Define the next outcome you want to move toward.'
   };
   const fieldHead=(forId)=>`<div class="gate-field-head">${gateBlockIcon(b.id)}<div><label class="block-label" for="${forId}">${esc(b.label)}</label><div class="gate-field-hint">${esc(hints[b.id]||'')}</div></div></div>`;
+  if(b.id==='energy'){
+    const energyOptions=[
+      {v:'energised',label:'Energised',icon:'<path d="M13.2 2L5 13h5.4L9.8 22 19 10h-5.6L13.2 2z"/>'},
+      {v:'focused',label:'Calm & Focused',icon:'<circle cx="12" cy="12" r="8"/><circle cx="12" cy="12" r="3"/>'},
+      {v:'meh',label:'Meh',icon:'<path d="M7 11h10v2H7z"/><circle cx="8" cy="8" r="1.2"/><circle cx="16" cy="8" r="1.2"/>'},
+      {v:'low',label:'Low Energy',icon:'<path d="M5 7h12v10H5zM19 10h2v4h-2zM7 9v6h4V9H7z"/>'}
+    ];
+    const options=energyOptions.map((o,i)=>`<button type="button" class="gate-energy-option" data-energy="${o.v}" role="radio" aria-checked="false" tabindex="${i===0?'0':'-1'}" onclick="window._setGateEnergy(this,'${o.v}')" onkeydown="window._energyKey(event,this)"><span class="gate-energy-icon" aria-hidden="true"><svg viewBox="0 0 24 24">${o.icon}</svg></span><span>${esc(o.label)}</span></button>`).join('');
+    return `<section class="gate-block gate-block-energy" data-block="energy"><div class="gate-field-head">${gateBlockIcon(b.id)}<div><div class="block-label" id="${fid}-label">${esc(b.label)}</div><div class="gate-field-hint">Choose the option that best matches how you feel right now.</div></div></div><input type="hidden" id="${fid}" value=""><div class="gate-energy-options" role="radiogroup" aria-labelledby="${fid}-label">${options}</div><div class="gate-energy-followup" id="${fid}-followup" hidden><label for="${fid}-note" id="${fid}-followup-label">What is influencing your energy today?</label><textarea id="${fid}-note" class="form-textarea" maxlength="600" placeholder="Add a short note..."></textarea></div></section>`;
+  }
   if(b.type==='stars'){
     let stars='',branches='';
     for(let i=1;i<=5;i++){
@@ -271,7 +351,15 @@ window._closeGate=function(){
 window._skipGate=function(){const pid=gateProjectId;window._closeGate();if(pid) navigate('#p/'+pid+'/modes');};
 window._submitCheckinGate=function(){
   const pid=gateProjectId||currentProjectId;
-  const gained=applyCheckinRewards();
+  const gate=document.getElementById('checkin-gate');
+  const selectedEnergy=gate ? gate.querySelector('.gate-energy-option[aria-checked="true"]') : null;
+  const selectedRating=gate ? gate.querySelector('.gate-stars .star-btn[aria-checked="true"]') : null;
+  const details={
+    energy:selectedEnergy ? selectedEnergy.dataset.energy : '',
+    energyNote:gate && gate.querySelector('#gate-energy-note') ? gate.querySelector('#gate-energy-note').value.trim() : '',
+    supportRating:selectedRating ? Number(selectedRating.dataset.star) : null
+  };
+  const gained=applyCheckinRewards(details);
   const proj=getProject(pid);
   const modal=document.querySelector('#checkin-gate .gate-modal');
   if(modal){
@@ -284,7 +372,7 @@ window._submitCheckinGate=function(){
   setTimeout(()=>{window._closeGate();if(pid) navigate('#p/'+pid+'/modes');},1400);
 };
 /* Shared reward logic used by gate and full-page check-in */
-function applyCheckinRewards(){ if(state.lastCheckin === today()) return false; state.lastCheckin = today(); state.xp += CHECKIN_CONFIG.xpClaim; state.streak++; state.checkins.push({date:today()}); saveState(); return true;
+function applyCheckinRewards(details){ if(state.lastCheckin === today()) return false; state.lastCheckin = today(); state.xp += CHECKIN_CONFIG.xpClaim; state.streak++; state.checkins.push(Object.assign({date:today()},details||{})); saveState(); return true;
 } function containerCard(p){ const c = catalog(); const cat = c ? c.getCategory(p.category) : {short:p.category, color:'#f59e0b', bg:'#26170b'}; const enrolled = true; const wish = (typeof mpWishlist==='function' && mpWishlist().includes(p.id)); return ` <div class="card-cell container-card" role="button" tabindex="0" data-clickable onclick="window._enterProject('${p.id}')" onkeydown="if(event.key==='Enter'){window._enterProject('${p.id}')}" style="background-color:#181818;border-radius:14px;overflow:hidden;border:2px solid #3f3f3f;display:flex;flex-direction:column;min-height:520px;cursor:pointer;"> <div class="cc-hero" style="height:190px;background:#0d0d0d url('${p.thumbnail}') center/cover no-repeat;position:relative;flex-shrink:0;"> <div style="position:absolute;inset:0;background:linear-gradient(to top, rgba(0,0,0,.72), rgba(0,0,0,.05));"></div> <div style="position:absolute;top:12px;left:12px;display:flex;gap:6px;flex-wrap:wrap;"> <span style="background:${cat.bg};color:${cat.color};font-size:10px;font-weight:800;padding:5px 10px;border-radius:999px;text-transform:uppercase;">${cat.short}</span> <span style="background:rgba(0,0,0,.6);color:#fff;font-size:10px;font-weight:700;padding:5px 10px;border-radius:999px;">${p.jobRole}</span> </div> <div style="position:absolute;bottom:12px;left:16px;right:16px;"> <div class="cc-rating" style="font-size:11px;font-weight:800;color:#fbbf24;text-transform:uppercase;">★ ${p.rating} • ${p.learners} learners</div> </div> </div> <div class="cc-body" style="padding:22px 22px 18px;flex:1;display:flex;flex-direction:column;min-width:0;"> <h3 class="cc-title" style="margin:0 0 8px 0;font-size:21px;font-weight:900;color:#ffffff;line-height:1.25;">${p.title}</h3> <p class="cc-desc" style="margin:0 0 14px 0;font-size:13.5px;color:#c6c6c6;line-height:1.55;flex:1;">${p.desc}</p> <div class="cc-pills" style="display:flex;gap:6px;flex-wrap:wrap;"> <span style="font-size:10px;font-weight:800;padding:5px 10px;border-radius:999px;background:#26170b;color:#f59e0b;">SUPPORTED INSIDE</span> <span style="font-size:10px;font-weight:800;padding:5px 10px;border-radius:999px;background:#172554;color:#60a5fa;">MANDATE INSIDE</span> <span style="font-size:10px;font-weight:800;padding:5px 10px;border-radius:999px;background:#14532d;color:#4ade80;">GROUP INSIDE</span> </div> </div> <div class="cc-side" style="padding:0 22px 22px;display:flex;flex-direction:column;gap:12px;"> <div class="cc-stats" style="display:grid;grid-template-columns:repeat(3,1fr);gap:12px;border-top:1px solid #3a3a3a;padding-top:16px;"> <div><p style="margin:0;font-size:10px;color:#8a8a8a;text-transform:uppercase;font-weight:700;">Level</p><p style="margin:4px 0 0 0;font-size:15px;font-weight:800;color:#fff;">${p.difficulty}</p></div> <div><p style="margin:0;font-size:10px;color:#8a8a8a;text-transform:uppercase;font-weight:700;">Length</p><p style="margin:4px 0 0 0;font-size:15px;font-weight:800;color:#fff;">${p.duration}</p></div> <div><p style="margin:0;font-size:10px;color:#8a8a8a;text-transform:uppercase;font-weight:700;">Price</p><p style="margin:4px 0 0 0;font-size:15px;font-weight:800;color:${p.price===0?'#4ade80':'#fbbf24'};">${p.price===0?'Free':'£'+p.price}</p></div> </div> <button onclick="event.stopPropagation();window._enterProject('${p.id}')" style="width:100%;padding:13px;border:none;border-radius:10px;background:linear-gradient(135deg,#d97706 0%,#f59e0b 100%);color:#fff;font-size:14px;font-weight:900;cursor:pointer;">Open Project →</button> </div> </div>`;
 } function viewDashboard(){
   const c = catalog();
@@ -646,7 +734,52 @@ function viewJobPortal(){ return renderTopbar('Job Acquisition Portal — Stage 
 function fireConfetti(){ const canvas = document.getElementById('confetti-canvas'); if(!canvas) return; canvas.width = window.innerWidth; canvas.height = window.innerHeight; canvas.style.display = 'block'; const ctx = canvas.getContext('2d'); const particles = []; const colors = ['#d97706','#f59e0b','#16a34a','#4ade80','#3b82f6','#ef4444','#ffffff']; for(let i=0;i<150;i++){ particles.push({ x:Math.random()*canvas.width, y:Math.random()*canvas.height - canvas.height, w:Math.random()*10+5, h:Math.random()*6+3, color:colors[Math.floor(Math.random()*colors.length)], vx:(Math.random()-0.5)*4, vy:Math.random()*3+2, rot:Math.random()*360, vr:(Math.random()-0.5)*10 }); } let frame = 0; function animate(){ ctx.clearRect(0,0,canvas.width,canvas.height); particles.forEach(p=>{ ctx.save(); ctx.translate(p.x,p.y); ctx.rotate(p.rot*Math.PI/180); ctx.fillStyle=p.color; ctx.fillRect(-p.w/2,-p.h/2,p.w,p.h); ctx.restore(); p.x+=p.vx; p.y+=p.vy; p.vy+=0.05; p.rot+=p.vr; }); frame++; if(frame<180) requestAnimationFrame(animate); else{ctx.clearRect(0,0,canvas.width,canvas.height);canvas.style.display='none';} } animate();
 } /* ─── Check-in submit ─── */
 window._submitCheckin = function(){ if(!applyCheckinRewards()) return; saveState(); const content = document.getElementById('main-content'); if(content){ content.innerHTML = ` <div style="text-align:center;padding:80px 24px;max-width:500px;margin:0 auto"> <div style="font-size:64px;margin-bottom:16px">&#x2705;</div> <h1 style="font-size:28px;font-weight:700;color:#fff;margin:0 0 8px">Check-In Complete!</h1> <p style="font-size:14px;color:#a3a3a3;margin:0 0 8px">You earned <b style="color:#d97706">+${CHECKIN_CONFIG.xpClaim} XP</b></p> <p style="font-size:13px;color:#737373;margin:0 0 24px">Streak: ${state.streak} day(s)</p> <button class="btn btn-amber" onclick="window._nav('portal')">Return to Portal</button> </div>`; } fireConfetti();
-}; /* ─── Star rating (cumulative fill: clicking N lights stars 1..N) ─── */
+}; /* ─── Energy level selector + contextual follow-up ─── */
+window._setGateEnergy = function(btn,value){
+  const wrap=btn.closest('.gate-energy-options');
+  if(!wrap) return;
+  wrap.querySelectorAll('.gate-energy-option').forEach(b=>{
+    const selected=b===btn;
+    b.classList.toggle('on',selected);
+    b.setAttribute('aria-checked',selected?'true':'false');
+    b.tabIndex=selected?0:-1;
+  });
+  const block=btn.closest('.gate-block-energy');
+  if(!block) return;
+  const hidden=block.querySelector('#gate-energy');
+  if(hidden) hidden.value=value;
+  const follow=block.querySelector('.gate-energy-followup');
+  const label=block.querySelector('#gate-energy-followup-label');
+  const note=block.querySelector('#gate-energy-note');
+  const copy={
+    energised:["What's helping you feel energised today?","Share what is working well so you can repeat it..."],
+    focused:["What's helping you stay calm and focused?","Capture the condition or habit helping you focus..."],
+    meh:["What would help lift your energy today?","Name one small change that could help..."],
+    low:["What is contributing to low energy today?","Share only what is useful for planning your workload..."]
+  };
+  const next=copy[value]||["What is influencing your energy today?","Add a short note..."];
+  if(label) label.textContent=next[0];
+  if(note) note.placeholder=next[1];
+  if(follow){follow.hidden=false;follow.classList.add('show');}
+};
+window._energyKey = function(event,btn){
+  if(!['ArrowLeft','ArrowRight','ArrowUp','ArrowDown','Home','End'].includes(event.key)) return;
+  const wrap=btn.closest('.gate-energy-options');
+  if(!wrap) return;
+  const buttons=Array.from(wrap.querySelectorAll('.gate-energy-option')),current=buttons.indexOf(btn);
+  if(current<0||!buttons.length) return;
+  event.preventDefault();
+  let next=current;
+  if(event.key==='Home') next=0;
+  else if(event.key==='End') next=buttons.length-1;
+  else if(event.key==='ArrowLeft'||event.key==='ArrowUp') next=(current-1+buttons.length)%buttons.length;
+  else next=(current+1)%buttons.length;
+  const target=buttons[next];
+  target.focus();
+  window._setGateEnergy(target,target.dataset.energy);
+};
+
+/* ─── Star rating (cumulative fill: clicking N lights stars 1..N) ─── */
 window._setStars = function(btn,val){
   const wrap=btn.closest('.stars-radio')||btn.closest('.gate-stars');
   if(!wrap) return;
