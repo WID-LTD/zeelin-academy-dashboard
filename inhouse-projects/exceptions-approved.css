@@ -11,7 +11,28 @@ body.approved-modes-route{
 body.approved-modes-route .layout.dash-mode{display:block!important;background:#eef3f9!important}
 body.approved-modes-route .layout.dash-mode>.sidebar{display:none!important}
 body.approved-modes-route .layout.dash-mode>.main{width:100%!important;background:#eef3f9!important}
-body.approved-modes-route #main-content{min-height:100vh!important;background:#eef3f9!important;color:var(--ex-ink)!important;overflow:auto!important}
+body.approved-modes-route .layout.dash-mode{height:100dvh!important;min-height:100dvh!important;overflow:hidden!important}
+body.approved-modes-route .layout.dash-mode>.main{height:100dvh!important;min-height:0!important;overflow:hidden!important}
+body.approved-modes-route #main-content{
+  height:100dvh!important;
+  min-height:0!important;
+  background:#eef3f9!important;
+  color:var(--ex-ink)!important;
+  overflow-y:auto!important;
+  overflow-x:hidden!important;
+  overscroll-behavior-y:contain;
+  scrollbar-width:thin;
+  scrollbar-color:#ffffff #dfe7f0
+}
+body.approved-modes-route #main-content::-webkit-scrollbar{width:11px}
+body.approved-modes-route #main-content::-webkit-scrollbar-track{background:#dfe7f0}
+body.approved-modes-route #main-content::-webkit-scrollbar-thumb{
+  background:#ffffff;
+  border:2px solid #cfd9e5;
+  border-radius:999px;
+  min-height:42px
+}
+body.approved-modes-route #main-content::-webkit-scrollbar-thumb:hover{background:#f8fbff;border-color:#bcc9d8}
 body.approved-modes-route .dash-topbar{height:76px!important;background:#fff!important;border:0!important;border-bottom:1px solid #dbe3ed!important;padding:0 28px!important;color:var(--ex-ink)!important}
 body.approved-modes-route .dash-topbar>div:nth-of-type(2) span{color:var(--ex-ink)!important;font:850 20px/1.1 "Plus Jakarta Sans",Inter,sans-serif!important;letter-spacing:.35px!important}
 body.approved-modes-route .dash-topbar a[href="/portal.html"]{background:#fff8e3!important;border:1px solid #ead083!important;color:#7a5b08!important}
