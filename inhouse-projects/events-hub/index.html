@@ -1,286 +1,103 @@
 <!DOCTYPE html>
-<html lang="en" class="antialiased selection:bg-amber-500/30 selection:text-white">
+<html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Events & Sessions Hub | Zeelin Academy</title>
-    
-    <!-- Tailwind CSS -->
-    <script src="https://cdn.tailwindcss.com"></script>
-    
-    <!-- Fonts: Outfit for highly geometric, technical, heavy weights requested (700-900) -->
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;700;800;900&display=swap" rel="stylesheet">
-    
-    <!-- Icons -->
-    <script src="https://unpkg.com/@phosphor-icons/web"></script>
-
-    <script>
-        tailwind.config = {
-            theme: {
-                extend: {
-                    fontFamily: {
-                        sans: ['Outfit', 'sans-serif'],
-                    },
-                    colors: {
-                        hub: {
-                            base: '#121212',
-                            surface: '#181818',
-                            border: '#3a3a3a',
-                            amber: { main: '#f59e0b', dark: '#d97706', bg: '#2c1a0e' },
-                            green: { main: '#4ade80', dark: '#16a34a' },
-                            blue:  { main: '#38bdf8', dark: '#2563eb' }
-                        }
-                    },
-                    animation: {
-                        'fade-in-up': 'fadeInUp 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards',
-                        'pulse-slow': 'pulse 3s cubic-bezier(0.4, 0, 0.6, 1) infinite',
-                    },
-                    keyframes: {
-                        fadeInUp: {
-                            '0%': { opacity: '0', transform: 'translateY(20px)' },
-                            '100%': { opacity: '1', transform: 'translateY(0)' },
-                        }
-                    }
-                }
-            }
-        }
-    </script>
-
-    <style>
-        /* Base Reset & Custom Scrollbar to maintain premium aesthetic */
-        body {
-            background-color: #121212;
-            color: #ffffff;
-            margin: 0;
-            overflow: hidden; /* Force full viewport containment */
-        }
-
-        /* Architectural Scrollbar for the main canvas */
-        .hub-scroll::-webkit-scrollbar {
-            width: 8px;
-        }
-        .hub-scroll::-webkit-scrollbar-track {
-            background: #121212;
-            border-left: 1px solid #1f1f1f;
-        }
-        .hub-scroll::-webkit-scrollbar-thumb {
-            background: #3a3a3a;
-            border-radius: 4px;
-        }
-        .hub-scroll::-webkit-scrollbar-thumb:hover {
-            background: #4a4a4a;
-        }
-
-        /* Noise Texture overlay for cinematic depth */
-        .bg-noise {
-            position: fixed;
-            top: 0; left: 0; w-full: 100vw; height: 100vh;
-            pointer-events: none;
-            z-index: 9999;
-            opacity: 0.03;
-            background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
-        }
-
-        /* Staggered entry classes for cards */
-        .stagger-1 { animation-delay: 100ms; opacity: 0; }
-        .stagger-2 { animation-delay: 200ms; opacity: 0; }
-        .stagger-3 { animation-delay: 300ms; opacity: 0; }
-        .stagger-4 { animation-delay: 400ms; opacity: 0; }
-
-        /* Liquid Refraction for Cards */
-        .glass-edge {
-            box-shadow: inset 0 1px 0 0 rgba(255, 255, 255, 0.05);
-        }
-    </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>Events & Sessions Hub | Zeelin Academy</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=Plus+Jakarta+Sans:wght@500;600;700;800&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box}
+:root{
+ --navy:#071b33;--navy2:#102d4a;--ink:#07143a;--gold:#d4a02a;--gold2:#ecc863;--gold3:#8b6f00;
+ --muted:#66748a;--line:#d9e2ec;--soft:#f4f7fb;--green:#15956f;--blue:#2f66c8;
+ --shadow:0 12px 32px rgba(23,48,82,.08);--shadow2:0 20px 42px rgba(23,48,82,.14)
+}
+html,body{margin:0;min-height:100%;background:#eef3f9;color:var(--ink);font-family:Inter,"Segoe UI",Arial,sans-serif}
+body{min-height:100vh}
+button,a{font:inherit}
+.topbar{
+ height:76px;display:grid;grid-template-columns:auto 1fr auto;align-items:center;gap:22px;padding:0 28px;
+ background:#fff;border-bottom:1px solid #dbe3ed;position:sticky;top:0;z-index:20
+}
+.logo{height:43px;width:auto;object-fit:contain;background:transparent}
+.portal{text-align:center;font:800 clamp(16px,1.5vw,22px)/1.1 "Plus Jakarta Sans",Inter,sans-serif;letter-spacing:.45px}
+.top-actions{display:flex;align-items:center;gap:9px}
+.pill{height:36px;padding:0 12px;border:1px solid var(--line);border-radius:999px;background:#fff;color:#485970;font-size:10px;font-weight:850;display:flex;align-items:center;gap:7px;text-decoration:none}
+.pill.gold{background:#fff7df;border-color:#e7ca75;color:#785a08}
+.page{max-width:1700px;margin:0 auto;padding:18px clamp(14px,2.5vw,40px) 44px}
+.back{display:inline-flex;align-items:center;gap:7px;color:#5d6e84;text-decoration:none;font-size:10px;font-weight:850;margin-bottom:14px}
+.hero{
+ min-height:300px;display:grid;grid-template-columns:minmax(0,.95fr) minmax(360px,1.05fr);
+ border:1px solid var(--line);border-radius:22px;overflow:hidden;background:#fff;box-shadow:var(--shadow)
+}
+.hero-copy{padding:34px 38px;display:flex;flex-direction:column;justify-content:center}
+.eyebrow{color:var(--gold3);font-size:10px;font-weight:900;letter-spacing:1px;text-transform:uppercase}
+.hero h1{margin:7px 0 10px;font:800 clamp(34px,3vw,48px)/1.03 "Plus Jakarta Sans",Inter,sans-serif;letter-spacing:-1.2px}
+.hero p{margin:0;color:#627187;font-size:13.5px;line-height:1.72;max-width:760px}
+.hero-meta{display:flex;gap:8px;flex-wrap:wrap;margin-top:18px}
+.meta{padding:7px 10px;border-radius:999px;background:#f6f8fb;border:1px solid #e0e7ee;color:#5b6c82;font-size:9px;font-weight:850}
+.hero-img{position:relative;background:url('https://images.unsplash.com/photo-1515187029135-18ee286d815b?auto=format&fit=crop&w=1600&q=82') center/cover no-repeat}
+.hero-img:before{content:"";position:absolute;inset:0;background:linear-gradient(90deg,#fff 0%,rgba(255,255,255,.18) 30%,rgba(7,27,51,.04) 100%)}
+.live-badge{position:absolute;right:20px;bottom:20px;padding:10px 13px;border-radius:11px;background:var(--navy);color:#fff;font-size:10px;font-weight:900;box-shadow:0 10px 22px rgba(7,27,51,.2)}
+.section-head{display:flex;align-items:end;justify-content:space-between;gap:20px;margin:22px 2px 12px}
+.section-head span{color:var(--gold3);font-size:9px;font-weight:900;letter-spacing:.9px}.section-head h2{margin:4px 0 0;font:800 24px/1.1 "Plus Jakarta Sans",Inter,sans-serif}.section-head small{color:#8491a2;font-size:10px}
+.grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px}
+.card{min-height:390px;background:#fff;border:1px solid var(--line);border-radius:18px;overflow:hidden;box-shadow:0 8px 22px rgba(28,53,84,.06);display:flex;flex-direction:column;transition:.2s}
+.card-img{height:165px;background-position:center;background-size:cover;position:relative}.card-img:after{content:"";position:absolute;inset:0;background:linear-gradient(to top,rgba(7,27,51,.48),rgba(7,27,51,.03))}
+.badge{position:absolute;z-index:2;top:14px;left:14px;padding:7px 10px;border-radius:999px;background:#fff6d9;color:#775a08;font-size:9px;font-weight:900}
+.card-body{padding:20px;display:flex;flex-direction:column;flex:1}.card-icon{width:44px;height:44px;margin-top:-42px;margin-bottom:13px;position:relative;z-index:3;border:3px solid #fff;border-radius:12px;background:#fff5d8;color:#876407;display:grid;place-items:center;box-shadow:0 6px 16px rgba(23,48,82,.12)}.card-icon svg{width:21px;height:21px;stroke:currentColor;fill:none;stroke-width:2}
+.card h3{margin:0 0 8px;font-size:19px}.card p{margin:0;color:#68778b;font-size:11.5px;line-height:1.65}.card-foot{margin-top:auto;padding-top:18px}.card-link{width:100%;min-height:43px;border-radius:10px;border:1px solid #c99a22;background:linear-gradient(135deg,var(--gold2),var(--gold));color:var(--navy);font-size:10.5px;font-weight:900;text-decoration:none;display:flex;align-items:center;justify-content:center;gap:8px}
+.support{margin-top:14px;display:flex;align-items:center;justify-content:space-between;gap:20px;padding:18px 20px;border:1px solid var(--line);border-radius:17px;background:#fff;box-shadow:var(--shadow)}
+.support-copy{display:flex;align-items:center;gap:13px}.status{width:38px;height:38px;border-radius:50%;background:#e9f7f1;color:var(--green);display:grid;place-items:center}.status:before{content:"";width:10px;height:10px;border-radius:50%;background:currentColor}.support b{display:block;font-size:12px}.support span{display:block;margin-top:3px;color:#7d899a;font-size:9.5px}.support a{min-height:39px;padding:0 14px;border-radius:9px;border:1px solid #d5b24d;background:#fff7df;color:#755707;font-size:10px;font-weight:900;text-decoration:none;display:flex;align-items:center}
+@media(hover:hover){.card:hover{transform:translateY(-6px) scale(1.012);border-color:#d4a02a;box-shadow:var(--shadow2)}.card-link:hover,.pill:hover,.support a:hover{transform:translateY(-2px);box-shadow:0 8px 18px rgba(23,48,82,.10)}}
+@media(max-width:1100px){.grid{grid-template-columns:1fr 1fr}.hero{grid-template-columns:1fr}.hero-img{min-height:240px}}
+@media(max-width:760px){.topbar{grid-template-columns:1fr auto;padding:0 14px}.portal{display:none}.top-actions .pill:not(.gold){display:none}.page{padding:12px 10px 30px}.hero-copy{padding:26px}.grid{grid-template-columns:1fr}.support{align-items:flex-start;flex-direction:column}.support a{width:100%;justify-content:center}}
+</style>
 </head>
-<body class="h-[100dvh] flex flex-col font-sans">
-    
-    <div class="bg-noise"></div>
+<body>
+<header class="topbar">
+ <img class="logo" src="../assets/logo.png" alt="Zeelin Academy">
+ <div class="portal">ZEELIN WORK EXPERIENCE PORTAL</div>
+ <div class="top-actions">
+  <a class="pill" href="../#dashboard">My Projects</a>
+  <a class="pill gold" href="../#mentorship">Mentorship Hub</a>
+ </div>
+</header>
 
-    <!-- HEADER (Macro-Architecture: Utility Layer) -->
-    <header class="shrink-0 h-[76px] bg-hub-surface border-b-[2px] border-hub-border px-6 md:px-12 flex items-center justify-between z-50 relative">
-        <div class="flex items-center gap-4">
-            <!-- Logo Mark -->
-            <div class="w-9 h-9 rounded-lg bg-gradient-to-br from-hub-amber-main to-hub-amber-dark flex items-center justify-center shadow-[0_0_15px_rgba(245,158,11,0.3)]">
-                <span class="font-black text-black text-base leading-none">W</span>
-            </div>
-            
-            <!-- Context Titles -->
-            <div class="flex flex-col justify-center">
-                <h1 class="text-[15px] font-black text-white leading-tight tracking-wide uppercase">In-House Training Portal</h1>
-                <p class="text-[11px] font-bold text-[#a3a3a3] uppercase tracking-wider">Events & Sessions Master Hub</p>
-            </div>
-        </div>
+<main class="page">
+ <a class="back" href="../#mentorship">← Back to Mentorship Hub</a>
+ <section class="hero">
+  <div class="hero-copy">
+   <span class="eyebrow">EVENTS & SESSIONS MASTER HUB</span>
+   <h1>Plan, join and revisit every learning session.</h1>
+   <p>Access synchronized calendar events, join live mentorship and cohort workshops, and return to your recording archive without losing your place in the Work Experience Portal.</p>
+   <div class="hero-meta"><span class="meta">Cohort 001 Active</span><span class="meta">West Africa Time</span><span class="meta">Mentor-led sessions</span></div>
+  </div>
+  <div class="hero-img"><span class="live-badge">Live learning workspace</span></div>
+ </section>
 
-        <!-- Status Pill -->
-        <div class="hidden sm:flex items-center gap-2 bg-hub-amber-bg border border-hub-amber-dark py-1.5 px-4 rounded-full shadow-[inset_0_1px_0_rgba(255,255,255,0.1)]">
-            <div class="w-1.5 h-1.5 rounded-full bg-hub-amber-main animate-pulse-slow"></div>
-            <span class="text-[13px] font-extrabold text-hub-amber-main uppercase tracking-wide">Cohort 001 Active</span>
-        </div>
-    </header>
+ <div class="section-head"><div><span>SESSION TOOLS</span><h2>Choose where you want to go</h2></div><small>Calendar, recordings and live mentorship stay connected</small></div>
+ <section class="grid">
+  <article class="card">
+   <div class="card-img" style="background-image:url('https://images.unsplash.com/photo-1506784983877-45594efa4cbe?auto=format&fit=crop&w=1000&q=82')"><span class="badge">SCHEDULE</span></div>
+   <div class="card-body"><div class="card-icon"><svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="17" rx="2"/><path d="M8 2v4M16 2v4M3 10h18"/></svg></div><h3>Calendar & Events</h3><p>Track cohort milestones, upcoming mentor calls, workshops and your scheduled project-review sessions.</p><div class="card-foot"><a class="card-link" href="../#mentorship/live-sessions">Open Calendar →</a></div></div>
+  </article>
+  <article class="card">
+   <div class="card-img" style="background-image:url('https://images.unsplash.com/photo-1516321318423-f06f85e504b3?auto=format&fit=crop&w=1000&q=82')"><span class="badge">ARCHIVE</span></div>
+   <div class="card-body"><div class="card-icon"><svg viewBox="0 0 24 24"><rect x="2" y="5" width="14" height="14" rx="2"/><path d="m16 10 6-3v10l-6-3z"/></svg></div><h3>Recordings</h3><p>Return to workshops, technical reviews, Q&A sessions and mentor walkthroughs whenever you need a refresher.</p><div class="card-foot"><a class="card-link" href="../#mentorship/recordings">Browse Recordings →</a></div></div>
+  </article>
+  <article class="card">
+   <div class="card-img" style="background-image:url('https://images.unsplash.com/photo-1522071820081-009f0129c71c?auto=format&fit=crop&w=1000&q=82')"><span class="badge">LIVE</span></div>
+   <div class="card-body"><div class="card-icon"><svg viewBox="0 0 24 24"><path d="M5 12a7 7 0 0 1 14 0M8 12a4 4 0 0 1 8 0"/><circle cx="12" cy="12" r="1"/><path d="M12 13v8"/></svg></div><h3>Live Sessions</h3><p>Jump into active mentor Q&A rooms, project reviews and collaborative learning sessions from the same schedule.</p><div class="card-foot"><a class="card-link" href="../#mentorship/live-sessions">Join Live Rooms →</a></div></div>
+  </article>
+ </section>
 
-    <!-- MAIN CANVAS (Macro-Architecture: Scrollable Environment) -->
-    <main class="flex-1 overflow-y-auto overflow-x-hidden hub-scroll bg-hub-base relative">
-        <!-- Inner Max-Width Container for Layout Integrity -->
-        <div class="max-w-[1200px] w-full mx-auto px-6 md:px-12 py-10 md:py-12 flex flex-col gap-10 pb-20">
-            
-            <!-- HERO BANNER (Meso-Architecture: The Billboard) -->
-            <section class="animate-fade-in-up stagger-1 relative w-full rounded-2xl border-[2px] border-hub-border overflow-hidden bg-hub-surface glass-edge min-h-[320px] flex flex-col justify-center px-8 py-10 md:px-12 md:py-14 shadow-2xl">
-                <!-- Background Image & Cinematic Overlays -->
-                <div class="absolute inset-0 z-0">
-                    <img src="https://images.unsplash.com/photo-1515187029135-18ee286d815b?auto=format&fit=crop&w=2000&q=80" alt="Abstract architectural ceiling representing master structure" class="w-full h-full object-cover object-center opacity-40">
-                    <div class="absolute inset-0 bg-gradient-to-r from-[#181818] via-[rgba(24,24,24,0.9)] to-[rgba(24,24,24,0.7)]"></div>
-                    <div class="absolute inset-0 bg-gradient-to-t from-[#181818] via-transparent to-transparent"></div>
-                </div>
-
-                <!-- Hero Content -->
-                <div class="relative z-10 max-w-2xl">
-                    <div class="inline-flex items-center gap-2 mb-4">
-                        <i class="ph-fill ph-calendar-blank text-hub-amber-main text-lg"></i>
-                        <span class="text-[12px] font-black text-hub-amber-main uppercase tracking-[0.1em]">Master Schedule Architecture</span>
-                    </div>
-                    
-                    <h2 class="text-4xl md:text-[42px] font-black text-white tracking-[-0.02em] leading-[1.1] mb-5">
-                        Events & Sessions Hub
-                    </h2>
-                    
-                    <p class="text-[15px] font-bold text-[#d4d4d4] leading-[1.6] max-w-[600px]">
-                        Seamlessly access your synchronized calendar events, tune into live workshops, and browse the comprehensive video recording archives.
-                    </p>
-                </div>
-            </section>
-
-            <!-- THREE CARDS GRID (Meso-Architecture: Interactive Core) -->
-            <section class="grid grid-cols-1 lg:grid-cols-3 gap-7">
-                
-                <!-- CARD 1: Calendar & Events -->
-                <article class="animate-fade-in-up stagger-2 group flex flex-col bg-hub-surface border-[2px] border-hub-border rounded-[14px] overflow-hidden transition-all duration-500 hover:-translate-y-[2px] hover:border-hub-amber-dark/50 hover:shadow-[0_20px_40px_-15px_rgba(217,119,6,0.15)] glass-edge">
-                    <!-- Image Header -->
-                    <div class="h-[180px] w-full relative border-b-[2px] border-hub-border overflow-hidden">
-                        <div class="absolute inset-0 bg-black/20 z-10 group-hover:bg-transparent transition-colors duration-500"></div>
-                        <img src="https://images.unsplash.com/photo-1506784983877-45594efa4cbe?auto=format&fit=crop&w=800&q=80" alt="Calendar scheduling visual" class="w-full h-full object-cover transform group-hover:scale-105 transition-transform duration-700 ease-out">
-                        
-                        <!-- Badge -->
-                        <div class="absolute top-4 left-4 z-20 bg-black/85 backdrop-blur-md border border-hub-amber-dark text-hub-amber-main px-3 py-1 text-xs font-black uppercase tracking-wider rounded-md rounded-br-[12px] shadow-[0_4px_12px_rgba(0,0,0,0.5)] flex items-center gap-1.5">
-                            <i class="ph-bold ph-calendar-check text-sm"></i>
-                            Schedule
-                        </div>
-                    </div>
-
-                    <!-- Content -->
-                    <div class="p-7 flex flex-col flex-1">
-                        <h3 class="text-[20px] font-black text-white mb-3 tracking-tight">Calendar & Events/Live</h3>
-                        <p class="text-[13px] font-bold text-[#a3a3a3] leading-[1.6] mb-8 flex-1">
-                            Interactive scheduling suite tracking cohort milestones, live workshop dates, and mentor booking timelines.
-                        </p>
-                        
-                        <!-- CTA -->
-                        <button class="w-full relative overflow-hidden bg-gradient-to-b from-hub-amber-main to-hub-amber-dark border border-hub-amber-main text-white py-3.5 px-4 rounded-[12px] rounded-br-[14px] font-black text-sm tracking-wide shadow-[0_0_20px_rgba(245,158,11,0.2)] hover:shadow-[0_0_25px_rgba(245,158,11,0.35)] transition-all active:scale-[0.98] flex justify-center items-center gap-2 group/btn">
-                            <span class="relative z-10">Open Calendar</span>
-                            <i class="ph-bold ph-arrow-right text-lg relative z-10 transform group-hover/btn:translate-x-1 transition-transform"></i>
-                        </button>
-                    </div>
-                </article>
-
-                <!-- CARD 2: Recordings -->
-                <article class="animate-fade-in-up stagger-3 group flex flex-col bg-hub-surface border-[2px] border-hub-border rounded-[14px] overflow-hidden transition-all duration-500 hover:-translate-y-[2px] hover:border-hub-green-dark/50 hover:shadow-[0_20px_40px_-15px_rgba(22,163,74,0.15)] glass-edge">
-                    <div class="h-[180px] w-full relative border-b-[2px] border-hub-border overflow-hidden">
-                        <div class="absolute inset-0 bg-black/20 z-10 group-hover:bg-transparent transition-colors duration-500"></div>
-                        <img src="https://images.unsplash.com/photo-1516321318423-f06f85e504b3?auto=format&fit=crop&w=800&q=80" alt="Video recording archive visual" class="w-full h-full object-cover transform group-hover:scale-105 transition-transform duration-700 ease-out">
-                        
-                        <div class="absolute top-4 left-4 z-20 bg-black/85 backdrop-blur-md border border-hub-green-dark text-hub-green-main px-3 py-1 text-xs font-black uppercase tracking-wider rounded-md rounded-br-[12px] shadow-[0_4px_12px_rgba(0,0,0,0.5)] flex items-center gap-1.5">
-                            <i class="ph-bold ph-video-camera text-sm"></i>
-                            Archive
-                        </div>
-                    </div>
-
-                    <div class="p-7 flex flex-col flex-1">
-                        <h3 class="text-[20px] font-black text-white mb-3 tracking-tight">Recordings</h3>
-                        <p class="text-[13px] font-bold text-[#a3a3a3] leading-[1.6] mb-8 flex-1">
-                            Comprehensive on-demand video archive of all past cohort technical reviews, lectures, and mock interview walkthroughs.
-                        </p>
-                        
-                        <button class="w-full relative overflow-hidden bg-hub-green-dark border border-[#22c55e] text-white py-3.5 px-4 rounded-[12px] rounded-br-[14px] font-black text-sm tracking-wide shadow-[0_0_20px_rgba(22,163,74,0.15)] hover:shadow-[0_0_25px_rgba(22,163,74,0.3)] hover:bg-[#15803d] transition-all active:scale-[0.98] flex justify-center items-center gap-2 group/btn">
-                            <span class="relative z-10">Browse Recordings</span>
-                            <i class="ph-bold ph-arrow-right text-lg relative z-10 transform group-hover/btn:translate-x-1 transition-transform"></i>
-                        </button>
-                    </div>
-                </article>
-
-                <!-- CARD 3: Live Sessions -->
-                <article class="animate-fade-in-up stagger-4 group flex flex-col bg-hub-surface border-[2px] border-hub-border rounded-[14px] overflow-hidden transition-all duration-500 hover:-translate-y-[2px] hover:border-hub-blue-dark/50 hover:shadow-[0_20px_40px_-15px_rgba(37,99,235,0.15)] glass-edge">
-                    <div class="h-[180px] w-full relative border-b-[2px] border-hub-border overflow-hidden">
-                        <div class="absolute inset-0 bg-black/20 z-10 group-hover:bg-transparent transition-colors duration-500"></div>
-                        <img src="https://images.unsplash.com/photo-1522071820081-009f0129c71c?auto=format&fit=crop&w=800&q=80" alt="Live collaborative session visual" class="w-full h-full object-cover transform group-hover:scale-105 transition-transform duration-700 ease-out">
-                        
-                        <div class="absolute top-4 left-4 z-20 bg-black/85 backdrop-blur-md border border-hub-blue-dark text-hub-blue-main px-3 py-1 text-xs font-black uppercase tracking-wider rounded-md rounded-br-[12px] shadow-[0_4px_12px_rgba(0,0,0,0.5)] flex items-center gap-1.5">
-                            <i class="ph-bold ph-broadcast text-sm"></i>
-                            Broadcast
-                        </div>
-                    </div>
-
-                    <div class="p-7 flex flex-col flex-1">
-                        <h3 class="text-[20px] font-black text-white mb-3 tracking-tight">Live Sessions</h3>
-                        <p class="text-[13px] font-bold text-[#a3a3a3] leading-[1.6] mb-8 flex-1">
-                            Direct access to active broadcasting rooms, mentor Q&A sessions, and real-time collaborative review calls.
-                        </p>
-                        
-                        <button class="w-full relative overflow-hidden bg-hub-blue-dark border border-[#3b82f6] text-white py-3.5 px-4 rounded-[12px] rounded-br-[14px] font-black text-sm tracking-wide shadow-[0_0_20px_rgba(37,99,235,0.15)] hover:shadow-[0_0_25px_rgba(37,99,235,0.3)] hover:bg-[#1d4ed8] transition-all active:scale-[0.98] flex justify-center items-center gap-2 group/btn">
-                            <span class="relative z-10">Join Live Rooms</span>
-                            <i class="ph-bold ph-arrow-right text-lg relative z-10 transform group-hover/btn:translate-x-1 transition-transform"></i>
-                        </button>
-                    </div>
-                </article>
-
-            </section>
-
-            <!-- BOTTOM SUPPORT STRIP (Micro-Architecture: Contextual Aid) -->
-            <section class="animate-fade-in-up stagger-4 mt-2 w-full bg-hub-surface border-[2px] border-hub-border rounded-[12px] p-5 md:px-8 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-5 glass-edge shadow-lg">
-                <div class="flex items-center gap-4">
-                    <div class="relative flex items-center justify-center w-8 h-8 rounded-full bg-[#262626] border border-[#3a3a3a] shrink-0">
-                        <div class="w-2.5 h-2.5 rounded-full bg-[#34d399] relative z-10"></div>
-                        <div class="absolute w-2.5 h-2.5 rounded-full bg-[#34d399] animate-ping opacity-75"></div>
-                    </div>
-                    <p class="text-[14px] font-extrabold text-white tracking-wide">
-                        Need assistance with your schedule or live access?
-                    </p>
-                </div>
-                
-                <button class="w-full sm:w-auto bg-[#262626] text-hub-amber-main border-[2px] border-hub-amber-dark py-2.5 px-6 rounded-[8px] rounded-br-[20px] font-black text-[13px] tracking-wider uppercase hover:bg-[#333333] hover:text-amber-400 transition-colors active:scale-[0.98] flex items-center justify-center gap-2">
-                    <i class="ph-bold ph-headset text-base"></i>
-                    Support Desk
-                </button>
-            </section>
-
-        </div>
-    </main>
-
-    <!-- Interactive Polish JS -->
-    <script>
-        // Add subtle mouse-follow gradient to cards for premium feel (Vanilla JS simulating framer-motion)
-        document.querySelectorAll('article').forEach(card => {
-            card.addEventListener('mousemove', e => {
-                const rect = card.getBoundingClientRect();
-                const x = e.clientX - rect.left;
-                const y = e.clientY - rect.top;
-                
-                // We use a CSS variable to pass coordinates to a hypothetical pseudo-element
-                // Since we are using standard tailwind hover effects mostly, this just adds a tiny 3D tilt
-                const centerX = rect.width / 2;
-                const centerY = rect.height / 2;
-                
-                const rotateX = ((y - centerY) / centerY) * -2; // max 2deg tilt
-                const rotateY = ((x - centerX) / centerX) * 2;
-                
-                card.style.transform = `perspective(1000px) rotateX(${rotateX}deg) rotateY(${rotateY}deg) translateY(-2px)`;
-            });
-            
-            card.addEventListener('mouseleave', () => {
-                card.style.transform = 'perspective(1000px) rotateX(0deg) rotateY(0deg) translateY(0px)';
-            });
-        });
-    </script>
-<script>(function(){function f(){try{var w=window.innerWidth||1600;document.body.style.zoom=(w<1024)?"":Math.min(2.4,Math.max(1,w/1600));}catch(e){}}window.addEventListener("resize",f);f();})();</script></body>
+ <section class="support">
+  <div class="support-copy"><div class="status"></div><div><b>Need assistance with your schedule or live access?</b><span>Use the existing mentorship support route for project and session help.</span></div></div>
+  <a href="../#mentorship/support">Open Support Desk</a>
+ </section>
+</main>
+</body>
 </html>
