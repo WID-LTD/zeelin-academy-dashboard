@@ -21,7 +21,7 @@ const COURSES = [
     id: 'ba-foundation',
     title: 'Business Analysis Foundation',
     short: 'BA Foundation',
-    category: 'Core / Classic Business Analysis',
+    category: 'Core / Classic Business Analysis Package',
     cover: A + 'books/foundation_in_bussiness_analysis_pratice.png',
     cohort: 'Cohort 001',
     days: [1, 2],

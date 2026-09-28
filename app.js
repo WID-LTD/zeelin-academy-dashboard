@@ -397,7 +397,7 @@ window._sendPost = function(){
 window._newPost = function(){ const ta = $('#composerText'); if(ta){ ta.focus(); ta.scrollIntoView({behavior:'smooth',block:'center'}); } };
 /* general message board (admin-only, read-only) */
 const GENERAL_BOARD = [
-  { id:'g1', title:'Welcome to Cohort 001 — Start Here', body:'Welcome to the Core / Classic Business Analysis track. Complete your Daily Check-In first, then open Day 1 from the sidebar. Your streak starts the day you claim XP.', meta:'Zeelin Admin \u2022 Pinned \u2022 Aug 1' },
+  { id:'g1', title:'Welcome to Cohort 001 — Start Here', body:'Welcome to the Core / Classic Business Analysis Package. Complete your Daily Check-In first, then open Day 1 from the sidebar. Your streak starts the day you claim XP.', meta:'Zeelin Admin \u2022 Pinned \u2022 Aug 1' },
   { id:'g2', title:'Live Workshop Schedule — August 2026', body:'Two live sessions this month: Effective Communication on Tue Aug 4 at 4:00 PM and the Cohort 001 Weekly Q&A on Sat Aug 8 at 2:00 PM. Add them to your calendar from the Calendar page.', meta:'Zeelin Admin \u2022 Aug 2' },
   { id:'g3', title:'How Mock Quizzes Are Scored', body:'Every chapter quiz has 5 questions and needs 4 correct to pass. Retakes are unlimited and only your best attempt counts toward readiness.', meta:'Zeelin Admin \u2022 Aug 5' },
   { id:'g4', title:'Scheduled Maintenance — Recordings Archive', body:'The recordings archive will be briefly unavailable this Sunday between 2:00 AM and 4:00 AM while we publish the new workshop replays.', meta:'Zeelin Admin \u2022 Aug 9' },
@@ -506,9 +506,9 @@ function renderSidebar() {
       ${item('Monday Motivations','monday','heart',r==='monday','', '')}
     </ul>
 
-    <div class="stage">CORE / CLASSIC BUSINESS ANALYSIS</div>
+    <div class="stage">CORE / CLASSIC BUSINESS ANALYSIS PACKAGE</div>
     <ul class="nav-main">
-      <li class="nav-item parent course-static-parent">${trainingSidebarIcon('folder')}<span>Core / Classic Business Analysis</span><span class="chev">⌄</span></li>
+      <li class="nav-item parent course-static-parent">${trainingSidebarIcon('folder')}<span>Core / Classic Business Analysis Package</span><span class="chev">⌄</span></li>
     </ul>
 
     <ul class="subnav course-subnav">
@@ -540,7 +540,7 @@ function renderSidebar() {
 function renderTopbar() {
   const claimed = claimedToday();
   const routeName = parseHash()[0] || 'home';
-  const crumb = routeName === 'home' ? 'Your Courses' : `${esc(dayCard(STATE.day).title)} - Day ${STATE.day} of 7`;
+  const crumb = routeName === 'home' ? 'Your Package' : `${esc(dayCard(STATE.day).title)} - Day ${STATE.day} of 7`;
   $('#topbar').innerHTML = `
     <button class="burger" id="burger" aria-label="Open navigation" aria-expanded="false">${ic('burger', 20, 20)}</button>
     <div class="training-topbar-title">
@@ -854,15 +854,15 @@ function renderCourses() {
       <div class="home-welcome">
         <div class="home-hello">Welcome back</div>
         <h1>Welcome back, ${esc(USER.name.split(' ')[0])}</h1>
-        <div class="sub">You're enrolled in ${COURSES.length} course${COURSES.length === 1 ? '' : 's'}. Pick up where you left off, or continue the day that unlocks your next XP claim.</div>
+        <div class="sub">You're enrolled in the ${esc((COURSES[0] && COURSES[0].category) || 'Core / Classic Business Analysis Package')}. Continue where you left off, or open the day that unlocks your next XP claim.</div>
       </div>
-      <div class="cat-head"><span class="cat-title">${esc((COURSES[0] && COURSES[0].category) || 'Core / Classic Business Analysis')}</span><span class="cat-badge">Purchased</span></div>
+      <div class="cat-head"><span class="cat-title">${esc((COURSES[0] && COURSES[0].category) || 'Core / Classic Business Analysis Package')}</span><span class="cat-badge">Purchased</span></div>
       <div class="enrolled courses-count-${COURSES.length}${COURSES.length===1?' single':COURSES.length===2?' dual':''}" data-course-count="${COURSES.length}">
         ${COURSES.map((c) => {
     const pct = Math.max(0, Math.min(100, c.progress));
     const hours = c.completedHours + ' of ' + c.estimatedHours + 'h';
     return `
-          <div class="enr-card" role="button" tabindex="0" data-continue="${c.id}" aria-label="${esc(c.title)} — ${c.progress > 0 ? 'Continue course' : 'Start course'}">
+          <div class="enr-card" role="button" tabindex="0" data-continue="${c.id}" aria-label="${esc(c.title)} — ${c.progress > 0 ? 'Continue package' : 'Start package'}">
             <div class="enr-hero"><img loading="lazy" decoding="async" class="cover" src="${c.cover}?v=2" alt=""/><div class="enr-hero-overlay"></div><div class="enr-badges"><span class="enr-badge">${esc(c.weekName)}</span><span class="enr-badge dim">${esc(c.short)}</span></div><div class="enr-hero-meta">${c.readiness}% readiness &bull; ${hours}</div></div>
             <div class="enr-body">
               <h3>${esc(c.title)}</h3>
@@ -874,7 +874,7 @@ function renderCourses() {
                 <div class="stat-box warn"><div class="v">${c.daysLeft} Days</div><div class="l">Days left</div></div>
               </div>
             </div>
-            <div class="enr-foot"><div class="readiness"><div class="rl"><span>Course progress</span><b>${pct}%</b></div>${bar(pct, 'gradient')}</div><button class="btn btn-gradient btn-block" data-continue="${c.id}">${c.progress > 0 ? 'Continue Course ' : 'Start Course '}${ic('arrow', 15, 15)}</button></div>
+            <div class="enr-foot"><div class="readiness"><div class="rl"><span>Package progress</span><b>${pct}%</b></div>${bar(pct, 'gradient')}</div><button class="btn btn-gradient btn-block" data-continue="${c.id}">${c.progress > 0 ? 'Continue Package ' : 'Start Package '}${ic('arrow', 15, 15)}</button></div>
           </div>`;
   }).join('')}
       </div>
