@@ -13,11 +13,11 @@
   ];
   const ROUTE_CLASSES = [
     'home','day','checkin','book','videos','watch','visual','profile','accountability',
-    'roadmap','board','guide','community','calendar','recordings','support','aluminal','monday'
+    'roadmap','board','guide','community','calendar','recordings','support','resources','aluminal','monday'
   ];
   const SPECIALIST_ROUTES = new Set([
     'book','visual','calendar','recordings','support','community','profile','accountability',
-    'guide','board','monday','aluminal','videos','roadmap','checkin','watch'
+    'guide','board','monday','aluminal','videos','roadmap','checkin','watch','resources'
   ]);
 
   function currentRoute(){
@@ -420,135 +420,119 @@
 /* Premium structural injector removed: original training shell is the source of truth. */
 
 /* ============================================================
-   PREMIUM V6 — TRAINING SUPPORT CENTRE
-   Acquisition-inspired layout; training SUPPORT content preserved.
+   PREMIUM V7 — TRAINING SUPPORT ROUTES
    ============================================================ */
 (function(){
   'use strict';
 
-  const escText=(v)=>String(v??'').replace(/[&<>"']/g,s=>({
-    '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'
-  }[s]));
+  const escText=(v)=>String(v??'').replace(/[&<>"']/g,s=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[s]));
+  const routeParts=()=>String(location.hash||'').replace(/^#\/?/,'').split('/').filter(Boolean);
+  const route=()=>routeParts()[0]||'home';
+  const sub=()=>routeParts()[1]||'home';
 
-  function route(){
-    return String(location.hash||'').replace(/^#\/?/,'').split('/')[0]||'home';
+  const areas={
+    training:{label:'TRAINING & COURSE',title:'Training & Course Support',intro:'Help with course navigation, daily learning activities, reading, videos, quizzes, check-ins and training workflow.',issues:['I cannot find the next learning activity','A course page or lesson is not opening','My reading or video progress looks incorrect','I need help understanding the daily training flow','A quiz, visual summary or activity is not behaving as expected']},
+    account:{label:'ACCOUNT & PROFILE',title:'Account & Profile Support',intro:'Help with your learner profile, personal details, progress visibility and account-level questions.',issues:['Update learner profile information','My progress or XP is not displaying correctly','I need help with account access','I need a copy of my learner data','My cohort or package information looks incorrect']},
+    billing:{label:'BILLING & PAYMENTS',title:'Billing & Payment Support',intro:'Support for package payment, invoices, billing details and payment-related account questions.',issues:['Payment or checkout issue','Request an invoice or payment confirmation','Update billing information','Package access after payment','Question about billing or membership status']},
+    technical:{label:'TECHNICAL & ACCESS',title:'Technical & Portal Access',intro:'Get help when a page, video, route, browser session or portal feature is not working as expected.',issues:['A page is blank or not loading','Video or recording playback issue','Calendar or route is not opening','Browser or device compatibility issue','I am repeatedly signed out or cannot access the portal']},
+    mentorship:{label:'MENTORSHIP & COMMUNITY',title:'Mentorship & Community Support',intro:'Help with community participation, cohort support, mentor-related questions and collaboration workflows.',issues:['Community posting or interaction issue','How to ask for learning support','Mentorship or feedback question','Cohort communication issue','Report inappropriate or unhelpful community content']}
+  };
+
+  function supportCard(id,a){
+    return '<section class="ts-side-card ts-route-card"><span class="ts-side-label">'+a.label+'</span><h3>'+a.title+'</h3><p>'+a.intro+'</p><button type="button" class="ts-primary-btn" data-support-route="'+id+'">Open '+a.title+'</button></section>';
   }
 
-  function supportData(){
-    try{return SUPPORT;}catch(_){return null;}
+  function teamCard(){
+    return '<section class="ts-side-card"><span class="ts-side-label">SUPPORT TEAM</span><h3>Zeelin Academy Support</h3><p>Help with portal access, course navigation, learning activities, account issues and training workflows.</p><div class="ts-team"><div class="ts-team-avatar">ZA</div><div><strong>Zeelin Admin | Support Team</strong><span>Course &amp; Learner Support</span></div></div><div class="ts-online"><i></i> Support channel available</div><button type="button" class="ts-primary-btn" data-support-contact>Contact Support</button></section>';
   }
 
-  function faqHtml(items){
-    return items.map((f,i)=>
-      '<article class="ts-faq" data-support-faq>'
-      +'<button type="button" class="ts-faq-q" aria-expanded="false">'
-      +'<span>'+escText(f.q)+'</span><span class="ts-faq-plus" aria-hidden="true">+</span>'
-      +'</button>'
-      +'<div class="ts-faq-a">'+escText(f.a)+'</div>'
-      +'</article>'
-    ).join('');
-  }
-
-  function cardHtml(c,index){
-    const tones=['gold','blue','green'];
-    const labels=['SUPPORT','RESOURCES','ACCOUNT'];
-    return '<article class="ts-support-card">'
-      +'<div class="ts-card-image"><img loading="lazy" decoding="async" src="'+escText(c.image)+'" alt=""><span class="ts-card-label '+tones[index]+'">'+labels[index]+'</span></div>'
-      +'<div class="ts-card-body"><h3>'+escText(c.title)+'</h3><p>'+escText(c.body)+'</p>'
-      +'<div class="ts-card-foot"><span>'+escText(c.foot?.who||'Zeelin Academy')+'</span>'
-      +'<button type="button" class="ts-card-open" data-support-card="'+escText(c.id)+'">Open <span aria-hidden="true">→</span></button>'
-      +'</div></div></article>';
-  }
-
-  function renderSupportPremium(){
-    if(route()!=='support') return;
-    const page=document.getElementById('page');
-    const data=supportData();
-    if(!page||!data) return;
-    if(page.querySelector('.training-support-premium')) return;
-
-    const manage=(data.manage||[]).map((x,i)=>
-      '<button type="button" class="ts-manage-item" data-support-manage="'+i+'"><span class="ts-manage-num">'+String(i+1).padStart(2,'0')+'</span><span>'+escText(x)+'</span><span class="ts-manage-arrow">→</span></button>'
-    ).join('');
-
-    page.innerHTML=
-      '<div class="training-support-premium">'
-      +'<main class="ts-support-main"><div class="ts-support-inner">'
-      +'<section class="ts-support-hero">'
-      +'<div class="ts-support-eyebrow">HELP CENTRE</div>'
-      +'<h1>'+escText(data.hero.title)+'</h1>'
-      +'<p>'+escText(data.hero.body)+'</p>'
-      +'<label class="ts-support-search"><span class="ts-search-ico" aria-hidden="true"><svg viewBox="0 0 24 24"><circle cx="10" cy="10" r="7"/><path d="m15 15 6 6"/></svg></span><input type="search" placeholder="What can we help you with?" aria-label="Search support"></label>'
-      +'</section>'
-      +'<section class="ts-support-grid">'+data.cards.map(cardHtml).join('')+'</section>'
-      +'<section class="ts-section" id="trainingSupportFaq">'
-      +'<div class="ts-section-head"><div><span>QUICK ANSWERS</span><h2>Frequently Asked Questions</h2><p>Find answers for common training, quiz, video, XP and streak questions.</p></div><span class="ts-section-pill">HELP CENTRE</span></div>'
-      +'<div class="ts-faq-list">'+faqHtml(data.faqs||[])+'</div>'
-      +'</section>'
-      +'<section class="ts-section" id="trainingSupportAccount">'
-      +'<div class="ts-section-head"><div><span>ACCOUNT</span><h2>Manage Account &amp; Membership</h2><p>Choose the account action you need help with.</p></div></div>'
-      +'<div class="ts-manage-grid">'
-      +'<article class="ts-manage-panel"><div class="ts-manage-list">'+manage+'</div></article>'
-      +'<article class="ts-direct-card"><span>DIRECT ASSISTANCE</span><h3>Need help from the ZEELIN team?</h3><p>Send the support team a clear description of the issue and the area of the training portal you were using.</p><button type="button" class="ts-primary-btn" data-support-contact>Open Support Request</button></article>'
-      +'</div></section>'
-      +'</div></main>'
-      +'<aside class="ts-support-side">'
-      +'<section class="ts-side-card"><span class="ts-side-label">SUPPORT TEAM</span><h3>Zeelin Academy Support</h3><p>Help with portal access, course navigation, learning activities, account issues and training workflows.</p>'
-      +'<div class="ts-team"><div class="ts-team-avatar">ZA</div><div><strong>Zeelin Admin | Support Team</strong><span>Course &amp; Learner Support</span></div></div>'
-      +'<div class="ts-online"><i></i> Support channel available</div>'
-      +'<button type="button" class="ts-primary-btn" data-support-contact>Contact Support</button></section>'
-      +'<section class="ts-side-card"><span class="ts-side-label">QUICK HELP</span><h3>Jump to a support area</h3>'
-      +'<nav class="ts-quick-links"><button type="button" data-support-scroll="trainingSupportFaq">Frequently Asked Questions <span>→</span></button><button type="button" data-support-scroll="trainingSupportAccount">Account &amp; Billing <span>→</span></button><button type="button" data-support-guide>Knowledge Bank &amp; Guides <span>→</span></button></nav></section>'
-      +'<section class="ts-side-card ts-side-image"><div><span class="ts-side-label">NEED MORE HELP?</span><h3>Open a support request</h3><p>Tell us what happened, where it happened, and what you expected to see.</p><button type="button" class="ts-primary-btn" data-support-contact>Create Request →</button></div></section>'
-      +'</aside>'
-      +'</div>'
-      +'<div class="ts-support-modal" id="trainingSupportModal" aria-hidden="true"><div class="ts-modal-card" role="dialog" aria-modal="true" aria-labelledby="trainingSupportModalTitle">'
+  function modalHtml(selected){
+    const opts=[
+      ['Job Training Portal','Job Training Portal'],['Course Content','Course Content'],['Personal Check-In','Personal Check-In'],
+      ['Videos & Recordings','Videos & Recordings'],['Account','Account'],['Billing & Payments','Billing & Payments'],
+      ['Technical & Portal Access','Technical & Portal Access'],['Mentorship & Community','Mentorship & Community']
+    ];
+    return '<div class="ts-support-modal" id="trainingSupportModal" aria-hidden="true"><div class="ts-modal-card" role="dialog" aria-modal="true" aria-labelledby="trainingSupportModalTitle">'
       +'<div class="ts-modal-head"><div><span>ZEELIN SUPPORT</span><h3 id="trainingSupportModalTitle">Open Support Request</h3></div><button type="button" aria-label="Close support request" data-support-close>×</button></div>'
-      +'<div class="ts-modal-body"><label>SUPPORT AREA<select><option>Job Training Portal</option><option>Course Content</option><option>Personal Check-In</option><option>Videos &amp; Recordings</option><option>Account &amp; Billing</option></select></label><label>SUBJECT<input type="text" placeholder="Brief description of the issue"></label><label>MESSAGE<textarea placeholder="Tell us what happened and what you need help with."></textarea></label><div class="ts-modal-actions"><button type="button" class="ts-secondary-btn" data-support-close>Cancel</button><button type="button" class="ts-primary-btn" data-support-submit>Submit Request</button></div></div>'
-      +'</div></div>';
+      +'<div class="ts-modal-body"><label>SUPPORT AREA<select id="trainingSupportArea">'+opts.map((x)=>'<option value="'+x[0]+'"'+(x[0]===selected?' selected':'')+'>'+x[1]+'</option>').join('')+'</select></label>'
+      +'<label>SUBJECT<input id="trainingSupportSubject" type="text" placeholder="Brief description of the issue"></label>'
+      +'<label>MESSAGE<textarea id="trainingSupportMessage" placeholder="Tell us what happened and what you need help with."></textarea></label>'
+      +'<div class="ts-modal-actions"><button type="button" class="ts-secondary-btn" data-support-close>Cancel</button><button type="button" class="ts-primary-btn" data-support-submit>Submit Request</button></div></div></div></div>';
+  }
 
-    const search=page.querySelector('.ts-support-search input');
-    search?.addEventListener('input',()=>{
-      const q=search.value.trim().toLowerCase();
-      page.querySelectorAll('[data-support-faq]').forEach(item=>{
-        item.hidden=!!q && !item.textContent.toLowerCase().includes(q);
-      });
-    });
-
-    page.querySelectorAll('.ts-faq-q').forEach(btn=>btn.addEventListener('click',()=>{
-      const item=btn.closest('.ts-faq');
-      const open=item.classList.toggle('open');
-      btn.setAttribute('aria-expanded',open?'true':'false');
-    }));
-
-    page.querySelectorAll('[data-support-card]').forEach(btn=>btn.addEventListener('click',()=>{
-      const id=btn.dataset.supportCard;
-      const target=id==='faq'?'trainingSupportFaq':id==='billing'?'trainingSupportAccount':null;
-      if(target) document.getElementById(target)?.scrollIntoView({behavior:'smooth',block:'start'});
-      else location.hash='/guide';
-    }));
-    page.querySelectorAll('[data-support-scroll]').forEach(btn=>btn.addEventListener('click',()=>{
-      document.getElementById(btn.dataset.supportScroll)?.scrollIntoView({behavior:'smooth',block:'start'});
-    }));
-    page.querySelectorAll('[data-support-guide]').forEach(btn=>btn.addEventListener('click',()=>{location.hash='/guide'}));
+  function bind(page,selected){
+    page.querySelectorAll('[data-support-route]').forEach(btn=>btn.addEventListener('click',()=>{location.hash='/support/'+btn.dataset.supportRoute}));
+    page.querySelectorAll('[data-support-resources]').forEach(btn=>btn.addEventListener('click',()=>{location.hash='/resources'}));
+    page.querySelectorAll('[data-support-home]').forEach(btn=>btn.addEventListener('click',()=>{location.hash='/support'}));
 
     const modal=page.querySelector('#trainingSupportModal');
     const openModal=()=>{
       modal?.classList.add('open');
       modal?.setAttribute('aria-hidden','false');
+      const sel=modal?.querySelector('#trainingSupportArea');
+      if(sel&&selected) sel.value=selected;
       modal?.querySelector('input')?.focus();
     };
-    const closeModal=()=>{
-      modal?.classList.remove('open');
-      modal?.setAttribute('aria-hidden','true');
-    };
+    const closeModal=()=>{modal?.classList.remove('open');modal?.setAttribute('aria-hidden','true')};
     page.querySelectorAll('[data-support-contact]').forEach(btn=>btn.addEventListener('click',openModal));
     page.querySelectorAll('[data-support-close]').forEach(btn=>btn.addEventListener('click',closeModal));
     modal?.addEventListener('click',e=>{if(e.target===modal)closeModal()});
+    page.querySelectorAll('[data-prefill]').forEach(btn=>btn.addEventListener('click',()=>{
+      const input=page.querySelector('#trainingSupportSubject');
+      if(input) input.value=btn.dataset.prefill||'';
+    }));
     page.querySelector('[data-support-submit]')?.addEventListener('click',()=>{
+      const area=page.querySelector('#trainingSupportArea')?.value||'Job Training Portal';
+      const subject=String(page.querySelector('#trainingSupportSubject')?.value||'').trim();
+      const message=String(page.querySelector('#trainingSupportMessage')?.value||'').trim();
+      if(!subject||!message){if(typeof toast==='function') toast('Add a subject and message first');return}
+      try{
+        const saved=JSON.parse(localStorage.getItem('zeelin_support_requests')||'[]');
+        saved.unshift({id:'SR-'+Date.now(),area,subject,message,created:new Date().toISOString(),status:'Open'});
+        localStorage.setItem('zeelin_support_requests',JSON.stringify(saved.slice(0,25)));
+      }catch(_){}
       closeModal();
-      if(typeof showToast==='function') showToast('Support request prepared.');
+      if(typeof toast==='function') toast('Support request submitted');
     });
+  }
+
+  function renderSupportPremium(){
+    if(route()!=='support') return;
+    const page=document.getElementById('page');
+    if(!page) return;
+    const current=sub();
+    if(page.querySelector('[data-support-view="'+current+'"]')) return;
+
+    if(current==='home'){
+      page.innerHTML='<div class="training-support-premium" data-support-view="home">'
+        +'<main class="ts-support-main"><div class="ts-support-inner">'
+        +'<section class="ts-support-hero ts-support-hero-clean"><div class="ts-support-eyebrow">HELP CENTRE</div><h1>Need a hand? We’ve got you covered.</h1><p>Choose the support area that matches the issue. Each route keeps the right guidance, common problems and direct access to the Zeelin Support Team in one place.</p><label class="ts-support-search"><span class="ts-search-ico" aria-hidden="true"><svg viewBox="0 0 24 24"><circle cx="10" cy="10" r="7"/><path d="m15 15 6 6"/></svg></span><input type="search" placeholder="What do you need help with?" aria-label="Search support areas"></label></section>'
+        +'<section class="ts-support-route-grid">'+Object.entries(areas).map((x)=>supportCard(x[0],x[1])).join('')
+        +'<section class="ts-side-card ts-route-card ts-resource-route"><span class="ts-side-label">RESOURCES</span><h3>Knowledge Bank &amp; Guides</h3><p>Dedicated guides for portal navigation, reading, videos, live learning, XP, accountability and the package journey.</p><button type="button" class="ts-primary-btn" data-support-resources>Open Resources</button></section></section>'
+        +'</div></main><aside class="ts-support-side">'+teamCard()
+        +'<section class="ts-side-card"><span class="ts-side-label">QUICK ROUTES</span><h3>Go straight to the issue</h3><nav class="ts-quick-links">'+Object.entries(areas).map((x)=>'<button type="button" data-support-route="'+x[0]+'">'+x[1].title+' <span>→</span></button>').join('')+'<button type="button" data-support-resources>Knowledge Bank &amp; Guides <span>→</span></button></nav></section></aside></div>'
+        +modalHtml('Job Training Portal');
+      const search=page.querySelector('.ts-support-search input');
+      search?.addEventListener('input',()=>{
+        const q=search.value.trim().toLowerCase();
+        page.querySelectorAll('.ts-route-card').forEach(card=>{card.hidden=!!q&&!card.textContent.toLowerCase().includes(q)});
+      });
+      bind(page,'Job Training Portal');
+      return;
+    }
+
+    const a=areas[current]||areas.training;
+    const selected=current==='billing'?'Billing & Payments':current==='account'?'Account':current==='technical'?'Technical & Portal Access':current==='mentorship'?'Mentorship & Community':'Course Content';
+    page.innerHTML='<div class="training-support-premium" data-support-view="'+current+'">'
+      +'<main class="ts-support-main"><div class="ts-support-inner">'
+      +'<button type="button" class="ts-support-back" data-support-home>← All support areas</button>'
+      +'<section class="ts-support-hero ts-support-hero-clean"><div class="ts-support-eyebrow">'+a.label+'</div><h1>'+a.title+'</h1><p>'+a.intro+'</p><button type="button" class="ts-primary-btn ts-hero-request" data-support-contact>Open Support Request</button></section>'
+      +'<section class="ts-section"><div class="ts-section-head"><div><span>COMMON ISSUES</span><h2>What do you need help with?</h2><p>Choose the issue closest to yours, then open a request if you still need direct help.</p></div></div>'
+      +'<div class="ts-issue-list">'+a.issues.map((x,i)=>'<button type="button" data-support-contact data-prefill="'+escText(x)+'"><span class="ts-manage-num">'+String(i+1).padStart(2,'0')+'</span><span>'+escText(x)+'</span><span class="ts-manage-arrow">→</span></button>').join('')+'</div></section>'
+      +'</div></main><aside class="ts-support-side">'+teamCard()
+      +'<section class="ts-side-card"><span class="ts-side-label">OTHER SUPPORT AREAS</span><h3>Switch issue type</h3><nav class="ts-quick-links">'+Object.entries(areas).filter((x)=>x[0]!==current).map((x)=>'<button type="button" data-support-route="'+x[0]+'">'+x[1].title+' <span>→</span></button>').join('')+'<button type="button" data-support-resources>Knowledge Bank &amp; Guides <span>→</span></button></nav></section></aside></div>'
+      +modalHtml(selected);
+    bind(page,selected);
   }
 
   const run=()=>requestAnimationFrame(renderSupportPremium);
@@ -561,6 +545,7 @@
 
 
 /* ============================================================
+   GLOBAL INTERACTION PREVIEW/* ============================================================
    GLOBAL INTERACTION PREVIEW — METRICS + STAR HOVER
    ============================================================ */
 (function(){
@@ -636,4 +621,21 @@
   window.addEventListener('hashchange',()=>requestAnimationFrame(enrichMetrics));
   window.addEventListener('load',enrichMetrics);
   enrichMetrics();
+})();
+
+
+/* CALENDAR ROUTE WATCHDOG */
+(function(){
+  function current(){return String(location.hash||'').replace(/^#\/?/,'').split('/')[0]||'home'}
+  function ensureCalendar(){
+    if(current()!=='calendar') return;
+    requestAnimationFrame(()=>{
+      if(!document.querySelector('.training-calendar-shell') && typeof renderCalendar==='function'){
+        try{renderCalendar()}catch(err){console.error('Calendar render failed',err)}
+      }
+    });
+  }
+  window.addEventListener('hashchange',ensureCalendar);
+  window.addEventListener('load',ensureCalendar);
+  ensureCalendar();
 })();
