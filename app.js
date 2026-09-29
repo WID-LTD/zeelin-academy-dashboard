@@ -1764,7 +1764,7 @@ function renderCommunity() {
     + '</div>';
   $('#page').addEventListener('click', backLink);
 }
-let CAL_VIEW =const MONTHS = ['January','February','March','April','May','June','July','August','September','October','November','December'];
+const MONTHS = ['January','February','March','April','May','June','July','August','September','October','November','December'];
 let CAL_VIEW = (function(){
   const first=(typeof CALENDAR_EVENTS!=='undefined'&&CALENDAR_EVENTS&&CALENDAR_EVENTS[0])||null;
   const now=new Date();
@@ -1878,7 +1878,7 @@ function renderResources() {
     '<div class="training-resources-page">'
     + '<header class="training-resources-head"><span>KNOWLEDGE BANK &amp; GUIDES</span><h1>Resources for every part of your training workflow.</h1><p>Use practical guides by task: understand the portal, organise learning, use recordings, manage progress and move confidently through your package.</p></header>'
     + '<section class="training-resource-grid">'+groups.map((g)=>'<article class="training-resource-item"><img loading="lazy" decoding="async" src="'+g.image+'" alt=""><div><span>'+g.k+'</span><h2>'+g.title+'</h2><p>'+g.body+'</p><a href="'+g.href+'">'+g.action+' '+ic('arrow',14,14)+'</a></div></article>').join('')+'</section>'
-    + '<section class="training-resource-support"><div><span>CAN\\'T FIND WHAT YOU NEED?</span><h2>Ask the Zeelin Support Team.</h2><p>Open the Support Center and choose the issue area that best matches your question.</p></div><a href="#/support">Open Support Center '+ic('arrow',15,15)+'</a></section>'
+    + '<section class="training-resource-support"><div><span>CAN\'T FIND WHAT YOU NEED?</span><h2>Ask the Zeelin Support Team.</h2><p>Open the Support Center and choose the issue area that best matches your question.</p></div><a href="#/support">Open Support Center '+ic('arrow',15,15)+'</a></section>'
     + '</div>';
   $('#page').addEventListener('click', backLink);
 }
@@ -1914,14 +1914,14 @@ function renderMonday() {
   ).join('');
   $('#page').innerHTML =
     '<div class="monday-premium">'
-    + '<header class="monday-hero"><div class="monday-hero-copy"><span class="monday-eyebrow">MONDAY MOTIVATIONS</span><h1>Start the week with direction, not pressure.</h1><p>Weekly encouragement for learners balancing work, life, study and the goal of becoming job ready.</p><div class="monday-week-focus"><span>THIS WEEK\\'S FOCUS</span><b>'+esc(MONDAY_FEATURED.title)+'</b></div></div><div class="monday-hero-image"><img loading="eager" decoding="async" src="https://images.unsplash.com/photo-1652971422886-784758cc28d7?auto=format&fit=crop&w=1600&q=88" alt="Professional learners collaborating"></div></header>'
+    + '<header class="monday-hero"><div class="monday-hero-copy"><span class="monday-eyebrow">MONDAY MOTIVATIONS</span><h1>Start the week with direction, not pressure.</h1><p>Weekly encouragement for learners balancing work, life, study and the goal of becoming job ready.</p><div class="monday-week-focus"><span>THIS WEEK\'S FOCUS</span><b>'+esc(MONDAY_FEATURED.title)+'</b></div></div><div class="monday-hero-image"><img loading="eager" decoding="async" src="https://images.unsplash.com/photo-1652971422886-784758cc28d7?auto=format&fit=crop&w=1600&q=88" alt="Professional learners collaborating"></div></header>'
     + '<section class="monday-feature"><div class="monday-feature-image"><img loading="lazy" decoding="async" src="'+MONDAY_FEATURED.image+'" alt="Team motivation study"></div><div class="monday-feature-copy"><div class="monday-feature-meta"><span>ZEELIN ACADEMY LEADERSHIP</span><b>'+esc(MONDAY_FEATURED.badge)+'</b></div><h2>'+esc(MONDAY_FEATURED.title)+'</h2><blockquote>“'+esc(MONDAY_FEATURED.body)+'”</blockquote><p>Take 5 minutes today to map out your week, review the learning backlog if needed, and keep your pace realistic. You have got this.</p></div></section>'
     + '<div class="monday-section-head"><span>PAST BRIEFS</span><h2>Keep the words that move you.</h2><p>Every brief now uses the same full visual treatment so previous motivation stays as useful and visible as this week’s message.</p></div>'
     + '<div class="monday-archive-stack">'+archive+'</div>'
     + '</div>';
   $('#page').addEventListener('click', backLink);
 }
-function fitStage()function fitStage(){ try{ document.body.style.zoom = ''; }catch(e){} }
+function fitStage(){ try{ document.body.style.zoom = ''; }catch(e){} }
 window.addEventListener('resize', fitStage);
 fitStage();
 window.addEventListener('hashchange', () => { route(); });
