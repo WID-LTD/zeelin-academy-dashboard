@@ -37,3 +37,17 @@ body.approved-dashboard-route #main-content{background:var(--ad-bg)!important;co
 @media(max-width:1150px){.apd-grid{grid-template-columns:1fr}.apd-market{min-height:300px}.apd-project{grid-template-columns:390px 1fr}.apd-stats{grid-template-columns:repeat(2,1fr)}}
 @media(max-width:820px){.apd-topbar{grid-template-columns:1fr auto;padding:0 14px}.apd-portal-title{display:none}.apd-pill:not(.gold){display:none}.apd-page{padding:18px 12px 36px}.apd-head-row{align-items:flex-start;flex-direction:column}.apd-project{grid-template-columns:1fr}.apd-project-image{min-height:260px}.apd-project-body{padding:22px}.apd-notif-panel{right:12px;left:12px;width:auto}}
 @media(max-width:540px){.apd-top-actions{gap:6px}.apd-pill.gold{display:none}.apd-stats{grid-template-columns:1fr}.apd-facts{grid-template-columns:1fr}.apd-actions{flex-direction:column}.apd-catalog-meta{grid-template-columns:1fr}.apd-profile-name{display:none}}
+
+
+/* Dashboard page-edge scrollbar */
+body.approved-dashboard-route #main-content{
+  overflow-y:scroll!important;
+  overflow-x:hidden!important;
+  scrollbar-width:thin!important;
+  scrollbar-color:#ffffff #dfe7f0!important;
+  scrollbar-gutter:stable!important;
+}
+body.approved-dashboard-route #main-content::-webkit-scrollbar{width:12px!important}
+body.approved-dashboard-route #main-content::-webkit-scrollbar-track{background:#dfe7f0!important}
+body.approved-dashboard-route #main-content::-webkit-scrollbar-thumb{background:#fff!important;border:2px solid #c6d2df!important;border-radius:999px!important;min-height:48px!important}
+body.approved-dashboard-route #main-content::-webkit-scrollbar-thumb:hover{background:#fff!important;border-color:#aebccc!important}
