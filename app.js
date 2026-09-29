@@ -311,6 +311,7 @@ function route() {
     case 'calendar': renderCalendar(); return;
     case 'recordings': renderRecordings(); return;
     case 'support': renderSupport(); return;
+    case 'resources': renderResources(); return;
     case 'aluminal': renderAluminal(); return;
     case 'monday': renderMonday(); return;
     default: renderCourses(); return;
@@ -336,7 +337,10 @@ function treeOpen(){ try { const o = JSON.parse(localStorage.getItem('zdash_tree
 function treeSave(o){ try { localStorage.setItem('zdash_tree', JSON.stringify(o)); } catch {} }
 function cohortOpen(){ try { const v = localStorage.getItem('zdash_cohort'); return v === null ? true : v === '1'; } catch { return true; } }
 function cohortSave(o){ try { localStorage.setItem('zdash_cohort', o ? '1' : '0'); } catch {} }
+function packageOpen(){ try { const v = localStorage.getItem('zdash_package'); return v === null ? true : v === '1'; } catch { return true; } }
+function packageSave(o){ try { localStorage.setItem('zdash_package', o ? '1' : '0'); } catch {} }
 window._navCohort = function(){ cohortSave(!cohortOpen()); renderSidebar(); };
+window._navPackage = function(){ packageSave(!packageOpen()); renderSidebar(); };
 window._navTree = function(w){ const o = treeOpen(); const next = (o.length === 1 && o[0] === w) ? [] : [w]; treeSave(next); renderSidebar(); };
 window._navDay = function(n){ STATE.day = n; save(); if((parseHash()[0]||'home')==='day'){ route(); } else { go('/day'); } };
 function trainingSidebarIcon(name){
@@ -403,65 +407,19 @@ const GENERAL_BOARD = [
   { id:'g4', title:'Scheduled Maintenance — Recordings Archive', body:'The recordings archive will be briefly unavailable this Sunday between 2:00 AM and 4:00 AM while we publish the new workshop replays.', meta:'Zeelin Admin \u2022 Aug 9' },
 ];
 function renderBoard() {
-  const pinned = GENERAL_BOARD[0];
-  const rest = GENERAL_BOARD.slice(1);
-  const boardIcon = (kind) => kind === 'schedule' ? ic('calendar',18,18) : kind === 'quiz' ? ic('check',18,18) : kind === 'maintenance' ? ic('settings',18,18) : ic('feed',18,18);
-  const typeFor = (g) => g.id === 'g2' ? 'schedule' : g.id === 'g3' ? 'quiz' : g.id === 'g4' ? 'maintenance' : 'announcement';
-  const labelFor = (g) => g.id === 'g2' ? 'Live learning' : g.id === 'g3' ? 'Assessment' : g.id === 'g4' ? 'System notice' : 'Announcement';
-  const card = (g) => `
-    <article class="board-card" tabindex="0">
-      <div class="board-card-icon">${boardIcon(typeFor(g))}</div>
-      <div class="board-card-body">
-        <div class="board-card-kicker">${esc(labelFor(g))}<span>${esc(g.meta.replace('Zeelin Admin • ','').replace('Zeelin Admin · ',''))}</span></div>
-        <h2>${esc(g.title)}</h2>
-        <p>${esc(g.body)}</p>
-      </div>
-      <div class="board-card-arrow" aria-hidden="true">${ic('arrow',18,18)}</div>
-    </article>`;
-  $('#page').innerHTML = `
-    <div class="board-premium">
-      <div class="board-top-grid">
-        <header class="board-hero">
-          <div>
-            <span class="board-eyebrow">OFFICIAL ZEELIN CHANNEL</span>
-            <h1>General Message Board</h1>
-            <p>Important cohort announcements, learning updates, assessment guidance and platform notices from the Zeelin Admin team.</p>
-          </div>
-          <div class="board-hero-stats" aria-label="Message board summary">
-            <span><b>${GENERAL_BOARD.length}</b><small>Announcements</small></span>
-            <span><b>Read only</b><small>Official channel</small></span>
-          </div>
-        </header>
-
-        <section class="board-pinned">
-          <div class="board-pinned-media">
-            <span class="board-pin-badge">${ic('feed',15,15)} PINNED</span>
-            <div class="board-admin-mark">ZA</div>
-            <div class="board-pinned-copy">
-              <span>Zeelin Admin</span>
-              <small>${esc(pinned.meta.replace('Zeelin Admin • ','').replace('Zeelin Admin · ',''))}</small>
-            </div>
-          </div>
-          <div class="board-pinned-content">
-            <span class="board-notice-label">Start here</span>
-            <h2>${esc(pinned.title)}</h2>
-            <p>${esc(pinned.body)}</p>
-            <div class="board-readonly">${ic('lock',14,14)} Official announcement · replies disabled</div>
-          </div>
-        </section>
-      </div>
-
-      <section class="board-updates">
-        <div class="board-section-head">
-          <div><span>LATEST UPDATES</span><h2>Everything you need to know</h2></div>
-          <small>Most recent notices from Zeelin Academy</small>
-        </div>
-        <div class="board-grid">${rest.map(card).join('')}</div>
-      </section>
-    </div>`;
+  const entries = GENERAL_BOARD.map((g) =>
+    '<article class="legacy-board-entry">'
+    + '<div class="legacy-board-meta"><div class="legacy-board-admin"><span>ZA</span><div><b>Zeelin Admin</b><small>'+esc(g.meta)+'</small></div></div><em>Announcement</em></div>'
+    + '<div class="legacy-board-copy"><h2>'+esc(g.title)+'</h2><p>'+esc(g.body)+'</p></div>'
+    + '</article>'
+  ).join('');
+  $('#page').innerHTML =
+    '<div class="legacy-board-shell">'
+    + '<header class="legacy-feed-heading"><div><span>OFFICIAL ZEELIN CHANNEL</span><h1>General Message Board</h1><p>Official announcements from the Zeelin Admin — read-only, no replies.</p></div></header>'
+    + '<div class="legacy-board-list">'+entries+'</div>'
+    + '</div>';
   $('#page').addEventListener('click', backLink);
 }
-
 function renderSidebar() {
   const r = parseHash()[0] || 'home';
   const open = treeOpen();
@@ -508,10 +466,10 @@ function renderSidebar() {
 
     <div class="stage">CORE / CLASSIC BUSINESS ANALYSIS PACKAGE</div>
     <ul class="nav-main">
-      <li class="nav-item parent course-static-parent">${trainingSidebarIcon('folder')}<span>Core / Classic Business Analysis Package</span><span class="chev">⌄</span></li>
+      <li class="nav-item parent course-static-parent" tabindex="0" role="button" onclick="window._navPackage()" onkeydown="if(event.key===\'Enter\'||event.key===\' \'){event.preventDefault();window._navPackage()}">${trainingSidebarIcon('folder')}<span>Core / Classic Business Analysis Package</span><span class="chev">${packageOpen()?'⌄':'›'}</span></li>
     </ul>
 
-    <ul class="subnav course-subnav">
+    <ul class="subnav course-subnav${packageOpen()?'':' package-closed'}">
       <li class="nav-item parent course-tree-row cohort-row" tabindex="0" role="button" onclick="window._navCohort()" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();window._navCohort()}">
         ${trainingSidebarIcon('folder')}<span>Cohort 001</span><span class="chev">${cohortOpen()?'⌄':'›'}</span>
       </li>
@@ -525,6 +483,7 @@ function renderSidebar() {
     <ul class="nav-main">
       ${item('Calendar','calendar','calendar',r==='calendar','', '3')}
       ${item('Recordings','recordings','rec',r==='recordings','', '')}
+      ${item('Resources','resources','book',r==='resources','', '')}
     </ul>
 
     <div class="stage">ACCOUNT</div>
@@ -1784,135 +1743,28 @@ window._sendCommunityReply = function(id, room){
 };
 
 function renderCommunity() {
-  const rooms = [
-    { id:'general', name:'General Community', kicker:'OPEN LOUNGE', desc:'Ask questions, share study wins and connect with the wider Zeelin Academy cohort.', members:'128 members', online:'12 online', icon:'users', tone:'gold' },
-    { id:'study-group', name:'Study Group', kicker:'PEER LEARNING', desc:'Find study partners, review chapters together and organise short peer learning sessions.', members:'46 members', online:'7 online', icon:'book', tone:'green' },
-    { id:'exam-prep', name:'Exam Prep Room', kicker:'CERTIFICATION', desc:'Discuss mock questions, exam techniques, difficult concepts and readiness strategies.', members:'83 members', online:'9 online', icon:'check', tone:'blue' },
-    { id:'accountability', name:'Accountability Room', kicker:'STAY CONSISTENT', desc:'Share weekly goals, study hours, progress updates and keep each other moving forward.', members:'61 members', online:'5 online', icon:'fire', tone:'brown' }
-  ];
-  const parts = parseHash();
-  const roomId = parts[1] || '';
-  const room = rooms.find((x)=>x.id===roomId);
-  const postRoom = (p) => p.room || ((POST_META[p.id]?.tag || p.tag || '').toLowerCase().includes('study') ? 'study-group' : 'general');
-  const roomPosts = (id) => allPosts().filter((p)=>postRoom(p)===id);
-
-  const roomPostCard = (p, activeRoom) => {
+  const posts = allPosts();
+  const postHtml = (p) => {
     const meta = POST_META[p.id] || { title:'', role:'Cohort 001 Student', time:p.time||'Just now', color:p.color||'#D4A02A', tag:p.tag||'General' };
     const n = postNums(p);
-    const s = socialState();
-    const replies = (s.replies && s.replies[p.id]) || [];
     const title = meta.title || p.title || String(p.body||'').slice(0,80);
     const body = (meta.title || p.title) ? p.body : '';
-    const likes = n.likes + ((s.likes[p.id])||0);
-    return `<article class="community-post">
-      <header>
-        <div class="community-person">
-          <span class="community-avatar" style="--avatar:${meta.color || '#D4A02A'}">${esc(p.initials||'ZA')}</span>
-          <div><strong>${esc(p.author)}</strong><small>${esc(meta.role)} · ${esc(meta.time)}</small></div>
-        </div>
-        <span class="community-post-tag">${esc(meta.tag || activeRoom.name)}</span>
-      </header>
-      <div class="community-post-body">
-        <h3>${esc(title)}</h3>
-        ${body ? `<p>${esc(body)}</p>` : ''}
-      </div>
-      <footer>
-        <button type="button" onclick="window._likePost('${p.id}',this)" class="community-action">${ic('heart',15,15)} <b>${likes}</b> Likes</button>
-        <button type="button" onclick="window._toggleCommunityReplies('${p.id}')" class="community-action">${ic('feed',15,15)} ${n.replies + replies.length} Comments</button>
-      </footer>
-      <div class="community-replies" id="communityReplies-${p.id}" hidden>
-        ${replies.map((r)=>`<div class="community-reply"><span>JD</span><div><strong>John Doe</strong><p>${esc(r.body)}</p><small>${esc(r.time||'Just now')}</small></div></div>`).join('')}
-        <div class="community-reply-form">
-          <input id="replyInput-${p.id}" type="text" placeholder="Write a reply..." aria-label="Reply to post">
-          <button type="button" onclick="window._sendCommunityReply('${p.id}','${activeRoom.id}')">${ic('arrow',15,15)} Reply</button>
-        </div>
-      </div>
-    </article>`;
+    const likes = n.likes + ((socialState().likes[p.id])||0);
+    return '<article class="legacy-community-post">'
+      + '<header><div class="legacy-community-person"><span class="legacy-community-avatar" style="--avatar:'+(meta.color||'#D4A02A')+'">'+esc(p.initials||'ZA')+'</span><div><b>'+esc(p.author)+'</b><small>'+esc(meta.role)+' · '+esc(meta.time)+'</small></div></div><em>'+esc(meta.tag)+'</em></header>'
+      + '<div class="legacy-community-copy"><h2>'+esc(title)+'</h2>'+(body?'<p>'+esc(body)+'</p>':'')+'</div>'
+      + '<footer><button type="button" onclick="window._likePost(\''+p.id+'\',this)">'+ic('heart',15,15)+' <b>'+likes+'</b> Likes</button><span>'+ic('feed',15,15)+' '+n.replies+' Comments</span></footer>'
+      + '</article>';
   };
-
-  if (room) {
-    const posts = roomPosts(room.id);
-    $('#page').innerHTML = `
-      <div class="community-room-page">
-        <button type="button" class="community-back" onclick="window._communityBack()">${ic('caret',14,14)} All community rooms</button>
-        <header class="community-room-hero tone-${room.tone}">
-          <div class="community-room-icon">${ic(room.icon,28,28)}</div>
-          <div>
-            <span>${esc(room.kicker)}</span>
-            <h1>${esc(room.name)}</h1>
-            <p>${esc(room.desc)}</p>
-          </div>
-          <div class="community-room-presence"><i></i>${esc(room.online)}<small>${esc(room.members)}</small></div>
-        </header>
-
-        <div class="community-room-layout">
-          <main class="community-room-feed">
-            <section class="community-room-composer">
-              <div class="community-composer-head">
-                <img src="${USER.avatar}" alt="" decoding="async">
-                <div><strong>${esc(USER.name)}</strong><span>Share with ${esc(room.name)}</span></div>
-              </div>
-              <textarea id="roomComposerText" rows="3" placeholder="Share a question, study update or useful tip with this room..."></textarea>
-              <div class="community-composer-actions">
-                <span>${ic('users',14,14)} Visible to everyone in this room</span>
-                <button type="button" onclick="window._sendRoomPost('${room.id}')">Post to room ${ic('arrow',14,14)}</button>
-              </div>
-            </section>
-            <div class="community-feed-heading"><div><span>ROOM ACTIVITY</span><h2>Conversation</h2></div><small>${posts.length} ${posts.length===1?'post':'posts'}</small></div>
-            ${posts.length ? posts.map((p)=>roomPostCard(p,room)).join('') : `<div class="community-empty"><div>${ic('users',26,26)}</div><h3>Start the conversation</h3><p>This room is ready for its first community post.</p></div>`}
-          </main>
-          <aside class="community-room-side">
-            <section><span class="community-side-label">ROOM GUIDE</span><h3>Keep it useful</h3><p>Share clear questions, practical examples and study support that helps other learners move forward.</p></section>
-            <section><span class="community-side-label">COMMUNITY RHYTHM</span><div class="community-mini-stat"><b>${room.online.split(' ')[0]}</b><span>Online now</span></div><div class="community-mini-stat"><b>${room.members.split(' ')[0]}</b><span>Room members</span></div></section>
-            <section class="community-side-image"><span>ZEELIN COMMUNITY</span><h3>Learn together. Progress together.</h3></section>
-          </aside>
-        </div>
-      </div>`;
-    $('#page').addEventListener('click', backLink);
-    return;
-  }
-
-  const recent = allPosts().slice(0,2);
-  $('#page').innerHTML = `
-    <div class="community-premium">
-      <header class="community-hero">
-        <div>
-          <span class="community-eyebrow">ZEELIN ACADEMY COMMUNITY</span>
-          <h1>Learn with people who are building alongside you.</h1>
-          <p>Choose a room, join the conversation and get practical support from peers preparing for the same learning and career goals.</p>
-          <div class="community-hero-actions"><button type="button" onclick="window._enterCommunityRoom('general')">Enter General Community ${ic('arrow',15,15)}</button><span><i></i> 33 learners online now</span></div>
-        </div>
-        <div class="community-hero-art">
-          <div class="community-floating-card c1"><b>Study Group</b><span>7 online</span></div>
-          <div class="community-floating-card c2"><b>Exam Prep</b><span>9 online</span></div>
-          <div class="community-floating-card c3"><b>Accountability</b><span>5 online</span></div>
-        </div>
-      </header>
-
-      <div class="community-section-head"><div><span>COMMUNITY ROOMS</span><h2>Where do you want to join in?</h2></div><p>Each room has a clear purpose so useful conversations are easier to find.</p></div>
-      <section class="community-room-grid">
-        ${rooms.map((r)=>`<button type="button" class="community-room-card tone-${r.tone}" onclick="window._enterCommunityRoom('${r.id}')">
-          <span class="community-room-card-icon">${ic(r.icon,23,23)}</span>
-          <span class="community-room-card-copy"><small>${esc(r.kicker)}</small><strong>${esc(r.name)}</strong><em>${esc(r.desc)}</em></span>
-          <span class="community-room-card-meta"><i></i>${esc(r.online)}<b>${esc(r.members)}</b></span>
-          <span class="community-room-card-enter">Enter room ${ic('arrow',15,15)}</span>
-        </button>`).join('')}
-      </section>
-
-      <div class="community-section-head compact"><div><span>RECENT ACTIVITY</span><h2>What the community is discussing</h2></div></div>
-      <section class="community-recent-grid">
-        ${recent.map((p)=> {
-          const meta=POST_META[p.id]||{title:p.title||'',role:'Cohort 001 Student',time:p.time||'Just now',tag:p.tag||'General'};
-          const rr=rooms.find(x=>x.id===postRoom(p))||rooms[0];
-          return `<article class="community-recent-card" onclick="window._enterCommunityRoom('${rr.id}')" tabindex="0">
-            <span>${esc(meta.tag)}</span><h3>${esc(meta.title || p.title || p.body)}</h3><p>${esc(p.body)}</p>
-            <footer><small>${esc(p.author)} · ${esc(meta.time)}</small><b>Open room ${ic('arrow',14,14)}</b></footer>
-          </article>`;
-        }).join('')}
-      </section>
-    </div>`;
+  $('#page').innerHTML =
+    '<div class="legacy-community-shell">'
+    + '<header class="legacy-feed-heading legacy-community-heading"><div><span>ZEELIN ACADEMY COMMUNITY</span><h1>Zeelin Academy General Community</h1><p>Connect with peers, share learning strategies, ask practical questions and discuss your coursework.</p></div><button type="button" onclick="window._newPost()">New Post</button></header>'
+    + '<section class="legacy-community-composer"><div class="legacy-composer-row"><span class="legacy-community-avatar self">JD</span><textarea id="composerText" rows="2" placeholder="Share your thoughts, questions or study tips with the community..."></textarea></div><div class="legacy-composer-foot"><span>Visible to the General Community</span><button type="button" onclick="window._sendPost()">Post</button></div></section>'
+    + '<div class="legacy-community-feed">'+posts.map(postHtml).join('')+'</div>'
+    + '</div>';
   $('#page').addEventListener('click', backLink);
 }
+let CAL_VIEW =const MONTHS = ['January','February','March','April','May','June','July','August','September','October','November','December'];
 let CAL_VIEW = (function(){
   const first=(typeof CALENDAR_EVENTS!=='undefined'&&CALENDAR_EVENTS&&CALENDAR_EVENTS[0])||null;
   const now=new Date();
@@ -2013,6 +1865,24 @@ function renderRecordings() {
   $('#page').addEventListener('click',backLink);
 }
 
+function renderResources() {
+  const groups = [
+    {k:'START HERE',title:'Portal Orientation & Navigation',body:'Understand your package, daily workflow, sidebar, progress and where each training activity lives.',action:'Open User Guide',href:'#/guide',image:'https://images.unsplash.com/photo-1524178232363-1fb2b075b655?auto=format&fit=crop&w=1400&q=86'},
+    {k:'READING',title:'Reading Roadmap & Study Guides',body:'Use the roadmap to organise chapters, track reading progress and keep the foundation sequence visible.',action:'Open Reading Roadmap',href:'#/roadmap',image:'https://images.unsplash.com/photo-1497633762265-9d179a990aa6?auto=format&fit=crop&w=1400&q=86'},
+    {k:'VIDEO',title:'Tutorials & Recording Guidance',body:'Find video tutorials, live-event recordings and the recommended way to use replays in your study routine.',action:'Open Video Tutorials',href:'#/videos',image:'https://images.unsplash.com/photo-1516321318423-f06f85e504b3?auto=format&fit=crop&w=1400&q=86'},
+    {k:'PROGRESS',title:'XP, Check-In & Accountability',body:'Learn how personal check-ins, XP, streaks and weekly accountability connect to your learner progress.',action:'Open Personal Check-In',href:'#/checkin',image:'https://images.unsplash.com/photo-1484480974693-6ca0a78fb36b?auto=format&fit=crop&w=1400&q=86'},
+    {k:'LIVE LEARNING',title:'Calendar & Live Session Guide',body:'See how to find upcoming cohort sessions, add events to your calendar and use the replay library afterwards.',action:'Open Calendar',href:'#/calendar',image:'https://images.unsplash.com/photo-1506784983877-45594efa4cbe?auto=format&fit=crop&w=1400&q=86'},
+    {k:'CAREER',title:'Package-to-Job Readiness Guide',body:'Understand how training progresses into project experience and then into the Job Acquisition Portal.',action:'View Package Progress',href:'#/profile',image:'https://images.unsplash.com/photo-1521737711867-e3b97375f902?auto=format&fit=crop&w=1400&q=86'}
+  ];
+  $('#page').innerHTML =
+    '<div class="training-resources-page">'
+    + '<header class="training-resources-head"><span>KNOWLEDGE BANK &amp; GUIDES</span><h1>Resources for every part of your training workflow.</h1><p>Use practical guides by task: understand the portal, organise learning, use recordings, manage progress and move confidently through your package.</p></header>'
+    + '<section class="training-resource-grid">'+groups.map((g)=>'<article class="training-resource-item"><img loading="lazy" decoding="async" src="'+g.image+'" alt=""><div><span>'+g.k+'</span><h2>'+g.title+'</h2><p>'+g.body+'</p><a href="'+g.href+'">'+g.action+' '+ic('arrow',14,14)+'</a></div></article>').join('')+'</section>'
+    + '<section class="training-resource-support"><div><span>CAN\\'T FIND WHAT YOU NEED?</span><h2>Ask the Zeelin Support Team.</h2><p>Open the Support Center and choose the issue area that best matches your question.</p></div><a href="#/support">Open Support Center '+ic('arrow',15,15)+'</a></section>'
+    + '</div>';
+  $('#page').addEventListener('click', backLink);
+}
+
 function renderSupport() {
   $('#page').innerHTML = `
     ${backBtn()}
@@ -2032,48 +1902,26 @@ function renderAluminal() {
 }
 function renderMonday() {
   const images = [
-    'https://images.unsplash.com/photo-1524178232363-1fb2b075b655?auto=format&fit=crop&w=1200&q=86',
-    'https://images.unsplash.com/photo-1522202176988-66273c2fd55f?auto=format&fit=crop&w=1200&q=86',
-    'https://images.unsplash.com/photo-1523240795612-9a054b0db644?auto=format&fit=crop&w=1200&q=86'
+    'https://images.unsplash.com/photo-1524178232363-1fb2b075b655?auto=format&fit=crop&w=1600&q=86',
+    'https://images.unsplash.com/photo-1522202176988-66273c2fd55f?auto=format&fit=crop&w=1600&q=86',
+    'https://images.unsplash.com/photo-1523240795612-9a054b0db644?auto=format&fit=crop&w=1600&q=86'
   ];
-  const arch = MONDAY.map((m,i) => `<article class="monday-quote-card">
-    <div class="monday-quote-image"><img loading="lazy" decoding="async" src="${images[i % images.length]}" alt="Learners building skills together"></div>
-    <div class="monday-quote-copy">
-      <span>${esc(m.author)}</span>
-      <h3>“${esc(m.q)}”</h3>
-      <p>${esc(m.body)}</p>
-      <div class="monday-quote-foot"><b>MONDAY BRIEF ${String(i+1).padStart(2,'0')}</b><i></i></div>
-    </div>
-  </article>`).join('');
-  $('#page').innerHTML = `
-    <div class="monday-premium">
-      <header class="monday-hero">
-        <div class="monday-hero-copy">
-          <span class="monday-eyebrow">MONDAY MOTIVATIONS</span>
-          <h1>Start the week with direction, not pressure.</h1>
-          <p>Weekly encouragement for learners balancing work, life, study and the goal of becoming job ready.</p>
-          <div class="monday-week-focus"><span>THIS WEEK'S FOCUS</span><b>${esc(MONDAY_FEATURED.title)}</b></div>
-        </div>
-        <div class="monday-hero-image"><img loading="eager" decoding="async" src="https://images.unsplash.com/photo-1652971422886-784758cc28d7?auto=format&fit=crop&w=1600&q=88" alt="Professional learners collaborating"></div>
-      </header>
-
-      <section class="monday-feature">
-        <div class="monday-feature-image"><img loading="lazy" decoding="async" src="${MONDAY_FEATURED.image}" alt="Team motivation study"></div>
-        <div class="monday-feature-copy">
-          <div class="monday-feature-meta"><span>ZEELIN ACADEMY LEADERSHIP</span><b>${esc(MONDAY_FEATURED.badge)}</b></div>
-          <h2>${esc(MONDAY_FEATURED.title)}</h2>
-          <blockquote>“${esc(MONDAY_FEATURED.body)}”</blockquote>
-          <p>Take 5 minutes today to map out your calendar events, review the recording backlog if needed, and engage with your peers in the community. You have got this!</p>
-          <div class="monday-feature-actions"><button type="button" onclick="location.hash='/calendar'">Open Calendar ${ic('arrow',14,14)}</button><button type="button" class="ghost" onclick="location.hash='/community'">Visit Community</button></div>
-        </div>
-      </section>
-
-      <div class="monday-section-head"><span>PAST BRIEFS</span><h2>Keep the words that move you.</h2><p>Visual reminders for the weeks when momentum needs rebuilding.</p></div>
-      <section class="monday-quote-grid">${arch}</section>
-    </div>`;
+  const archive = MONDAY.map((m,i) =>
+    '<section class="monday-feature monday-archive-feature">'
+    + '<div class="monday-feature-image"><img loading="lazy" decoding="async" src="'+images[i % images.length]+'" alt="Learners building skills together"></div>'
+    + '<div class="monday-feature-copy"><div class="monday-feature-meta"><span>'+esc(m.author)+'</span><b>MONDAY BRIEF '+String(i+1).padStart(2,'0')+'</b></div><h2>“'+esc(m.q)+'”</h2><blockquote>'+esc(m.body)+'</blockquote><p>Use this brief as a simple reminder to keep your learning rhythm realistic, consistent and connected to the career outcome you are building toward.</p></div>'
+    + '</section>'
+  ).join('');
+  $('#page').innerHTML =
+    '<div class="monday-premium">'
+    + '<header class="monday-hero"><div class="monday-hero-copy"><span class="monday-eyebrow">MONDAY MOTIVATIONS</span><h1>Start the week with direction, not pressure.</h1><p>Weekly encouragement for learners balancing work, life, study and the goal of becoming job ready.</p><div class="monday-week-focus"><span>THIS WEEK\\'S FOCUS</span><b>'+esc(MONDAY_FEATURED.title)+'</b></div></div><div class="monday-hero-image"><img loading="eager" decoding="async" src="https://images.unsplash.com/photo-1652971422886-784758cc28d7?auto=format&fit=crop&w=1600&q=88" alt="Professional learners collaborating"></div></header>'
+    + '<section class="monday-feature"><div class="monday-feature-image"><img loading="lazy" decoding="async" src="'+MONDAY_FEATURED.image+'" alt="Team motivation study"></div><div class="monday-feature-copy"><div class="monday-feature-meta"><span>ZEELIN ACADEMY LEADERSHIP</span><b>'+esc(MONDAY_FEATURED.badge)+'</b></div><h2>'+esc(MONDAY_FEATURED.title)+'</h2><blockquote>“'+esc(MONDAY_FEATURED.body)+'”</blockquote><p>Take 5 minutes today to map out your week, review the learning backlog if needed, and keep your pace realistic. You have got this.</p></div></section>'
+    + '<div class="monday-section-head"><span>PAST BRIEFS</span><h2>Keep the words that move you.</h2><p>Every brief now uses the same full visual treatment so previous motivation stays as useful and visible as this week’s message.</p></div>'
+    + '<div class="monday-archive-stack">'+archive+'</div>'
+    + '</div>';
   $('#page').addEventListener('click', backLink);
 }
-function fitStage(){ try{ document.body.style.zoom = ''; }catch(e){} }
+function fitStage()function fitStage(){ try{ document.body.style.zoom = ''; }catch(e){} }
 window.addEventListener('resize', fitStage);
 fitStage();
 window.addEventListener('hashchange', () => { route(); });
