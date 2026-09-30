@@ -73,3 +73,49 @@ body.approved-dashboard-route #main-content::-webkit-scrollbar-thumb:hover{backg
 .apd-project-select-grid[data-owned-count="1"]{grid-template-columns:minmax(0,1.25fr) minmax(320px,.75fr)!important}
 @media(max-width:1180px){.apd-project-select-grid,.apd-project-select-grid[data-owned-count="1"]{grid-template-columns:1fr!important}}
 @media(max-width:680px){.apd-project-select-grid{gap:12px!important}.apd-project-seq{top:10px;right:10px}}
+
+
+/* September 30: the dashboard must own a viewport-sized scroll container.
+   The base portal sets body/html overflow:hidden. Without a bounded
+   #main-content, the child can grow beyond .main and its scrollbar never appears. */
+@supports (height: 100dvh){
+  body.approved-dashboard-route .layout,
+  body.approved-dashboard-route .layout>.main{
+    height:100dvh!important;min-height:0!important;max-height:100dvh!important;
+  }
+  body.approved-dashboard-route #main-content{
+    height:100dvh!important;min-height:0!important;max-height:100dvh!important;
+  }
+}
+body.approved-dashboard-route .layout,
+body.approved-dashboard-route .layout>.main{
+  height:100vh;min-height:0!important;overflow:hidden!important;
+}
+body.approved-dashboard-route .layout>.main{display:flex!important;flex-direction:column!important}
+body.approved-dashboard-route #main-content{
+  display:block!important;flex:1 1 auto!important;
+  width:100%!important;min-width:0!important;
+  height:100vh;min-height:0!important;max-height:100vh;
+  overflow-x:hidden!important;overflow-y:scroll!important;
+  overscroll-behavior-y:contain!important;
+  scrollbar-width:thin!important;
+  scrollbar-color:#fff #d1dce8!important;
+  scrollbar-gutter:stable!important;
+}
+body.approved-dashboard-route #main-content::-webkit-scrollbar{width:12px!important}
+body.approved-dashboard-route #main-content::-webkit-scrollbar-track{
+  background:#d1dce8!important;
+  border-left:1px solid #becad7!important;
+}
+body.approved-dashboard-route #main-content::-webkit-scrollbar-thumb{
+  background:#fff!important;border:2px solid #8fa4bb!important;
+  border-radius:999px!important;min-height:46px!important;
+}
+body.approved-dashboard-route #main-content::-webkit-scrollbar-thumb:hover{
+  background:#f8fafc!important;border-color:#5c7b99!important;
+}
+@supports (height: 100dvh){
+  body.approved-dashboard-route #main-content{
+    height:100dvh!important;max-height:100dvh!important;
+  }
+}
