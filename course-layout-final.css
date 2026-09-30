@@ -732,3 +732,58 @@ body.premium-training.premium-route-monday #page#page .monday-archive-stack{disp
 body.premium-training .journey-strip{gap:11px!important;margin-top:16px!important}body.premium-training .jy-step{min-height:116px!important;position:relative!important;display:flex!important;align-items:flex-start!important;justify-content:flex-end!important;text-align:left!important;padding:17px 44px 16px 15px!important;border:1.5px solid #d7e2ed!important;border-radius:13px!important;background:linear-gradient(145deg,#ffffff,#f3f7fb)!important;overflow:hidden!important}body.premium-training .jy-step:before{content:"";position:absolute;left:0;top:0;bottom:0;width:5px;background:#244f78}body.premium-training .jy-step.done{background:linear-gradient(145deg,#fffaf0,#ffffff)!important;border-color:#dfc36f!important}body.premium-training .jy-step.done:before{background:#d4a02a}body.premium-training .jy-step .jy-dot{position:absolute!important;right:9px!important;top:9px!important;width:29px!important;height:29px!important;border-radius:8px!important;background:#eaf0f6!important;border:1px solid #cbd7e3!important;color:#234c72!important;margin:0!important}body.premium-training .jy-step.done .jy-dot{background:#071b33!important;border-color:#071b33!important;color:#f0c95b!important}body.premium-training .jy-step .jy-dot .sv{width:14px!important;height:14px!important}body.premium-training .jy-step .jy-txt{display:grid!important;gap:4px!important;align-self:flex-end}body.premium-training .jy-step b{font-size:14px!important;color:#0b2947!important}body.premium-training .jy-step em{font-size:9.5px!important;line-height:1.35!important;color:#6d7c90!important;font-weight:750!important}body.premium-training .jy-step.done em{color:#83620c!important}
 body.premium-training.premium-route-resources #page{width:100%!important;max-width:none!important;padding:18px var(--course-edge,22px) 40px!important;background:#fff!important}.training-resources-page{max-width:1400px;margin:0 auto;color:#07143a}.training-resources-head{padding:28px 30px;background:#071b33;color:#fff;border-bottom:5px solid #d4a02a}.training-resources-head>span{color:#edc75a;font-size:9px;font-weight:900;letter-spacing:1px}.training-resources-head h1{margin:6px 0 7px;font-size:32px}.training-resources-head p{max-width:850px;margin:0;color:#c7d4e0;font-size:11.5px}.training-resource-grid{display:grid;grid-template-columns:1fr 1fr;gap:1px;background:#d7e1eb;margin-top:14px}.training-resource-item{display:grid;grid-template-columns:180px 1fr;min-height:220px;background:#fff;overflow:hidden}.training-resource-item>img{width:100%;height:100%;object-fit:cover;background:#e9eef3;transition:transform .28s ease}.training-resource-item>div{padding:20px}.training-resource-item span{color:#936200;font-size:8px;font-weight:900;letter-spacing:.8px}.training-resource-item h2{margin:6px 0 7px;font-size:17px}.training-resource-item p{margin:0;color:#617187;font-size:10px;line-height:1.55}.training-resource-item a{display:inline-flex;align-items:center;gap:6px;margin-top:15px;color:#0d3153;text-decoration:none;font-size:9px;font-weight:900}.training-resource-item:hover img{transform:scale(1.035)}.training-resource-support{margin-top:14px;padding:22px 24px;background:#fff8e3;border:1px solid #dfc16d;display:flex;justify-content:space-between;align-items:center;gap:20px}.training-resource-support span{color:#8f6000;font-size:8px;font-weight:900}.training-resource-support h2{margin:4px 0;font-size:18px}.training-resource-support p{margin:0;color:#6f6859;font-size:9.5px}.training-resource-support>a{display:inline-flex;gap:6px;align-items:center;min-height:40px;padding:0 13px;background:#071b33;color:#fff;text-decoration:none;font-size:9px;font-weight:900}
 @media(max-width:900px){.training-resource-grid{grid-template-columns:1fr}.training-resource-support{align-items:flex-start;flex-direction:column}}@media(max-width:760px){body.premium-training.premium-route-board #page#page > .legacy-board-shell,body.premium-training.premium-route-community #page#page > .legacy-community-shell{padding:10px 4px 30px!important}.legacy-feed-heading{align-items:flex-start;flex-direction:column}.legacy-board-copy,.legacy-community-copy{padding-left:0}.legacy-community-post footer{margin-left:0}.legacy-composer-foot{padding-left:0}}@media(max-width:560px){.training-resource-item{grid-template-columns:1fr}.training-resource-item>img{height:180px}.training-resources-head{padding:22px 18px}}
+
+/* Profile journey readability: larger day numbers and full, legible titles. */
+body.premium-training.premium-route-profile .journey-strip{
+  grid-template-columns:repeat(7,minmax(0,1fr))!important;
+  gap:12px!important;
+  margin-top:20px!important;
+  align-items:stretch!important;
+}
+body.premium-training.premium-route-profile .journey-strip .jy-step{
+  box-sizing:border-box!important;
+  min-width:0!important;
+  min-height:154px!important;
+  padding:24px 12px 17px 17px!important;
+  justify-content:flex-end!important;
+}
+body.premium-training.premium-route-profile .journey-strip .jy-txt{
+  width:100%!important;
+  min-width:0!important;
+  display:flex!important;
+  flex-direction:column!important;
+  align-items:flex-start!important;
+  gap:9px!important;
+}
+body.premium-training.premium-route-profile .journey-strip .jy-txt b{
+  font-size:clamp(19px,1.35vw,24px)!important;
+  line-height:1.12!important;
+  font-weight:900!important;
+  letter-spacing:-.035em!important;
+  color:#0b2947!important;
+}
+body.premium-training.premium-route-profile .journey-strip .jy-txt em{
+  display:block!important;
+  max-width:100%!important;
+  font-size:clamp(13px,1vw,16px)!important;
+  line-height:1.35!important;
+  font-weight:850!important;
+  font-style:normal!important;
+  overflow-wrap:break-word!important;
+  color:#38506b!important;
+}
+body.premium-training.premium-route-profile .journey-strip .jy-step.done .jy-txt em{
+  color:#775507!important;
+}
+@media(max-width:1350px){
+  body.premium-training.premium-route-profile .journey-strip{grid-template-columns:repeat(4,minmax(0,1fr))!important}
+  body.premium-training.premium-route-profile .journey-strip .jy-txt b{font-size:23px!important}
+  body.premium-training.premium-route-profile .journey-strip .jy-txt em{font-size:16px!important}
+}
+@media(max-width:750px){
+  body.premium-training.premium-route-profile .journey-strip{grid-template-columns:repeat(2,minmax(0,1fr))!important}
+  body.premium-training.premium-route-profile .journey-strip .jy-step{min-height:140px!important}
+}
+@media(max-width:390px){
+  body.premium-training.premium-route-profile .journey-strip{grid-template-columns:minmax(0,1fr)!important}
+}
