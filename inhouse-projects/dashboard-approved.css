@@ -51,3 +51,25 @@ body.approved-dashboard-route #main-content::-webkit-scrollbar{width:12px!import
 body.approved-dashboard-route #main-content::-webkit-scrollbar-track{background:#dfe7f0!important}
 body.approved-dashboard-route #main-content::-webkit-scrollbar-thumb{background:#fff!important;border:2px solid #c6d2df!important;border-radius:999px!important;min-height:48px!important}
 body.approved-dashboard-route #main-content::-webkit-scrollbar-thumb:hover{background:#fff!important;border-color:#aebccc!important}
+
+
+/* Purchased-project dashboard: every demo purchase becomes a selectable project card */
+.apd-project-select-grid{
+  display:grid!important;
+  grid-template-columns:repeat(2,minmax(0,1fr))!important;
+  gap:18px!important;
+  align-items:stretch!important;
+}
+.apd-project-select-grid .apd-owned-project,
+.apd-project-select-grid .apd-market{min-width:0!important;height:100%!important}
+.apd-project-select-grid .apd-project-image{position:relative}
+.apd-project-seq{
+  position:absolute;top:16px;right:16px;padding:6px 9px;border-radius:7px;
+  background:rgba(7,27,51,.88);border:1px solid rgba(255,255,255,.22);color:#f0c95b;
+  font-size:9px;font-weight:900;letter-spacing:.65px
+}
+.apd-project-select-grid .apd-project{transition:transform .22s ease,box-shadow .22s ease,border-color .22s ease}
+.apd-project-select-grid .apd-project:hover{transform:translateY(-4px);box-shadow:0 18px 38px rgba(14,43,73,.12);border-color:#c8a64a!important}
+.apd-project-select-grid[data-owned-count="1"]{grid-template-columns:minmax(0,1.25fr) minmax(320px,.75fr)!important}
+@media(max-width:1180px){.apd-project-select-grid,.apd-project-select-grid[data-owned-count="1"]{grid-template-columns:1fr!important}}
+@media(max-width:680px){.apd-project-select-grid{gap:12px!important}.apd-project-seq{top:10px;right:10px}}

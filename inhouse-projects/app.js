@@ -380,19 +380,26 @@ function applyCheckinRewards(details){ if(state.lastCheckin === today()) return 
   const totalN = c ? c.MARKETPLACE_PROJECTS.length : 0;
   const streakDays = state.streak || 7;
   let docsPosted = 0; try{ docsPosted = vCountDocs(vTree()); }catch(e){}
-  const p = list[0] || (c && c.MARKETPLACE_PROJECTS ? c.MARKETPLACE_PROJECTS[0] : null);
-  const cat = p && c ? c.getCategory(p.category) : {short:'CORE BA'};
-  const title = p ? p.title : 'Choose your first Work Experience project';
-  const desc = p ? p.desc : 'Browse the project marketplace and add a practical project to your dashboard.';
-  const thumb = p && p.thumbnail ? p.thumbnail : 'assets/stock/confident.jpg';
-  const difficulty = p ? p.difficulty : 'Foundation';
-  const duration = p ? p.duration : '2 weeks';
-  const price = p ? (p.price===0?'Free':'£'+p.price) : 'Free';
-  const rating = p ? p.rating : '4.4';
-  const learners = p ? p.learners : '437';
-  const role = p ? p.jobRole : 'Business Analyst';
-  const projectId = p ? p.id : '';
-  const openAction = projectId ? "window._enterProject('"+projectId+"')" : "location.hash='#catalog'";
+
+  const projectCards = list.map(function(p,index){
+    const cat = p && c ? c.getCategory(p.category) : {short:'CORE BA'};
+    const thumb = p && p.thumbnail ? p.thumbnail : 'assets/stock/confident.jpg';
+    const difficulty = p ? p.difficulty : 'Foundation';
+    const duration = p ? p.duration : '2 weeks';
+    const price = p ? (p.price===0?'Free':'£'+p.price) : 'Free';
+    const rating = p ? p.rating : '4.4';
+    const learners = p ? p.learners : '437';
+    const role = p ? p.jobRole : 'Business Analyst';
+    const projectId = p ? p.id : '';
+    const openAction = projectId ? "window._enterProject('"+projectId+"')" : "location.hash='#catalog'";
+    return '<article class="apd-project apd-owned-project" data-project-id="'+esc(projectId)+'">'
+      +'<div class="apd-project-image" style="background-image:url(\''+String(thumb).replace(/'/g,"%27")+'\')"><div class="apd-project-tags"><span class="apd-tag gold">'+esc(cat.short||'CORE BA')+'</span><span class="apd-tag">'+esc(role)+'</span></div><div class="apd-project-seq">PROJECT '+String(index+1).padStart(2,'0')+'</div><div class="apd-rating"><b>★ '+esc(rating)+'</b> · '+esc(learners)+' learners</div></div>'
+      +'<div class="apd-project-body"><div class="apd-active"><i></i>OWNED · READY TO OPEN</div><h2>'+esc(p.title)+'</h2><p>'+esc(p.desc)+'</p>'
+      +'<div class="apd-modes"><span class="apd-mode supported">SUPPORTED INSIDE</span><span class="apd-mode mandate">MANDATE INSIDE</span><span class="apd-mode group">GROUP INSIDE</span></div>'
+      +'<div class="apd-facts"><div class="apd-fact"><span>Level</span><b>'+esc(difficulty)+'</b></div><div class="apd-fact"><span>Length</span><b>'+esc(duration)+'</b></div><div class="apd-fact"><span>Purchase</span><b style="color:#13835f">'+esc(price)+'</b></div></div>'
+      +'<div class="apd-actions"><button class="apd-btn primary" onclick="'+openAction+'">Open Project <svg viewBox="0 0 24 24"><path d="M5 12h14M13 6l6 6-6 6"/></svg></button><button class="apd-btn secondary" onclick="'+openAction+'">Project Details</button></div></div></article>';
+  }).join('');
+
 
   return `
   <div class="apd-dash">
@@ -420,11 +427,8 @@ function applyCheckinRewards(details){ if(state.lastCheckin === today()) return 
         <article class="apd-stat"><div class="apd-stat-ico"><svg viewBox="0 0 24 24"><rect x="3" y="5" width="14" height="14" rx="2"/><path d="m17 10 4-3v10l-4-3"/></svg></div><div><b>${list.length}</b><span style="color:#2f66b2">Projects Owned</span><small>Your active proof-of-work projects</small></div></article>
         <article class="apd-stat"><div class="apd-stat-ico"><svg viewBox="0 0 24 24"><path d="M5 3h10l4 4v14H5z"/><path d="M9 12h6M9 16h6"/></svg></div><div><b>${docsPosted}</b><span style="color:#13835f">Docs Posted</span><small>Documents and evidence stored in the portal</small></div></article>
       </section>
-      <section class="apd-grid">
-        <article class="apd-project">
-          <div class="apd-project-image" style="background-image:url('${String(thumb).replace(/'/g,"%27")}')"><div class="apd-project-tags"><span class="apd-tag gold">${esc(cat.short||'CORE BA')}</span><span class="apd-tag">${esc(role)}</span></div><div class="apd-rating"><b>★ ${esc(rating)}</b> · ${esc(learners)} learners</div></div>
-          <div class="apd-project-body"><div class="apd-active"><i></i>ACTIVE PROJECT</div><h2>${esc(title)}</h2><p>${esc(desc)}</p><div class="apd-modes"><span class="apd-mode supported">SUPPORTED INSIDE</span><span class="apd-mode mandate">MANDATE INSIDE</span><span class="apd-mode group">GROUP INSIDE</span></div><div class="apd-facts"><div class="apd-fact"><span>Level</span><b>${esc(difficulty)}</b></div><div class="apd-fact"><span>Length</span><b>${esc(duration)}</b></div><div class="apd-fact"><span>Price</span><b style="color:#13835f">${esc(price)}</b></div></div><div class="apd-actions"><button class="apd-btn primary" onclick="${openAction}">${projectId?'Open Project':'Choose Project'} <svg viewBox="0 0 24 24"><path d="M5 12h14M13 6l6 6-6 6"/></svg></button><button class="apd-btn secondary" onclick="${openAction}">Project Details</button></div></div>
-        </article>
+      <section class="apd-grid apd-project-select-grid" data-owned-count="${list.length}">
+        ${projectCards}
         <article class="apd-market"><div class="apd-market-icon"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 8v8M8 12h8"/></svg></div><span class="apd-eyebrow">PROJECT MARKETPLACE</span><h2>Get More Project</h2><p>Browse the existing project marketplace by job role and add more practical work-experience projects to this dashboard.</p><div class="apd-catalog"><strong>${totalN}</strong><span>Projects Available</span><div class="apd-catalog-meta"><div><b>7</b><small>Categories</small></div><div><b>5</b><small>Projects per role</small></div></div></div><button class="apd-btn primary" onclick="location.hash='#catalog'">Explore Project Shop</button></article>
       </section>
     </main>
@@ -436,7 +440,7 @@ function mpSetCart(a){ localStorage.setItem('zeelin_mp_cart', JSON.stringify(a))
 function mpAdd(id){ const c=mpCart(); if(c.includes(id)) return false; c.push(id); mpSetCart(c); return true }
 function mpRemove(id){ const c=mpCart().filter(x=>x!==id); mpSetCart(c) }
 function mpEnrolled(){ try{ const a=JSON.parse(localStorage.getItem('zeelin_mp_enrolled')||'[]'); const c=catalog(); if(c) return a.filter(id=>c.MARKETPLACE_PROJECTS.some(p=>p.id===id)); return a; }catch(e){return []} }
-function mpEnroll(ids){ const e=mpEnrolled(); const m=new Set([...e, ...ids]); localStorage.setItem('zeelin_mp_enrolled', JSON.stringify([...m])) }
+function mpEnroll(ids){ const e=myProjectIds(); const m=new Set([...e, ...ids]); localStorage.setItem('zeelin_mp_enrolled', JSON.stringify([...m])) }
 function mpPrice(p){ return p.price===0?'Free':'GBP '+p.price }
 function mpFind(id){ const c=catalog(); if(c){ const hit=c.MARKETPLACE_PROJECTS.find(p=>p.id===id); if(hit) return hit; } if(typeof MARKETPLACE_PROJECTS!=='undefined'){ const l=MARKETPLACE_PROJECTS.find(p=>p.id===id); if(l) return l; } return null;
 }
