@@ -144,3 +144,371 @@ body.premium-training .ts-side-card{box-shadow:0 9px 24px rgba(15,45,76,.05)!imp
  body.premium-training .ts-support-route-grid{grid-template-columns:1fr!important}
  body.premium-training.premium-route-support .ts-support-side{grid-template-columns:1fr!important}
 }
+
+
+/* =====================================================================
+   30 SEPT — FEED & RECORDINGS LAYOUT REPAIR
+   One authoritative route-specific composition after the older
+   experimental #page > div:first-child grids. All original feed
+   content, composer actions and recording filters remain unchanged.
+   ===================================================================== */
+
+/* The main column must own all space beside the independently sized sidebar. */
+body.premium-training:is(.premium-route-board,.premium-route-community,.premium-route-recordings)
+#shell.app>.shell-row>.content{
+  flex:1 1 auto!important;min-width:0!important;max-width:none!important;
+  width:auto!important;margin:0!important;overflow-x:clip!important;
+}
+body.premium-training:is(.premium-route-board,.premium-route-community,.premium-route-recordings)
+#shell.app>.shell-row>.content>#page#page{
+  box-sizing:border-box!important;display:block!important;
+  width:100%!important;max-width:none!important;min-width:0!important;
+  padding:14px clamp(12px,1.65vw,27px) 42px!important;
+  margin:0!important;overflow-x:clip!important;background:#f4f7fb!important;
+}
+
+/* Both feeds: no accidental grid imposed on the entire route root.
+   The only grid is the deliberately arranged collection of cards. */
+body.premium-training.premium-route-board #page#page>.legacy-board-shell,
+body.premium-training.premium-route-community #page#page>.legacy-community-shell{
+  display:flex!important;flex-direction:column!important;grid-template-columns:none!important;
+  align-items:stretch!important;gap:0!important;position:relative!important;
+  box-sizing:border-box!important;width:100%!important;max-width:none!important;
+  min-width:0!important;margin:0!important;padding:0 0 19px!important;
+  background:#fff!important;border:1.5px solid #d7e2ed!important;
+  border-radius:17px!important;overflow:hidden!important;
+  box-shadow:0 12px 32px rgba(15,45,76,.07)!important;
+}
+body.premium-training:is(.premium-route-board,.premium-route-community) #page#page
+:is(.legacy-board-shell,.legacy-community-shell)>*{
+  box-sizing:border-box!important;position:relative!important;
+  grid-area:auto!important;grid-column:auto!important;grid-row:auto!important;
+  flex-shrink:0!important;min-width:0!important;max-width:none!important;
+  width:100%!important;margin:0!important;transform:none!important;
+}
+
+/* Image-led banner, with WHITE foreground on an opaque navy overlay. */
+body.premium-training:is(.premium-route-board,.premium-route-community) #page#page
+:is(.legacy-board-shell,.legacy-community-shell)>.zf-route-banner{
+  display:block!important;flex:0 0 218px!important;
+  width:100%!important;height:218px!important;min-height:218px!important;
+  max-height:218px!important;margin:0!important;padding:0!important;
+  position:relative!important;overflow:hidden!important;border:0!important;
+  border-radius:0!important;background:#071b33!important;box-shadow:none!important;
+}
+body.premium-training:is(.premium-route-board,.premium-route-community) #page#page .zf-route-banner>img{
+  display:block!important;position:absolute!important;inset:0!important;
+  width:100%!important;height:100%!important;max-width:none!important;
+  border:0!important;border-radius:0!important;object-fit:cover!important;
+  object-position:center 43%!important;opacity:1!important;
+}
+body.premium-training:is(.premium-route-board,.premium-route-community) #page#page .zf-route-banner:after{
+  content:""!important;position:absolute!important;z-index:1!important;inset:0!important;
+  background:linear-gradient(90deg,rgba(7,27,51,.98) 0%,rgba(7,27,51,.94) 35%,rgba(7,27,51,.58) 65%,rgba(7,27,51,.18) 100%)!important;
+}
+body.premium-training:is(.premium-route-board,.premium-route-community) #page#page .zf-route-banner>div{
+  display:flex!important;flex-direction:column!important;justify-content:center!important;
+  align-items:flex-start!important;gap:5px!important;
+  position:absolute!important;z-index:2!important;inset:0 auto 0 0!important;
+  left:0!important;top:0!important;right:auto!important;bottom:0!important;
+  width:min(760px,68%)!important;max-width:68%!important;height:100%!important;
+  padding:20px clamp(20px,3vw,46px)!important;margin:0!important;
+  background:none!important;border:0!important;box-shadow:none!important;
+}
+body.premium-training:is(.premium-route-board,.premium-route-community) #page#page .zf-route-banner span{
+  display:block!important;color:#ffdc78!important;font-size:10px!important;
+  font-weight:900!important;letter-spacing:1.25px!important;line-height:1.3!important;
+}
+body.premium-training:is(.premium-route-board,.premium-route-community) #page#page .zf-route-banner h2{
+  display:block!important;margin:0!important;color:#fff!important;
+  font:800 clamp(25px,2.25vw,36px)/1.12 "Plus Jakarta Sans",Inter,sans-serif!important;
+  letter-spacing:-.55px!important;opacity:1!important;max-width:none!important;
+}
+body.premium-training:is(.premium-route-board,.premium-route-community) #page#page .zf-route-banner p{
+  display:block!important;margin:3px 0 0!important;color:#e0ebf5!important;
+  font-size:13px!important;line-height:1.5!important;font-weight:500!important;
+  max-width:610px!important;opacity:1!important;
+}
+
+/* The original heading is the section introduction, not a second hero column. */
+body.premium-training:is(.premium-route-board,.premium-route-community) #page#page
+:is(.legacy-board-shell,.legacy-community-shell)>.legacy-feed-heading{
+  display:flex!important;flex-direction:row!important;align-items:center!important;
+  justify-content:space-between!important;gap:16px!important;position:static!important;
+  flex:0 0 auto!important;max-width:none!important;
+  padding:19px clamp(18px,2vw,29px) 17px!important;margin:0!important;
+  border:0!important;border-bottom:1.5px solid #dce5ee!important;
+  background:#fff!important;border-radius:0!important;box-shadow:none!important;
+  text-align:left!important;
+}
+body.premium-training:is(.premium-route-board,.premium-route-community) #page#page .legacy-feed-heading>div{
+  display:block!important;flex:1 1 auto!important;min-width:0!important;
+  max-width:none!important;margin:0!important;padding:0!important;
+  background:none!important;border:0!important;box-shadow:none!important;
+}
+body.premium-training:is(.premium-route-board,.premium-route-community) #page#page .legacy-feed-heading h1{
+  color:#07143a!important;font-size:clamp(19px,1.55vw,25px)!important;
+  line-height:1.2!important;letter-spacing:-.4px!important;margin:3px 0 4px!important;
+}
+body.premium-training:is(.premium-route-board,.premium-route-community) #page#page .legacy-feed-heading p{
+  color:#52627a!important;font-size:12.5px!important;line-height:1.5!important;margin:0!important;
+}
+body.premium-training:is(.premium-route-board,.premium-route-community) #page#page .legacy-feed-heading span{
+  color:#936600!important;font-size:9px!important;font-weight:900!important;
+}
+
+/* Message Board: pinned announcement spans the full row;
+   remaining announcements form a balanced two-column set. */
+body.premium-training.premium-route-board #page#page .legacy-board-shell>.legacy-board-list{
+  display:grid!important;grid-template-columns:repeat(2,minmax(0,1fr))!important;
+  align-content:start!important;align-items:stretch!important;gap:13px!important;
+  width:100%!important;min-width:0!important;max-width:none!important;
+  padding:17px clamp(14px,1.6vw,24px) 0!important;margin:0!important;
+  background:#fff!important;border:0!important;border-radius:0!important;box-shadow:none!important;
+}
+body.premium-training.premium-route-board #page#page .legacy-board-list>.legacy-board-entry{
+  display:flex!important;flex-direction:column!important;justify-content:flex-start!important;
+  position:static!important;grid-column:auto!important;min-width:0!important;width:100%!important;
+  height:auto!important;min-height:180px!important;margin:0!important;
+  padding:18px 20px 20px!important;border:1.5px solid #d8e2ec!important;border-radius:14px!important;
+  background:#fff!important;box-shadow:0 5px 16px rgba(15,45,76,.045)!important;
+  overflow:visible!important;transform:none!important;transition:transform .2s,box-shadow .2s,border-color .2s!important;
+}
+body.premium-training.premium-route-board #page#page .legacy-board-list>.legacy-board-entry:first-child{
+  grid-column:1/-1!important;min-height:155px!important;
+  background:linear-gradient(110deg,#fff9eb,#fff)!important;border-color:#e4cd8c!important;
+}
+body.premium-training.premium-route-board #page#page .legacy-board-entry>.legacy-board-meta,
+body.premium-training.premium-route-community #page#page .legacy-community-post>header{
+  display:flex!important;flex-direction:row!important;justify-content:space-between!important;
+  align-items:center!important;width:100%!important;min-width:0!important;
+  padding:0!important;margin:0!important;background:none!important;border:0!important;box-shadow:none!important;
+}
+body.premium-training.premium-route-board #page#page .legacy-board-entry>.legacy-board-copy,
+body.premium-training.premium-route-community #page#page .legacy-community-post>.legacy-community-copy{
+  display:block!important;position:static!important;width:100%!important;
+  padding:14px 0 0!important;margin:0!important;background:none!important;
+  border:0!important;box-shadow:none!important;
+}
+body.premium-training.premium-route-board #page#page .legacy-board-copy h2,
+body.premium-training.premium-route-community #page#page .legacy-community-copy h2{
+  color:#0b2442!important;font:800 clamp(16px,1.3vw,21px)/1.3 "Plus Jakarta Sans",Inter,sans-serif!important;
+  overflow-wrap:anywhere!important;
+}
+body.premium-training.premium-route-board #page#page .legacy-board-copy p,
+body.premium-training.premium-route-community #page#page .legacy-community-copy p{
+  color:#576780!important;font-size:13px!important;line-height:1.65!important;
+  max-width:none!important;overflow-wrap:anywhere!important;
+}
+body.premium-training.premium-route-board #page#page .legacy-board-admin,
+body.premium-training.premium-route-community #page#page .legacy-community-person{
+  display:flex!important;flex-direction:row!important;align-items:center!important;gap:11px!important;
+  min-width:0!important;padding:0!important;margin:0!important;
+  background:none!important;border:0!important;box-shadow:none!important;
+}
+
+/* Community: compose at full width, then display dynamic posts as equal cards. */
+body.premium-training.premium-route-community #page#page .legacy-community-shell>.legacy-community-composer{
+  display:block!important;position:static!important;width:100%!important;max-width:none!important;
+  min-width:0!important;flex:0 0 auto!important;padding:20px clamp(14px,2vw,29px)!important;
+  margin:0!important;border:0!important;border-bottom:1.5px solid #dce5ee!important;
+  background:#f9fbfe!important;box-shadow:none!important;min-height:0!important;
+}
+body.premium-training.premium-route-community #page#page .legacy-composer-row{
+  display:flex!important;flex-direction:row!important;align-items:flex-start!important;
+  gap:13px!important;width:100%!important;margin:0!important;min-width:0!important;
+}
+body.premium-training.premium-route-community #page#page .legacy-composer-row>textarea{
+  display:block!important;flex:1 1 auto!important;min-width:0!important;width:100%!important;
+  height:auto!important;min-height:85px!important;max-width:none!important;
+  padding:13px 15px!important;margin:0!important;background:#fff!important;
+  border:1.5px solid #ccd9e6!important;border-radius:12px!important;
+  color:#07143a!important;font-size:13.5px!important;line-height:1.5!important;
+}
+body.premium-training.premium-route-community #page#page .legacy-composer-foot{
+  display:flex!important;align-items:center!important;justify-content:space-between!important;
+  gap:12px!important;margin:10px 0 0!important;padding:0 0 0 51px!important;width:100%!important;
+  background:none!important;border:0!important;
+}
+body.premium-training.premium-route-community #page#page .legacy-community-shell>.legacy-community-feed{
+  display:grid!important;grid-template-columns:repeat(2,minmax(0,1fr))!important;
+  gap:13px!important;align-content:start!important;align-items:stretch!important;
+  padding:17px clamp(14px,1.6vw,24px) 0!important;margin:0!important;
+  width:100%!important;min-width:0!important;max-width:none!important;
+  border:0!important;background:#fff!important;box-shadow:none!important;
+}
+body.premium-training.premium-route-community #page#page .legacy-community-feed>.legacy-community-post{
+  display:flex!important;flex-direction:column!important;justify-content:flex-start!important;
+  position:static!important;min-width:0!important;width:100%!important;
+  height:auto!important;min-height:220px!important;margin:0!important;
+  padding:19px 20px 17px!important;border:1.5px solid #d8e2ec!important;
+  border-radius:14px!important;background:#fff!important;
+  box-shadow:0 5px 16px rgba(15,45,76,.045)!important;
+  overflow:visible!important;transform:none!important;
+  transition:transform .2s,box-shadow .2s,border-color .2s!important;
+}
+body.premium-training.premium-route-community #page#page .legacy-community-post>footer{
+  display:flex!important;align-items:center!important;gap:16px!important;
+  margin:auto 0 0!important;padding:14px 0 0!important;
+  border:0!important;border-top:1px solid #e9eef5!important;
+  width:100%!important;background:none!important;
+}
+body.premium-training.premium-route-community #page#page .legacy-community-post>footer>button{
+  color:#6c7b90!important;min-height:32px!important;font-size:11px!important;
+}
+body.premium-training.premium-route-community #page#page .legacy-community-heading>button{
+  flex:0 0 auto!important;min-width:100px!important;min-height:39px!important;
+  background:linear-gradient(105deg,#f1d06e,#d4a02a)!important;
+  border:1px solid #c99a22!important;color:#071b33!important;
+  font-size:11px!important;font-weight:900!important;border-radius:10px!important;
+}
+
+/* Recordings: previous generic first-child selectors made the header a
+   grid cell on the left and the first recording a cell on the right. */
+body.premium-training.premium-route-recordings #page#page>.training-recordings-shell{
+  display:grid!important;grid-template-columns:repeat(2,minmax(0,1fr))!important;
+  gap:14px!important;align-content:start!important;align-items:stretch!important;
+  box-sizing:border-box!important;width:100%!important;max-width:none!important;
+  min-width:0!important;padding:0!important;margin:0!important;
+  background:transparent!important;border:0!important;box-shadow:none!important;
+}
+body.premium-training.premium-route-recordings #page#page .training-recordings-shell>.training-recordings-head{
+  display:flex!important;flex-direction:row!important;align-items:center!important;
+  justify-content:space-between!important;grid-column:1/-1!important;grid-row:auto!important;
+  width:100%!important;min-width:0!important;max-width:none!important;
+  min-height:116px!important;margin:0!important;padding:20px 24px!important;
+  background:#fff!important;border:1.5px solid #d7e2ed!important;border-radius:15px!important;
+  box-shadow:0 7px 20px rgba(15,45,76,.04)!important;transform:none!important;
+}
+body.premium-training.premium-route-recordings #page#page .training-recordings-head>div{
+  flex:1 1 auto!important;min-width:0!important;width:auto!important;max-width:none!important;
+  margin:0!important;padding:0!important;background:none!important;border:0!important;box-shadow:none!important;
+}
+body.premium-training.premium-route-recordings #page#page .training-recordings-head h1{
+  color:#07143a!important;font-size:clamp(24px,2.1vw,33px)!important;line-height:1.16!important;
+}
+body.premium-training.premium-route-recordings #page#page .training-recordings-head p{
+  color:#61728a!important;font-size:13px!important;line-height:1.5!important;
+}
+body.premium-training.premium-route-recordings #page#page .training-recordings-filter{
+  flex:0 0 auto!important;width:190px!important;min-height:43px!important;
+  background:#fff!important;border:1.5px solid #cfdbe7!important;color:#213c5b!important;
+  border-radius:10px!important;font-size:12px!important;
+}
+body.premium-training.premium-route-recordings #page#page .training-recordings-shell>.training-recording-card{
+  display:flex!important;flex-direction:column!important;justify-content:flex-start!important;
+  grid-column:auto!important;grid-row:auto!important;min-width:0!important;
+  width:100%!important;height:auto!important;min-height:370px!important;
+  margin:0!important;padding:0!important;background:#fff!important;
+  border:1.5px solid #d7e2ed!important;border-radius:16px!important;
+  box-shadow:0 9px 25px rgba(15,45,76,.065)!important;
+  overflow:hidden!important;transform:none!important;
+  transition:transform .22s,box-shadow .22s,border-color .22s!important;
+}
+body.premium-training.premium-route-recordings #page#page .training-recording-card>.training-recording-thumb{
+  position:relative!important;flex:0 0 205px!important;
+  height:205px!important;min-height:205px!important;max-height:205px!important;
+  display:block!important;width:100%!important;min-width:0!important;
+  padding:0!important;margin:0!important;overflow:hidden!important;
+  background:#12304d!important;border:0!important;border-radius:0!important;
+}
+body.premium-training.premium-route-recordings #page#page .training-recording-thumb>img{
+  position:absolute!important;inset:0!important;display:block!important;
+  width:100%!important;height:100%!important;max-width:none!important;
+  object-fit:cover!important;border:0!important;border-radius:0!important;
+}
+body.premium-training.premium-route-recordings #page#page .training-recording-card>.training-recording-body{
+  display:flex!important;flex:1 1 auto!important;flex-direction:column!important;
+  align-items:stretch!important;justify-content:flex-start!important;
+  position:static!important;min-width:0!important;width:100%!important;
+  margin:0!important;padding:19px 21px 22px!important;
+  background:#fff!important;border:0!important;border-radius:0!important;
+  box-shadow:none!important;
+}
+body.premium-training.premium-route-recordings #page#page .training-recording-meta{
+  display:flex!important;align-items:center!important;flex-wrap:wrap!important;
+  gap:8px!important;width:100%!important;min-width:0!important;
+  margin:0!important;padding:0!important;background:none!important;border:0!important;
+}
+body.premium-training.premium-route-recordings #page#page .training-recording-body h2{
+  display:block!important;color:#07143a!important;font-size:20px!important;
+  line-height:1.28!important;letter-spacing:-.4px!important;
+  margin:13px 0 8px!important;overflow-wrap:anywhere!important;
+}
+body.premium-training.premium-route-recordings #page#page .training-recording-body p{
+  color:#66758c!important;font-size:12.5px!important;line-height:1.5!important;
+}
+body.premium-training.premium-route-recordings #page#page .training-recording-actions{
+  margin:auto 0 0!important;padding:17px 0 0!important;display:flex!important;gap:9px!important;
+}
+body.premium-training.premium-route-recordings #page#page .training-recording-actions .btn{
+  min-height:42px!important;padding:0 17px!important;
+  border-radius:10px!important;font-size:12px!important;font-weight:850!important;
+  background:linear-gradient(110deg,#ecc863,#d4a02a)!important;color:#071b33!important;
+  border:1px solid #c89c2c!important;
+}
+
+/* Hover feedback, without ghost preview overlays or page reflow. */
+@media(hover:hover){
+  body.premium-training:is(.premium-route-board,.premium-route-community) #page#page
+  :is(.legacy-board-entry,.legacy-community-post):hover{
+    transform:translateY(-3px)!important;border-color:#d0ae55!important;
+    box-shadow:0 13px 26px rgba(24,51,86,.12)!important;
+  }
+  body.premium-training.premium-route-recordings #page#page .training-recording-card:hover{
+    transform:translateY(-3px)!important;border-color:#d0ae55!important;
+    box-shadow:0 14px 28px rgba(24,51,86,.12)!important;
+  }
+}
+
+/* Breakpoints follow available content space as the sidebar opens/closes. */
+@media(max-width:1250px){
+  body.premium-training.premium-route-board #page#page .legacy-board-shell>.legacy-board-list,
+  body.premium-training.premium-route-community #page#page .legacy-community-shell>.legacy-community-feed{
+    grid-template-columns:1fr!important;
+  }
+}
+@media(max-width:850px){
+  body.premium-training.premium-route-recordings #page#page>.training-recordings-shell{
+    grid-template-columns:1fr!important;
+  }
+  body.premium-training.premium-route-recordings #page#page .training-recordings-shell>.training-recordings-head{
+    flex-wrap:wrap!important;min-height:0!important;gap:15px!important;
+  }
+  body.premium-training.premium-route-recordings #page#page .training-recordings-filter{width:min(100%,260px)!important;}
+}
+@media(max-width:720px){
+  body.premium-training:is(.premium-route-board,.premium-route-community) #page#page .zf-route-banner{
+    height:180px!important;min-height:180px!important;max-height:180px!important;
+  }
+  body.premium-training:is(.premium-route-board,.premium-route-community) #page#page .zf-route-banner>div{
+    width:100%!important;max-width:100%!important;padding:14px 19px!important;
+  }
+  body.premium-training:is(.premium-route-board,.premium-route-community) #page#page .zf-route-banner:after{
+    background:rgba(7,27,51,.83)!important;
+  }
+  body.premium-training:is(.premium-route-board,.premium-route-community) #page#page .zf-route-banner h2{
+    font-size:clamp(21px,5.2vw,28px)!important;
+  }
+  body.premium-training:is(.premium-route-board,.premium-route-community) #page#page .zf-route-banner p{
+    font-size:11px!important;
+  }
+  body.premium-training:is(.premium-route-board,.premium-route-community) #page#page .legacy-feed-heading{
+    align-items:flex-start!important;flex-direction:column!important;
+    padding:17px 17px 15px!important;
+  }
+  body.premium-training.premium-route-community #page#page .legacy-composer-foot{
+    padding-left:0!important;
+  }
+  body.premium-training:is(.premium-route-board,.premium-route-community) #page#page
+  :is(.legacy-board-list,.legacy-community-feed){
+    padding-left:12px!important;padding-right:12px!important;
+  }
+}
+@media(prefers-reduced-motion:reduce){
+  body.premium-training:is(.premium-route-board,.premium-route-community) #page#page
+  :is(.legacy-board-entry,.legacy-community-post),
+  body.premium-training.premium-route-recordings #page#page .training-recording-card{
+    transition:none!important;
+  }
+}
