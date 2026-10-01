@@ -119,3 +119,19 @@ body.approved-dashboard-route #main-content::-webkit-scrollbar-thumb:hover{
     height:100dvh!important;max-height:100dvh!important;
   }
 }
+
+/* Shared Work Experience top navigation on project pages (marketplace keeps its own header). */
+.apd-topbar,.apd-notif-panel{
+  --ad-navy:#071b33;--ad-ink:#07143a;--ad-muted:#66748a;--ad-gold:#d4a02a;--ad-gold2:#ecc863;
+  --ad-gold3:#8b6f00;--ad-line:#dbe4ee;--ad-bg:#f3f6fa;--ad-green:#13835f;--ad-blue:#2f66b2;
+  --ad-shadow:0 14px 34px rgba(20,46,79,.10);--ad-shadow2:0 24px 56px rgba(13,37,69,.16);
+}
+body:not(.approved-dashboard-route) .apd-project-topbar{
+  width:100%;box-sizing:border-box;flex:0 0 auto;
+}
+body.approved-project-route #main-content,
+body.approved-docs-route #main-content,
+body.approved-editor-route #main-content,
+body.approved-modes-route #main-content{
+  position:relative;
+}
