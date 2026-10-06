@@ -1334,52 +1334,52 @@ function renderVideos() {
   const course = COURSES.find((c) => c.days.includes(STATE.day)) || COURSES[0];
   $('#page').innerHTML = `
     ${backBtn()}
-    <div class="video-progress-card" style="background-color:#181818;border:1px solid #2a2a2a;border-radius:12px;padding:14px 24px;margin-bottom:18px;">
-      <div class="video-progress-main">
-        <svg style="width:18px;height:18px;fill:#d97706;flex:0 0 auto;" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
-        <span class="video-progress-label">Video Tutorials Completion Progress</span>
-        <div class="video-progress-track">
+    <div style="background-color:#181818;border:1px solid #2a2a2a;border-radius:12px;padding:14px 24px;display:flex;align-items:center;justify-content:space-between;gap:20px;margin-bottom:18px;">
+      <div style="display:flex;align-items:center;gap:12px;flex:1;">
+        <svg style="width:18px;height:18px;fill:#d97706;" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
+        <span style="font-size:13px;font-weight:600;color:#ffffff;white-space:nowrap;">Video Tutorials Completion Progress</span>
+        <div style="flex:1;max-width:400px;height:8px;background-color:#262626;border-radius:4px;overflow:hidden;">
           <div style="width:${pct}%;height:100%;background:linear-gradient(90deg,#f59e0b 0%,#16a34a 100%);border-radius:4px;"></div>
         </div>
       </div>
-      <div class="video-progress-stats">
+      <div style="display:flex;align-items:center;gap:12px;font-size:12px;color:#a3a3a3;">
         <span>${seen} of ${list.length} Watched</span>
         <span style="color:#16a34a;font-weight:700;">${pct}% Completed</span>
       </div>
     </div>
-    <div class="video-section-heading" style="margin-bottom:24px;border-bottom:1px solid #2a2a2a;padding-bottom:16px;">
+    <div style="margin-bottom:24px;border-bottom:1px solid #2a2a2a;padding-bottom:16px;">
       <h1 style="font-size:24px;font-weight:700;color:#ffffff;margin:0 0 4px 0;">Video Tutorials Section</h1>
       <p style="font-size:13px;color:#a3a3a3;margin:0;">${esc(course.title)} &bull; Expert Video Walkthroughs</p>
     </div>
-    <div class="video-library-grid">
+    <div class="video-library-responsive">
       ${list.map((v, idx) => {
     const done = !!STATE.doneVideo[v.id];
     const num = String(idx + 1).padStart(2, '0');
     const mins = v.dur.includes(':') ? v.dur : v.dur;
-    return `<article class="video-row video-card">
-        <div class="thumb-wrap video-card-media">
+    return `<div class="video-row">
+        <div class="thumb-wrap">
           <img loading="lazy" decoding="async" src="${v.thumb}" alt="" />
           <div style="position:absolute;inset:0;background:${done ? 'rgba(0,0,0,0.3)' : 'rgba(0,0,0,0.4)'};display:flex;align-items:center;justify-content:center;">
-            <div style="width:42px;height:42px;background-color:${done ? '#16a34a' : '#d97706'};border-radius:50%;display:flex;align-items:center;justify-content:center;box-shadow:0 6px 18px rgba(0,0,0,.24);">
-              <svg style="width:17px;height:17px;fill:white;margin-left:2px;" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
+            <div style="width:32px;height:32px;background-color:${done ? '#16a34a' : '#d97706'};border-radius:50%;display:flex;align-items:center;justify-content:center;">
+              <svg style="width:14px;height:14px;fill:white;margin-left:1px;" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
             </div>
           </div>
         </div>
-        <div class="video-card-body">
-          <div class="video-card-meta">
-            <span style="font-size:11px;background-color:${done ? '#14532d' : '#382818'};color:${done ? '#4ade80' : '#d97706'};padding:3px 7px;border-radius:4px;font-weight:700;">${done ? 'Watched' : 'Pending'}</span>
+        <div style="flex:1;">
+          <div style="display:flex;align-items:center;gap:8px;margin-bottom:4px;">
+            <span style="font-size:11px;background-color:${done ? '#14532d' : '#382818'};color:${done ? '#4ade80' : '#d97706'};padding:2px 6px;border-radius:4px;font-weight:600;">${done ? 'Watched' : 'Pending'}</span>
             <span style="font-size:12px;color:#737373;">Duration: ${esc(mins)}</span>
           </div>
-          <h3>${num}. ${esc(v.title)}</h3>
-          <p>${esc(v.takeaway || v.chapter)}</p>
+          <h3 style="font-size:16px;font-weight:600;color:#ffffff;margin:0 0 6px 0;">${num}. ${esc(v.title)}</h3>
+          <p style="font-size:13px;color:#a3a3a3;margin:0;">${esc(v.takeaway || v.chapter)}</p>
         </div>
-        <div class="video-card-actions">
-          <label class="video-card-check" style="color:${done ? '#4ade80' : '#a3a3a3'};">
+        <div style="display:flex;align-items:center;gap:16px;flex-shrink:0;">
+          <label style="display:flex;align-items:center;gap:6px;font-size:12px;color:${done ? '#4ade80' : '#a3a3a3'};font-weight:500;cursor:pointer;">
             <input type="checkbox" ${done ? 'checked disabled' : ''} style="accent-color:${done ? '#16a34a' : '#d97706'};width:16px;height:16px;"> ${done ? 'Completed' : 'Mark Done'}
           </label>
-          <button class="video-card-cta" data-watch="${v.id}" style="${done ? 'background-color:#262626;color:#d4d4d4;border:1px solid #333333;' : 'background:linear-gradient(135deg,#f59e0b 0%,#d97706 100%);color:#ffffff;border:none;'}">${done ? 'Replay' : '<svg style="width:12px;height:12px;fill:white;" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg><span>Watch Tutorial</span>'}</button>
+          <button data-watch="${v.id}" style="${done ? 'background-color:#262626;color:#d4d4d4;border:1px solid #333333;padding:8px 16px;border-radius:6px;font-size:12px;font-weight:600;cursor:pointer;' : 'background:linear-gradient(135deg,#f59e0b 0%,#d97706 100%);color:#ffffff;border:none;padding:8px 18px;border-radius:6px;font-size:12px;font-weight:700;cursor:pointer;display:flex;align-items:center;gap:6px;'}">${done ? 'Replay' : '<svg style="width:12px;height:12px;fill:white;" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg><span>Watch Tutorial</span>'}</button>
         </div>
-      </article>`;
+      </div>`;
   }).join('')}
     </div>`;
   $('#page').addEventListener('click', (e) => {
