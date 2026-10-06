@@ -512,3 +512,201 @@ body.premium-training.premium-route-recordings #page#page .training-recording-ac
     transition:none!important;
   }
 }
+
+
+/* ============================================================
+   VIDEO TUTORIALS + WATCH PAGE — FLUID RESPONSIVENESS
+   Uses available content width, not assumptions about monitor size.
+   ============================================================ */
+body.premium-training.premium-route-videos #page#page,
+body.premium-training.premium-route-watch #page#page{
+  width:100%!important;
+  max-width:1440px!important;
+  min-width:0!important;
+  box-sizing:border-box!important;
+}
+
+/* Progress header can wrap instead of squeezing the title into one-word lines. */
+body.premium-training:is(.premium-route-videos,.premium-route-watch) #page#page>.back-nav+div{
+  display:flex!important;
+  flex-wrap:wrap!important;
+  align-items:center!important;
+  gap:12px 18px!important;
+  min-width:0!important;
+}
+body.premium-training:is(.premium-route-videos,.premium-route-watch) #page#page>.back-nav+div>div{
+  min-width:0!important;
+  flex-wrap:wrap!important;
+}
+body.premium-training:is(.premium-route-videos,.premium-route-watch) #page#page>.back-nav+div [style*="white-space:nowrap"]{
+  white-space:normal!important;
+}
+
+/* Video library: cards choose their own column count from the REAL page width. */
+body.premium-training.premium-route-videos #page#page>div:last-child{
+  display:grid!important;
+  grid-template-columns:repeat(auto-fit,minmax(min(100%,420px),1fr))!important;
+  gap:18px!important;
+  width:100%!important;
+  min-width:0!important;
+  align-items:stretch!important;
+}
+body.premium-training.premium-route-videos #page#page .video-row{
+  display:grid!important;
+  grid-template-columns:minmax(0,1fr)!important;
+  grid-template-rows:auto 1fr auto!important;
+  width:100%!important;
+  min-width:0!important;
+  height:100%!important;
+  gap:0!important;
+  padding:0!important;
+  overflow:hidden!important;
+  border-radius:20px!important;
+  box-sizing:border-box!important;
+}
+body.premium-training.premium-route-videos #page#page .video-row .thumb-wrap{
+  position:relative!important;
+  width:100%!important;
+  height:auto!important;
+  min-height:0!important;
+  aspect-ratio:16/9!important;
+  border-radius:0!important;
+  overflow:hidden!important;
+}
+body.premium-training.premium-route-videos #page#page .video-row .thumb-wrap img{
+  width:100%!important;
+  height:100%!important;
+  display:block!important;
+  object-fit:cover!important;
+  border-radius:0!important;
+}
+body.premium-training.premium-route-videos #page#page .video-row>div:nth-child(2){
+  min-width:0!important;
+  width:100%!important;
+  padding:20px 20px 9px!important;
+  box-sizing:border-box!important;
+}
+body.premium-training.premium-route-videos #page#page .video-row>div:nth-child(2)>div:first-child{
+  display:flex!important;
+  flex-wrap:wrap!important;
+  align-items:center!important;
+  gap:7px 9px!important;
+}
+body.premium-training.premium-route-videos #page#page .video-row h3{
+  width:100%!important;
+  max-width:none!important;
+  margin:8px 0 8px!important;
+  font-size:clamp(18px,1.4vw,22px)!important;
+  line-height:1.3!important;
+  font-weight:800!important;
+  word-break:normal!important;
+  overflow-wrap:break-word!important;
+}
+body.premium-training.premium-route-videos #page#page .video-row p{
+  min-height:0!important;
+  max-width:none!important;
+  font-size:13.5px!important;
+  line-height:1.6!important;
+  word-break:normal!important;
+  overflow-wrap:break-word!important;
+}
+body.premium-training.premium-route-videos #page#page .video-row>div:nth-child(3){
+  width:100%!important;
+  min-width:0!important;
+  padding:12px 20px 20px!important;
+  display:flex!important;
+  flex-wrap:wrap!important;
+  align-items:center!important;
+  justify-content:space-between!important;
+  gap:10px 14px!important;
+  box-sizing:border-box!important;
+}
+body.premium-training.premium-route-videos #page#page .video-row>div:nth-child(3) label{
+  min-width:0!important;
+  white-space:normal!important;
+}
+body.premium-training.premium-route-videos #page#page .video-row [data-watch]{
+  flex:0 0 auto!important;
+  min-height:40px!important;
+  white-space:nowrap!important;
+}
+
+/* Watch page: main player and playlist wrap according to available content width. */
+body.premium-training.premium-route-watch #page#page .watch-layout{
+  display:flex!important;
+  flex-wrap:wrap!important;
+  align-items:flex-start!important;
+  gap:20px!important;
+  width:100%!important;
+  min-width:0!important;
+}
+body.premium-training.premium-route-watch #page#page .watch-layout>div:first-child{
+  flex:999 1 620px!important;
+  min-width:min(100%,520px)!important;
+  width:auto!important;
+}
+body.premium-training.premium-route-watch #page#page .watch-layout>div:last-child{
+  flex:1 1 300px!important;
+  width:auto!important;
+  min-width:min(100%,280px)!important;
+  max-width:360px!important;
+  position:static!important;
+}
+body.premium-training.premium-route-watch #page#page .watch-layout>div:first-child>div>div:first-child{
+  width:100%!important;
+  height:auto!important;
+  min-height:300px!important;
+  aspect-ratio:16/9!important;
+}
+body.premium-training.premium-route-watch #page#page .watch-layout>div:first-child>div>div:nth-child(2){
+  min-width:0!important;
+  padding:clamp(22px,2.5vw,36px)!important;
+}
+body.premium-training.premium-route-watch #page#page .watch-layout h1,
+body.premium-training.premium-route-watch #page#page .watch-layout p{
+  overflow-wrap:break-word!important;
+  word-break:normal!important;
+}
+
+/* Tablet / narrow content: one card per row and full-width playlist. */
+@media(max-width:980px){
+  body.premium-training.premium-route-videos #page#page>div:last-child{
+    grid-template-columns:1fr!important;
+  }
+  body.premium-training.premium-route-watch #page#page .watch-layout>div:first-child{
+    min-width:100%!important;
+  }
+  body.premium-training.premium-route-watch #page#page .watch-layout>div:last-child{
+    flex-basis:100%!important;
+    width:100%!important;
+    min-width:0!important;
+    max-width:none!important;
+  }
+}
+
+/* Phone: actions stack cleanly and media stays proportional. */
+@media(max-width:620px){
+  body.premium-training:is(.premium-route-videos,.premium-route-watch) #page#page>.back-nav+div{
+    align-items:flex-start!important;
+    flex-direction:column!important;
+  }
+  body.premium-training:is(.premium-route-videos,.premium-route-watch) #page#page>.back-nav+div>div{
+    width:100%!important;
+  }
+  body.premium-training.premium-route-videos #page#page .video-row>div:nth-child(2){
+    padding:16px 16px 8px!important;
+  }
+  body.premium-training.premium-route-videos #page#page .video-row>div:nth-child(3){
+    padding:10px 16px 16px!important;
+    align-items:stretch!important;
+    flex-direction:column!important;
+  }
+  body.premium-training.premium-route-videos #page#page .video-row [data-watch]{
+    width:100%!important;
+    justify-content:center!important;
+  }
+  body.premium-training.premium-route-watch #page#page .watch-layout>div:first-child>div>div:first-child{
+    min-height:0!important;
+    aspect-ratio:16/9!important;
+  }
+}
